@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>Levrum.Utils</PackageId>
+    <Version>0.0.1</Version>
+    <Authors>Carl Niedner, Kevin M. Kelly</Authors>
+    <Company>Levrum Data Technologies</Company>
   </PropertyGroup>
 
 </Project>

@@ -4,21 +4,10 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Levrum.DataClasses</RootNamespace>
     <AssemblyName>Levrum.DataClasses</AssemblyName>
+    <PackageId>Levrum.DataClasses</PackageId>
+    <Version>0.0.1</Version>
+    <Authors>Kevin M. Kelly</Authors>
+    <Company>Levrum Data Technologies</Company>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="DataAggregators.Test\**" />
-    <Compile Remove="DataAggregators\**" />
-    <Compile Remove="DataClasses.Test\**" />
-    <Compile Remove="packages\**" />
-    <EmbeddedResource Remove="DataAggregators.Test\**" />
-    <EmbeddedResource Remove="DataAggregators\**" />
-    <EmbeddedResource Remove="DataClasses.Test\**" />
-    <EmbeddedResource Remove="packages\**" />
-    <None Remove="DataAggregators.Test\**" />
-    <None Remove="DataAggregators\**" />
-    <None Remove="DataClasses.Test\**" />
-    <None Remove="packages\**" />
-  </ItemGroup>
 
 </Project>
