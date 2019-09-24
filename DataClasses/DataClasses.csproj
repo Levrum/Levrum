@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Levrum.DataClasses</RootNamespace>
+    <AssemblyName>Levrum.DataClasses</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="DataAggregators.Test\**" />
+    <Compile Remove="DataAggregators\**" />
+    <Compile Remove="DataClasses.Test\**" />
+    <Compile Remove="packages\**" />
+    <EmbeddedResource Remove="DataAggregators.Test\**" />
+    <EmbeddedResource Remove="DataAggregators\**" />
+    <EmbeddedResource Remove="DataClasses.Test\**" />
+    <EmbeddedResource Remove="packages\**" />
+    <None Remove="DataAggregators.Test\**" />
+    <None Remove="DataAggregators\**" />
+    <None Remove="DataClasses.Test\**" />
+    <None Remove="packages\**" />
+  </ItemGroup>
+
+</Project>

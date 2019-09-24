@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <AssemblyName>Levrum.DataAggregators.Test</AssemblyName>
+    <RootNamespace>Levrum.DataAggregators.Test</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataAggregators\DataAggregators.csproj" />
+    <ProjectReference Include="..\DataClasses.csproj" />
+  </ItemGroup>
+
+</Project>
