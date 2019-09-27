@@ -1,0 +1,76 @@
+﻿<Window x:Class="Levrum.DataBridge.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DataBridge"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
+        mc:Ignorable="d"
+        Title="Levrum DataBridge" Height="700" Width="1368" Icon="databridge.ico">
+    <Window.CommandBindings>
+        <CommandBinding Command="New" Executed="NewMenuItem_Click"/>
+        <CommandBinding Command="Open" Executed="OpenMenuItem_Click"/>
+        <CommandBinding Command="Save" Executed="SaveMenuItem_Click"/>
+        <CommandBinding Command="Close" Executed="CloseMenuItem_Click"/>
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Key="N" Modifiers="Control" Command="New"/>
+        <KeyBinding Key="O" Modifiers="Control" Command="Open"/>
+        <KeyBinding Key="S" Modifiers="Control" Command="Save"/>
+        <KeyBinding Key="W" Modifiers="Control" Command="Close"/>
+    </Window.InputBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="22" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+            <Menu Grid.Row="0" Height="20">
+                <MenuItem Header="_File" IsTabStop="False">
+                    <MenuItem Header="_New" Click="NewMenuItem_Click"/>
+                    <MenuItem Header="_Open..." Click="OpenMenuItem_Click"/>
+                    <Separator/>
+                    <MenuItem Header="_Close" Click="CloseMenuItem_Click"/>
+                    <Separator/>
+                    <MenuItem Name="SaveMenuItem" Header="_Save" Click="SaveMenuItem_Click" IsEnabled="false"/>
+                    <MenuItem Name="SaveAsMenuItem" Header="Save _As..." Click="SaveAsMenuItem_Click" IsEnabled="false"/>
+                    <Separator/>
+                    <MenuItem Header="E_xit" Click="ExitMenuItem_Click"/>
+                </MenuItem>
+                <MenuItem Header="_Edit" IsTabStop="False">
+                    
+                </MenuItem>
+                <MenuItem Header="_Tools" IsTabStop="False">
+                </MenuItem>
+                <MenuItem Header="_Help" IsTabStop="False">
+                    <MenuItem Header="_About"/>
+                </MenuItem>
+            </Menu>
+        <xcad:DockingManager Grid.Row="1">
+            <xcad:DockingManager.Theme>
+                <xcad:Vs2013LightTheme/>
+            </xcad:DockingManager.Theme>
+            <xcad:DockingManager.DocumentHeaderTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{Binding IconSource}" Margin="0,0,4,0"/>
+                        <TextBlock Text="{Binding Title}" />
+                    </StackPanel>
+                </DataTemplate>
+            </xcad:DockingManager.DocumentHeaderTemplate>
+            <xcad:LayoutRoot x:Name="_layoutRoot">
+                <xcad:LayoutPanel Orientation="Vertical">
+                    <xcad:LayoutDocumentPaneGroup >
+                        <xcad:LayoutDocumentPane x:Name="DocumentPane" PropertyChanged="DocumentPane_PropertyChanged">
+                        </xcad:LayoutDocumentPane>
+                    </xcad:LayoutDocumentPaneGroup >
+                    <xcad:LayoutAnchorablePane DockHeight="200">
+                        <xcad:LayoutAnchorable ContentId="sources" Title="Data Sources" CanHide="False" CanClose="False"
+                                            AutoHideWidth="240">
+                        </xcad:LayoutAnchorable>
+                    </xcad:LayoutAnchorablePane>
+                </xcad:LayoutPanel>
+            </xcad:LayoutRoot>
+        </xcad:DockingManager>
+    </Grid>
+</Window>

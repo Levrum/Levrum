@@ -2,14 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>Levrum.DataClasses</RootNamespace>
-    <AssemblyName>Levrum.DataClasses</AssemblyName>
+    <AssemblyName>Levrum.Data.Map</AssemblyName>
+    <RootNamespace>Levrum.Data.Map</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>Levrum.DataClasses</PackageId>
+    <PackageId>Levrum.Data.Map</PackageId>
     <Version>0.0.1</Version>
     <Authors>Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
 
 </Project>

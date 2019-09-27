@@ -5,9 +5,6 @@ using System.Reflection;
 
 namespace Levrum.Utils.Geometry
 {
-
-
-
     public class LineSegment2 : ICloneable
     {
         public LineSegment2(Point2 oPointA, Point2 oPointB)
