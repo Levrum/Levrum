@@ -5,6 +5,11 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <RootNamespace>Levrum.DataBridge</RootNamespace>
+    <Version>0.0.1</Version>
+    <Authors>Kevin M. Kelly</Authors>
+    <Company>Levrum Data Technologies</Company>
+    <PackageId>Levrum.DataBridge</PackageId>
+    <Copyright>(c) 2019 Levrum Data Technologies</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +25,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataMap\DataMap.csproj" />
+    <ProjectReference Include="..\DataSources\DataSources.csproj" />
+    <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>

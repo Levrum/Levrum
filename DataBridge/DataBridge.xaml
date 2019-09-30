@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DataBridge"
+        xmlns:local="clr-namespace:Levrum.DataBridge"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
         mc:Ignorable="d"
@@ -67,6 +67,7 @@
                     <xcad:LayoutAnchorablePane DockHeight="200">
                         <xcad:LayoutAnchorable ContentId="sources" Title="Data Sources" CanHide="False" CanClose="False"
                                             AutoHideWidth="240">
+                            <local:DataSourcesList x:Name="DataSources" Margin="0,0,0,0" IsEnabled="false"/>
                         </xcad:LayoutAnchorable>
                     </xcad:LayoutAnchorablePane>
                 </xcad:LayoutPanel>

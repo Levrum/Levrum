@@ -10,6 +10,7 @@
     <Authors>Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>(c) 2019 Levrum Data Technologies</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

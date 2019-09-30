@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.0;net48</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>Levrum.WPFUI</AssemblyName>
+    <RootNamespace>Levrum.WPFUI</RootNamespace>
+    <Version>0.0.1</Version>
+    <Authors>Kevin M. Kelly</Authors>
+    <Company>Levrum Data Technologies</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Copyright>(c) 2019 Levrum Data Technologies</Copyright>
+  </PropertyGroup>
+
+</Project>

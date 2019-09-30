@@ -27,5 +27,60 @@ namespace Levrum.DataBridge
             InitializeComponent();
             DataMap = _map;
         }
+
+        private void AddIncidentFieldButton_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void RemoveIncidentFieldButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void AddResponseFieldButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RemoveResponseFieldButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void IncidentIDButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void IncidentTimeButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void IncidentLatitudeButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void IncidentLongitudeButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void IncidentLocationButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void AddBenchmarkButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RemoveBenchmarkButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

@@ -1,21 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>Levrum.Utils</RootNamespace>
+    <TargetFrameworks>netcoreapp3.0;net48</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>Levrum.Utils</PackageId>
-    <Version>0.0.1</Version>
-    <Authors>Carl Niedner, Kevin M. Kelly</Authors>
+    <AssemblyName>Levrum.Data.Sources</AssemblyName>
+    <RootNamespace>Levrum.Data.Sources</RootNamespace>
+    <Authors>Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
+    <Version>0.0.1</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Product>Levrum.Utils</Product>
     <Copyright>(c) 2019 Levrum Data Technologies</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="12.1.2" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="1.0.19269.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
   </ItemGroup>
-
 </Project>

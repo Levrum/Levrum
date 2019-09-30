@@ -1,19 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>Levrum.Data.Map</AssemblyName>
-    <RootNamespace>Levrum.Data.Map</RootNamespace>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>Levrum.Data.Map</PackageId>
-    <Version>0.0.1</Version>
-    <Authors>Kevin M. Kelly</Authors>
-    <Company>Levrum Data Technologies</Company>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <TargetFrameworks>netcoreapp3.0;net48</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataSources\DataSources.csproj" />
+    <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>
 
 </Project>

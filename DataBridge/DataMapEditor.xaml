@@ -6,7 +6,121 @@
              xmlns:local="clr-namespace:Levrum.DataBridge"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
-            
+    <UserControl.Resources>
+        <!--
+        <Style TargetType="GroupBox">
+            <Setter Property="Margin" Value="5,1,5,5"/>
+            <Setter Property="HeaderTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" FontWeight="Bold" FontSize="16"/>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        -->
+    </UserControl.Resources>
+    <Grid Background="WhiteSmoke">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260*"/>
+            <ColumnDefinition Width="260*"/>
+            <ColumnDefinition Width="260*"/>
+        </Grid.ColumnDefinitions>
+        <GroupBox Grid.Column="0">
+            <GroupBox.Header>
+                <TextBlock Text="Incident Data" FontSize="16" FontWeight="DemiBold"/>
+            </GroupBox.Header>
+            <Grid Margin="0,4,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="300*"/>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="75"/>
+                        <ColumnDefinition Width="250*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Height="20" FontSize="14">ID:</TextBlock>
+                        <TextBlock Height="20" FontSize="14">Time:</TextBlock>
+                        <TextBlock Height="20" FontSize="14">Latitude:</TextBlock>
+                        <TextBlock Height="20" FontSize="14">Longitude:</TextBlock>
+                        <TextBlock Height="20" FontSize="14">Location:</TextBlock>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <Button x:Name="IncidentIDButton" Height="20" FontSize="14" VerticalContentAlignment="Center" Click="IncidentIDButton_Click" Background="Transparent">
+                            <TextBlock x:Name="IncidentIDButtonText" Margin="0,-2,0,0">Click to select...</TextBlock>
+                        </Button>
+                        <Button x:Name="IncidentTimeButton" Height="20" FontSize="14" VerticalContentAlignment="Center" Click="IncidentTimeButton_Click" Background="Transparent">
+                            <TextBlock x:Name="IncidentTimeButtonText" Margin="0,-2,0,0">Click to select...</TextBlock>
+                        </Button>
+                        <Button x:Name="IncidentLatitudeButton" Height="20" FontSize="14" VerticalContentAlignment="Center" Click="IncidentLatitudeButton_Click" Background="Transparent">
+                            <TextBlock x:Name="IncidentLatitudeButtonText" Margin="0,-2,0,0">Click to select...</TextBlock>
+                        </Button>
+                        <Button x:Name="IncidentLongitudeButton" Height="20" FontSize="14" VerticalContentAlignment="Center" Click="IncidentLongitudeButton_Click" Background="Transparent">
+                            <TextBlock x:Name="IncidentLongitudeButtonText" Margin="0,-2,0,0">Click to select...</TextBlock>
+                        </Button>
+                        <Button x:Name="IncidentLocationButton" Height="20" FontSize="14" VerticalContentAlignment="Center" Click="IncidentLocationButton_Click" Background="Transparent">
+                            <TextBlock x:Name="IncidentLocationButtonText" Margin="0,-2,0,0">Click to select...</TextBlock>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="1" Margin="0,4,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="22"/>
+                        <RowDefinition Height="200*"/>
+                        <RowDefinition Height="40"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Height="28" FontSize="16" Grid.Row="0">Data</TextBlock>
+                    <ListBox Grid.Row="1">
+
+                    </ListBox>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2">
+                        <Button Name="AddIncidentFieldButton" Margin="8,8,8,8" Width="80" Click="AddIncidentFieldButton_Click">Add Field</Button>
+                        <Button Name="RemoveIncidentFieldButton" Margin="8,8,8,8" Width="80" Click="RemoveIncidentFieldButton_Click">Remove Field</Button>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Column="1">
+            <GroupBox.Header>
+                <TextBlock Text="Response Data" FontSize="16" FontWeight="DemiBold"/>
+            </GroupBox.Header>
+            <Grid>
+                <Grid Grid.Row="0" Margin="0,4,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="200*"/>
+                        <RowDefinition Height="40"/>
+                    </Grid.RowDefinitions>
+                    <ListBox Grid.Row="0">
+
+                    </ListBox>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
+                        <Button x:Name="AddResponseFieldButton" Margin="8,8,8,8" Width="80" Click="AddResponseFieldButton_Click">Add Field</Button>
+                        <Button x:Name="RemoveResponseFieldButton" Margin="8,8,8,8" Width="80" Click="RemoveResponseFieldButton_Click">Remove Field</Button>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Column="2">
+            <GroupBox.Header>
+                <TextBlock Text="Benchmarks" FontSize="16" FontWeight="DemiBold"/>
+            </GroupBox.Header>
+            <Grid Margin="0,4,0,0">
+                <Grid Grid.Row="0" Margin="0,0,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="200*"/>
+                        <RowDefinition Height="40"/>
+                    </Grid.RowDefinitions>
+                    <ListBox Grid.Row="0">
+
+                    </ListBox>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
+                        <Button x:Name="AddBenchmarkButton" Margin="8,8,8,8" Width="80" Click="AddBenchmarkButton_Click">Add</Button>
+                        <Button x:Name="RemoveBenchmarkButton" Margin="8,8,8,8" Width="80" Click="RemoveBenchmarkButton_Click">Remove</Button>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </GroupBox>
     </Grid>
 </UserControl>

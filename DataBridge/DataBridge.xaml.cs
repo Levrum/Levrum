@@ -30,7 +30,9 @@ namespace Levrum.DataBridge
     /// </summary>
     public partial class MainWindow : Window
     {
-        public Dictionary<DataMap, LayoutDocument> openDocuments = new Dictionary<DataMap, LayoutDocument>();
+        public List<DataMapDocument> openDocuments = new List<DataMapDocument>();
+
+        // public Dictionary<DataMap, LayoutDocument> openDocuments = new Dictionary<DataMap, LayoutDocument>();
 
         public MainWindow()
         {
@@ -42,9 +44,9 @@ namespace Levrum.DataBridge
             LayoutDocument document = new LayoutDocument();
             string title = "New DataMap.dmap";
             int counter = 1;
-            foreach (DataMap map in openDocuments.Keys)
+            foreach (DataMapDocument mapDocument in openDocuments)
             {
-                while (map.Name == title)
+                while (mapDocument.Map.Name == title)
                 {
                     title = string.Format("New DataMap {0}.dmap", counter);
                     counter++;
@@ -55,7 +57,7 @@ namespace Levrum.DataBridge
             document.Title = title;
             document.Content = new DataMapEditor(newMap);
             DocumentPane.Children.Add(document);
-            openDocuments.Add(newMap, document);
+            openDocuments.Add(new DataMapDocument(newMap, document));
         }
 
         public void OpenMenuItem_Click(object sender, RoutedEventArgs e)
@@ -66,29 +68,27 @@ namespace Levrum.DataBridge
                 ofd.DefaultExt = "dmap";
                 ofd.Filter = "Levrum DataMap (*.dmap)|*.dmap|All files (*.*)|*.*";
                 if (ofd.ShowDialog() == true) {
-                    DataMap map = (from DataMap d in openDocuments.Keys
-                                   where d.Path == ofd.FileName
-                                   select d).FirstOrDefault();
+                    DataMapDocument mapDocument = (from DataMapDocument d in openDocuments
+                                                  where d.Map.Path == ofd.FileName
+                                                  select d).FirstOrDefault();
 
-                    if (map != null)
+                    if (mapDocument != null)
                     {
-                        LayoutDocument openDocument = openDocuments[map];
-                        int index = DocumentPane.IndexOfChild(openDocument);
+                        int index = DocumentPane.IndexOfChild(mapDocument.Document);
                         DocumentPane.SelectedContentIndex = index;
                         return;
                     }
 
                     FileInfo file = new FileInfo(ofd.FileName);
-                    map = JsonConvert.DeserializeObject<DataMap>(File.ReadAllText(ofd.FileName));
+                    DataMap map = JsonConvert.DeserializeObject<DataMap>(File.ReadAllText(ofd.FileName));
                     map.Name = file.Name;
                     map.Path = ofd.FileName;
-                    map.SaveNeeded = false;
 
                     LayoutDocument document = new LayoutDocument();
                     document.Title = map.Name;
                     document.Content = new DataMapEditor(map);
                     DocumentPane.Children.Add(document);
-                    openDocuments.Add(map, document);
+                    openDocuments.Add(new DataMapDocument(map, document));
                 }
             } catch (Exception ex)
             {
@@ -101,7 +101,11 @@ namespace Levrum.DataBridge
             LayoutDocument document = DocumentPane.SelectedContent as LayoutDocument;
             DataMapEditor editor = document.Content as DataMapEditor;
             DataMap map = editor.DataMap;
-            if (map.SaveNeeded)
+            DataMapDocument openDocument = (from DataMapDocument d in openDocuments
+                                            where d.Map == map
+                                            select d).FirstOrDefault();
+
+            if (openDocument.ChangesMade)
             {
                 MessageBoxResult result = MessageBox.Show(string.Format("Save {0} before closing?", map.Name), "Save File?", MessageBoxButton.YesNoCancel);
                 if (result == MessageBoxResult.Cancel)
@@ -117,8 +121,12 @@ namespace Levrum.DataBridge
                 }
             }
 
-            DocumentPane.Children.Remove(document);
-            openDocuments.Remove(map);
+
+            if (openDocument != null)
+            {
+                DocumentPane.Children.Remove(document);
+                openDocuments.Remove(openDocument);
+            }
         }
 
         public void SaveMenuItem_Click(object sender, RoutedEventArgs e)
@@ -141,6 +149,11 @@ namespace Levrum.DataBridge
         {
             try
             {
+
+                DataMapDocument document = (from DataMapDocument d in openDocuments
+                                            where d.Map == map
+                                            select d).FirstOrDefault();
+
                 if (forceSaveAs || string.IsNullOrEmpty(map.Path))
                 {
                     SaveFileDialog sfd = new SaveFileDialog();
@@ -153,15 +166,18 @@ namespace Levrum.DataBridge
                     FileInfo file = new FileInfo(sfd.FileName);
                     map.Path = sfd.FileName;
                     map.Name = file.Name;
-                    if (openDocuments.ContainsKey(map))
+
+                    if (document != null)
                     {
-                        openDocuments[map].Title = file.Name;
+                        document.Document.Title = file.Name;
                     }
                 }
 
                 string mapJson = JsonConvert.SerializeObject(map);
                 File.WriteAllText(map.Path, mapJson);
-                map.SaveNeeded = false;
+                if (document != null) {
+                    document.ChangesMade = false;
+                }
                 return true;
             } catch (Exception ex)
             {
@@ -190,7 +206,10 @@ namespace Levrum.DataBridge
                             SaveAsMenuItem.IsEnabled = true;
                             SaveAsMenuItem.Header = string.Format("Save {0} _As...", map.Name);
                             SaveMenuItem.IsEnabled = true;
-                            SaveMenuItem.Header = string.Format("Save {0}", map.Name);
+                            SaveMenuItem.Header = string.Format("_Save {0}", map.Name);
+
+                            DataSources.Map = map;
+                            DataSources.IsEnabled = true;
                             return;
                         }
                     }
@@ -198,14 +217,31 @@ namespace Levrum.DataBridge
 
                 SaveAsMenuItem.Header = "Save _As...";
                 SaveAsMenuItem.IsEnabled = false;
-                SaveMenuItem.Header = "Save";
+                SaveMenuItem.Header = "_Save";
                 SaveMenuItem.IsEnabled = false;
+
+                DataSources.Map = null;
+                DataSources.IsEnabled = false;
             }
         }
 
         private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
         {
 
+        }
+    }
+
+    public class DataMapDocument
+    {
+        public DataMap Map { get; set; }
+        public LayoutDocument Document { get; set; } = null;
+        public bool ChangesMade { get; set; } = false;
+
+        public DataMapDocument (DataMap _map, LayoutDocument _document, bool _changesMade = false)
+        {
+            Map = _map;
+            Document = _document;
+            ChangesMade = _changesMade;
         }
     }
 }
