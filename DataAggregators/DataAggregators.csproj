@@ -6,7 +6,7 @@
     <AssemblyName>Levrum.DataAggregators</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Levrum.DataAggregators</PackageId>
-    <Version>0.0.1</Version>
+    <Version>0.0.1.1</Version>
     <Authors>Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

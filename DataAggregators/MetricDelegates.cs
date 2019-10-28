@@ -444,7 +444,7 @@ namespace Levrum.DataAggregators
                         }
 
                         double dispatched = (from BenchmarkData bmk in response.Benchmarks
-                                             where bmk.Name == "Dispatched"
+                                             where bmk.Name == "Assigned"
                                              select bmk.Value).FirstOrDefault();
 
                         if (dispatched == default)
@@ -536,7 +536,7 @@ namespace Levrum.DataAggregators
                         else
                         {
                             double dispatched = (from BenchmarkData bmk in response.Benchmarks
-                                                 where bmk.Name == "Dispatched"
+                                                 where bmk.Name == "Assigned"
                                                  select bmk.Value).FirstOrDefault();
 
                             if (dispatched == default)
