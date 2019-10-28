@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Levrum.DataClasses
 {
     public class DataSet<T> : List<T>
     {
+        public object Parent { get; set; }
+
         private char[] m_id;
 
         public string Id
@@ -44,7 +48,12 @@ namespace Levrum.DataClasses
 
         }
 
-        public DataSet(string id = "", List<T> items = null, Dictionary<string, object> data = null)
+        public DataSet(object _parent = null)
+        {
+            Parent = _parent;
+        }
+
+        public DataSet(string id = "", List<T> items = null, Dictionary<string, object> data = null, object _parent = null)
         {
             Id = id;
             if (items != null)
@@ -59,6 +68,63 @@ namespace Levrum.DataClasses
                     Data.Add(kvp.Key, kvp.Value);
                 }
             }
+
+            Parent = _parent;
+        }
+
+        public new void Add(T item)
+        {
+            if (Parent == null)
+            {
+                base.Add(item);
+                return;
+            }
+            PropertyInfo[] properties = item.GetType().GetProperties();
+            PropertyInfo info = (from PropertyInfo p in properties
+                                 where p.Name is "Parent"
+                                 select p).FirstOrDefault();
+
+            if (info != default(PropertyInfo))
+            {
+                Type parentType = Parent.GetType();
+                if (info.PropertyType == parentType)
+                {
+                    info.SetValue(item, Parent);
+                }
+            }
+
+            base.Add(item);
+        }
+
+        public new void AddRange(IEnumerable<T> range)
+        {
+            if (Parent == null)
+            {
+                base.AddRange(range);
+                return;
+            }
+
+            Type type = typeof(T);
+
+            PropertyInfo[] properties = type.GetProperties();
+            PropertyInfo info = (from PropertyInfo p in properties
+                                 where p.Name is "Parent"
+                                 select p).FirstOrDefault();
+
+            T[] items = range.ToArray();
+            if (info != default(PropertyInfo))
+            {
+                Type parentType = Parent.GetType();
+                if (info.PropertyType == parentType)
+                {
+                    foreach (T item in items)
+                    {
+                        info.SetValue(item, Parent);
+                    }
+                }
+            }
+
+            base.AddRange(items);
         }
     }
 }

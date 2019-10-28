@@ -86,11 +86,11 @@ namespace Levrum.DataClasses
         }
 
 
-        public DataSet<ResponseData> Responses { get; set; } = new DataSet<ResponseData>();
+        public DataSet<ResponseData> Responses { get; set; }
 
         public IncidentData()
         {
-
+            Responses = new DataSet<ResponseData>(this);
         }
 
         // 20190629 CDN - modified parameter defaults to compile in VS2017.   DateTime
@@ -103,9 +103,7 @@ namespace Levrum.DataClasses
             Longitude = longitude;
             Latitude = latitude;
 
-            DateTime mindtm = new DateTime(1970,1,1);
-
-            if (time > mindtm)
+            if (time > DateTime.MinValue)
                 Time = (DateTime)time;
 
             if (data != null)
@@ -115,6 +113,8 @@ namespace Levrum.DataClasses
                     Data.Add(kvp.Key, kvp.Value);
                 }
             }
+
+            Responses = new DataSet<ResponseData>(this);
 
             if (responses != null)
                 Responses.AddRange(responses);
@@ -134,6 +134,8 @@ namespace Levrum.DataClasses
             {
                 Data.Add(kvp.Key, kvp.Value);
             }
+
+            Responses = new DataSet<ResponseData>(this);
 
             Responses.AddRange(source.Responses);
 

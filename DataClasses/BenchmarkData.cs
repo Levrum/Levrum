@@ -6,6 +6,8 @@ namespace Levrum.DataClasses
 {
     public class BenchmarkData
     {
+        public ResponseData Parent { get; set; }
+
         private string m_name = string.Empty;
         private string m_details = string.Empty;
 
@@ -21,7 +23,7 @@ namespace Levrum.DataClasses
             }
         }
 
-        public double Value { get; set; } = 0.0;
+        public double Value { get; set; } = Double.NaN;
 
         public string Details
         {
@@ -64,7 +66,7 @@ namespace Levrum.DataClasses
             }
         }
 
-        public BenchmarkData(string name = "", double value = 0.0, string details = "")
+        public BenchmarkData(string name = "", double value = Double.NaN, string details = "")
         {
             Name = name;
             Value = value;
