@@ -77,9 +77,9 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column ="0" Text="{Binding Field}"></TextBlock>
-                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding Column.ColumnName}"/>
+                                    <TextBlock Grid.Column ="0" Text="{Binding Field}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Column.ColumnName}" HorizontalAlignment="Right"/>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -111,9 +111,9 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column ="0" Text="{Binding Field}"></TextBlock>
-                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding Column.ColumnName}"/>
+                                    <TextBlock Grid.Column ="0" Text="{Binding Field}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Column.ColumnName}" HorizontalAlignment="Right"/>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -145,9 +145,9 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column ="0" Text="{Binding Field}"></TextBlock>
-                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding Column.ColumnName}"/>
+                                    <TextBlock Grid.Column ="0" Text="{Binding Field}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}" HorizontalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Column.ColumnName}" HorizontalAlignment="Right"/>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>

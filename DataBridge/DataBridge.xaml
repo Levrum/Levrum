@@ -30,7 +30,7 @@
                     <MenuItem Header="_New" Click="NewMenuItem_Click"/>
                     <MenuItem Header="_Open..." Click="OpenMenuItem_Click"/>
                     <Separator/>
-                    <MenuItem Header="_Close" Click="CloseMenuItem_Click"/>
+                    <MenuItem Name="CloseMenuItem" Header="_Close" Click="CloseMenuItem_Click"/>
                     <Separator/>
                     <MenuItem Name="SaveMenuItem" Header="_Save" Click="SaveMenuItem_Click" IsEnabled="false"/>
                     <MenuItem Name="SaveAsMenuItem" Header="Save _As..." Click="SaveAsMenuItem_Click" IsEnabled="false"/>
@@ -67,7 +67,7 @@
             <xcad:LayoutRoot x:Name="_layoutRoot">
                 <xcad:LayoutPanel Orientation="Vertical">
                     <xcad:LayoutDocumentPaneGroup >
-                        <xcad:LayoutDocumentPane x:Name="DocumentPane" PropertyChanged="DocumentPane_PropertyChanged">
+                        <xcad:LayoutDocumentPane x:Name="DocumentPane" PropertyChanged="DocumentPane_PropertyChanged" ChildrenCollectionChanged="DocumentPane_ChildrenCollectionChanged">
                         </xcad:LayoutDocumentPane>
                     </xcad:LayoutDocumentPaneGroup >
                     <xcad:LayoutAnchorablePane DockHeight="200">

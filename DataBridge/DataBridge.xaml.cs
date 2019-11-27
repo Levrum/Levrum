@@ -91,7 +91,9 @@ namespace Levrum.DataBridge
 
                     LayoutDocument document = new LayoutDocument();
                     document.Title = map.Name;
-                    document.Content = new DataMapEditor(map);
+                    DataMapEditor editor = new DataMapEditor(map);
+                    editor.Window = this;
+                    document.Content = editor;
                     DocumentPane.Children.Add(document);
                     openDocuments.Add(new DataMapDocument(map, document));
                 }
@@ -212,11 +214,23 @@ namespace Levrum.DataBridge
                             SaveAsMenuItem.Header = string.Format("Save {0} _As...", map.Name);
                             SaveMenuItem.IsEnabled = true;
                             SaveMenuItem.Header = string.Format("_Save {0}", map.Name);
+                            CloseMenuItem.IsEnabled = true;
+
                             CreateIncidentJsonMenuItem.IsEnabled = true;
 
                             DataSources.Map = map;
                             DataSources.IsEnabled = true;
                             CoordinateConversionMenuItem.IsEnabled = true;
+                            if (map.EnableCoordinateConversion)
+                            {
+                                CoordinateConversionMenuItem.Header = "Disable _Coordinate Conversion";
+                                DefineProjectionMenuItem.IsEnabled = true;
+                            }
+                            else
+                            {
+                                CoordinateConversionMenuItem.Header = "Enable _Coordinate Conversion";
+                                DefineProjectionMenuItem.IsEnabled = false;
+                            }
                             SelectCauseTreeMenuItem.IsEnabled = true;
                             return;
                         }
@@ -227,11 +241,14 @@ namespace Levrum.DataBridge
                 SaveAsMenuItem.IsEnabled = false;
                 SaveMenuItem.Header = "_Save";
                 SaveMenuItem.IsEnabled = false;
+                CloseMenuItem.IsEnabled = false;
+                
                 CreateIncidentJsonMenuItem.IsEnabled = false;
 
                 DataSources.Map = null;
                 DataSources.IsEnabled = false;
                 CoordinateConversionMenuItem.IsEnabled = false;
+                DefineProjectionMenuItem.IsEnabled = false;
                 SelectCauseTreeMenuItem.IsEnabled = false;
             }
         }
@@ -330,6 +347,23 @@ namespace Levrum.DataBridge
             } catch (Exception ex)
             {
                 MessageBox.Show(string.Format("Unable to create JSON: {0}", ex.Message));
+            }
+        }
+
+        private void DocumentPane_ChildrenCollectionChanged(object sender, EventArgs e)
+        {
+            HashSet<DataMapDocument> documentsToRemove = new HashSet<DataMapDocument>();
+            foreach (DataMapDocument document in openDocuments)
+            {
+                if (!DocumentPane.Children.Contains(document.Document))
+                {
+                    documentsToRemove.Add(document);
+                }
+            }
+
+            foreach (DataMapDocument document in documentsToRemove)
+            {
+                openDocuments.Remove(document);
             }
         }
     }
