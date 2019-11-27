@@ -25,34 +25,36 @@
             <RowDefinition Height="22" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-            <Menu Grid.Row="0" Height="20">
-                <MenuItem Header="_File" IsTabStop="False">
-                    <MenuItem Header="_New" Click="NewMenuItem_Click"/>
-                    <MenuItem Header="_Open..." Click="OpenMenuItem_Click"/>
-                    <Separator/>
-                    <MenuItem Name="CloseMenuItem" Header="_Close" Click="CloseMenuItem_Click"/>
-                    <Separator/>
-                    <MenuItem Name="SaveMenuItem" Header="_Save" Click="SaveMenuItem_Click" IsEnabled="false"/>
-                    <MenuItem Name="SaveAsMenuItem" Header="Save _As..." Click="SaveAsMenuItem_Click" IsEnabled="false"/>
-                    <Separator/>
-                    <MenuItem Name="CreateIncidentJsonMenuItem" Header="Create _JSON..." Click="CreateIncidentJsonMenuItem_Click" IsEnabled="false"/>
-                    <Separator/>
-                    <MenuItem Header="E_xit" Click="ExitMenuItem_Click"/>
-                </MenuItem>
-                <MenuItem Header="_Edit" IsTabStop="False">
+        <Menu Grid.Row="0" Height="20">
+            <MenuItem Header="_File" IsTabStop="False">
+                <MenuItem Header="_New" Click="NewMenuItem_Click"/>
+                <MenuItem Header="_Open..." Click="OpenMenuItem_Click"/>
+                <Separator/>
+                <MenuItem Name="CloseMenuItem" Header="_Close" Click="CloseMenuItem_Click"/>
+                <Separator/>
+                <MenuItem Name="SaveMenuItem" Header="_Save" Click="SaveMenuItem_Click" IsEnabled="false"/>
+                <MenuItem Name="SaveAsMenuItem" Header="Save _As..." Click="SaveAsMenuItem_Click" IsEnabled="false"/>
+                <Separator/>
+                <MenuItem Name="CreateIncidentJsonMenuItem" Header="Create _JSON..." Click="CreateIncidentJsonMenuItem_Click" IsEnabled="false"/>
+                <Separator/>
+                <MenuItem Header="E_xit" Click="ExitMenuItem_Click"/>
+            </MenuItem>
+            <!--
+            <MenuItem Header="_Edit" IsTabStop="False">
                     
-                </MenuItem>
-                <MenuItem Header="_Tools" IsTabStop="False">
-                    <MenuItem x:Name="CoordinateConversionMenuItem" Header="Enable _Coordinate Conversion" Click="CoordinateConversionMenuItem_Click" IsEnabled="False"/>
-                    <MenuItem x:Name="DefineProjectionMenuItem" Header="Define _Projection For Conversion..." Click="DefineProjectionMenuItem_Click" IsEnabled="False"/>
-                    <Separator/>
-                    <MenuItem x:Name="SelectCauseTreeMenuItem" Header="Select Cause _Tree JSON..." Click="SelectCauseTreeMenuItem_Click" IsEnabled="false"/>
-                </MenuItem>
-                <MenuItem Header="_Help" IsTabStop="False">
-                    <MenuItem Header="_About"/>
-                </MenuItem>
-            </Menu>
-        <xcad:DockingManager Grid.Row="1">
+            </MenuItem>
+            -->
+            <MenuItem Header="_Tools" IsTabStop="False">
+                <MenuItem x:Name="CoordinateConversionMenuItem" Header="Enable _Coordinate Conversion" Click="CoordinateConversionMenuItem_Click" IsEnabled="False"/>
+                <MenuItem x:Name="DefineProjectionMenuItem" Header="Define _Projection For Conversion..." Click="DefineProjectionMenuItem_Click" IsEnabled="False"/>
+                <Separator/>
+                <MenuItem x:Name="SelectCauseTreeMenuItem" Header="Select Cause _Tree JSON..." Click="SelectCauseTreeMenuItem_Click" IsEnabled="false"/>
+            </MenuItem>
+            <MenuItem Header="_Help" IsTabStop="False">
+                <MenuItem Header="_About"/>
+            </MenuItem>
+        </Menu>
+        <xcad:DockingManager Grid.Row="1" DocumentClosing="DockingManager_DocumentClosing">
             <xcad:DockingManager.Theme>
                 <xcad:Vs2013LightTheme/>
             </xcad:DockingManager.Theme>

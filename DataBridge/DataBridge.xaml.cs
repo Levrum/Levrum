@@ -350,21 +350,34 @@ namespace Levrum.DataBridge
             }
         }
 
-        private void DocumentPane_ChildrenCollectionChanged(object sender, EventArgs e)
+        private void DockingManager_DocumentClosing(object sender, DocumentClosingEventArgs e)
         {
-            HashSet<DataMapDocument> documentsToRemove = new HashSet<DataMapDocument>();
-            foreach (DataMapDocument document in openDocuments)
+            LayoutDocument document = e.Document;
+            DataMapEditor editor = document.Content as DataMapEditor;
+            DataMap map = editor.DataMap;
+            DataMapDocument openDocument = (from DataMapDocument d in openDocuments
+                                            where d.Map == map
+                                            select d).FirstOrDefault();
+
+            if (openDocument.ChangesMade)
             {
-                if (!DocumentPane.Children.Contains(document.Document))
+                MessageBoxResult result = MessageBox.Show(string.Format("Save {0} before closing?", map.Name), "Save File?", MessageBoxButton.YesNoCancel);
+                if (result == MessageBoxResult.Cancel)
                 {
-                    documentsToRemove.Add(document);
+                    e.Cancel = true;
+                    return;
+                }
+                else if (result == MessageBoxResult.Yes)
+                {
+                    if (!SaveMap(map))
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
                 }
             }
 
-            foreach (DataMapDocument document in documentsToRemove)
-            {
-                openDocuments.Remove(document);
-            }
+            openDocuments.Remove(openDocument);
         }
     }
 
