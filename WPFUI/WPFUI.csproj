@@ -13,4 +13,16 @@
     <Copyright>(c) 2019 Levrum Data Technologies</Copyright>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Update="TextInputDialog.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="TextInputDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
 </Project>

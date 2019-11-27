@@ -35,12 +35,18 @@
                     <MenuItem Name="SaveMenuItem" Header="_Save" Click="SaveMenuItem_Click" IsEnabled="false"/>
                     <MenuItem Name="SaveAsMenuItem" Header="Save _As..." Click="SaveAsMenuItem_Click" IsEnabled="false"/>
                     <Separator/>
+                    <MenuItem Name="CreateIncidentJsonMenuItem" Header="Create _JSON..." Click="CreateIncidentJsonMenuItem_Click" IsEnabled="false"/>
+                    <Separator/>
                     <MenuItem Header="E_xit" Click="ExitMenuItem_Click"/>
                 </MenuItem>
                 <MenuItem Header="_Edit" IsTabStop="False">
                     
                 </MenuItem>
                 <MenuItem Header="_Tools" IsTabStop="False">
+                    <MenuItem x:Name="CoordinateConversionMenuItem" Header="Enable _Coordinate Conversion" Click="CoordinateConversionMenuItem_Click" IsEnabled="False"/>
+                    <MenuItem x:Name="DefineProjectionMenuItem" Header="Define _Projection For Conversion..." Click="DefineProjectionMenuItem_Click" IsEnabled="False"/>
+                    <Separator/>
+                    <MenuItem x:Name="SelectCauseTreeMenuItem" Header="Select Cause _Tree JSON..." Click="SelectCauseTreeMenuItem_Click" IsEnabled="false"/>
                 </MenuItem>
                 <MenuItem Header="_Help" IsTabStop="False">
                     <MenuItem Header="_About"/>

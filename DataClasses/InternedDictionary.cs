@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Levrum.DataClasses
+namespace Levrum.Data.Classes
 {
     public class InternedDictionary<T1, T2> : Dictionary<T1, T2> 
     {

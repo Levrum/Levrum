@@ -15,13 +15,20 @@ namespace Levrum.Data.Sources
         { 
             get 
             {
+                string user = Parameters.ContainsKey("User") ? Parameters["User"] : "Undefined";
                 string server = Parameters.ContainsKey("Server") ? Parameters["Server"] : "Undefined";
+                string port = Parameters.ContainsKey("Port") ? Parameters["Port"] : "Undefined";
+                string database = Parameters.ContainsKey("Database") ? Parameters["Database"] : "Undefined";
+                string table = Parameters.ContainsKey("Table") ? Parameters["Table"] : "Undefined";
 
-                return string.Format("{0}: {1} [Database: {2} User: {3}]", Name, server, Parameters["Database"], Parameters["User"] ); 
+                return string.Format("{0}: {1}@{2},{3} [{4}].[{5}]", Name, user, server, port, database, table);
             } 
         }
 
-        static readonly string[] s_requiredParameters = new string[] { "Server", "Port", "User", "Password", "Database" };
+        public string IDColumn { get; set; } = "";
+        public string ResponseIDColumn { get; set; } = "";
+
+        static readonly string[] s_requiredParameters = new string[] { "Server", "Port", "User", "Password", "Database", "Table" };
 
         [JsonIgnore]
         public List<string> RequiredParameters { get { return new List<string>(s_requiredParameters); } }
@@ -63,30 +70,23 @@ namespace Levrum.Data.Sources
 
         }
 
-        public List<string> GetTables()
-        {
-            List<string> tables = new List<string>();
-
-            return tables;
-        }
-
-        public List<string> GetColumns(string table)
+        public List<string> GetColumns()
         {
             List<string> columns = new List<string>();
 
             return columns;
         }
 
-        public List<string> GetColumnValues(string table, string column)
+        public List<string> GetColumnValues(string column)
         {
             List<string> values = new List<string>();
 
             return values;
         }
 
-        public List<string[]> GetRecords(string table)
+        public List<Record> GetRecords()
         {
-            List<string[]> records = new List<string[]>();
+            List<Record> records = new List<Record>();
 
             return records;
         }

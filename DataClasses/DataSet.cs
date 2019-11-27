@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Levrum.DataClasses
+namespace Levrum.Data.Classes
 {
     public class DataSet<T> : List<T>
     {

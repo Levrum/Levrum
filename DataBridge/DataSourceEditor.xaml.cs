@@ -12,7 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
 using Levrum.Data.Sources;
-using Levrum.Utils;
+using Levrum.Utils.Data;
 
 using Microsoft.Win32;
 
@@ -29,6 +29,7 @@ namespace Levrum.DataBridge
         List<DataSourceTypeInfo> DataSourceTypes { get; } = new List<DataSourceTypeInfo>(new DataSourceTypeInfo[] { "CSV File", "SQL Server" });
 
         bool ChangesMade { get; set; } = false;
+        private bool Loading { get; set; } = true;
 
         public DataSourceEditor(IDataSource _dataSource = null)
         {
@@ -44,6 +45,17 @@ namespace Levrum.DataBridge
                     DataSourceTypeComboBox.SelectedItem = DataSourceTypes[0];
                     CsvNameTextBox.Text = _dataSource.Name;
                     FileNameTextBox.Text = _dataSource.Parameters["File"];
+                    CsvSource csvSource = _dataSource as CsvSource;
+                    if (csvSource == null)
+                    {
+                        return;
+                    }
+
+                    List<string> columns = csvSource.GetColumns();
+                    IdColumnComboBox.ItemsSource = columns;
+                    IdColumnComboBox.SelectedItem = _dataSource.IDColumn;
+                    ResponseIdColumnComboBox.ItemsSource = columns;
+                    ResponseIdColumnComboBox.SelectedItem = _dataSource.ResponseIDColumn;
                 }
                 else if (DataSource.Type == DataSourceType.SqlSource)
                 {
@@ -53,8 +65,10 @@ namespace Levrum.DataBridge
             } else
             {
                 DataSourceTypeComboBox.SelectedItem = DataSourceTypes[0];
+                DataSource = new CsvSource();
                 ChangesMade = false;
             }
+            Loading = false;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -83,43 +97,79 @@ namespace Levrum.DataBridge
 
         private void DataSourceType_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (Loading)
+            {
+                return;
+            }
+
             if (DataSourceTypeComboBox.SelectedItem.ToString() == "CSV File")
             {
                 CsvOptionsGrid.Visibility = Visibility.Visible;
+                CsvOptionsButtons.Visibility = Visibility.Visible;
                 SqlOptionsGrid.Visibility = Visibility.Hidden;
                 DataSource = new CsvSource();
                 ChangesMade = true;
             } else if (DataSourceTypeComboBox.SelectedItem.ToString() == "SQL Server")
             {
                 CsvOptionsGrid.Visibility = Visibility.Hidden;
+                CsvOptionsButtons.Visibility = Visibility.Hidden;
                 SqlOptionsGrid.Visibility = Visibility.Visible;
                 DataSource = new SqlSource();
                 ChangesMade = true;
             }
         }
 
+        private void SummarizeCsvButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Cursor = Cursors.Wait;
+                CsvSource csvSource = DataSource as CsvSource;
+                CsvAnalyzer analyzer = new CsvAnalyzer(csvSource.CsvFile);
+                string summary = analyzer.GetSummary();
+                CsvSummaryTextBox.Text = summary;
+                Cursor = Cursors.Arrow;
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
         private void CsvFileSelectButton_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.DefaultExt = "csv";
-            ofd.Filter = "CSV Files (*.csv)|*.csv|All Files (*.*)|*.*";
-            if(ofd.ShowDialog() == false)
+            FileInfo info = null;
+            try
             {
-                return;
-            }
+                OpenFileDialog ofd = new OpenFileDialog();
+                ofd.DefaultExt = "csv";
+                ofd.Filter = "CSV Files (*.csv)|*.csv|All Files (*.*)|*.*";
+                if (ofd.ShowDialog() == false)
+                {
+                    return;
+                }
 
-            CsvSource source = DataSource as CsvSource;
-            FileInfo info = new FileInfo(ofd.FileName);
-            if (source.File != null && (info.FullName == source.File.FullName))
+                CsvSource source = new CsvSource();
+                DataSource = source;
+                info = new FileInfo(ofd.FileName);
+                if (source.CsvFile != null && (info.FullName == source.CsvFile.FullName))
+                {
+                    return;
+                }
+                source.CsvFile = new FileInfo(ofd.FileName);
+                FileNameTextBox.Text = ofd.FileName;
+
+                List<string> columns = source.GetColumns();
+                IdColumnComboBox.ItemsSource = columns;
+                ResponseIdColumnComboBox.ItemsSource = columns;
+                ChangesMade = true;
+            } catch (Exception ex)
             {
-                return;
+                string name = "Unknown";
+                if (info != null)
+                    name = info.Name;
+                MessageBox.Show(string.Format("Exception reading CSV File '{0}': {1}", name, ex.Message));
             }
-            source.File = new FileInfo(ofd.FileName);
-            FileNameTextBox.Text = ofd.FileName;
-            CsvAnalyzer analyzer = new CsvAnalyzer(source.File);
-            string stuff = analyzer.GetSummary();
-            CsvSummaryTextBox.Text = stuff;
-            ChangesMade = true;
         }
 
         private void CsvNameTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -130,6 +180,16 @@ namespace Levrum.DataBridge
             {
                 ChangesMade = true;
             }
+        }
+
+        private void IdColumnComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DataSource.IDColumn = IdColumnComboBox.SelectedItem as string;
+        }
+
+        private void ResponseIdColumnComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DataSource.ResponseIDColumn = ResponseIdColumnComboBox.SelectedItem as string;
         }
     }
 

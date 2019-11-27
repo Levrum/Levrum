@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
-namespace Levrum.DataAggregators
+namespace Levrum.Data.Aggregators
 {
     public static class DataAggregators
     {

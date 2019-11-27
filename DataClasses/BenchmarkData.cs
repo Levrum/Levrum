@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Levrum.DataClasses
+namespace Levrum.Data.Classes
 {
     public class BenchmarkData
     {

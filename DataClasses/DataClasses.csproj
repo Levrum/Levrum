@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>Levrum.DataClasses</RootNamespace>
-    <AssemblyName>Levrum.DataClasses</AssemblyName>
+    <RootNamespace>Levrum.Data.Classes</RootNamespace>
+    <AssemblyName>Levrum.Data.Classes</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>Levrum.DataClasses</PackageId>
-    <Version>0.0.1.1</Version>
+    <PackageId>Levrum.Data.Classes</PackageId>
+    <Version>0.0.2</Version>
     <Authors>Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

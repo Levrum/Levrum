@@ -32,7 +32,7 @@
             </GroupBox.Header>
             <Grid Margin="0,4,0,0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="80"/>
                     <RowDefinition Height="300*"/>
                 </Grid.RowDefinitions>
                 <Grid>
@@ -41,16 +41,12 @@
                         <ColumnDefinition Width="250*"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel>
-                        <TextBlock Height="20" FontSize="14">ID:</TextBlock>
                         <TextBlock Height="20" FontSize="14">Time:</TextBlock>
                         <TextBlock Height="20" FontSize="14">Latitude:</TextBlock>
                         <TextBlock Height="20" FontSize="14">Longitude:</TextBlock>
                         <TextBlock Height="20" FontSize="14">Location:</TextBlock>
                     </StackPanel>
                     <StackPanel Grid.Column="1">
-                        <Button x:Name="IncidentIDButton" Height="20" FontSize="14" VerticalContentAlignment="Center" Click="IncidentIDButton_Click" Background="Transparent">
-                            <TextBlock x:Name="IncidentIDButtonText" Margin="0,-2,0,0">Click to select...</TextBlock>
-                        </Button>
                         <Button x:Name="IncidentTimeButton" Height="20" FontSize="14" VerticalContentAlignment="Center" Click="IncidentTimeButton_Click" Background="Transparent">
                             <TextBlock x:Name="IncidentTimeButtonText" Margin="0,-2,0,0">Click to select...</TextBlock>
                         </Button>
@@ -72,12 +68,26 @@
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
                     <TextBlock Height="28" FontSize="16" Grid.Row="0">Data</TextBlock>
-                    <ListBox Grid.Row="1">
-
+                    <ListBox x:Name="IncidentDataListBox" Grid.Row="1" SelectionChanged="IncidentDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column ="0" Text="{Binding Field}"></TextBlock>
+                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Column.ColumnName}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
                     </ListBox>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2">
-                        <Button Name="AddIncidentFieldButton" Margin="8,8,8,8" Width="80" Click="AddIncidentFieldButton_Click">Add Field</Button>
-                        <Button Name="RemoveIncidentFieldButton" Margin="8,8,8,8" Width="80" Click="RemoveIncidentFieldButton_Click">Remove Field</Button>
+                        <Button Name="AddIncidentFieldButton" Margin="8,8,8,8" Width="60" Click="AddIncidentFieldButton_Click">Add</Button>
+                        <Button Name="EditIncidentFieldButton" Margin="8,8,8,8" Width="60" Click="EditIncidentFieldButton_Click" IsEnabled="False">Edit</Button>
+                        <Button Name="RemoveIncidentFieldButton" Margin="8,8,8,8" Width="60" Click="RemoveIncidentFieldButton_Click" IsEnabled="False">Remove</Button>
                     </StackPanel>
                 </Grid>
             </Grid>
@@ -92,19 +102,33 @@
                         <RowDefinition Height="200*"/>
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
-                    <ListBox Grid.Row="0">
-
+                    <ListBox Grid.Row="0" x:Name="ResponseDataListBox" SelectionChanged="ResponseDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column ="0" Text="{Binding Field}"></TextBlock>
+                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Column.ColumnName}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
                     </ListBox>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
-                        <Button x:Name="AddResponseFieldButton" Margin="8,8,8,8" Width="80" Click="AddResponseFieldButton_Click">Add Field</Button>
-                        <Button x:Name="RemoveResponseFieldButton" Margin="8,8,8,8" Width="80" Click="RemoveResponseFieldButton_Click">Remove Field</Button>
+                        <Button x:Name="AddResponseFieldButton" Margin="8,8,8,8" Width="60" Click="AddResponseFieldButton_Click">Add</Button>
+                        <Button x:Name="EditResponseFieldButton" Margin="8,8,8,8" Width="60" Click="EditResponseFieldButton_Click" IsEnabled="False">Edit</Button>
+                        <Button x:Name="RemoveResponseFieldButton" Margin="8,8,8,8" Width="60" Click="RemoveResponseFieldButton_Click" IsEnabled="False">Remove</Button>
                     </StackPanel>
                 </Grid>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Column="2">
             <GroupBox.Header>
-                <TextBlock Text="Benchmarks" FontSize="16" FontWeight="DemiBold"/>
+                <TextBlock Text="Response Timings" FontSize="16" FontWeight="DemiBold"/>
             </GroupBox.Header>
             <Grid Margin="0,4,0,0">
                 <Grid Grid.Row="0" Margin="0,0,0,0">
@@ -112,12 +136,26 @@
                         <RowDefinition Height="200*"/>
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
-                    <ListBox Grid.Row="0">
-
+                    <ListBox Grid.Row="0" x:Name="BenchmarkListBox" SelectionChanged="BenchmarkListBox_SelectionChanged" HorizontalContentAlignment="Stretch">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column ="0" Text="{Binding Field}"></TextBlock>
+                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Column.ColumnName}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
                     </ListBox>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
-                        <Button x:Name="AddBenchmarkButton" Margin="8,8,8,8" Width="80" Click="AddBenchmarkButton_Click">Add</Button>
-                        <Button x:Name="RemoveBenchmarkButton" Margin="8,8,8,8" Width="80" Click="RemoveBenchmarkButton_Click">Remove</Button>
+                        <Button x:Name="AddBenchmarkButton" Margin="8,8,8,8" Width="60" Click="AddBenchmarkButton_Click">Add</Button>
+                        <Button x:Name="EditBenchmarkButton" Margin="8,8,8,8" Width="60" Click="EditBenchmarkButton_Click" IsEnabled="False">Edit</Button>
+                        <Button x:Name="RemoveBenchmarkButton" Margin="8,8,8,8" Width="60" Click="RemoveBenchmarkButton_Click" IsEnabled="False">Remove</Button>
                     </StackPanel>
                 </Grid>
             </Grid>

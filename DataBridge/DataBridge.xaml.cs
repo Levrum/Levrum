@@ -21,7 +21,9 @@ using Xceed.Wpf.AvalonDock.Layout;
 
 using Newtonsoft.Json;
 
+using Levrum.Data.Classes;
 using Levrum.Data.Map;
+using Levrum.WPFUI;
 
 namespace Levrum.DataBridge
 {
@@ -37,6 +39,7 @@ namespace Levrum.DataBridge
         public MainWindow()
         {
             InitializeComponent();
+            DataSources.Window = this;
         }
 
         public void NewMenuItem_Click(object sender, RoutedEventArgs e)
@@ -55,7 +58,9 @@ namespace Levrum.DataBridge
             
             DataMap newMap = new DataMap(title);
             document.Title = title;
-            document.Content = new DataMapEditor(newMap);
+            DataMapEditor editor = new DataMapEditor(newMap);
+            editor.Window = this;
+            document.Content = editor;
             DocumentPane.Children.Add(document);
             openDocuments.Add(new DataMapDocument(newMap, document));
         }
@@ -80,7 +85,7 @@ namespace Levrum.DataBridge
                     }
 
                     FileInfo file = new FileInfo(ofd.FileName);
-                    DataMap map = JsonConvert.DeserializeObject<DataMap>(File.ReadAllText(ofd.FileName));
+                    DataMap map = JsonConvert.DeserializeObject<DataMap>(File.ReadAllText(ofd.FileName), new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All });
                     map.Name = file.Name;
                     map.Path = ofd.FileName;
 
@@ -173,7 +178,7 @@ namespace Levrum.DataBridge
                     }
                 }
 
-                string mapJson = JsonConvert.SerializeObject(map);
+                string mapJson = JsonConvert.SerializeObject(map, Formatting.Indented, new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All });
                 File.WriteAllText(map.Path, mapJson);
                 if (document != null) {
                     document.ChangesMade = false;
@@ -207,9 +212,12 @@ namespace Levrum.DataBridge
                             SaveAsMenuItem.Header = string.Format("Save {0} _As...", map.Name);
                             SaveMenuItem.IsEnabled = true;
                             SaveMenuItem.Header = string.Format("_Save {0}", map.Name);
+                            CreateIncidentJsonMenuItem.IsEnabled = true;
 
                             DataSources.Map = map;
                             DataSources.IsEnabled = true;
+                            CoordinateConversionMenuItem.IsEnabled = true;
+                            SelectCauseTreeMenuItem.IsEnabled = true;
                             return;
                         }
                     }
@@ -219,15 +227,110 @@ namespace Levrum.DataBridge
                 SaveAsMenuItem.IsEnabled = false;
                 SaveMenuItem.Header = "_Save";
                 SaveMenuItem.IsEnabled = false;
+                CreateIncidentJsonMenuItem.IsEnabled = false;
 
                 DataSources.Map = null;
                 DataSources.IsEnabled = false;
+                CoordinateConversionMenuItem.IsEnabled = false;
+                SelectCauseTreeMenuItem.IsEnabled = false;
             }
         }
 
         private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
         {
 
+        }
+
+        private void CoordinateConversionMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            DataSources.Map.EnableCoordinateConversion = !DataSources.Map.EnableCoordinateConversion;
+            DefineProjectionMenuItem.IsEnabled = DataSources.Map.EnableCoordinateConversion;
+            if (DataSources.Map.EnableCoordinateConversion)
+            {
+                CoordinateConversionMenuItem.Header = "Disable _Coordinate Conversion";
+            } else
+            {
+                CoordinateConversionMenuItem.Header = "Enable _Coordinate Conversion";
+            }
+
+            SetChangesMade(DataSources.Map, true);
+        }
+
+        private void DefineProjectionMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            string projection = null;
+            if (!string.IsNullOrWhiteSpace(DataSources.Map.Projection))
+            {
+                projection = DataSources.Map.Projection;
+            }
+            TextInputDialog dialog = new TextInputDialog("Define Projection", "Projection:", projection);
+            dialog.ShowDialog();
+
+            if (dialog.Result != null)
+            {
+                DataSources.Map.Projection = dialog.Result;
+                SetChangesMade(DataSources.Map, true);
+            }
+        }
+
+        private void SelectCauseTreeMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.DefaultExt = "json";
+            ofd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
+            if (ofd.ShowDialog() == true)
+            {
+                try
+                {
+                    List<CauseData> causeTree = JsonConvert.DeserializeObject<List<CauseData>>(File.ReadAllText(ofd.FileName), new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All });
+                    DataSources.Map.CauseTree = causeTree;
+                    SetChangesMade(DataSources.Map, true);
+                } catch (Exception ex)
+                {
+                    MessageBox.Show(string.Format("Unable to load cause JSON from file '{0}':\n{1}", ofd.FileName, ex.Message));
+                }
+            }
+        }
+
+        public void SetChangesMade(DataMap map, bool status)
+        {
+            DataMapDocument document = (from DataMapDocument d in openDocuments
+                                        where d.Map == DataSources.Map
+                                        select d).FirstOrDefault();
+
+            if (document != null)
+            {
+                document.ChangesMade = status;
+            }
+        }
+
+        private void CreateIncidentJsonMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.DefaultExt = "json";
+            sfd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
+            if (sfd.ShowDialog() == false)
+            {
+                return;
+            }
+            try
+            {
+                Cursor = Cursors.Wait;
+                MapLoader loader = new MapLoader();
+                loader.LoadMap(DataSources.Map);
+
+                JsonSerializerSettings settings = new JsonSerializerSettings();
+                settings.PreserveReferencesHandling = PreserveReferencesHandling.All;
+                settings.Formatting = Formatting.Indented;
+                string incidentJson = JsonConvert.SerializeObject(loader.Incidents, settings);
+                File.WriteAllText(sfd.FileName, incidentJson);
+                Cursor = Cursors.Arrow;
+                FileInfo file = new FileInfo(sfd.FileName);
+                MessageBox.Show(string.Format("Incidents saved as JSON file '{0}'", file.Name));
+            } catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to create JSON: {0}", ex.Message));
+            }
         }
     }
 

@@ -2,13 +2,18 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.0;net48</TargetFrameworks>
+    <AssemblyName>Levrum.Data.Map</AssemblyName>
+    <RootNamespace>Levrum.Data.Map</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="12.2.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DataClasses\DataClasses.csproj" />
     <ProjectReference Include="..\DataSources\DataSources.csproj" />
     <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>

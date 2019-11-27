@@ -16,19 +16,20 @@ namespace Levrum.Data.Sources
         DataSourceType Type { get; }
         string Info { get; }
 
+        string IDColumn { get; set; }
+        string ResponseIDColumn { get; set; }
+
         List<string> RequiredParameters { get; }
         Dictionary<string, string> Parameters { get; set; }
-        
+
         bool Connect();
         void Disconnect();
-        List<string> GetTables();
-        List<string> GetColumns(string table);
-        List<string> GetColumnValues(string table, string column);
-        List<string[]> GetRecords(string table);
+        List<string> GetColumns();
+        List<string> GetColumnValues(string column);
+        List<Record> GetRecords();
     }
 
-    public enum DataSourceType { CsvSource, SqlSource };
-
+    public enum DataSourceType { CsvSource, SqlSource, EmergencyReportingSource };
 
     public class IDataSourceConcreteClassConverter : DefaultContractResolver
     {
@@ -44,32 +45,54 @@ namespace Levrum.Data.Sources
 
     public class IDataSourceConverter : JsonConverter
     {
-        static JsonSerializerSettings s_serializerSettings = new JsonSerializerSettings() { ContractResolver = new IDataSourceConcreteClassConverter() };
+        static JsonSerializerSettings s_serializerSettings;
+
+        static IDataSourceConverter()
+        {
+            s_serializerSettings = new JsonSerializerSettings();
+            s_serializerSettings.PreserveReferencesHandling = PreserveReferencesHandling.All;
+            s_serializerSettings.ContractResolver = new IDataSourceConcreteClassConverter();
+        }
 
         public override bool CanConvert(Type objectType)
         {
             return (objectType == typeof(IDataSource));
         }
 
+        public Dictionary<int, object> JsonObjectRefs { get; private set; } = new Dictionary<int, object>();
+
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             JObject jo = JObject.Load(reader);
+            if (jo.First.Path == "$ref")
+            {
+                return JsonObjectRefs[jo.Value<int>("$ref")];
+            }
+
             int index = jo["Type"].Value<int>();
             try
             {
                 DataSourceType type = (DataSourceType)index;
+                object output;
                 if (type == DataSourceType.CsvSource)
                 {
-                    return JsonConvert.DeserializeObject<CsvSource>(jo.ToString(), s_serializerSettings);
-                } else if (type == DataSourceType.SqlSource)
+                    output = JsonConvert.DeserializeObject<CsvSource>(jo.ToString(), s_serializerSettings);
+                }
+                else if (type == DataSourceType.SqlSource)
                 {
-                    return JsonConvert.DeserializeObject<SqlSource>(jo.ToString(), s_serializerSettings);
-                } else
+                    output = JsonConvert.DeserializeObject<SqlSource>(jo.ToString(), s_serializerSettings);
+                }
+                else
                 {
                     throw new NotImplementedException();
                 }
-            } catch (Exception ex)
+                int value = jo.Value<int>("$id");
+                JsonObjectRefs[value] = output;
+                return output;
+            }
+            catch (Exception ex)
             {
+                // Do stuff and things
                 throw new NotImplementedException();
             }
         }

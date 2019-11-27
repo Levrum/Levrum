@@ -4,6 +4,8 @@ using System.IO;
 using System.Text;
 
 using Newtonsoft.Json;
+using CsvHelper;
+using CsvHelper.Expressions;
 
 namespace Levrum.Data.Sources
 {
@@ -14,10 +16,13 @@ namespace Levrum.Data.Sources
         
         public string Info { get { return string.Format("CSV Source '{0}': {1}", Name, Parameters["File"]); } }
 
+        public string IDColumn { get; set; } = "";
+        public string ResponseIDColumn { get; set; } = "";
+
         private FileInfo s_file = null;
 
         [JsonIgnore]
-        public FileInfo File 
+        public FileInfo CsvFile 
         { 
             get 
             { 
@@ -50,7 +55,7 @@ namespace Levrum.Data.Sources
         {
             if (_fileName != string.Empty)
             {
-                File = new FileInfo(_fileName);
+                CsvFile = new FileInfo(_fileName);
             }
             Name = _name;
             Parameters["File"] = _fileName;
@@ -58,14 +63,15 @@ namespace Levrum.Data.Sources
 
         public CsvSource(FileInfo _file, string _name = "CSV File")
         {
-            File = _file;
+            CsvFile = _file;
             Name = _name;
             Parameters["File"] = _file.FullName;
         }
 
         public object Clone()
         {
-            CsvSource clone = new CsvSource(File.FullName, Name);
+            CsvSource clone = new CsvSource(CsvFile.FullName, Name);
+            clone.IDColumn = IDColumn;
             foreach (string key in Parameters.Keys)
             {
                 clone.Parameters[key] = Parameters[key];
@@ -76,14 +82,14 @@ namespace Levrum.Data.Sources
 
         public bool Connect()
         {
-            if (File == null)
+            if (CsvFile == null)
             {
                 if (!Parameters.ContainsKey("File"))
                 {
                     return false;
                 }
 
-                File = new FileInfo(Parameters["File"]);
+                CsvFile = new FileInfo(Parameters["File"]);
             }
 
             return true;
@@ -94,30 +100,52 @@ namespace Levrum.Data.Sources
 
         }
 
-        static readonly string[] s_tableName = new string[] { "CSV File" };
-
-        public List<string> GetTables()
+        public List<string> GetColumns()
         {
-            return new List<string>(s_tableName);
+            using (StreamReader sr = new StreamReader(CsvFile.OpenRead()))
+            using (CsvReader csvReader = new CsvReader(sr))
+            {
+                csvReader.Read();
+                csvReader.ReadHeader();
+                return new List<string>(csvReader.Context.HeaderRecord);
+            }
         }
 
-        public List<string> GetColumns(string table)
+        public List<string> GetColumnValues(string column)
         {
-            List<string> columnNames = new List<string>();
+            List<string> values = new List<string>();
+            using (StreamReader sr = new StreamReader(CsvFile.OpenRead()))
+            using (CsvReader csvReader = new CsvReader(sr))
+            {
+                csvReader.Read();
+                csvReader.ReadHeader();
+                while (csvReader.Read())
+                {
+                    values.Add(csvReader.GetField(column));
+                };
+            }
 
-            return columnNames;
+            return values;
         }
 
-        public List<string> GetColumnValues(string table, string column)
+        public List<Record> GetRecords()
         {
-            List<string> columnValues = new List<string>();
-
-            return columnValues;
-        }
-
-        public List<string[]> GetRecords(string table)
-        {
-            List<string[]> records = new List<string[]>();
+            List<Record> records = new List<Record>();
+            using (StreamReader sr = new StreamReader(CsvFile.OpenRead()))
+            using (CsvReader csvReader = new CsvReader(sr))
+            {
+                csvReader.Read();
+                csvReader.ReadHeader();
+                while (csvReader.Read())
+                {
+                    Record record = new Record();
+                    foreach (string column in csvReader.Context.HeaderRecord)
+                    {
+                        record.AddValue(column, csvReader.GetField(column));
+                    }
+                    records.Add(record);
+                };
+            }
 
             return records;
         }

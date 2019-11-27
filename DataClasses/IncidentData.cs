@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace Levrum.DataClasses
+namespace Levrum.Data.Classes
 {
     public class IncidentData
     {

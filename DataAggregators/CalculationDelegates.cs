@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Levrum.DataAggregators
+namespace Levrum.Data.Aggregators
 {
     public static class CalculationDelegates
     {

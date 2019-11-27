@@ -22,6 +22,8 @@ namespace Levrum.DataBridge
     /// </summary>
     public partial class DataSourcesList : UserControl
     {
+        public MainWindow Window { get; set; } = null;
+
         private DataMap m_dataMap = null;
         public DataMap Map 
         { 
@@ -58,6 +60,10 @@ namespace Levrum.DataBridge
             if (newSource != null)
             {
                 DataSources.Add(newSource);
+                if (Window != null)
+                {
+                    Window.SetChangesMade(Map, true);
+                }
             }
         }
 
@@ -70,12 +76,26 @@ namespace Levrum.DataBridge
             DataSources.RemoveAt(index);
             currentSource = editor.DataSource;
             DataSources.Insert(index, currentSource);
+            if (Window != null)
+            {
+                Window.SetChangesMade(Map, true);
+            }
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
             IDataSource currentSource = DataSourcesListBox.SelectedItem as IDataSource;
             DataSources.Remove(currentSource);
+            if (Window != null)
+            {
+                Window.SetChangesMade(Map, true);
+            }
+        }
+
+        private void DataSourcesListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            EditButton.IsEnabled = DataSourcesListBox.SelectedIndex != -1;
+            DeleteButton.IsEnabled = DataSourcesListBox.SelectedIndex != -1;
         }
     }
 }

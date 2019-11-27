@@ -5,9 +5,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-using Levrum.DataClasses;
+using Levrum.Data.Classes;
 
-namespace Levrum.DataAggregators
+namespace Levrum.Data.Aggregators
 {
     public static class MetricDelegates
     {

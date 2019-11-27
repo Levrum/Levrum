@@ -5,7 +5,7 @@ using System.Text;
 
 using Newtonsoft.Json;
 
-namespace Levrum.DataClasses
+namespace Levrum.Data.Classes
 {
     public class FireEMSIncident : IncidentData
     {
