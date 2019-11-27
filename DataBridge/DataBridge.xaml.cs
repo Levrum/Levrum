@@ -330,6 +330,7 @@ namespace Levrum.DataBridge
             {
                 return;
             }
+
             try
             {
                 Cursor = Cursors.Wait;

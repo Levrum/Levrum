@@ -69,7 +69,7 @@
             <xcad:LayoutRoot x:Name="_layoutRoot">
                 <xcad:LayoutPanel Orientation="Vertical">
                     <xcad:LayoutDocumentPaneGroup >
-                        <xcad:LayoutDocumentPane x:Name="DocumentPane" PropertyChanged="DocumentPane_PropertyChanged" ChildrenCollectionChanged="DocumentPane_ChildrenCollectionChanged">
+                        <xcad:LayoutDocumentPane x:Name="DocumentPane" PropertyChanged="DocumentPane_PropertyChanged">
                         </xcad:LayoutDocumentPane>
                     </xcad:LayoutDocumentPaneGroup >
                     <xcad:LayoutAnchorablePane DockHeight="200">
