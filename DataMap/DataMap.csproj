@@ -4,6 +4,12 @@
     <TargetFrameworks>netcoreapp3.0;net48</TargetFrameworks>
     <AssemblyName>Levrum.Data.Map</AssemblyName>
     <RootNamespace>Levrum.Data.Map</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.0.1</Version>
+    <Authors>Kevin M. Kelly</Authors>
+    <Company>Levrum Data Technologies</Company>
+    <Copyright>(c) 2019 Levrum Data Technologies</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

@@ -6,6 +6,7 @@ using System.Text;
 using Newtonsoft.Json;
 
 using Levrum.Data.Classes;
+using Levrum.Data.Sources;
 using Levrum.Data.Map;
 
 namespace Sandbox
@@ -93,6 +94,19 @@ namespace Sandbox.DefaultCommands
             }
 
             return "Loading complete";
+        }
+
+        public static string recordtest(List<string> args)
+        {
+            try
+            {
+                Record record = new Record();
+                record.AddValue("Test", null);
+            } catch (Exception ex)
+            {
+
+            }
+            return "Test passed.";
         }
     }
 }

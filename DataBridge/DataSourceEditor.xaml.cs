@@ -15,6 +15,7 @@ using Levrum.Data.Sources;
 using Levrum.Utils.Data;
 
 using Microsoft.Win32;
+using Microsoft.Data.SqlClient;
 
 namespace Levrum.DataBridge
 {
@@ -28,6 +29,8 @@ namespace Levrum.DataBridge
 
         List<DataSourceTypeInfo> DataSourceTypes { get; } = new List<DataSourceTypeInfo>(new DataSourceTypeInfo[] { "CSV File", "SQL Server" });
 
+        List<DataSourceTypeInfo> SqlSourceTypes { get; } = new List<DataSourceTypeInfo>(new DataSourceTypeInfo[] { "Table", "Query" });
+
         bool ChangesMade { get; set; } = false;
         private bool Loading { get; set; } = true;
 
@@ -36,14 +39,17 @@ namespace Levrum.DataBridge
             InitializeComponent();
             DataSourceTypeComboBox.ItemsSource = DataSourceTypes;
             DataSourceTypeComboBox.DisplayMemberPath = "Name";
+            SqlDataTypeComboBox.ItemsSource = SqlSourceTypes;
+            SqlDataTypeComboBox.DisplayMemberPath = "Name";
+
             if (_dataSource != null)
             {
                 OriginalDataSource = _dataSource.Clone() as IDataSource;
                 DataSource = _dataSource;
+                NameTextBox.Text = _dataSource.Name;
                 if (DataSource.Type == DataSourceType.CsvSource)
                 {
                     DataSourceTypeComboBox.SelectedItem = DataSourceTypes[0];
-                    CsvNameTextBox.Text = _dataSource.Name;
                     FileNameTextBox.Text = _dataSource.Parameters["File"];
                     CsvSource csvSource = _dataSource as CsvSource;
                     if (csvSource == null)
@@ -60,11 +66,26 @@ namespace Levrum.DataBridge
                 else if (DataSource.Type == DataSourceType.SqlSource)
                 {
                     DataSourceTypeComboBox.SelectedItem = DataSourceTypes[1];
+                    SqlServerAddress.Text = DataSource.Parameters["Server"];
+                    SqlServerPort.Text = DataSource.Parameters["Port"];
+                    SqlServerUser.Text = DataSource.Parameters["User"];
+                    SqlServerPassword.Password = DataSource.Parameters["Password"];
+                    SqlServerDatabase.Text = DataSource.Parameters["Database"];
+                    connectToSqlSource();
+                    if (DataSource.Parameters["Query"] != null)
+                    {
+                        SqlDataTypeComboBox.SelectedItem = SqlSourceTypes[1];
+                        SqlQueryTextBox.Text = DataSource.Parameters["Query"];
+                    } else
+                    {
+                        SqlTableComboBox.SelectedItem = DataSource.Parameters["Table"];
+                    }
                 }
                 ChangesMade = false;
             } else
             {
                 DataSourceTypeComboBox.SelectedItem = DataSourceTypes[0];
+                SqlDataTypeComboBox.SelectedItem = SqlSourceTypes[0];
                 DataSource = new CsvSource();
                 ChangesMade = false;
             }
@@ -81,10 +102,12 @@ namespace Levrum.DataBridge
                     return;
                 } else if (result == MessageBoxResult.No)
                 {
+                    DataSource.Disconnect();
                     DataSource = OriginalDataSource;
                 }
             } else
             {
+                DataSource.Disconnect();
                 DataSource = OriginalDataSource;
             }
             Close();
@@ -92,6 +115,7 @@ namespace Levrum.DataBridge
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            DataSource.Disconnect();
             Close();
         }
 
@@ -100,6 +124,11 @@ namespace Levrum.DataBridge
             if (Loading)
             {
                 return;
+            }
+
+            if (DataSource != null)
+            {
+                DataSource.Disconnect();
             }
 
             if (DataSourceTypeComboBox.SelectedItem.ToString() == "CSV File")
@@ -172,11 +201,10 @@ namespace Levrum.DataBridge
             }
         }
 
-        private void CsvNameTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void NameTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            CsvSource source = DataSource as CsvSource;
-            source.Name = CsvNameTextBox.Text;
-            if (OriginalDataSource == null || (OriginalDataSource != null && OriginalDataSource.Name != source.Name))
+            DataSource.Name = NameTextBox.Text;
+            if (OriginalDataSource == null || (OriginalDataSource != null && OriginalDataSource.Name != DataSource.Name))
             {
                 ChangesMade = true;
             }
@@ -184,12 +212,98 @@ namespace Levrum.DataBridge
 
         private void IdColumnComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            DataSource.IDColumn = IdColumnComboBox.SelectedItem as string;
+            ComboBox comboBox = sender as ComboBox;
+            if (comboBox != null)
+            {
+                DataSource.IDColumn = comboBox.SelectedItem as string;
+            }
         }
 
         private void ResponseIdColumnComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            DataSource.ResponseIDColumn = ResponseIdColumnComboBox.SelectedItem as string;
+            ComboBox comboBox = sender as ComboBox;
+            if (comboBox != null)
+            {
+                DataSource.ResponseIDColumn = comboBox.SelectedItem as string;
+            }
+        }
+
+        private void ConnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            SqlStatusText.Text = "Connecting...";
+            connectToSqlSource();
+        }
+
+        private void connectToSqlSource()
+        {
+            SqlSource dataSource = DataSource as SqlSource;
+            dataSource.Parameters["Server"] = SqlServerAddress.Text;
+            dataSource.Parameters["Port"] = SqlServerPort.Text;
+            dataSource.Parameters["User"] = SqlServerUser.Text;
+            dataSource.Parameters["Password"] = SqlServerPassword.Password;
+            dataSource.Parameters["Database"] = SqlServerDatabase.Text;
+
+            if (!string.IsNullOrWhiteSpace(SqlQueryTextBox.Text))
+            {
+                dataSource.Parameters["Query"] = SqlQueryTextBox.Text;
+            }
+
+            bool connected = dataSource.Connect();
+            if (connected)
+            {
+                SqlStatusText.Text = "Connected OK!";
+            }
+            else
+            {
+                SqlStatusText.Text = "Unable to connect!";
+            }
+            List<string> tables = dataSource.GetTables();
+            tables.Sort();
+            SqlTableComboBox.ItemsSource = tables;
+            if (dataSource.Parameters.ContainsKey("Query"))
+            {
+                SqlIdColumnComboBox.ItemsSource = dataSource.GetColumns();
+                SqlResponseIdColumnComboBox.ItemsSource = dataSource.GetColumns();
+            }
+            dataSource.Disconnect();
+        }
+
+        private void SqlDataTypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (SqlDataTypeComboBox.SelectedItem == SqlSourceTypes[0])
+            {
+                // Table
+                SqlTableComboBox.Visibility = Visibility.Visible;
+                SqlTableTextBlock.Visibility = Visibility.Visible;
+                SqlTableDetailsTextBox.Visibility = Visibility.Visible;
+                SqlQueryTextBox.Visibility = Visibility.Hidden;
+                SqlQueryTextBox.Text = string.Empty;
+                if (DataSource != null)
+                {
+                    DataSource.Parameters.Remove("Query");
+                }
+            } else
+            {
+                // Query
+                SqlTableComboBox.Visibility = Visibility.Hidden;
+                SqlTableTextBlock.Visibility = Visibility.Hidden;
+                SqlTableDetailsTextBox.Visibility = Visibility.Hidden;
+                SqlQueryTextBox.Visibility = Visibility.Visible;
+                if (DataSource != null)
+                {
+                    DataSource.Parameters.Remove("Table");
+                }
+            }
+        }
+
+        private void SqlTableComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (DataSource != null)
+            {
+                DataSource.Parameters["Table"] = SqlTableComboBox.SelectedItem as string;
+                SqlIdColumnComboBox.ItemsSource = DataSource.GetColumns();
+                SqlResponseIdColumnComboBox.ItemsSource = DataSource.GetColumns();
+            }
         }
     }
 

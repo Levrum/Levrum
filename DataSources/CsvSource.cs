@@ -92,7 +92,7 @@ namespace Levrum.Data.Sources
                 CsvFile = new FileInfo(Parameters["File"]);
             }
 
-            return true;
+            return CsvFile.Exists;
         }
 
         public void Disconnect()

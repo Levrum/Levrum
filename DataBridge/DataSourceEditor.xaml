@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Levrum.DataBridge"
         mc:Ignorable="d"
-        Title="DataSource Editor" Height="350" Width="600">
+        Title="DataSource Editor" Height="350" Width="800">
     <Grid Margin="0,0,0,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
@@ -22,7 +22,7 @@
             <Label Grid.Column="0" Margin="5,6,4,8" Height="32">Data Source Type:</Label>
             <ComboBox Grid.Column="1" x:Name="DataSourceTypeComboBox" Margin="0,8,0,8" SelectionChanged="DataSourceType_SelectionChanged" DisplayMemberPath="Name"/>
             <TextBlock Height="16" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">Name:</TextBlock>
-            <TextBox x:Name="CsvNameTextBox" Height="24" Grid.Column="3" TextChanged="CsvNameTextBox_TextChanged" VerticalContentAlignment="Center" Margin="0,0,8,0"></TextBox>
+            <TextBox x:Name="NameTextBox" Height="24" Grid.Column="3" TextChanged="NameTextBox_TextChanged" VerticalContentAlignment="Center" Margin="0,0,8,0"></TextBox>
         </Grid>
         <Grid x:Name="CsvOptionsGrid" Grid.Row="1" Visibility="Visible">
             <Grid.RowDefinitions>
@@ -61,9 +61,70 @@
             </Grid>
         </Grid>
         <Grid x:Name="SqlOptionsGrid" Grid.Row="1" Visibility="Hidden">
-            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="300*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="0,0,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="48"/>
+                    <ColumnDefinition Width="80*"/>
+                    <ColumnDefinition Width="28"/>
+                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition Width="30"/>
+                    <ColumnDefinition Width="60*"/>
+                    <ColumnDefinition Width="55"/>
+                    <ColumnDefinition Width="60*"/>
+                    <ColumnDefinition Width="55"/>
+                    <ColumnDefinition Width="60*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Margin="8,0,0,0" VerticalAlignment="Center">Server:</TextBlock>
+                <TextBox x:Name="SqlServerAddress" Grid.Column="1" Height="24" Margin="8,0,8,0" HorizontalContentAlignment="Right"></TextBox>
+                <TextBlock Grid.Column="2" VerticalAlignment="Center">Port:</TextBlock>
+                <TextBox x:Name="SqlServerPort" Grid.Column="3" Margin="8,0,8,0" Height="24" HorizontalContentAlignment="Right"></TextBox>
+                <TextBlock Grid.Column="4" VerticalAlignment="Center">User:</TextBlock>
+                <TextBox x:Name="SqlServerUser" Grid.Column="5" Margin="8,0,8,0" Height="24" HorizontalContentAlignment="Right"></TextBox>
+                <TextBlock Grid.Column="6" VerticalAlignment="Center">Password:</TextBlock>
+                <PasswordBox x:Name="SqlServerPassword" Grid.Column="7" Margin="8,0,8,0" Height="24" HorizontalContentAlignment="Right"></PasswordBox>
+                <TextBlock Grid.Column="8" VerticalAlignment="Center">Database:</TextBlock>
+                <TextBox x:Name="SqlServerDatabase" Grid.Column="9" Margin="8,0,8,0" Height="24" HorizontalContentAlignment="Right"></TextBox>
+            </Grid>
+            <Grid Grid.Row="1" Margin="0,8,0,8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="48"/>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="200*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Margin="8,0,0,0" VerticalAlignment="Center">Type:</TextBlock>
+                <ComboBox x:Name="SqlDataTypeComboBox" Grid.Column="1" Margin="0,0,0,0" SelectionChanged="SqlDataTypeComboBox_SelectionChanged"/>
+                <DockPanel Grid.Column="2" HorizontalAlignment="Stretch">
+                    <TextBlock x:Name="SqlTableTextBlock" Height="16" Margin="8,0,0,0">Table:</TextBlock>
+                    <ComboBox x:Name="SqlTableComboBox" Width="120" Margin="8,0,0,0" SelectionChanged="SqlTableComboBox_SelectionChanged"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="120*"/>
+                            <ColumnDefinition Width="70"/>
+                            <ColumnDefinition Width="120*"/>
+                        </Grid.ColumnDefinitions>
+                    <TextBlock Height="16" Grid.Column="0" Margin="8,0,0,0">Incident ID:</TextBlock>
+                    <ComboBox x:Name="SqlIdColumnComboBox" Grid.Column="1" Margin="8,0,8,0" SelectionChanged="IdColumnComboBox_SelectionChanged"></ComboBox>
+                    <TextBlock Height="16" Grid.Column="2">Response ID:</TextBlock>
+                    <ComboBox x:Name="SqlResponseIdColumnComboBox" Grid.Column="3" Margin="8,0,8,0" SelectionChanged="ResponseIdColumnComboBox_SelectionChanged"></ComboBox>
+                    </Grid>
+                </DockPanel>
+            </Grid>
+            <Grid Grid.Row="2">
+                <TextBox x:Name="SqlQueryTextBox" Margin="8,0,8,0" TextWrapping="WrapWithOverflow" AcceptsReturn="True" Visibility="Visible"/>
+                <TextBox x:Name="SqlTableDetailsTextBox" Margin="8,0,8,0" TextWrapping="WrapWithOverflow" Visibility="Hidden"/>
+            </Grid>
         </Grid>
-        <StackPanel x:Name="CsvOptionsButtons" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Visibility="Visible">
+        <StackPanel x:Name="SqlOptionsPanel" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Stretch" Visibility="Visible">
+            <Button x:Name="ConnectButton" Width="80" Margin="8,8,0,8" Click="ConnectButton_Click">Connect</Button>
+            <TextBlock x:Name="SqlStatusText" Margin="8,8,0,8" VerticalAlignment="Center">Disconnected</TextBlock>
+        </StackPanel>
+        <StackPanel x:Name="CsvOptionsButtons" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Visibility="Hidden">
             <Button x:Name="SummarizeCsvButton" Width="80" Margin="8,8,0,8" Click="SummarizeCsvButton_Click">Summarize</Button>
         </StackPanel>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">

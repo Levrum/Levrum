@@ -40,7 +40,7 @@ namespace Levrum.Data.Sources
 
         [JsonIgnore]
         public List<string> RequiredParameters { get { return new List<string>(s_requiredParameters); } }
-        public Dictionary<string, string> Parameters { get; set; }
+        public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
 
         protected SqlConnection m_connection = null;
         protected bool m_connected = false;
@@ -134,7 +134,7 @@ namespace Levrum.Data.Sources
             try
             {
                 Connect();
-                SqlCommand cmd = new SqlCommand(string.Format("SELECT table_name FROM INFORMATION_SCHEMA.TABLES WHERE table_schema LIKE '%{0}%'", Parameters["Database"]), m_connection);
+                SqlCommand cmd = new SqlCommand(string.Format("SELECT table_name FROM INFORMATION_SCHEMA.TABLES;"), m_connection);
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
                     while (dr.Read())
@@ -172,7 +172,8 @@ namespace Levrum.Data.Sources
             List<string> output = new List<string>();
             try
             {
-                SqlCommand cmd = new SqlCommand(string.Format("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name LIKE '%{0}%'", Parameters["Table"]));
+                Connect();
+                SqlCommand cmd = new SqlCommand(string.Format("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name LIKE '%{0}%'", Parameters["Table"]), m_connection);
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
                     while (dr.Read())
@@ -196,7 +197,9 @@ namespace Levrum.Data.Sources
             List<string> output = new List<string>();
             try
             {
-                SqlCommand cmd = new SqlCommand(string.Format("SELECT name FROM sys.dm_exec_describe_first_result_set('{0}', NULL, 0);", Parameters["Query"]));
+                Connect();
+                string query = Parameters["Query"].Replace("'", "''");
+                SqlCommand cmd = new SqlCommand(string.Format("SELECT name FROM sys.dm_exec_describe_first_result_set('{0}', NULL, 0);", query), m_connection);
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
                     while (dr.Read())
@@ -208,7 +211,12 @@ namespace Levrum.Data.Sources
                         }
                     }
                 }
-            } finally
+            }
+            catch (Exception ex)
+            {
+
+            }
+            finally
             {
 
             }
@@ -233,8 +241,9 @@ namespace Levrum.Data.Sources
                 {
                     return output;
                 }
-
-                SqlCommand cmd = new SqlCommand(string.Format("SELECT {0} FROM ({1}) AS A", column, source));
+                
+                Connect();
+                SqlCommand cmd = new SqlCommand(string.Format("SELECT {0} FROM ({1}) AS A", column, source), m_connection);
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
                     while (dr.Read())
@@ -255,10 +264,69 @@ namespace Levrum.Data.Sources
 
         public List<Record> GetRecords()
         {
+            try
+            {
+                if (Parameters.ContainsKey("Table"))
+                {
+                    return getRecordsFromTable();
+                } else if (Parameters.ContainsKey("Query"))
+                {
+                    return getRecordsFromQuery();
+                }
+            } finally
+            {
+
+            }
+            return new List<Record>();
+        }
+
+        private List<Record> getRecordsFromTable()
+        {
             List<Record> output = new List<Record>();
             try
             {
+                Connect();
+                SqlCommand cmd = new SqlCommand(string.Format("SELECT * FROM {0}", Parameters["Table"], m_connection));
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        Record record = new Record();
+                        for (int i = 0; i < dr.FieldCount; i++)
+                        {
+                            record.AddValue(dr.GetName(i), dr.GetValue(i));
+                        }
+                        output.Add(record);
+                    }
+                }
+            }
+            finally
+            {
 
+            }
+            return output;
+        }
+
+        private List<Record> getRecordsFromQuery()
+        {
+            List<Record> output = new List<Record>();
+            try
+            {
+                Connect();
+                SqlCommand cmd = new SqlCommand(Parameters["Query"], m_connection);
+                cmd.CommandTimeout = 120;
+                using (SqlDataReader dr = cmd.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        Record record = new Record();
+                        for (int i = 0; i < dr.FieldCount; i++)
+                        {
+                            record.AddValue(dr.GetName(i), dr.GetValue(i));
+                        }
+                        output.Add(record);
+                    }
+                }
             } finally
             {
 

@@ -76,7 +76,7 @@ namespace Levrum.Data.Map
 
         public string[] GetNatureCodeData(string natureCode)
         {
-            string[] codeData = new string[3] { natureCode, "Unknown", "Unknown" };
+            string[] codeData = new string[3] { null, "Unknown", "Unknown" };
             CauseData parentCause = null;
             NatureCode code = null;
 
@@ -88,7 +88,10 @@ namespace Levrum.Data.Map
 
                 if (code != null)
                 {
-                    codeData[0] = string.Format("{0}: {1}", code.Value, code.Description);
+                    if (!string.IsNullOrWhiteSpace(code.Description))
+                    {
+                        codeData[0] = code.Description;
+                    }
                     parentCause = cause;
                     break;
                 }
@@ -460,7 +463,11 @@ namespace Levrum.Data.Map
                     natureCode = incident.Data["Code"].ToString();
                 }
                 string[] natureCodeData = GetNatureCodeData(natureCode);
-                incident.Data["Code"] = natureCodeData[0];
+                if (!string.IsNullOrWhiteSpace(natureCodeData[0]))
+                {
+                    incident.Data["CodeDescription"] = natureCodeData[0];
+                }
+
                 incident.Data["Category"] = natureCodeData[1];
                 incident.Data["Type"] = natureCodeData[2];
             }
