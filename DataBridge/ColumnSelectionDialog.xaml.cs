@@ -34,16 +34,20 @@ namespace Levrum.DataBridge
                 m_result = value;
                 if (!m_closing)
                 {
-                    FieldNameTextBox.Text = value.Field;
+                    FieldNameComboBox.Text = value.Field;
                     FieldSourceComboBox.SelectedItem = value.Column.DataSource;
                     ColumnComboBox.SelectedItem = value.Column.ColumnName;
                 }
             } 
         }
 
+        public List<string> DefaultFieldNames = new List<string>(new string[] { "Code", "Category", "Type", "Jurisdiction", "District", "Priority", "CallProcessed", "Unit", "UnitType", "Shift", "Assigned", "Responding", "OnScene", "ClearScene", "InService", "InQuarters" });
+
         public ColumnSelectionDialog(List<IDataSource> _dataSources, DataMapping _mapping)
         {
             InitializeComponent();
+            FieldNameComboBox.ItemsSource = DefaultFieldNames;
+
             FieldSourceComboBox.ItemsSource = _dataSources;
             FieldSourceComboBox.DisplayMemberPath = "Name";
 
@@ -60,9 +64,10 @@ namespace Levrum.DataBridge
         {
             InitializeComponent();
             Result = new DataMapping();
+            FieldNameComboBox.ItemsSource = DefaultFieldNames;
 
-            FieldNameTextBox.Text = _fieldName;
-            FieldNameTextBox.IsReadOnly = fieldNameReadOnly;
+            FieldNameComboBox.Text = _fieldName;
+            FieldNameComboBox.IsReadOnly = fieldNameReadOnly;
 
             FieldSourceComboBox.ItemsSource = _dataSources;
             FieldSourceComboBox.DisplayMemberPath = "Name";
@@ -82,6 +87,7 @@ namespace Levrum.DataBridge
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            Result.Field = FieldNameComboBox.Text; 
             Close();
         }
 
@@ -92,9 +98,9 @@ namespace Levrum.DataBridge
             Close();
         }
 
-        private void FieldNameTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void FieldNameComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            Result.Field = FieldNameTextBox.Text;
+            FieldNameComboBox.Text = FieldNameComboBox.SelectedItem as string;
         }
     }
 }

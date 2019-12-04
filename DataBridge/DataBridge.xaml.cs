@@ -34,6 +34,8 @@ namespace Levrum.DataBridge
     {
         public List<DataMapDocument> openDocuments = new List<DataMapDocument>();
 
+        public DataMapEditor ActiveEditor { get; set; } = null;
+
         // public Dictionary<DataMap, LayoutDocument> openDocuments = new Dictionary<DataMap, LayoutDocument>();
 
         public MainWindow()
@@ -44,21 +46,32 @@ namespace Levrum.DataBridge
 
         public void NewMenuItem_Click(object sender, RoutedEventArgs e)
         {
+            NewDataMapWindow window = new NewDataMapWindow();
+            window.ShowDialog();
+
+            if (window.Result == null)
+            {
+                return;
+            }
+
             LayoutDocument document = new LayoutDocument();
-            string title = "New DataMap.dmap";
+            DataMap newMap = window.Result;
+            string baseTitle = newMap.Name.Substring(0, newMap.Name.Length - 5);
+            string title = newMap.Name;
             int counter = 1;
             foreach (DataMapDocument mapDocument in openDocuments)
             {
                 while (mapDocument.Map.Name == title)
                 {
-                    title = string.Format("New DataMap {0}.dmap", counter);
+                    title = string.Format("{0} {1}.dmap", baseTitle, counter);
                     counter++;
                 }
             }
-            
-            DataMap newMap = new DataMap(title);
+
+            newMap.Name = title;
             document.Title = title;
             DataMapEditor editor = new DataMapEditor(newMap);
+            ActiveEditor = editor;
             editor.Window = this;
             document.Content = editor;
             DocumentPane.Children.Add(document);
@@ -69,7 +82,11 @@ namespace Levrum.DataBridge
         {
             try
             {
+                DirectoryInfo di = new DirectoryInfo(string.Format("{0}\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Levrum\\Data Maps"));
+                di.Create();
+
                 OpenFileDialog ofd = new OpenFileDialog();
+                ofd.InitialDirectory = di.FullName;
                 ofd.DefaultExt = "dmap";
                 ofd.Filter = "Levrum DataMap (*.dmap)|*.dmap|All files (*.*)|*.*";
                 if (ofd.ShowDialog() == true) {
@@ -92,6 +109,7 @@ namespace Levrum.DataBridge
                     LayoutDocument document = new LayoutDocument();
                     document.Title = map.Name;
                     DataMapEditor editor = new DataMapEditor(map);
+                    ActiveEditor = editor;
                     editor.Window = this;
                     document.Content = editor;
                     DocumentPane.Children.Add(document);
@@ -107,6 +125,7 @@ namespace Levrum.DataBridge
         {
             LayoutDocument document = DocumentPane.SelectedContent as LayoutDocument;
             DataMapEditor editor = document.Content as DataMapEditor;
+            ActiveEditor = null;
             DataMap map = editor.DataMap;
             DataMapDocument openDocument = (from DataMapDocument d in openDocuments
                                             where d.Map == map
@@ -163,7 +182,11 @@ namespace Levrum.DataBridge
 
                 if (forceSaveAs || string.IsNullOrEmpty(map.Path))
                 {
+                    DirectoryInfo di = new DirectoryInfo(string.Format("{0}\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Levrum\\Data Maps"));
+                    di.Create();
+
                     SaveFileDialog sfd = new SaveFileDialog();
+                    sfd.InitialDirectory = di.FullName;
                     sfd.DefaultExt = "dmap";
                     sfd.Filter = "Levrum DataMap (*.dmap)|*.dmap|All files (*.*)|*.*";
                     if (sfd.ShowDialog() == false)
@@ -185,6 +208,9 @@ namespace Levrum.DataBridge
                 if (document != null) {
                     document.ChangesMade = false;
                 }
+
+                SaveAsMenuItem.Header = string.Format("Save {0} _As...", map.Name);
+                SaveMenuItem.Header = string.Format("_Save {0}", map.Name);
                 return true;
             } catch (Exception ex)
             {
@@ -205,6 +231,7 @@ namespace Levrum.DataBridge
                 LayoutDocument document = DocumentPane.SelectedContent as LayoutDocument;
                 if (document != null) {
                     DataMapEditor editor = document.Content as DataMapEditor;
+                    ActiveEditor = editor;
                     if (editor != null)
                     {
                         DataMap map = editor.DataMap;
@@ -221,16 +248,13 @@ namespace Levrum.DataBridge
                             DataSources.Map = map;
                             DataSources.IsEnabled = true;
                             CoordinateConversionMenuItem.IsEnabled = true;
-                            if (map.EnableCoordinateConversion)
-                            {
-                                CoordinateConversionMenuItem.Header = "Disable _Coordinate Conversion";
-                                DefineProjectionMenuItem.IsEnabled = true;
-                            }
-                            else
-                            {
-                                CoordinateConversionMenuItem.Header = "Enable _Coordinate Conversion";
-                                DefineProjectionMenuItem.IsEnabled = false;
-                            }
+                            updateCoordinateConversionHeader();
+
+                            ToggleInvertLatitude.IsEnabled = true;
+                            ToggleInvertLongitude.IsEnabled = true;
+                            updateInvertLatitudeHeader();
+                            updateInvertLongitudeHeader();                            
+
                             SelectCauseTreeMenuItem.IsEnabled = true;
                             return;
                         }
@@ -262,15 +286,25 @@ namespace Levrum.DataBridge
         {
             DataSources.Map.EnableCoordinateConversion = !DataSources.Map.EnableCoordinateConversion;
             DefineProjectionMenuItem.IsEnabled = DataSources.Map.EnableCoordinateConversion;
-            if (DataSources.Map.EnableCoordinateConversion)
-            {
-                CoordinateConversionMenuItem.Header = "Disable _Coordinate Conversion";
-            } else
-            {
-                CoordinateConversionMenuItem.Header = "Enable _Coordinate Conversion";
-            }
+            updateCoordinateConversionHeader();
 
             SetChangesMade(DataSources.Map, true);
+        }
+
+        private void updateCoordinateConversionHeader()
+        {
+            if (DataSources.Map.EnableCoordinateConversion)
+            {
+                CoordinateConversionMenuItem.Header = "_Coordinate Conversion Enabled";
+                CoordinateConversionMenuItem.IsChecked = true;
+                DefineProjectionMenuItem.IsEnabled = true;
+            }
+            else
+            {
+                CoordinateConversionMenuItem.Header = "_Coordinate Conversion Disabled";
+                CoordinateConversionMenuItem.IsChecked = false;
+                DefineProjectionMenuItem.IsEnabled = false;
+            }
         }
 
         private void DefineProjectionMenuItem_Click(object sender, RoutedEventArgs e)
@@ -299,7 +333,7 @@ namespace Levrum.DataBridge
             {
                 try
                 {
-                    List<CauseData> causeTree = JsonConvert.DeserializeObject<List<CauseData>>(File.ReadAllText(ofd.FileName), new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All });
+                    List<CauseData> causeTree = JsonConvert.DeserializeObject<List<CauseData>>(File.ReadAllText(ofd.FileName), new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All });
                     DataSources.Map.CauseTree = causeTree;
                     SetChangesMade(DataSources.Map, true);
                 } catch (Exception ex)
@@ -324,16 +358,17 @@ namespace Levrum.DataBridge
         private void CreateIncidentJsonMenuItem_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
+            sfd.InitialDirectory = string.Format("{0}\\Levrum", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
             sfd.DefaultExt = "json";
             sfd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
             if (sfd.ShowDialog() == false)
             {
                 return;
             }
+            Cursor = Cursors.Wait;
 
             try
-            {
-                Cursor = Cursors.Wait;
+            {    
                 MapLoader loader = new MapLoader();
                 loader.LoadMap(DataSources.Map);
 
@@ -342,12 +377,16 @@ namespace Levrum.DataBridge
                 settings.Formatting = Formatting.Indented;
                 string incidentJson = JsonConvert.SerializeObject(loader.Incidents, settings);
                 File.WriteAllText(sfd.FileName, incidentJson);
-                Cursor = Cursors.Arrow;
+                
                 FileInfo file = new FileInfo(sfd.FileName);
                 MessageBox.Show(string.Format("Incidents saved as JSON file '{0}'", file.Name));
             } catch (Exception ex)
             {
                 MessageBox.Show(string.Format("Unable to create JSON: {0}", ex.Message));
+            } finally
+            {
+                GC.Collect();
+                Cursor = Cursors.Arrow;
             }
         }
 
@@ -379,6 +418,50 @@ namespace Levrum.DataBridge
             }
 
             openDocuments.Remove(openDocument);
+        }
+
+        private void ToggleInvertLongitude_Click(object sender, RoutedEventArgs e)
+        {
+            DataSources.Map.InvertLongitude = !DataSources.Map.InvertLongitude;
+            updateInvertLongitudeHeader();
+
+            SetChangesMade(DataSources.Map, true);
+        }
+
+        private void updateInvertLongitudeHeader()
+        {
+            if (DataSources.Map.InvertLongitude)
+            {
+                ToggleInvertLongitude.Header = "Invert Lon_gitude Enabled";
+                ToggleInvertLongitude.IsChecked = true;
+            }
+            else
+            {
+                ToggleInvertLongitude.Header = "Invert Lon_gitude Disabled";
+                ToggleInvertLongitude.IsChecked = false;
+            }
+        }
+
+        private void ToggleInvertLatitude_Click(object sender, RoutedEventArgs e)
+        {
+            DataSources.Map.InvertLatitude = !DataSources.Map.InvertLatitude;
+            updateInvertLatitudeHeader();
+
+            SetChangesMade(DataSources.Map, true);
+        }
+
+        private void updateInvertLatitudeHeader()
+        {
+            if (DataSources.Map.InvertLatitude)
+            {
+                ToggleInvertLatitude.Header = "Invert _Latitude Enabled";
+                ToggleInvertLatitude.IsChecked = true;
+            }
+            else
+            {
+                ToggleInvertLatitude.Header = "Invert _Latitude Disabled";
+                ToggleInvertLatitude.IsChecked = false;
+            }
         }
     }
 

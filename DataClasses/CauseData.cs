@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+
 namespace Levrum.Data.Classes
 {
-    public class CauseData
+    public class CauseData : CategoryData
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public List<CauseData> Children { get; set; } = new List<CauseData>();
-        public List<NatureCode> NatureCodes { get; set; } = new List<NatureCode>();
+        public List<ICategorizedValue> NatureCodes { get { return Values; } set { Values = value; } }
 
         public CauseData()
         {
@@ -17,7 +17,7 @@ namespace Levrum.Data.Classes
         }
     }
 
-    public class NatureCode
+    public class NatureCode : ICategorizedValue
     {
         public string Value { get; set; }
         public string Description { get; set; }

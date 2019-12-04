@@ -37,14 +37,19 @@ namespace Levrum.Data.Map
                 processResponseDataMappings(map);
                 processBenchmarkMappings(map);
 
-                CauseData = flattenCauseData(map.CauseTree);
+                List<ICategoryData> causeTree = new List<ICategoryData>();
+                foreach (CauseData cause in map.CauseTree)
+                {
+                    causeTree.Add(cause);
+                }
+                CauseData = flattenCauseData(causeTree);
 
                 cleanupIncidentData(map);
                 cleanupResponseData(map);
                 cleanupBenchmarks(map);
 
                 calculateDerivedBenchmarks(map);
-            } 
+            }
             finally
             {
                 foreach (IDataSource dataSource in map.DataSources)
@@ -53,7 +58,8 @@ namespace Levrum.Data.Map
                     {
                         dataSource.Disconnect();
                         dataSource.Dispose();
-                    } catch (Exception ex)
+                    }
+                    catch (Exception ex)
                     {
 
                     }
@@ -62,7 +68,7 @@ namespace Levrum.Data.Map
             return false;
         }
 
-        private List<CauseData> flattenCauseData(List<CauseData> source)
+        private List<CauseData> flattenCauseData(List<ICategoryData> source)
         {
             List<CauseData> output = new List<CauseData>();
             foreach (CauseData data in source)
@@ -78,7 +84,7 @@ namespace Levrum.Data.Map
         {
             string[] codeData = new string[3] { null, "Unknown", "Unknown" };
             CauseData parentCause = null;
-            NatureCode code = null;
+            ICategorizedValue code = null;
 
             foreach (CauseData cause in CauseData)
             {
@@ -99,7 +105,7 @@ namespace Levrum.Data.Map
 
             if (parentCause == null)
                 return codeData;
-            
+
             CauseData grandparentCause = (from CauseData cause in CauseData
                                           where cause.Children.Contains(parentCause)
                                           select cause).FirstOrDefault();
@@ -128,12 +134,23 @@ namespace Levrum.Data.Map
                                                        where mapping.Column.DataSource == dataSource
                                                        select mapping).ToList();
 
+                if (mappingsForSource.Count == 0)
+                {
+                    continue;
+                }
+
                 List<Record> recordsFromSource = dataSource.GetRecords();
                 foreach (Record record in recordsFromSource)
                 {
                     IncidentData incident;
-                    string recordIncidentId = record.GetValue(dataSource.IDColumn) as string;
-                    if (string.IsNullOrEmpty(recordIncidentId))
+                    object idValue = record.GetValue(dataSource.IDColumn);
+                    string recordIncidentId = "";
+                    if (idValue != null) 
+                    {
+                        recordIncidentId = idValue.ToString();
+                    }
+
+                    if (string.IsNullOrWhiteSpace(recordIncidentId))
                     {
                         ErrorRecords[dataSource].Add(new Tuple<DataMapping, Record>(null, record));
                         continue;
@@ -151,8 +168,8 @@ namespace Levrum.Data.Map
                     {
                         try
                         {
-                            string value = record.GetValue(mapping.Column.ColumnName) as string;
-                            if (string.IsNullOrEmpty(value))
+                            object value = record.GetValue(mapping.Column.ColumnName);
+                            if (value == null)
                             {
                                 ErrorRecords[dataSource].Add(new Tuple<DataMapping, Record>(mapping, record));
                                 continue;
@@ -162,31 +179,55 @@ namespace Levrum.Data.Map
                             {
                                 case "Time":
                                     DateTime time;
-                                    if (!DateTime.TryParse(value, out time))
+                                    if (value is DateTime)
                                     {
-                                        ErrorRecords[dataSource].Add(new Tuple<DataMapping, Record>(mapping, record));
-                                        continue;
+                                        time = (DateTime)value;
+                                    }
+                                    else
+                                    {
+                                        value = value.ToString();
+                                        if (!DateTime.TryParse(value as string, out time))
+                                        {
+                                            ErrorRecords[dataSource].Add(new Tuple<DataMapping, Record>(mapping, record));
+                                            continue;
+                                        }
                                     }
                                     incident.Time = time;
                                     break;
                                 case "Location":
-                                    incident.Location = value;
+                                    incident.Location = value as string;
                                     break;
                                 case "Latitude":
                                     double latitude;
-                                    if (!double.TryParse(value, out latitude))
+                                    if (value is double)
                                     {
-                                        ErrorRecords[dataSource].Add(new Tuple<DataMapping, Record>(mapping, record));
-                                        continue;
+                                        latitude = (double)value;
+                                    }
+                                    else
+                                    {
+                                        value = value.ToString();
+                                        if (!double.TryParse(value as string, out latitude))
+                                        {
+                                            ErrorRecords[dataSource].Add(new Tuple<DataMapping, Record>(mapping, record));
+                                            continue;
+                                        }
                                     }
                                     incident.Latitude = latitude;
                                     break;
                                 case "Longitude":
                                     double longitude;
-                                    if (!double.TryParse(value, out longitude))
+                                    if (value is double)
                                     {
-                                        ErrorRecords[dataSource].Add(new Tuple<DataMapping, Record>(mapping, record));
-                                        continue;
+                                        longitude = (double)value;
+                                    }
+                                    else
+                                    {
+                                        value = value.ToString();
+                                        if (!double.TryParse(value as string, out longitude))
+                                        {
+                                            ErrorRecords[dataSource].Add(new Tuple<DataMapping, Record>(mapping, record));
+                                            continue;
+                                        }
                                     }
                                     incident.Longitude = longitude;
                                     break;
@@ -205,11 +246,11 @@ namespace Levrum.Data.Map
                 }
             }
         }
-    
+
         private void processIncidentDataMappings(DataMap map)
         {
             HashSet<IDataSource> dataSources = (from mapping in map.IncidentDataMappings
-                                                                   select mapping.Column.DataSource).ToHashSet();
+                                                select mapping.Column.DataSource).ToHashSet();
 
             foreach (IDataSource dataSource in dataSources)
             {
@@ -217,11 +258,21 @@ namespace Levrum.Data.Map
                                                        where mapping.Column.DataSource == dataSource
                                                        select mapping).ToList();
 
+                if (mappingsForSource.Count == 0)
+                {
+                    continue;
+                }
+
                 List<Record> recordsFromSource = dataSource.GetRecords();
                 foreach (Record record in recordsFromSource)
                 {
                     IncidentData incident;
-                    string recordIncidentId = record.GetValue(dataSource.IDColumn) as string;
+                    object value = record.GetValue(dataSource.IDColumn);
+                    string recordIncidentId = null;
+                    if (value != null) {
+                        recordIncidentId = value.ToString();
+                    }
+
                     if (string.IsNullOrEmpty(recordIncidentId))
                     {
                         ErrorRecords[dataSource].Add(new Tuple<DataMapping, Record>(null, record));
@@ -238,31 +289,14 @@ namespace Levrum.Data.Map
 
                     foreach (DataMapping mapping in mappingsForSource)
                     {
-                        string stringValue = record.GetValue(mapping.Column.ColumnName) as string;
+                        string stringValue = record.GetValue(mapping.Column.ColumnName).ToString();
                         if (string.IsNullOrEmpty(stringValue))
                         {
                             ErrorRecords[dataSource].Add(new Tuple<DataMapping, Record>(mapping, record));
                             continue;
                         }
 
-                        object parsedValue = null;
-                        DateTime dateValue;
-                        double doubleValue;
-                        int intValue;
-
-                        if (DateTime.TryParse(stringValue, out dateValue))
-                        {
-                            parsedValue = dateValue;
-                        } else if (int.TryParse(stringValue, out intValue))
-                        {
-                            parsedValue = intValue;
-                        } else if (double.TryParse(stringValue, out doubleValue))
-                        {
-                            parsedValue = doubleValue;
-                        } else
-                        {
-                            parsedValue = stringValue;
-                        }
+                        object parsedValue = getParsedValue(stringValue);
 
                         incident.Data[mapping.Field] = parsedValue;
                     }
@@ -281,11 +315,22 @@ namespace Levrum.Data.Map
                                                        where mapping.Column.DataSource == dataSource
                                                        select mapping).ToList();
 
+                if (mappingsForSource.Count == 0)
+                {
+                    continue;
+                }
+
                 List<Record> recordsFromSource = dataSource.GetRecords();
                 foreach (Record record in recordsFromSource)
                 {
                     IncidentData incident;
-                    string recordIncidentId = record.GetValue(dataSource.IDColumn) as string;
+                    object value = record.GetValue(dataSource.IDColumn);
+                    string recordIncidentId = null;
+                    if (value != null)
+                    {
+                        recordIncidentId = value.ToString();
+                    }
+
                     if (string.IsNullOrEmpty(recordIncidentId))
                     {
                         ErrorRecords[dataSource].Add(new Tuple<DataMapping, Record>(null, record));
@@ -300,11 +345,18 @@ namespace Levrum.Data.Map
                         Incidents.Add(incident);
                     }
 
+
+                    string recordResponseId = string.Empty;
+                    if (!string.IsNullOrEmpty(dataSource.ResponseIDColumn)) {
+                        object recordResponseIdValue = record.GetValue(dataSource.ResponseIDColumn);
+                        if (recordResponseIdValue != null)
+                            recordResponseId = recordResponseIdValue.ToString();
+                    }
                     
-                    string recordResponseId = record.GetValue(dataSource.ResponseIDColumn) as string;
                     ResponseData response = (from r in incident.Responses
                                              where r.Data.ContainsKey("ResponseID") && recordResponseId == r.Data["ResponseID"] as string
                                              select r).FirstOrDefault();
+
                     if (response == null)
                     {
                         response = new ResponseData();
@@ -315,34 +367,14 @@ namespace Levrum.Data.Map
 
                     foreach (DataMapping mapping in mappingsForSource)
                     {
-                        string stringValue = record.GetValue(mapping.Column.ColumnName) as string;
+                        string stringValue = record.GetValue(mapping.Column.ColumnName).ToString();
                         if (string.IsNullOrEmpty(stringValue))
                         {
                             ErrorRecords[dataSource].Add(new Tuple<DataMapping, Record>(mapping, record));
                             continue;
                         }
 
-                        object parsedValue = null;
-                        DateTime dateValue;
-                        double doubleValue;
-                        int intValue;
-
-                        if (DateTime.TryParse(stringValue, out dateValue))
-                        {
-                            parsedValue = dateValue;
-                        }
-                        else if (int.TryParse(stringValue, out intValue))
-                        {
-                            parsedValue = intValue;
-                        }
-                        else if (double.TryParse(stringValue, out doubleValue))
-                        {
-                            parsedValue = doubleValue;
-                        }
-                        else
-                        {
-                            parsedValue = stringValue;
-                        }
+                        object parsedValue = getParsedValue(stringValue);
 
                         response.Data[mapping.Field] = parsedValue;
                     }
@@ -361,11 +393,22 @@ namespace Levrum.Data.Map
                                                        where mapping.Column.DataSource == dataSource
                                                        select mapping).ToList();
 
+                if (mappingsForSource.Count == 0)
+                {
+                    continue;
+                }
+
                 List<Record> recordsFromSource = dataSource.GetRecords();
                 foreach (Record record in recordsFromSource)
                 {
                     IncidentData incident;
-                    string recordIncidentId = record.GetValue(dataSource.IDColumn) as string;
+                    object value = record.GetValue(dataSource.IDColumn);
+                    string recordIncidentId = null;
+                    if (value != null)
+                    {
+                        recordIncidentId = value.ToString();
+                    }
+
                     if (string.IsNullOrEmpty(recordIncidentId))
                     {
                         ErrorRecords[dataSource].Add(new Tuple<DataMapping, Record>(null, record));
@@ -380,7 +423,13 @@ namespace Levrum.Data.Map
                         Incidents.Add(incident);
                     }
 
-                    string recordResponseId = record.GetValue(dataSource.ResponseIDColumn) as string;
+                    value = record.GetValue(dataSource.ResponseIDColumn);
+                    string recordResponseId = "";
+                    if (value != null)
+                    {
+                        recordResponseId = value.ToString();
+                    }
+
                     ResponseData response = (from r in incident.Responses
                                              where r.Data.ContainsKey("ResponseID") && recordResponseId == r.Data["ResponseID"] as string
                                              select r).FirstOrDefault();
@@ -393,34 +442,16 @@ namespace Levrum.Data.Map
 
                     foreach (DataMapping mapping in mappingsForSource)
                     {
-                        string stringValue = record.GetValue(mapping.Column.ColumnName) as string;
+                        value = record.GetValue(mapping.Column.ColumnName);
+                        string stringValue = value == null ? "" : value.ToString();
+
                         if (string.IsNullOrEmpty(stringValue))
                         {
                             ErrorRecords[dataSource].Add(new Tuple<DataMapping, Record>(mapping, record));
                             continue;
                         }
 
-                        object parsedValue = null;
-                        DateTime dateValue;
-                        double doubleValue;
-                        int intValue;
-
-                        if (DateTime.TryParse(stringValue, out dateValue))
-                        {
-                            parsedValue = dateValue;
-                        }
-                        else if (int.TryParse(stringValue, out intValue))
-                        {
-                            parsedValue = intValue;
-                        }
-                        else if (double.TryParse(stringValue, out doubleValue))
-                        {
-                            parsedValue = doubleValue;
-                        }
-                        else
-                        {
-                            parsedValue = stringValue;
-                        }
+                        object parsedValue = getParsedValue(stringValue);
 
                         BenchmarkData benchmark = new BenchmarkData();
                         benchmark.Name = mapping.Field;
@@ -433,6 +464,33 @@ namespace Levrum.Data.Map
                     }
                 }
             }
+        }
+
+        private object getParsedValue(string stringValue)
+        {
+            object parsedValue = null;
+            DateTime dateValue;
+            double doubleValue;
+            int intValue;
+
+            if (DateTime.TryParse(stringValue, out dateValue))
+            {
+                parsedValue = dateValue;
+            }
+            else if (int.TryParse(stringValue, out intValue))
+            {
+                parsedValue = intValue;
+            }
+            else if (double.TryParse(stringValue, out doubleValue))
+            {
+                parsedValue = doubleValue;
+            }
+            else
+            {
+                parsedValue = stringValue;
+            }
+
+            return parsedValue;
         }
 
         private void cleanupIncidentData(DataMap map)
@@ -457,6 +515,17 @@ namespace Levrum.Data.Map
                     incident.Latitude = latLon.Latitude;
                     incident.Longitude = latLon.Longitude;
                 }
+
+                if (map.InvertLatitude)
+                {
+                    incident.Latitude = incident.Latitude * -1.0;
+                }
+
+                if (map.InvertLongitude)
+                {
+                    incident.Longitude = incident.Longitude * -1.0;
+                }
+
                 string natureCode = "Unknown";
                 if (incident.Data.ContainsKey("Code"))
                 {
@@ -489,7 +558,8 @@ namespace Levrum.Data.Map
                     if (firstEffAction is DateTime)
                     {
                         baseTime = (DateTime)firstEffAction;
-                    } else
+                    }
+                    else
                     {
                         DateTime firstEffActionDate;
                         if (DateTime.TryParse(firstEffAction as string, out firstEffActionDate))
@@ -504,7 +574,7 @@ namespace Levrum.Data.Map
                     BenchmarkData assigned = (from b in response.Benchmarks
                                               where b.Name == "Assigned"
                                               select b).FirstOrDefault();
-                    
+
                     DateTime assignedTime = DateTime.MinValue;
                     if (assigned != null)
                     {
@@ -527,8 +597,8 @@ namespace Levrum.Data.Map
                     }
 
                     BenchmarkData responding = (from b in response.Benchmarks
-                                              where b.Name == "Responding"
-                                              select b).FirstOrDefault();
+                                                where b.Name == "Responding"
+                                                select b).FirstOrDefault();
 
                     DateTime respondingTime = DateTime.MinValue;
                     if (responding != null)
@@ -552,8 +622,8 @@ namespace Levrum.Data.Map
                     }
 
                     BenchmarkData turnout = (from b in response.Benchmarks
-                                              where b.Name == "TurnoutTime"
-                                              select b).FirstOrDefault();
+                                             where b.Name == "TurnoutTime"
+                                             select b).FirstOrDefault();
                     if (turnout == null)
                     {
                         turnout = new BenchmarkData("TurnoutTime", Math.Max(0, (respondingTime - assignedTime).TotalMinutes));
@@ -597,7 +667,7 @@ namespace Levrum.Data.Map
                     BenchmarkData clearScene = (from b in response.Benchmarks
                                                 where b.Name == "ClearScene"
                                                 select b).FirstOrDefault();
-                    
+
                     DateTime clearSceneTime = DateTime.MinValue;
                     if (clearScene != null)
                     {

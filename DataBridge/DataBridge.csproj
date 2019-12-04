@@ -5,7 +5,7 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <RootNamespace>Levrum.DataBridge</RootNamespace>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <Authors>Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
     <PackageId>Levrum.DataBridge</PackageId>
@@ -13,7 +13,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="BlankTemplate.png" />
     <None Remove="databridge.ico" />
+    <None Remove="SuperionTemplate.png" />
+    <None Remove="Templates\Superion.dmap" />
+    <None Remove="Templates\TriTech.dmap" />
+    <None Remove="TritechTemplate.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Templates\Superion.dmap">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\TriTech.dmap">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -31,7 +45,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="BlankTemplate.png" />
     <Resource Include="databridge.ico" />
+    <Resource Include="SuperionTemplate.png" />
+    <Resource Include="TritechTemplate.png" />
   </ItemGroup>
 
 </Project>

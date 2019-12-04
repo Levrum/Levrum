@@ -30,6 +30,10 @@ namespace Levrum.Data.Map
         public string ResponseIdColumn { get; set; } = string.Empty;
 
         public string Projection { get; set; } = string.Empty;
+
+        public bool InvertLongitude { get; set; } = false;
+        public bool InvertLatitude { get; set; } = false;
+
         public List<CauseData> CauseTree { get; set; } = new List<CauseData>();
 
         public DataMap(string _name)
