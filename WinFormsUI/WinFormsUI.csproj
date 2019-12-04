@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.0;net48</TargetFrameworks>
     <UseWPF>true</UseWPF>
-    <AssemblyName>Levrum.UI.WPF</AssemblyName>
-    <RootNamespace>Levrum.UI.WPF</RootNamespace>
+    <AssemblyName>Levrum.UI.WinForms</AssemblyName>
+    <RootNamespace>Levrum.UI.WinForms</RootNamespace>
     <Version>0.0.1</Version>
     <Authors>Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
@@ -12,17 +12,5 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Copyright>(c) 2019 Levrum Data Technologies</Copyright>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Update="TextInputDialog.xaml.cs">
-      <SubType>Code</SubType>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Page Update="TextInputDialog.xaml">
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
 
 </Project>

@@ -10,7 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Levrum.WPFUI
+namespace Levrum.UI.WPF
 {
     /// <summary>
     /// Interaction logic for TextInputDialog.xaml
