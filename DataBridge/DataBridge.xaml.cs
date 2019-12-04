@@ -23,7 +23,7 @@ using Newtonsoft.Json;
 
 using Levrum.Data.Classes;
 using Levrum.Data.Map;
-using Levrum.WPFUI;
+using Levrum.UI.WPF;
 
 namespace Levrum.DataBridge
 {
