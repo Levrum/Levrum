@@ -104,7 +104,35 @@ namespace Sandbox.DefaultCommands
                 record.AddValue("Test", null);
             } catch (Exception ex)
             {
+                return "Test failed.";
+            }
+            return "Test passed.";
+        }
 
+        public static string causetest(List<string> args)
+        {
+            try
+            {
+                List<CauseData> causeDataList = new List<CauseData>();
+                CauseData causeDataOne = new CauseData();
+                causeDataOne.Name = "Test";
+                causeDataOne.Description = "Testing";
+                CauseData causeDataTwo = new CauseData();
+                causeDataTwo.Name = "Test 2";
+                causeDataTwo.Description = "Testing 2";
+                causeDataOne.Children.Add(causeDataTwo);
+                NatureCode code = new NatureCode();
+                code.Description = "Code";
+                code.Value = "Code";
+                causeDataTwo.NatureCodes.Add(code);
+
+                causeDataList.Add(causeDataOne);
+                string json = JsonConvert.SerializeObject(causeDataList, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto, Formatting = Formatting.Indented, PreserveReferencesHandling = PreserveReferencesHandling.All });
+
+                List<CauseData> output = JsonConvert.DeserializeObject<List<CauseData>>(json, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto, Formatting = Formatting.Indented, PreserveReferencesHandling = PreserveReferencesHandling.All });
+            } catch (Exception ex)
+            {
+                return "Test failed.";
             }
             return "Test passed.";
         }

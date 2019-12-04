@@ -50,6 +50,7 @@ namespace Levrum.DataBridge
                 if (DataSource.Type == DataSourceType.CsvSource)
                 {
                     DataSourceTypeComboBox.SelectedItem = DataSourceTypes[0];
+                    updateDataSourceOptionsDisplay();
                     FileNameTextBox.Text = _dataSource.Parameters["File"];
                     CsvSource csvSource = _dataSource as CsvSource;
                     if (csvSource == null)
@@ -66,6 +67,7 @@ namespace Levrum.DataBridge
                 else if (DataSource.Type == DataSourceType.SqlSource)
                 {
                     DataSourceTypeComboBox.SelectedItem = DataSourceTypes[1];
+                    updateDataSourceOptionsDisplay();
                     SqlServerAddress.Text = DataSource.Parameters["Server"];
                     SqlServerPort.Text = DataSource.Parameters["Port"];
                     SqlServerUser.Text = DataSource.Parameters["User"];
@@ -80,6 +82,9 @@ namespace Levrum.DataBridge
                     {
                         SqlTableComboBox.SelectedItem = DataSource.Parameters["Table"];
                     }
+
+                    SqlIdColumnComboBox.SelectedItem = DataSource.IDColumn;
+                    SqlResponseIdColumnComboBox.SelectedItem = DataSource.ResponseIDColumn;
                 }
                 ChangesMade = false;
             } else
@@ -115,8 +120,40 @@ namespace Levrum.DataBridge
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            updateParameters();
             DataSource.Disconnect();
             Close();
+        }
+
+        private void updateParameters()
+        {
+            if (DataSource is CsvSource)
+            {
+                DataSource.Parameters["File"] = FileNameTextBox.Text;
+            }
+            else if (DataSource is SqlSource)
+            {
+                DataSource.Parameters["Server"] = SqlServerAddress.Text;
+                DataSource.Parameters["Port"] = SqlServerPort.Text;
+                DataSource.Parameters["User"] = SqlServerUser.Text;
+                DataSource.Parameters["Password"] = SqlServerPassword.Password;
+                DataSource.Parameters["Database"] = SqlServerDatabase.Text;
+                if (SqlDataTypeComboBox.SelectedItem == SqlSourceTypes[0])
+                {
+                    if (DataSource.Parameters.ContainsKey("Query"))
+                    {
+                        DataSource.Parameters.Remove("Query");
+                    }
+                    DataSource.Parameters["Table"] = SqlTableComboBox.SelectedItem as string;
+                } else
+                {
+                    if (DataSource.Parameters.ContainsKey("Table"))
+                    {
+                        DataSource.Parameters.Remove("Table");
+                    }
+                    DataSource.Parameters["Query"] = SqlQueryTextBox.Text;
+                }
+            }
         }
 
         private void DataSourceType_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -133,18 +170,31 @@ namespace Levrum.DataBridge
 
             if (DataSourceTypeComboBox.SelectedItem.ToString() == "CSV File")
             {
-                CsvOptionsGrid.Visibility = Visibility.Visible;
-                CsvOptionsButtons.Visibility = Visibility.Visible;
-                SqlOptionsGrid.Visibility = Visibility.Hidden;
                 DataSource = new CsvSource();
                 ChangesMade = true;
             } else if (DataSourceTypeComboBox.SelectedItem.ToString() == "SQL Server")
             {
+                DataSource = new SqlSource();
+                ChangesMade = true;
+            }
+            updateDataSourceOptionsDisplay();
+        }
+
+        private void updateDataSourceOptionsDisplay()
+        {
+            if (DataSourceTypeComboBox.SelectedItem.ToString() == "CSV File")
+            {
+                CsvOptionsGrid.Visibility = Visibility.Visible;
+                CsvOptionsButtons.Visibility = Visibility.Visible;
+                SqlOptionsGrid.Visibility = Visibility.Hidden;
+                SqlOptionsPanel.Visibility = Visibility.Hidden;
+            }
+            else if (DataSourceTypeComboBox.SelectedItem.ToString() == "SQL Server")
+            {
                 CsvOptionsGrid.Visibility = Visibility.Hidden;
                 CsvOptionsButtons.Visibility = Visibility.Hidden;
                 SqlOptionsGrid.Visibility = Visibility.Visible;
-                DataSource = new SqlSource();
-                ChangesMade = true;
+                SqlOptionsPanel.Visibility = Visibility.Visible;
             }
         }
 

@@ -14,6 +14,7 @@ namespace Levrum.Data.Sources
         public string Name { get; set; } = "SQL Source";
         public DataSourceType Type { get { return DataSourceType.SqlSource; } }
 
+        [JsonIgnore]
         public string Info 
         { 
             get 
@@ -45,6 +46,8 @@ namespace Levrum.Data.Sources
         protected SqlConnection m_connection = null;
         protected bool m_connected = false;
 
+        private List<Record> m_cachedRecords = null;
+
         public SqlSource()
         {
 
@@ -58,6 +61,9 @@ namespace Levrum.Data.Sources
         public object Clone()
         {
             SqlSource clone = new SqlSource(Name);
+            clone.IDColumn = IDColumn;
+            clone.ResponseIDColumn = ResponseIDColumn;
+
             foreach (string key in Parameters.Keys)
             {
                 clone.Parameters[key] = Parameters[key];
@@ -80,7 +86,19 @@ namespace Levrum.Data.Sources
                 SqlConnectionStringBuilder sqlcsb = new SqlConnectionStringBuilder();
                 sqlcsb.UserID = Parameters["User"];
                 sqlcsb.Password = Parameters["Password"];
-                sqlcsb.DataSource = string.Format("{0},{1}", Parameters["Server"], Parameters["Port"]);
+                
+                string dataSource = "";
+                if (!Parameters.ContainsKey("Port") || string.IsNullOrWhiteSpace(Parameters["Port"]))
+                    dataSource = Parameters["Server"];
+                else
+                    dataSource = string.Format("{0},{1}", Parameters["Server"], Parameters["Port"]);
+
+                if (string.IsNullOrWhiteSpace(dataSource))
+                {
+                    return false;
+                }
+
+                sqlcsb.DataSource = dataSource;
                 sqlcsb.InitialCatalog = Parameters["Database"];
 
                 m_connection = new SqlConnection();
@@ -98,6 +116,8 @@ namespace Levrum.Data.Sources
 
         public void Disconnect()
         {
+            m_cachedRecords = null;
+
             try
             {
                 if (m_connection != null)
@@ -134,6 +154,11 @@ namespace Levrum.Data.Sources
             try
             {
                 Connect();
+                if (!testConnection())
+                {
+                    return output;
+                }
+
                 SqlCommand cmd = new SqlCommand(string.Format("SELECT table_name FROM INFORMATION_SCHEMA.TABLES;"), m_connection);
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
@@ -173,6 +198,11 @@ namespace Levrum.Data.Sources
             try
             {
                 Connect();
+                if (!testConnection())
+                {
+                    return output;
+                }
+
                 SqlCommand cmd = new SqlCommand(string.Format("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name LIKE '%{0}%'", Parameters["Table"]), m_connection);
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
@@ -198,6 +228,11 @@ namespace Levrum.Data.Sources
             try
             {
                 Connect();
+                if (!testConnection())
+                {
+                    return output;
+                }
+
                 string query = Parameters["Query"].Replace("'", "''");
                 SqlCommand cmd = new SqlCommand(string.Format("SELECT name FROM sys.dm_exec_describe_first_result_set('{0}', NULL, 0);", query), m_connection);
                 using (SqlDataReader dr = cmd.ExecuteReader())
@@ -243,6 +278,11 @@ namespace Levrum.Data.Sources
                 }
                 
                 Connect();
+                if (!testConnection())
+                {
+                    return output;
+                }
+
                 SqlCommand cmd = new SqlCommand(string.Format("SELECT {0} FROM ({1}) AS A", column, source), m_connection);
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
@@ -264,20 +304,26 @@ namespace Levrum.Data.Sources
 
         public List<Record> GetRecords()
         {
+            List<Record> output = new List<Record>();
+            if (m_cachedRecords != null)
+            {
+                return m_cachedRecords;
+            }
             try
             {
                 if (Parameters.ContainsKey("Table"))
                 {
-                    return getRecordsFromTable();
+                    output = getRecordsFromTable();
                 } else if (Parameters.ContainsKey("Query"))
                 {
-                    return getRecordsFromQuery();
+                    output = getRecordsFromQuery();
                 }
             } finally
             {
 
             }
-            return new List<Record>();
+            m_cachedRecords = output;
+            return output;
         }
 
         private List<Record> getRecordsFromTable()
@@ -286,6 +332,11 @@ namespace Levrum.Data.Sources
             try
             {
                 Connect();
+                if (!testConnection())
+                {
+                    return output;
+                }
+
                 SqlCommand cmd = new SqlCommand(string.Format("SELECT * FROM {0}", Parameters["Table"], m_connection));
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
@@ -313,6 +364,11 @@ namespace Levrum.Data.Sources
             try
             {
                 Connect();
+                if (!testConnection())
+                {
+                    return output;
+                }
+
                 SqlCommand cmd = new SqlCommand(Parameters["Query"], m_connection);
                 cmd.CommandTimeout = 120;
                 using (SqlDataReader dr = cmd.ExecuteReader())

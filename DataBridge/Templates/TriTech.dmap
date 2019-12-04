@@ -1,0 +1,223 @@
+{
+  "$id": "1",
+  "Name": "TriTech.dmap",
+  "EnableCoordinateConversion": false,
+  "IncidentMappings": {
+    "$id": "2",
+    "$values": [
+      {
+        "$id": "3",
+        "Field": "Time",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "4",
+          "ColumnName": "CallReceived",
+          "DataSource": {
+            "$id": "5",
+            "Name": "TriTech CAD",
+            "Type": 1,
+            "Info": "",
+            "IDColumn": "UniqueID",
+            "ResponseIDColumn": "Unit",
+            "Parameters": {
+              "$id": "6",
+              "Server": "",
+              "Port": "",
+              "User": "",
+              "Password": "",
+              "Database": "System",
+              "Query": "SELECT \r\n          I.Master_Incident_Number AS 'UniqueID', \r\n          I.Time_PhonePickUp AS 'CallReceived', \r\n          I.Problem AS 'Nature', \r\n          I.City AS 'City', \r\n          I.Priority_Number AS 'Priority', \r\n          I.RequestToCancel AS 'Cancelled', \r\n          I.Address AS 'Address', \r\n          I.Longitude AS 'X',\r\n          I.Latitude AS 'Y', \r\n          I.CurrentSectorID AS 'District', \r\n          I.Jurisdiction AS 'Jurisdiction', \r\n          RTRIM(D.Radio_Name) AS 'Unit', \r\n          I.Time_PhonePickUp AS 'FirstEffAction', \r\n          I.Time_First_Unit_Arrived AS 'FirstArrival', \r\n          I.Time_First_Unit_Enroute AS 'FirstResponding', \r\n          D.Time_Assigned AS 'Dispatched', \r\n          D.Time_Enroute AS 'Enroute', \r\n          D.Time_ArrivedAtScene AS 'OnScene', \r\n          D.Time_Call_Cleared AS 'ClearScene', \r\n          D.Time_BackInQtrs AS 'InQuarters' \r\n        FROM Response_Master_Incident I \r\n          INNER JOIN Response_Vehicles_Assigned D on I.ID=D.Master_Incident_ID \r\n        WHERE (I.Agency_Type LIKE '%Fire%' OR I.Agency_Type LIKE '%EMS%')\r\n        ORDER BY CallReceived;"
+            }
+          }
+        }
+      },
+      {
+        "$id": "7",
+        "Field": "Latitude",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "8",
+          "ColumnName": "Y",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "9",
+        "Field": "Longitude",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "10",
+          "ColumnName": "X",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "11",
+        "Field": "Location",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "12",
+          "ColumnName": "Address",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      }
+    ]
+  },
+  "IncidentDataMappings": {
+    "$id": "13",
+    "$values": [
+      {
+        "$id": "14",
+        "Field": "Code",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "15",
+          "ColumnName": "Nature",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "16",
+        "Field": "District",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "17",
+          "ColumnName": "District",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "18",
+        "Field": "Jurisdiction",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "19",
+          "ColumnName": "Jurisdiction",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "20",
+        "Field": "Priority",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "21",
+          "ColumnName": "Priority",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      }
+    ]
+  },
+  "ResponseDataMappings": {
+    "$id": "22",
+    "$values": [
+      {
+        "$id": "23",
+        "Field": "Unit",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "24",
+          "ColumnName": "Unit",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      }
+    ]
+  },
+  "BenchmarkMappings": {
+    "$id": "25",
+    "$values": [
+      {
+        "$id": "26",
+        "Field": "Assigned",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "27",
+          "ColumnName": "Dispatched",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "28",
+        "Field": "Responding",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "29",
+          "ColumnName": "Enroute",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "30",
+        "Field": "OnScene",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "31",
+          "ColumnName": "OnScene",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "32",
+        "Field": "ClearScene",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "33",
+          "ColumnName": "ClearScene",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "34",
+        "Field": "InQuarters",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "35",
+          "ColumnName": "InQuarters",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      }
+    ]
+  },
+  "DataSources": {
+    "$id": "36",
+    "$values": [
+      {
+        "$ref": "5"
+      }
+    ]
+  },
+  "ResponseIdColumn": "",
+  "Projection": "",
+  "InvertLongitude": true,
+  "InvertLatitude": false,
+  "CauseTree": {
+    "$id": "37",
+    "$values": []
+  }
+}

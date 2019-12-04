@@ -31,7 +31,7 @@ namespace Levrum.DataBridge
             IncidentDataListBox.ItemsSource = _map.IncidentDataMappings;
             ResponseDataListBox.ItemsSource = _map.ResponseDataMappings;
             BenchmarkListBox.ItemsSource = _map.BenchmarkMappings;
-            updateStaticMappingButtons();
+            UpdateStaticMappingButtons();
         }
 
         private void AddIncidentFieldButton_Click(object sender, RoutedEventArgs e)
@@ -131,25 +131,25 @@ namespace Levrum.DataBridge
             {
                 Window.SetChangesMade(DataMap, true);
             }
-            updateStaticMappingButtons();
+            UpdateStaticMappingButtons();
         }
 
-        private void updateStaticMappingButtons()
+        public void UpdateStaticMappingButtons()
         {
             DataMapping timeMapping = (from m in DataMap.IncidentMappings
-                                       where m.Field == "Time"
+                                       where m != null && m.Field == "Time"
                                        select m).FirstOrDefault();
 
             DataMapping latMapping = (from m in DataMap.IncidentMappings
-                                       where m.Field == "Latitude"
+                                       where m != null && m.Field == "Latitude"
                                        select m).FirstOrDefault();
 
             DataMapping longMapping = (from m in DataMap.IncidentMappings
-                                       where m.Field == "Longitude"
+                                       where m != null && m.Field == "Longitude"
                                        select m).FirstOrDefault();
 
             DataMapping locMapping = (from m in DataMap.IncidentMappings
-                                       where m.Field == "Location"
+                                       where m != null && m.Field == "Location"
                                        select m).FirstOrDefault();
 
             IncidentTimeButtonText.Text = getStaticMappingButtonText(timeMapping);

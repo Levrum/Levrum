@@ -13,7 +13,8 @@ namespace Levrum.Data.Sources
     {
         public string Name { get; set; } = "CSV File";
         public DataSourceType Type { get { return DataSourceType.CsvSource; } }
-        
+
+        [JsonIgnore]
         public string Info { get { return string.Format("CSV Source '{0}': {1}", Name, Parameters["File"]); } }
 
         public string IDColumn { get; set; } = "";
@@ -72,6 +73,8 @@ namespace Levrum.Data.Sources
         {
             CsvSource clone = new CsvSource(CsvFile.FullName, Name);
             clone.IDColumn = IDColumn;
+            clone.ResponseIDColumn = ResponseIDColumn;
+
             foreach (string key in Parameters.Keys)
             {
                 clone.Parameters[key] = Parameters[key];

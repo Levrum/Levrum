@@ -44,9 +44,11 @@
                     
             </MenuItem>
             -->
-            <MenuItem Header="_Tools" IsTabStop="False">
+            <MenuItem Header="_Settings" IsTabStop="False">
                 <MenuItem x:Name="CoordinateConversionMenuItem" Header="Enable _Coordinate Conversion" Click="CoordinateConversionMenuItem_Click" IsEnabled="False"/>
                 <MenuItem x:Name="DefineProjectionMenuItem" Header="Define _Projection For Conversion..." Click="DefineProjectionMenuItem_Click" IsEnabled="False"/>
+                <MenuItem x:Name="ToggleInvertLatitude" Header="Enable Invert _Latitude" Click="ToggleInvertLatitude_Click" IsEnabled="False"/>
+                <MenuItem x:Name="ToggleInvertLongitude" Header="Enable Invert Lon_gitude" Click="ToggleInvertLongitude_Click" IsEnabled="False"/>
                 <Separator/>
                 <MenuItem x:Name="SelectCauseTreeMenuItem" Header="Select Cause _Tree JSON..." Click="SelectCauseTreeMenuItem_Click" IsEnabled="false"/>
             </MenuItem>

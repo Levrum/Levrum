@@ -120,11 +120,11 @@
                 <TextBox x:Name="SqlTableDetailsTextBox" Margin="8,0,8,0" TextWrapping="WrapWithOverflow" Visibility="Hidden"/>
             </Grid>
         </Grid>
-        <StackPanel x:Name="SqlOptionsPanel" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Stretch" Visibility="Visible">
+        <StackPanel x:Name="SqlOptionsPanel" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Stretch" Visibility="Hidden">
             <Button x:Name="ConnectButton" Width="80" Margin="8,8,0,8" Click="ConnectButton_Click">Connect</Button>
             <TextBlock x:Name="SqlStatusText" Margin="8,8,0,8" VerticalAlignment="Center">Disconnected</TextBlock>
         </StackPanel>
-        <StackPanel x:Name="CsvOptionsButtons" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Visibility="Hidden">
+        <StackPanel x:Name="CsvOptionsButtons" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Visibility="Visible">
             <Button x:Name="SummarizeCsvButton" Width="80" Margin="8,8,0,8" Click="SummarizeCsvButton_Click">Summarize</Button>
         </StackPanel>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">

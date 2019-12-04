@@ -1,0 +1,209 @@
+{
+  "$id": "1",
+  "Name": "Superion DataMap.dmap",
+  "EnableCoordinateConversion": true,
+  "IncidentMappings": {
+    "$id": "2",
+    "$values": [
+      {
+        "$id": "3",
+        "Field": "Time",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "4",
+          "ColumnName": "CallReceived",
+          "DataSource": {
+            "$id": "5",
+            "Name": "Superion CAD",
+            "Type": 1,
+            "Info": "Superion CAD",
+            "IDColumn": "UniqueID",
+            "ResponseIDColumn": "Unit",
+            "Parameters": {
+              "$id": "6",
+              "Server": "",
+              "Port": "",
+              "User": "",
+              "Password": "",
+              "Database": "",
+              "Query": "WITH IncidentsWithResponses AS (\r\n                        SELECT\r\n                          I.inci_id AS 'UniqueID',\r\n                          I.calltime AS 'CallReceived',\r\n                          I.nature as 'Nature',\r\n                          I.citydesc as 'City',\r\n                          REPLACE(\r\n                          REPLACE(\r\n                          REPLACE(\r\n                          REPLACE(\r\n                          REPLACE(I.priority,'P','3')\r\n                         ,'2','1')\r\n                         ,'4','1')\r\n                         ,'7','1')\r\n                         ,' ','1') AS 'Priority',\r\n                          I.cancelled as 'Cancelled',\r\n                          I.street as 'Address',\r\n                          I.geox as 'X',\r\n                          I.geoy as 'Y',\r\n                          I.district as 'District',\r\n                          RTRIM(D.unitcode) AS 'Unit',\r\n                          I.firstdtm AS 'FirstEffAction',\r\n                          I.firstenr AS 'FirstResponding',\r\n                          I.firstarrv AS 'FirstArrival',\r\n                          REPLACE(\r\n                          REPLACE(\r\n                          REPLACE(\r\n                          REPLACE(D.transtype,'D','Dispatched')\r\n                         ,'R','Responding')\r\n                         ,'A','OnScene')\r\n                         ,'C','ClearScene') as 'BenchmarkType',\r\n                          D.timestamp as 'Timestamp'  \r\n                        FROM  dbo.inmain I\r\n                          INNER JOIN dbo.incilog D ON ((D.inci_id=I.inci_id) AND (D.transtype in ('D', 'E', 'A', 'C')))\r\n                        WHERE (I.service = 'FIRE') AND (D.unitcode IS NOT NULL)\r\n                        )\r\n                        SELECT *\r\n                        FROM\r\n                           IncidentsWithResponses\r\n                           PIVOT (MAX(Timestamp) FOR BenchmarkType IN (Dispatched, Enroute, OnScene, ClearScene))\r\n                        AS p\r\n                        ORDER BY UniqueID"
+            }
+          }
+        }
+      },
+      {
+        "$id": "7",
+        "Field": "Latitude",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "8",
+          "ColumnName": "Y",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "9",
+        "Field": "Longitude",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "10",
+          "ColumnName": "X",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "11",
+        "Field": "Location",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "12",
+          "ColumnName": "Address",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      }
+    ]
+  },
+  "IncidentDataMappings": {
+    "$id": "13",
+    "$values": [
+      {
+        "$id": "14",
+        "Field": "Priority",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "15",
+          "ColumnName": "Priority",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "16",
+        "Field": "Cancelled",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "17",
+          "ColumnName": "Cancelled",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "18",
+        "Field": "District",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "19",
+          "ColumnName": "District",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "20",
+        "Field": "Code",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "21",
+          "ColumnName": "Nature",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      }
+    ]
+  },
+  "ResponseDataMappings": {
+    "$id": "22",
+    "$values": [
+      {
+        "$id": "23",
+        "Field": "Unit",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "24",
+          "ColumnName": "Unit",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      }
+    ]
+  },
+  "BenchmarkMappings": {
+    "$id": "25",
+    "$values": [
+      {
+        "$id": "26",
+        "Field": "Assigned",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "27",
+          "ColumnName": "Dispatched",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "28",
+        "Field": "Responding",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "29",
+          "ColumnName": "Enroute",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "30",
+        "Field": "OnScene",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "31",
+          "ColumnName": "OnScene",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "32",
+        "Field": "ClearScene",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "33",
+          "ColumnName": "ClearScene",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      }
+    ]
+  },
+  "DataSources": {
+    "$id": "34",
+    "$values": [
+      {
+        "$ref": "5"
+      }
+    ]
+  },
+  "ResponseIdColumn": "",
+  "Projection": "",
+  "CauseTree": {
+    "$id": "35",
+    "$values": []
+  }
+}
