@@ -24,6 +24,12 @@ namespace Levrum.Data.Classes
         string Description { get; set; }
     }
 
+    public class CategorizedValue : ICategorizedValue
+    {
+        public virtual string Value { get; set; }
+        public virtual string Description { get; set; }
+    }
+
     public class CategoryData : ICategoryData
     {
         public virtual string Name { get; set; } = "";
