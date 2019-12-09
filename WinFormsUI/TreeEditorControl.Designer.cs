@@ -74,8 +74,8 @@
             this.m_flpOrganizedData.Name = "m_flpOrganizedData";
             this.m_flpOrganizedData.Size = new System.Drawing.Size(419, 473);
             this.m_flpOrganizedData.TabIndex = 0;
-            this.m_flpOrganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainPanel_DragDrop);
-            this.m_flpOrganizedData.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainPanel_DragEnter);
+            this.m_flpOrganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.OrganizedPanel_DragDrop);
+            this.m_flpOrganizedData.DragEnter += new System.Windows.Forms.DragEventHandler(this.OrganizedPanel_DragEnter);
             // 
             // m_btnAddOrganizedCategory
             // 
@@ -91,6 +91,7 @@
             // 
             // m_flpUnorganizedData
             // 
+            this.m_flpUnorganizedData.AllowDrop = true;
             this.m_flpUnorganizedData.AutoScroll = true;
             this.m_flpUnorganizedData.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.m_flpUnorganizedData.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -99,6 +100,8 @@
             this.m_flpUnorganizedData.Name = "m_flpUnorganizedData";
             this.m_flpUnorganizedData.Size = new System.Drawing.Size(424, 473);
             this.m_flpUnorganizedData.TabIndex = 1;
+            this.m_flpUnorganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.UnorganizedPanel_DragDrop);
+            this.m_flpUnorganizedData.DragEnter += new System.Windows.Forms.DragEventHandler(this.UnorganizedPanel_DragEnter);
             // 
             // m_btnLoadTree
             // 
@@ -108,7 +111,7 @@
             this.m_btnLoadTree.Name = "m_btnLoadTree";
             this.m_btnLoadTree.Size = new System.Drawing.Size(99, 23);
             this.m_btnLoadTree.TabIndex = 1;
-            this.m_btnLoadTree.Text = "Load Tree";
+            this.m_btnLoadTree.Text = "&Load Tree";
             this.m_btnLoadTree.UseVisualStyleBackColor = true;
             this.m_btnLoadTree.Click += new System.EventHandler(this.m_btnLoadTree_Click);
             // 
@@ -120,7 +123,7 @@
             this.m_btnSaveTree.Name = "m_btnSaveTree";
             this.m_btnSaveTree.Size = new System.Drawing.Size(99, 23);
             this.m_btnSaveTree.TabIndex = 2;
-            this.m_btnSaveTree.Text = "Save Tree";
+            this.m_btnSaveTree.Text = "&Save Tree";
             this.m_btnSaveTree.UseVisualStyleBackColor = true;
             this.m_btnSaveTree.Click += new System.EventHandler(this.m_btnSaveTree_Click);
             // 
@@ -132,7 +135,7 @@
             this.m_btnLoadIncidents.Name = "m_btnLoadIncidents";
             this.m_btnLoadIncidents.Size = new System.Drawing.Size(108, 23);
             this.m_btnLoadIncidents.TabIndex = 3;
-            this.m_btnLoadIncidents.Text = "Load Incident Data";
+            this.m_btnLoadIncidents.Text = "Load &Incident Data";
             this.m_btnLoadIncidents.UseVisualStyleBackColor = true;
             this.m_btnLoadIncidents.Click += new System.EventHandler(this.m_btnLoadIncidents_Click);
             // 

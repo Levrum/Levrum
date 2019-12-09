@@ -57,12 +57,63 @@ namespace Levrum.UI.WinForms
         public TreeEditorControl()
         {
             InitializeComponent();
-            
+
         }
 
-        private void MainPanel_DragEnter(object sender, DragEventArgs e)
+        private void OrganizedPanel_DragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(FlowLayoutPanel)))
+            // Allow dropping of category panels
+            if (e.Data.GetDataPresent(typeof(DraggedData)) && (e.Data.GetData(typeof(DraggedData)) as DraggedData).Data is ICategoryData)
+            {
+                e.Effect = DragDropEffects.Move | DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+            }
+        }
+
+        private void OrganizedPanel_DragDrop(object sender, DragEventArgs e)
+        {
+            FlowLayoutPanel receivingPanel = sender as FlowLayoutPanel;
+            if (receivingPanel == null)
+            {
+                return;
+            }
+
+            DraggedData draggedData = e.Data.GetData(typeof(DraggedData)) as DraggedData;
+            if (e.AllowedEffect == DragDropEffects.Copy)
+            {
+                AddSubPanel(receivingPanel, draggedData.Data as ICategoryData);
+            }
+            else if (e.AllowedEffect == DragDropEffects.Move)
+            {
+                ICategoryData oldParentData = draggedData.Control.Parent.Tag as ICategoryData;
+                oldParentData?.Children?.Remove(draggedData.Data as ICategoryData);
+                receivingPanel.Controls.Add(draggedData.Control);
+            }
+
+            Button receivingPanelAddButton = null;
+            foreach (Control control in receivingPanel.Controls)
+            {
+                if (control is Button)
+                {
+                    receivingPanelAddButton = control as Button;
+                    break;
+                }
+            }
+            
+            if (receivingPanelAddButton != null)
+            {
+                receivingPanel.Controls.Remove(receivingPanelAddButton);
+                receivingPanel.Controls.Add(receivingPanelAddButton);
+            }
+        }
+
+        private void UnorganizedPanel_DragEnter(object sender, DragEventArgs e)
+        {
+            // Allow dropping of category panels
+            if (e.Data.GetDataPresent(typeof(DraggedData)))
             {
                 e.Effect = DragDropEffects.Move;
             }
@@ -72,32 +123,22 @@ namespace Levrum.UI.WinForms
             }
         }
 
-        private void MainPanel_DragDrop(object sender, DragEventArgs e)
+        private void UnorganizedPanel_DragDrop(object sender, DragEventArgs e)
         {
-            FlowLayoutPanel receivingPanel = sender as FlowLayoutPanel;
-            if (receivingPanel == null)
-            {
-                return;
-            }
+            DraggedData draggedData = e.Data.GetData(typeof(DraggedData)) as DraggedData;
 
-            Control droppedControl = e.Data.GetData(typeof(FlowLayoutPanel)) as FlowLayoutPanel;
-            if (droppedControl == null)
+            if (e.AllowedEffect == DragDropEffects.Move)
             {
-                return;
-            }
-
-            receivingPanel.Controls.Add(droppedControl);
-
-            List<Control> receivingPanelControls = new List<Control>();
-            foreach (Control control in receivingPanel.Controls)
-            {
-                receivingPanelControls.Add(control);
-            }
-            Button receivingPanelAddButton = receivingPanelControls.Where(x => x is Button).FirstOrDefault() as Button;
-            if (receivingPanelAddButton != null)
-            {
-                receivingPanel.Controls.Remove(receivingPanelAddButton);
-                receivingPanel.Controls.Add(receivingPanelAddButton);
+                ICategoryData oldParentData = draggedData.Control.Parent.Tag as ICategoryData;
+                if (draggedData.Data is ICategoryData)
+                {
+                    oldParentData?.Children?.Remove(draggedData.Data as ICategoryData);
+                }
+                else if (draggedData.Data is ICategorizedValue)
+                {
+                    oldParentData?.Values?.Remove(draggedData.Data as ICategorizedValue);
+                }
+                draggedData.Control.Parent.Controls.Remove(draggedData.Control);
             }
         }
 
@@ -166,6 +207,18 @@ namespace Levrum.UI.WinForms
                 Anchor = (AnchorStyles.Left | AnchorStyles.Right)
             });
 
+            // Add values
+            foreach (ICategorizedValue value in panelCatData.Values)
+            {
+                newPanel.Controls.Add(GenerateValueBlock(value));
+            }
+
+            // Add children
+            foreach (ICategoryData categoryData in panelCatData.Children)
+            {
+                AddSubPanel(newPanel, categoryData);
+            }
+
             Button btnSubPanelAddNewSub = new Button { Text = "Add Subcategory", AutoSize = true, Margin = new Padding(2) };
             btnSubPanelAddNewSub.Click += AddSubcategory_Click;
             newPanel.Controls.Add(btnSubPanelAddNewSub);
@@ -182,15 +235,16 @@ namespace Levrum.UI.WinForms
             {
                 return;
             }
-
-            clickedPanel.DoDragDrop(clickedPanel, DragDropEffects.Move);
+            DraggedData draggedData = new DraggedData { Control = clickedPanel, Data = clickedPanel.Tag, Type = clickedPanel.Tag.GetType() };
+            DragDropEffects dragDropEffects = clickedPanel.Parent == m_flpUnorganizedData ? DragDropEffects.Copy : DragDropEffects.Move;
+            clickedPanel.DoDragDrop(draggedData, DragDropEffects.Move);
         }
 
         private void SubPanel_DragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(Button)) || e.Data.GetDataPresent(typeof(FlowLayoutPanel)))
+            if (e.Data.GetDataPresent(typeof(DraggedData)))
             {
-                e.Effect = DragDropEffects.Move;
+                e.Effect = DragDropEffects.Move | DragDropEffects.Copy;
             }
             else
             {
@@ -200,7 +254,7 @@ namespace Levrum.UI.WinForms
 
         private void SubPanel_DragDrop(object sender, DragEventArgs e)
         {
-            FlowLayoutPanel receivingPanel = sender as FlowLayoutPanel;            
+            FlowLayoutPanel receivingPanel = sender as FlowLayoutPanel;
             if (receivingPanel == null)
             {
                 return;
@@ -208,48 +262,59 @@ namespace Levrum.UI.WinForms
             ICategoryData receivingPanelData = receivingPanel.Tag as ICategoryData;
             if (receivingPanelData == null)
             {
-                throw new Exception("Panel does not contain data");
+                throw new Exception("Dropped object does not contain data");
+            }
+            
+            DraggedData draggedData = e.Data.GetData(typeof(DraggedData)) as DraggedData;
+            ICategoryData oldParentData = draggedData.Control.Parent.Tag as ICategoryData;
+
+            if (draggedData.Control == receivingPanel)
+            {
+                return;
             }
 
-            Control droppedControl = e.Data.GetData(typeof(Button)) as Button;
-            if (droppedControl == null)
+            // Handle drop of category data panel
+            if (draggedData.Data is ICategoryData)
             {
-                droppedControl = e.Data.GetData(typeof(FlowLayoutPanel)) as FlowLayoutPanel;
-                if (droppedControl == null)
+                ICategoryData droppedData = draggedData.Data as ICategoryData;
+                if (droppedData == null)
                 {
-                    return;
-                }
-            }            
-
-            if (droppedControl is FlowLayoutPanel)
-            {
-                ICategoryData droppedData = droppedControl.Tag as ICategoryData;
-                if (droppedData != null)
-                {
-                    if (droppedControl.Parent.Tag != null)
-                    {
-                        ICategoryData oldParentData = droppedControl.Parent.Tag as ICategoryData;
-                        oldParentData.Children.Remove(droppedData);
-                    }
-
-                    receivingPanelData.Children.Add(droppedData);
+                    throw new Exception("Null data received");
                 }
 
-                receivingPanel.Controls.Add(droppedControl);
+                if (oldParentData != null)
+                {
+                    oldParentData.Children.Remove(droppedData);
+                }
+
+                if (e.AllowedEffect == DragDropEffects.Move && draggedData.Control.Parent != null)
+                {
+                    draggedData.Control.Parent.Controls.Remove(draggedData.Control);
+                }
+
+                receivingPanelData.Children.Add(droppedData);
+                AddSubPanel(receivingPanel, droppedData);
             }
-            else if (droppedControl is Button)
+            // Handle drop of value block
+            else if (draggedData.Data is ICategorizedValue)
             {
-                ICategorizedValue droppedData = droppedControl.Tag as ICategorizedValue;
-                if (droppedData != null)
+                ICategorizedValue droppedData = draggedData.Data as ICategorizedValue;
+                if (droppedData == null)
                 {
-                    if (droppedControl.Parent.Tag != null)
-                    {
-                        ICategoryData oldParentData = droppedControl.Parent.Tag as ICategoryData;
-                        oldParentData.Values.Remove(droppedData);
-                    }
-
-                    receivingPanelData.Values.Add(droppedData);
+                    throw new Exception("Null data received");
                 }
+
+                if (oldParentData != null)
+                {
+                    oldParentData.Values.Remove(droppedData);
+                }
+
+                if (e.AllowedEffect == DragDropEffects.Move && draggedData.Control.Parent != null)
+                {
+                    draggedData.Control.Parent.Controls.Remove(draggedData.Control);
+                }
+
+                receivingPanelData.Values.Add(droppedData);
 
                 // Keep values on top and containers on bottome
                 List<Control> panels = new List<Control>();
@@ -262,8 +327,12 @@ namespace Levrum.UI.WinForms
                 }
 
                 panels.ForEach(x => receivingPanel.Controls.Remove(x));
-                receivingPanel.Controls.Add(droppedControl);
+                receivingPanel.Controls.Add(GenerateValueBlock(droppedData));
                 panels.ForEach(x => receivingPanel.Controls.Add(x));
+            }
+            else
+            {
+                throw new Exception("Invalid data received");
             }
 
             Control addSubBtn = null;
@@ -279,7 +348,7 @@ namespace Levrum.UI.WinForms
             {
                 return;
             }
-            
+
             receivingPanel.Controls.Remove(addSubBtn);
             receivingPanel.Controls.Add(addSubBtn);
         }
@@ -303,8 +372,9 @@ namespace Levrum.UI.WinForms
             {
                 return;
             }
-
-            valueBlock.DoDragDrop(valueBlock, DragDropEffects.Move);
+            DraggedData draggedData = new DraggedData { Type = valueBlock.Tag.GetType(), Control = valueBlock, Data = valueBlock.Tag };
+            DragDropEffects dragDropEffects = valueBlock.Parent == m_flpUnorganizedData ? DragDropEffects.Copy : DragDropEffects.Move;
+            valueBlock.DoDragDrop(draggedData, dragDropEffects);
         }
 
         private void m_btnLoadIncidents_Click(object sender, EventArgs e)
@@ -341,8 +411,8 @@ namespace Levrum.UI.WinForms
             string selectedField = null;
             ListBox listBox = new ListBox();
             listBox.Items.AddRange(incidentDataFields.ToArray());
-            listBox.DoubleClick += (sdr, args) => 
-            { 
+            listBox.DoubleClick += (sdr, args) =>
+            {
                 selectedField = listBox.SelectedItem.ToString();
                 listBox.Hide();
                 this.Controls.Remove(listBox);
@@ -361,7 +431,7 @@ namespace Levrum.UI.WinForms
             listBox.Location = new Point(m_btnLoadIncidents.Location.X, m_btnLoadIncidents.Location.Y - (m_btnLoadIncidents.Height + listBox.Height + 4));
             listBox.Anchor = (AnchorStyles.Bottom | AnchorStyles.Right);
             this.Controls.Add(listBox);
-            listBox.BringToFront();            
+            listBox.BringToFront();
         }
 
         private void PopulateUnorganizedDataWithValueBlocks(IEnumerable<string> data)
@@ -369,7 +439,7 @@ namespace Levrum.UI.WinForms
             Control[] newBlocks = new Control[data.Count()];
             int nbIdx = 0;
             foreach (string dataString in data.OrderBy(x => x))
-            {                
+            {
                 CategorizedValue newCatValue = new CategorizedValue { Value = dataString };
                 Button newBlock = GenerateValueBlock(newCatValue) as Button;
                 newBlocks[nbIdx] = newBlock;
@@ -434,7 +504,7 @@ namespace Levrum.UI.WinForms
                     parentPanel.Controls.Remove(tbNewCatNameEntry);
                     parentPanel.Controls.Add(clickedButton);
                     return;
-                }                
+                }
             });
             parentPanel.Controls.Add(tbNewCatNameEntry);
             tbNewCatNameEntry.Focus();
@@ -446,8 +516,8 @@ namespace Levrum.UI.WinForms
             if (newCatNameEntry == null)
             {
                 return;
-            }            
-            newCatNameEntry.Text = string.Empty;            
+            }
+            newCatNameEntry.Text = string.Empty;
         }
 
         private List<ICategoryData> ConvertToTree()
@@ -458,7 +528,7 @@ namespace Levrum.UI.WinForms
                 if (node is FlowLayoutPanel)
                 {
                     tree.Add(node.Tag as ICategoryData);
-                }                
+                }
             }
 
             return tree;
@@ -484,6 +554,13 @@ namespace Levrum.UI.WinForms
 
                 MessageBox.Show("Successfully Saved Tree!");
             }
+        }
+
+        class DraggedData
+        {
+            public Type Type { get; set; }
+            public Control Control { get; set; }
+            public object Data { get; set; }
         }
     }
 }
