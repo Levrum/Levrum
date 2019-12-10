@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Levrum.Data.Classes;
 using Levrum.Data.Sources;
 using Levrum.Data.Map;
+using Levrum.Utils.Geography;
 
 namespace Sandbox
 {
@@ -53,6 +54,31 @@ namespace Sandbox.DefaultCommands
             }
 
             return "";
+        }
+
+        public static string quack(List<string> args)
+        {
+            try
+            {
+                double lat = Convert.ToDouble(args[0]);
+                double lon = Convert.ToDouble(args[1]);
+                
+                if(args.Count > 2)
+                {
+                    string unit = args[2];
+                    string projection = AutoProjection.GetProjection(lat, lon, unit);
+                    return projection;
+                }
+                else
+                {
+                    string projection = AutoProjection.GetProjection(lat, lon);
+                    return projection;
+                }
+            }
+            catch
+            {
+                return "What the quack? You didn't quack right. Enter 'quack latitude longitude unit(optional)'. QUACK!";
+            }
         }
 
         public static string maploader(List<string> args)
