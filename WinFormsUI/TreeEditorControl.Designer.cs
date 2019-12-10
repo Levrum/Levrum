@@ -75,6 +75,7 @@
             this.m_flpOrganizedData.Name = "m_flpOrganizedData";
             this.m_flpOrganizedData.Size = new System.Drawing.Size(635, 473);
             this.m_flpOrganizedData.TabIndex = 0;
+            this.m_flpOrganizedData.Click += new System.EventHandler(this.m_flpOrganizedData_Click);
             this.m_flpOrganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.OrganizedPanel_DragDrop);
             this.m_flpOrganizedData.DragEnter += new System.Windows.Forms.DragEventHandler(this.OrganizedPanel_DragEnter);
             // 
@@ -89,6 +90,7 @@
             this.m_flpUnorganizedData.Name = "m_flpUnorganizedData";
             this.m_flpUnorganizedData.Size = new System.Drawing.Size(208, 473);
             this.m_flpUnorganizedData.TabIndex = 1;
+            this.m_flpUnorganizedData.Click += new System.EventHandler(this.m_flpUnorganizedData_Click);
             this.m_flpUnorganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.UnorganizedPanel_DragDrop);
             this.m_flpUnorganizedData.DragEnter += new System.Windows.Forms.DragEventHandler(this.UnorganizedPanel_DragEnter);
             // 
@@ -155,6 +157,7 @@
             this.Controls.Add(this.m_scMain);
             this.Name = "TreeEditorControl";
             this.Size = new System.Drawing.Size(847, 521);
+            this.Click += new System.EventHandler(this.TreeEditorControl_Click);
             this.m_scMain.Panel1.ResumeLayout(false);
             this.m_scMain.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.m_scMain)).EndInit();
