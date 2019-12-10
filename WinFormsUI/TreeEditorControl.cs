@@ -127,7 +127,7 @@ namespace Levrum.UI.WinForms
         private void UnorganizedPanel_DragEnter(object sender, DragEventArgs e)
         {
             // Allow dropping of category panels
-            if (e.Data.GetDataPresent(typeof(DraggedData)))
+            if (e.Data.GetDataPresent(typeof(List<DraggedData>)))
             {
                 e.Effect = DragDropEffects.Move;
             }
@@ -139,20 +139,23 @@ namespace Levrum.UI.WinForms
 
         private void UnorganizedPanel_DragDrop(object sender, DragEventArgs e)
         {
-            DraggedData draggedData = e.Data.GetData(typeof(DraggedData)) as DraggedData;
+            List<DraggedData> allDraggedData = e.Data.GetData(typeof(List<DraggedData>)) as List<DraggedData>;
 
             if (e.AllowedEffect == DragDropEffects.Move)
             {
-                ICategoryData oldParentData = draggedData.Control.Parent.Tag as ICategoryData;
-                if (draggedData.Data is ICategoryData)
+                foreach(DraggedData draggedData in allDraggedData)
                 {
-                    oldParentData?.Children?.Remove(draggedData.Data as ICategoryData);
-                }
-                else if (draggedData.Data is ICategorizedValue)
-                {
-                    oldParentData?.Values?.Remove(draggedData.Data as ICategorizedValue);
-                }
-                draggedData.Control.Parent.Controls.Remove(draggedData.Control);
+                    ICategoryData oldParentData = draggedData.Control.Parent.Tag as ICategoryData;
+                    if (draggedData.Data is ICategoryData)
+                    {
+                        oldParentData?.Children?.Remove(draggedData.Data as ICategoryData);
+                    }
+                    else if (draggedData.Data is ICategorizedValue)
+                    {
+                        oldParentData?.Values?.Remove(draggedData.Data as ICategorizedValue);
+                    }
+                    draggedData.Control.Parent.Controls.Remove(draggedData.Control);
+                }                
             }
         }
 
@@ -243,7 +246,7 @@ namespace Levrum.UI.WinForms
                 FlatStyle = FlatStyle.Flat,
                 Margin = new Padding(2) 
             };
-            btnSubPanelAddNewSub.FlatAppearance.BorderColor = System.Drawing.SystemColors.Control;
+            btnSubPanelAddNewSub.FlatAppearance.BorderColor = Color.WhiteSmoke;
             btnSubPanelAddNewSub.Click += AddSubcategory_Click;
             newPanel.Controls.Add(btnSubPanelAddNewSub);
 
@@ -290,14 +293,14 @@ namespace Levrum.UI.WinForms
             }
 
             List<DraggedData> allDraggedData = e.Data.GetData(typeof(List<DraggedData>)) as List<DraggedData>;
-
+            receivingPanel.SuspendLayout();
             foreach (DraggedData draggedData in allDraggedData)
             {
                 ICategoryData oldParentData = draggedData.Control.Parent.Tag as ICategoryData;
 
                 if (draggedData.Control == receivingPanel)
                 {
-                    return;
+                    continue;
                 }
 
                 // Handle drop of category data panel
@@ -307,6 +310,11 @@ namespace Levrum.UI.WinForms
                     if (droppedData == null)
                     {
                         throw new Exception("Null data received");
+                    }
+
+                    if (receivingPanelData.Children.Contains(droppedData))
+                    {
+                        continue;
                     }
 
                     if (oldParentData != null)
@@ -329,6 +337,11 @@ namespace Levrum.UI.WinForms
                     if (droppedData == null)
                     {
                         throw new Exception("Null data received");
+                    }
+
+                    if (receivingPanelData.Values.Contains(droppedData))
+                    {
+                        continue;
                     }
 
                     if (oldParentData != null)
@@ -362,6 +375,7 @@ namespace Levrum.UI.WinForms
                     throw new Exception("Invalid data received");
                 }
 
+                // Keep the add subcategory button at the bottom
                 Control addSubBtn = null;
                 foreach (Control control in receivingPanel.Controls)
                 {
@@ -373,12 +387,13 @@ namespace Levrum.UI.WinForms
                 }
                 if (addSubBtn == null)
                 {
-                    return;
+                    continue;
                 }
 
                 receivingPanel.Controls.Remove(addSubBtn);
                 receivingPanel.Controls.Add(addSubBtn);
-            }            
+            }
+            receivingPanel.ResumeLayout();
         }
 
         private Control GenerateValueBlock(ICategorizedValue value)
@@ -405,6 +420,11 @@ namespace Levrum.UI.WinForms
             {
                 clickedValueBlock.BackColor = Color.LightGray;
                 m_selectedButtons.Add(clickedValueBlock);
+            }
+            if (Form.ModifierKeys == Keys.Shift)
+            {
+                SelectRangeOfValueBlocks(clickedValueBlock.Parent, clickedValueBlock);
+                return;
             }
             else if (Form.ModifierKeys == Keys.Control)
             {
@@ -633,6 +653,63 @@ namespace Levrum.UI.WinForms
                 button.BackColor = Color.White;
             }
             m_selectedButtons.Clear();
+        }
+
+        private void AddValueBlockToSelection(Button valueBlock)
+        {
+            valueBlock.BackColor = Color.LightGray;
+            if (!m_selectedButtons.Contains(valueBlock))
+            {
+                m_selectedButtons.Add(valueBlock);
+            }
+        }
+
+        private void SelectRangeOfValueBlocks(Control container, Button valueBlock)
+        {
+            Button vbOtherEnd = null;
+            foreach (Control control in container.Controls)
+            {
+                if (!(control is Button))
+                {
+                    continue;
+                }
+                if (control == valueBlock)
+                {
+                    continue;
+                }
+
+                if (m_selectedButtons.Contains(control as Button))
+                {
+                    vbOtherEnd = control as Button;
+                    break;
+                }
+            }
+
+            bool seenOne = false;
+            foreach (Control control in container.Controls)
+            {
+                if (!(control is Button))
+                {
+                    continue;
+                }
+
+                if (seenOne)
+                {
+                    AddValueBlockToSelection(control as Button);
+                }
+
+                if (control == valueBlock || control == vbOtherEnd)
+                {
+                    if (!seenOne)
+                    {
+                        seenOne = true;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
         }
 
         class DraggedData
