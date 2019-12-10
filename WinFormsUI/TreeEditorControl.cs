@@ -11,6 +11,19 @@ namespace Levrum.UI.WinForms
 {
     public partial class TreeEditorControl : UserControl
     {
+        [System.ComponentModel.Category("Load Incidents Button"), System.ComponentModel.Description("Whether or not to display the 'Load Incidents' button.")]
+        public bool LoadIncidentsButton 
+        {
+            get
+            {
+                return m_btnLoadIncidents.Visible;
+            }
+            set
+            {
+                m_btnLoadIncidents.Visible = value;
+                Invalidate();
+            }
+        }
         List<CauseData> causeDatas = new List<CauseData>
         {
             new CauseData
@@ -57,7 +70,7 @@ namespace Levrum.UI.WinForms
         public TreeEditorControl()
         {
             InitializeComponent();
-
+            m_btnLoadIncidents.Visible = LoadIncidentsButton;
         }
 
         private void OrganizedPanel_DragEnter(object sender, DragEventArgs e)
@@ -200,7 +213,7 @@ namespace Levrum.UI.WinForms
             newPanel.Controls.Add(new Label
             {
                 Text = panelName,
-                Font = new Font("Microsoft Sans Serif", 9),
+                Font = new Font("Microsoft Sans Serif", 10),
                 AutoSize = true,
                 Margin = new Padding(0, 0, 0, 2),
                 Dock = DockStyle.Top,
@@ -219,7 +232,17 @@ namespace Levrum.UI.WinForms
                 AddSubPanel(newPanel, categoryData);
             }
 
-            Button btnSubPanelAddNewSub = new Button { Text = "Add Subcategory", AutoSize = true, Margin = new Padding(2) };
+            Button btnSubPanelAddNewSub = new Button 
+            { 
+                Name = "Add Subcategory", 
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Image = Properties.Resources.add_subcategory,
+                ImageAlign = ContentAlignment.MiddleCenter,
+                FlatStyle = FlatStyle.Flat,
+                Margin = new Padding(2) 
+            };
+            btnSubPanelAddNewSub.FlatAppearance.BorderColor = System.Drawing.SystemColors.Control;
             btnSubPanelAddNewSub.Click += AddSubcategory_Click;
             newPanel.Controls.Add(btnSubPanelAddNewSub);
 
@@ -338,7 +361,7 @@ namespace Levrum.UI.WinForms
             Control addSubBtn = null;
             foreach (Control control in receivingPanel.Controls)
             {
-                if (control.Text == "Add Subcategory")
+                if (control.Name == "Add Subcategory")
                 {
                     addSubBtn = control;
                     break;
@@ -358,6 +381,10 @@ namespace Levrum.UI.WinForms
             Button newValueBlock = new Button
             {
                 Text = value.Value,
+                AutoSize = true,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.White,
+                TextImageRelation = TextImageRelation.ImageBeforeText,
                 Tag = value
             };
             newValueBlock.MouseDown += ValueBlock_MouseDown;
@@ -484,6 +511,7 @@ namespace Levrum.UI.WinForms
             TextBox tbNewCatNameEntry = new TextBox
             {
                 Text = "Enter name of new category",
+                Font = new Font(Font.FontFamily, 9),
                 Margin = new Padding(10),
                 Width = 200
             };
