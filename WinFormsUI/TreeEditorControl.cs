@@ -67,6 +67,7 @@ namespace Levrum.UI.WinForms
                 }
             },
         };
+        List<Button> m_selectedButtons = new List<Button>();
         public TreeEditorControl()
         {
             InitializeComponent();
@@ -215,7 +216,7 @@ namespace Levrum.UI.WinForms
                 Text = panelName,
                 Font = new Font("Microsoft Sans Serif", 10),
                 AutoSize = true,
-                Margin = new Padding(0, 0, 0, 2),
+                Margin = new Padding(0, 0, 0, 4),
                 Dock = DockStyle.Top,
                 Anchor = (AnchorStyles.Left | AnchorStyles.Right)
             });
@@ -265,7 +266,7 @@ namespace Levrum.UI.WinForms
 
         private void SubPanel_DragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(DraggedData)))
+            if (e.Data.GetDataPresent(typeof(List<DraggedData>)))
             {
                 e.Effect = DragDropEffects.Move | DragDropEffects.Copy;
             }
@@ -287,93 +288,97 @@ namespace Levrum.UI.WinForms
             {
                 throw new Exception("Dropped object does not contain data");
             }
-            
-            DraggedData draggedData = e.Data.GetData(typeof(DraggedData)) as DraggedData;
-            ICategoryData oldParentData = draggedData.Control.Parent.Tag as ICategoryData;
 
-            if (draggedData.Control == receivingPanel)
+            List<DraggedData> allDraggedData = e.Data.GetData(typeof(List<DraggedData>)) as List<DraggedData>;
+
+            foreach (DraggedData draggedData in allDraggedData)
             {
-                return;
-            }
+                ICategoryData oldParentData = draggedData.Control.Parent.Tag as ICategoryData;
 
-            // Handle drop of category data panel
-            if (draggedData.Data is ICategoryData)
-            {
-                ICategoryData droppedData = draggedData.Data as ICategoryData;
-                if (droppedData == null)
+                if (draggedData.Control == receivingPanel)
                 {
-                    throw new Exception("Null data received");
+                    return;
                 }
 
-                if (oldParentData != null)
+                // Handle drop of category data panel
+                if (draggedData.Data is ICategoryData)
                 {
-                    oldParentData.Children.Remove(droppedData);
+                    ICategoryData droppedData = draggedData.Data as ICategoryData;
+                    if (droppedData == null)
+                    {
+                        throw new Exception("Null data received");
+                    }
+
+                    if (oldParentData != null)
+                    {
+                        oldParentData.Children.Remove(droppedData);
+                    }
+
+                    if (e.AllowedEffect == DragDropEffects.Move && draggedData.Control.Parent != null)
+                    {
+                        draggedData.Control.Parent.Controls.Remove(draggedData.Control);
+                    }
+
+                    receivingPanelData.Children.Add(droppedData);
+                    AddSubPanel(receivingPanel, droppedData);
+                }
+                // Handle drop of value block
+                else if (draggedData.Data is ICategorizedValue)
+                {
+                    ICategorizedValue droppedData = draggedData.Data as ICategorizedValue;
+                    if (droppedData == null)
+                    {
+                        throw new Exception("Null data received");
+                    }
+
+                    if (oldParentData != null)
+                    {
+                        oldParentData.Values.Remove(droppedData);
+                    }
+
+                    if (e.AllowedEffect == DragDropEffects.Move && draggedData.Control.Parent != null)
+                    {
+                        draggedData.Control.Parent.Controls.Remove(draggedData.Control);
+                    }
+
+                    receivingPanelData.Values.Add(droppedData);
+
+                    // Keep values on top and containers on bottome
+                    List<Control> panels = new List<Control>();
+                    foreach (Control control in receivingPanel.Controls)
+                    {
+                        if (control is FlowLayoutPanel)
+                        {
+                            panels.Add(control);
+                        }
+                    }
+
+                    panels.ForEach(x => receivingPanel.Controls.Remove(x));
+                    receivingPanel.Controls.Add(GenerateValueBlock(droppedData));
+                    panels.ForEach(x => receivingPanel.Controls.Add(x));
+                }
+                else
+                {
+                    throw new Exception("Invalid data received");
                 }
 
-                if (e.AllowedEffect == DragDropEffects.Move && draggedData.Control.Parent != null)
-                {
-                    draggedData.Control.Parent.Controls.Remove(draggedData.Control);
-                }
-
-                receivingPanelData.Children.Add(droppedData);
-                AddSubPanel(receivingPanel, droppedData);
-            }
-            // Handle drop of value block
-            else if (draggedData.Data is ICategorizedValue)
-            {
-                ICategorizedValue droppedData = draggedData.Data as ICategorizedValue;
-                if (droppedData == null)
-                {
-                    throw new Exception("Null data received");
-                }
-
-                if (oldParentData != null)
-                {
-                    oldParentData.Values.Remove(droppedData);
-                }
-
-                if (e.AllowedEffect == DragDropEffects.Move && draggedData.Control.Parent != null)
-                {
-                    draggedData.Control.Parent.Controls.Remove(draggedData.Control);
-                }
-
-                receivingPanelData.Values.Add(droppedData);
-
-                // Keep values on top and containers on bottome
-                List<Control> panels = new List<Control>();
+                Control addSubBtn = null;
                 foreach (Control control in receivingPanel.Controls)
                 {
-                    if (control is FlowLayoutPanel)
+                    if (control.Name == "Add Subcategory")
                     {
-                        panels.Add(control);
+                        addSubBtn = control;
+                        break;
                     }
                 }
-
-                panels.ForEach(x => receivingPanel.Controls.Remove(x));
-                receivingPanel.Controls.Add(GenerateValueBlock(droppedData));
-                panels.ForEach(x => receivingPanel.Controls.Add(x));
-            }
-            else
-            {
-                throw new Exception("Invalid data received");
-            }
-
-            Control addSubBtn = null;
-            foreach (Control control in receivingPanel.Controls)
-            {
-                if (control.Name == "Add Subcategory")
+                if (addSubBtn == null)
                 {
-                    addSubBtn = control;
-                    break;
+                    return;
                 }
-            }
-            if (addSubBtn == null)
-            {
-                return;
-            }
 
-            receivingPanel.Controls.Remove(addSubBtn);
-            receivingPanel.Controls.Add(addSubBtn);
+                receivingPanel.Controls.Remove(addSubBtn);
+                receivingPanel.Controls.Add(addSubBtn);
+            }            
         }
 
         private Control GenerateValueBlock(ICategorizedValue value)
@@ -394,14 +399,36 @@ namespace Levrum.UI.WinForms
 
         private void ValueBlock_MouseDown(object sender, MouseEventArgs e)
         {
-            Control valueBlock = sender as Control;
-            if (valueBlock == null)
+            Button clickedValueBlock = sender as Button;
+            
+            if (!m_selectedButtons.Contains(clickedValueBlock))
+            {
+                clickedValueBlock.BackColor = Color.LightGray;
+                m_selectedButtons.Add(clickedValueBlock);
+            }
+            else if (Form.ModifierKeys == Keys.Control)
+            {
+                clickedValueBlock.BackColor = Color.White;
+                m_selectedButtons.Remove(clickedValueBlock);
+            }
+
+            if (clickedValueBlock == null)
             {
                 return;
             }
-            DraggedData draggedData = new DraggedData { Type = valueBlock.Tag.GetType(), Control = valueBlock, Data = valueBlock.Tag };
-            DragDropEffects dragDropEffects = valueBlock.Parent == m_flpUnorganizedData ? DragDropEffects.Copy : DragDropEffects.Move;
-            valueBlock.DoDragDrop(draggedData, dragDropEffects);
+
+            List<DraggedData> selectedValueBlocks = new List<DraggedData>();
+            foreach (Button valueBlock in m_selectedButtons)
+            {
+                selectedValueBlocks.Add(new DraggedData { Type = valueBlock.Tag.GetType(), Control = valueBlock, Data = valueBlock.Tag });
+            }
+            DragDropEffects dragDropEffects = clickedValueBlock.Parent == m_flpUnorganizedData ? DragDropEffects.Copy : DragDropEffects.Move;
+            clickedValueBlock.DoDragDrop(selectedValueBlocks, dragDropEffects);
+
+            if (Form.ModifierKeys != Keys.Control && m_selectedButtons.Count > 1)
+            {
+                ClearValueBlockSelection();
+            }
         }
 
         private void m_btnLoadIncidents_Click(object sender, EventArgs e)
@@ -584,11 +611,35 @@ namespace Levrum.UI.WinForms
             }
         }
 
+        private void m_flpOrganizedData_Click(object sender, EventArgs e)
+        {
+            ClearValueBlockSelection();
+        }
+
+        private void m_flpUnorganizedData_Click(object sender, EventArgs e)
+        {
+            ClearValueBlockSelection();
+        }
+
+        private void TreeEditorControl_Click(object sender, EventArgs e)
+        {
+            ClearValueBlockSelection();
+        }
+
+        private void ClearValueBlockSelection()
+        {
+            foreach (Button button in m_selectedButtons)
+            {
+                button.BackColor = Color.White;
+            }
+            m_selectedButtons.Clear();
+        }
+
         class DraggedData
         {
             public Type Type { get; set; }
             public Control Control { get; set; }
             public object Data { get; set; }
-        }
+        }        
     }
 }
