@@ -30,11 +30,11 @@
         {
             this.m_scMain = new System.Windows.Forms.SplitContainer();
             this.m_flpOrganizedData = new System.Windows.Forms.FlowLayoutPanel();
+            this.m_btnAddOrganizedCategory = new System.Windows.Forms.Button();
             this.m_flpUnorganizedData = new System.Windows.Forms.FlowLayoutPanel();
             this.m_btnLoadTree = new System.Windows.Forms.Button();
             this.m_btnSaveTree = new System.Windows.Forms.Button();
             this.m_btnLoadIncidents = new System.Windows.Forms.Button();
-            this.m_btnAddOrganizedCategory = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.m_scMain)).BeginInit();
             this.m_scMain.Panel1.SuspendLayout();
             this.m_scMain.Panel2.SuspendLayout();
@@ -72,12 +72,30 @@
             this.m_flpOrganizedData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_flpOrganizedData.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.m_flpOrganizedData.Location = new System.Drawing.Point(0, 0);
+            this.m_flpOrganizedData.MaximumSize = new System.Drawing.Size(1000, 2000);
             this.m_flpOrganizedData.Name = "m_flpOrganizedData";
             this.m_flpOrganizedData.Size = new System.Drawing.Size(635, 473);
             this.m_flpOrganizedData.TabIndex = 0;
             this.m_flpOrganizedData.Click += new System.EventHandler(this.m_flpOrganizedData_Click);
             this.m_flpOrganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.OrganizedPanel_DragDrop);
             this.m_flpOrganizedData.DragEnter += new System.Windows.Forms.DragEventHandler(this.OrganizedPanel_DragEnter);
+            // 
+            // m_btnAddOrganizedCategory
+            // 
+            this.m_btnAddOrganizedCategory.AutoSize = true;
+            this.m_btnAddOrganizedCategory.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.m_btnAddOrganizedCategory.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.m_btnAddOrganizedCategory.FlatAppearance.BorderColor = System.Drawing.SystemColors.Control;
+            this.m_btnAddOrganizedCategory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.m_btnAddOrganizedCategory.Image = global::Levrum.UI.WinForms.Properties.Resources.add_subcategory;
+            this.m_btnAddOrganizedCategory.Location = new System.Drawing.Point(10, 10);
+            this.m_btnAddOrganizedCategory.Margin = new System.Windows.Forms.Padding(10);
+            this.m_btnAddOrganizedCategory.Name = "m_btnAddOrganizedCategory";
+            this.m_btnAddOrganizedCategory.Size = new System.Drawing.Size(36, 36);
+            this.m_btnAddOrganizedCategory.TabIndex = 0;
+            this.m_btnAddOrganizedCategory.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.m_btnAddOrganizedCategory.UseVisualStyleBackColor = false;
+            this.m_btnAddOrganizedCategory.Click += new System.EventHandler(this.AddSubcategory_Click);
             // 
             // m_flpUnorganizedData
             // 
@@ -129,23 +147,6 @@
             this.m_btnLoadIncidents.Text = "Load &Incident Data";
             this.m_btnLoadIncidents.UseVisualStyleBackColor = true;
             this.m_btnLoadIncidents.Click += new System.EventHandler(this.m_btnLoadIncidents_Click);
-            // 
-            // m_btnAddOrganizedCategory
-            // 
-            this.m_btnAddOrganizedCategory.AutoSize = true;
-            this.m_btnAddOrganizedCategory.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.m_btnAddOrganizedCategory.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.m_btnAddOrganizedCategory.FlatAppearance.BorderColor = System.Drawing.SystemColors.Control;
-            this.m_btnAddOrganizedCategory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.m_btnAddOrganizedCategory.Image = global::Levrum.UI.WinForms.Properties.Resources.add_subcategory;
-            this.m_btnAddOrganizedCategory.Location = new System.Drawing.Point(10, 10);
-            this.m_btnAddOrganizedCategory.Margin = new System.Windows.Forms.Padding(10);
-            this.m_btnAddOrganizedCategory.Name = "m_btnAddOrganizedCategory";
-            this.m_btnAddOrganizedCategory.Size = new System.Drawing.Size(36, 36);
-            this.m_btnAddOrganizedCategory.TabIndex = 0;
-            this.m_btnAddOrganizedCategory.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.m_btnAddOrganizedCategory.UseVisualStyleBackColor = false;
-            this.m_btnAddOrganizedCategory.Click += new System.EventHandler(this.AddSubcategory_Click);
             // 
             // TreeEditorControl
             // 
