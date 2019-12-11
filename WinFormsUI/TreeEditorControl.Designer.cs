@@ -53,6 +53,7 @@
             // m_scMain.Panel1
             // 
             this.m_scMain.Panel1.Controls.Add(this.m_flpOrganizedData);
+            this.m_scMain.Panel1.SizeChanged += new System.EventHandler(this.m_scMain_Panel1_SizeChanged);
             // 
             // m_scMain.Panel2
             // 
@@ -72,7 +73,6 @@
             this.m_flpOrganizedData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_flpOrganizedData.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.m_flpOrganizedData.Location = new System.Drawing.Point(0, 0);
-            this.m_flpOrganizedData.MaximumSize = new System.Drawing.Size(1000, 2000);
             this.m_flpOrganizedData.Name = "m_flpOrganizedData";
             this.m_flpOrganizedData.Size = new System.Drawing.Size(635, 473);
             this.m_flpOrganizedData.TabIndex = 0;
@@ -179,5 +179,8 @@
         private System.Windows.Forms.Button m_btnSaveTree;
         private System.Windows.Forms.Button m_btnLoadIncidents;
         private System.Windows.Forms.Button m_btnAddOrganizedCategory;
+
+        // Cursors
+        private System.Windows.Forms.Cursor MoveCursor;
     }
 }

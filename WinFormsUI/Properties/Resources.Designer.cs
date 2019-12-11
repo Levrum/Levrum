@@ -81,12 +81,12 @@ namespace Levrum.UI.WinForms.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Bitmap move_button {
+        internal static System.Drawing.Icon move_button {
             get {
                 object obj = ResourceManager.GetObject("move_button", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                return ((System.Drawing.Icon)(obj));
             }
         }
         
