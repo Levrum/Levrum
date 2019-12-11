@@ -76,7 +76,9 @@ namespace Levrum.UI.WinForms
         {
             InitializeComponent();
             m_btnLoadIncidents.Visible = LoadIncidentsButton;
+            MoveCursor = new Cursor(Properties.Resources.move_button.Handle);
         }
+
 
         private void OrganizedPanel_DragEnter(object sender, DragEventArgs e)
         {
@@ -183,7 +185,7 @@ namespace Levrum.UI.WinForms
             if (m_selectedPanels.Count > 1)
             {
                 ClearPanelSelection();
-            }            
+            }
         }
 
         private void m_btnLoadTree_Click(object sender, EventArgs e)
@@ -197,22 +199,17 @@ namespace Levrum.UI.WinForms
 
             string fileName = ofd.FileName;
 
-            List<CategoryData> tree = JsonConvert.DeserializeObject<List<CategoryData>>(File.ReadAllText(fileName), new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All });
-            m_flpUnorganizedData.Controls.Clear();
-            LoadTreeIntoFLP(tree, m_flpUnorganizedData);
+            List<ICategoryData> tree = JsonConvert.DeserializeObject<List<ICategoryData>>(File.ReadAllText(fileName), new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All });
+            LoadTree(tree, m_flpUnorganizedData);
         }
 
-        public void LoadTreeIntoFLP(IEnumerable<ICategoryData> categoryData, FlowLayoutPanel parentPanel)
+        public void LoadTree(IEnumerable<ICategoryData> categoryData, FlowLayoutPanel parentPanel)
         {
+            parentPanel.Controls.Clear();
+            parentPanel.FlowDirection = FlowDirection.TopDown;
             foreach (ICategoryData data in categoryData)
             {
                 FlowLayoutPanel newPanel = AddSubPanel(parentPanel, data);
-                foreach (ICategorizedValue value in data.Values)
-                {
-                    newPanel.Controls.Add(GenerateValueBlock(value));
-                }
-
-                LoadTreeIntoFLP(data.Children, newPanel);
             }
         }
 
@@ -241,17 +238,6 @@ namespace Levrum.UI.WinForms
             newPanel.DragEnter += SubPanel_DragEnter;
             newPanel.DragDrop += SubPanel_DragDrop;
 
-            /*Button moveButton = new Button
-            {
-                Image = Properties.Resources.move_button,
-                FlatStyle = FlatStyle.Flat,
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Margin = new Padding(-8)
-            };
-            moveButton.FlatAppearance.BorderColor = Color.WhiteSmoke;
-            newPanel.Controls.Add(moveButton);*/
-
             Label panelLabel = new Label
             {
                 Text = panelName,
@@ -259,7 +245,8 @@ namespace Levrum.UI.WinForms
                 AutoSize = true,
                 Margin = new Padding(0, 0, 0, 4),
                 Dock = DockStyle.Top,
-                Anchor = (AnchorStyles.Left | AnchorStyles.Right)
+                Anchor = (AnchorStyles.Left | AnchorStyles.Right),
+                Cursor = MoveCursor
             };
             panelLabel.MouseDown += PanelLabel_MouseDown;
 
@@ -322,29 +309,33 @@ namespace Levrum.UI.WinForms
             }
             else if (Form.ModifierKeys == Keys.Control && ListContainsPanel(m_selectedPanels, clickedPanel))
             {
-                RemoveValueBlockFromSelection(clickedPanel);
+                RemovePanelFromSelection(clickedPanel);
             }
             else if (Form.ModifierKeys == Keys.Control)
             {
-                AddValueBlockToSelection(clickedPanel);
+                AddPanelToSelection(clickedPanel);
             }
-            else
-            {
-                AddValueBlockToSelection(clickedPanel);
-            }
-
-            List<DraggedData> selectedPanels = new List<DraggedData>();
-            foreach (FlowLayoutPanel flp in m_selectedPanels)
-            {
-                selectedPanels.Add(new DraggedData { Control = flp, Data = flp.Tag, Type = flp.Tag.GetType() });
-            }
-
-            DragDropEffects dragDropEffects = clickedPanel.Parent == m_flpUnorganizedData ? DragDropEffects.Copy : DragDropEffects.Move;
-            clickedPanel.DoDragDrop(selectedPanels, DragDropEffects.Move);
-
-            if (Form.ModifierKeys != Keys.Control && m_selectedPanels.Count > 1)
+            else if (!ListContainsPanel(m_selectedPanels, clickedPanel))
             {
                 ClearPanelSelection();
+                AddPanelToSelection(clickedPanel);
+            }
+
+            if (Form.ModifierKeys != Keys.Control)
+            {
+                List<DraggedData> selectedPanels = new List<DraggedData>();
+                foreach (FlowLayoutPanel flp in m_selectedPanels)
+                {
+                    selectedPanels.Add(new DraggedData { Control = flp, Data = flp.Tag, Type = flp.Tag.GetType() });
+                }
+
+                DragDropEffects dragDropEffects = clickedPanel.Parent == m_flpUnorganizedData ? DragDropEffects.Copy : DragDropEffects.Move;
+                clickedPanel.DoDragDrop(selectedPanels, DragDropEffects.Move);
+
+                if (m_selectedPanels.Count > 1)
+                {
+                    ClearPanelSelection();
+                }
             }
         }
 
@@ -359,6 +350,8 @@ namespace Levrum.UI.WinForms
 
         private void SelectRangeOfPanels(Control container, FlowLayoutPanel clickedPanel)
         {
+            AddPanelToSelection(clickedPanel);
+
             FlowLayoutPanel panelOtherEnd = null;
             foreach (Control control in container.Controls)
             {
@@ -440,7 +433,7 @@ namespace Levrum.UI.WinForms
                     continue;
                 }
 
-                if (panelData.Name == flpData.Name && panelData.Description == flpData.Description)
+                if (panelData.Name == flpData.Name && panelData.Description == flpData.Description && panel.Parent == flp.Parent)
                 {
                     containsPanel = true;
                     break;
@@ -452,7 +445,12 @@ namespace Levrum.UI.WinForms
 
         private void SubPanel_DragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(List<DraggedData>)))
+            List<DraggedData> data = e.Data.GetData(typeof(List<DraggedData>)) as List<DraggedData>;
+            if (data[0].Control == sender || data[0].Control.Parent == sender)
+            {
+                e.Effect = DragDropEffects.None;
+            }
+            else if (e.Data.GetDataPresent(typeof(List<DraggedData>)))
             {
                 e.Effect = DragDropEffects.Move | DragDropEffects.Copy;
             }
@@ -578,11 +576,11 @@ namespace Levrum.UI.WinForms
             }
             receivingPanel.ResumeLayout();
 
-            if (m_selectedButtons.Count > 1)
+            if (m_selectedButtons.Count > 0)
             {
                 ClearValueBlockSelection();
             }
-            if (m_selectedPanels.Count > 1)
+            if (m_selectedPanels.Count > 0)
             {
                 ClearPanelSelection();
             }
@@ -593,6 +591,7 @@ namespace Levrum.UI.WinForms
             Button newValueBlock = new Button
             {
                 Text = value.Value,
+                Font = new Font(Font.FontFamily, 9),
                 AutoSize = true,
                 FlatStyle = FlatStyle.Flat,
                 BackColor = Color.White,
@@ -608,6 +607,11 @@ namespace Levrum.UI.WinForms
         {
             Button clickedValueBlock = sender as Button;
 
+            if (clickedValueBlock == null)
+            {
+                return;
+            }
+
             if (Form.ModifierKeys == Keys.Shift)
             {
                 SelectRangeOfValueBlocks(clickedValueBlock.Parent, clickedValueBlock);
@@ -621,14 +625,10 @@ namespace Levrum.UI.WinForms
             {
                 AddValueBlockToSelection(clickedValueBlock);
             }
-            else
+            else if (!ListContainsValueBlock(m_selectedButtons, clickedValueBlock))
             {
+                ClearValueBlockSelection();
                 AddValueBlockToSelection(clickedValueBlock);
-            }
-
-            if (clickedValueBlock == null)
-            {
-                return;
             }
 
             if (Form.ModifierKeys != Keys.Control)
@@ -646,7 +646,7 @@ namespace Levrum.UI.WinForms
                     ClearValueBlockSelection();
                 }
             }
-            
+
         }
 
         private void m_btnLoadIncidents_Click(object sender, EventArgs e)
@@ -678,16 +678,23 @@ namespace Levrum.UI.WinForms
                     }
                 }
             }
+            if (incidentDataFields.Count < 1)
+            {
+                MessageBox.Show("Could not find any data fields in incident data.");
+                return;
+            }
 
             // Prompt user to select incident data field
             string selectedField = null;
             ListBox listBox = new ListBox();
+            Label header = new Label();
             listBox.Items.AddRange(incidentDataFields.ToArray());
             listBox.DoubleClick += (sdr, args) =>
             {
                 selectedField = listBox.SelectedItem.ToString();
                 listBox.Hide();
                 this.Controls.Remove(listBox);
+                this.Controls.Remove(header);
 
                 // Populate unorganized data with data field values
                 HashSet<string> dataFieldValues = new HashSet<string>();
@@ -700,9 +707,22 @@ namespace Levrum.UI.WinForms
                 }
                 PopulateUnorganizedDataWithValueBlocks(dataFieldValues);
             };
-            listBox.Location = new Point(m_btnLoadIncidents.Location.X, m_btnLoadIncidents.Location.Y - (m_btnLoadIncidents.Height + listBox.Height + 4));
+            listBox.Location = new Point(m_btnLoadIncidents.Location.X, m_btnLoadIncidents.Location.Y - (m_btnLoadIncidents.Height + listBox.Height - listBox.Margin.Top - header.Margin.Bottom));
             listBox.Anchor = (AnchorStyles.Bottom | AnchorStyles.Right);
+
+            header.Text = "Please choose a data field";
+            header.Font = new Font(header.Font.FontFamily, 9, FontStyle.Bold);
+            header.Padding = new Padding(2);
+            header.BackColor = Color.White;
+            header.Location = new Point(listBox.Location.X, listBox.Location.Y - header.Height);
+            header.Anchor = (AnchorStyles.Bottom | AnchorStyles.Right);
+            header.AutoSize = true;
+            header.BorderStyle = BorderStyle.FixedSingle;
+            listBox.Width = TextRenderer.MeasureText(header.Text, header.Font).Width + header.Padding.Right * 2 + 1;
+
+            this.Controls.Add(header);
             this.Controls.Add(listBox);
+            header.BringToFront();
             listBox.BringToFront();
         }
 
@@ -792,6 +812,11 @@ namespace Levrum.UI.WinForms
 
         private void m_btnSaveTree_Click(object sender, EventArgs e)
         {
+            SaveTree();
+        }
+
+        private void SaveTree()
+        {
             List<ICategoryData> tree = ConvertToTree();
             SaveFileDialog ofd = new SaveFileDialog();
             ofd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
@@ -854,7 +879,7 @@ namespace Levrum.UI.WinForms
             ICategorizedValue vbData = valueBlock.Tag as ICategorizedValue;
             if (vbData == null)
             {
-                throw new Exception("Value block contains no data");
+                return false;
             }
             bool containsBlock = false;
             foreach (Button vb in m_selectedButtons)
@@ -886,10 +911,12 @@ namespace Levrum.UI.WinForms
 
         private void SelectRangeOfValueBlocks(Control container, Button valueBlock)
         {
+            AddValueBlockToSelection(valueBlock);
+
             Button vbOtherEnd = null;
             foreach (Control control in container.Controls)
             {
-                if (!(control is Button))
+                if (!(control.Tag is ICategorizedValue))
                 {
                     continue;
                 }
@@ -898,11 +925,16 @@ namespace Levrum.UI.WinForms
                     continue;
                 }
 
-                if (m_selectedButtons.Contains(control as Button))
+                if (ListContainsValueBlock(m_selectedButtons, control as Button))
                 {
                     vbOtherEnd = control as Button;
                     break;
                 }
+            }
+
+            if (vbOtherEnd == null)
+            {
+                return;
             }
 
             bool seenOne = false;
@@ -937,6 +969,11 @@ namespace Levrum.UI.WinForms
             public Type Type { get; set; }
             public Control Control { get; set; }
             public object Data { get; set; }
+        }
+
+        private void m_scMain_Panel1_SizeChanged(object sender, EventArgs e)
+        {
+            m_flpOrganizedData.MaximumSize = new Size(m_scMain.Panel1.Width, 9000000);
         }
     }
 }
