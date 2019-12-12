@@ -25,49 +25,13 @@ namespace Levrum.UI.WinForms
             }
         }
 
-        List<CauseData> causeDatas = new List<CauseData>
+        public List<ICategoryData> Tree
         {
-            new CauseData
+            get
             {
-                Name = "Fire",
-                NatureCodes = new List<ICategorizedValue>
-                {
-                    new NatureCode { Value = "700" },
-                    new NatureCode { Value = "701"}
-                },
-                Children = new List<ICategoryData>
-                {
-                    new CauseData
-                    {
-                        Name = "Structure Fire",
-                        NatureCodes = new List<ICategorizedValue>
-                        {
-                            new NatureCode { Value = "731"}
-                        }
-                    }
-                }
-            },
-            new CauseData
-            {
-                Name = "EMS",
-                NatureCodes = new List<ICategorizedValue>
-                {
-                    new NatureCode { Value = "100" },
-                    new NatureCode { Value = "101"}
-                },
-                Children = new List<ICategoryData>
-                {
-                    new CauseData
-                    {
-                        Name = "EMS Urgent",
-                        NatureCodes = new List<ICategorizedValue>
-                        {
-                            new NatureCode { Value = "131"}
-                        }
-                    }
-                }
-            },
-        };
+                return ConvertToTree();
+            }
+        }
 
         List<FlowLayoutPanel> m_selectedPanels = new List<FlowLayoutPanel>();
         List<Button> m_selectedButtons = new List<Button>();
@@ -777,6 +741,8 @@ namespace Levrum.UI.WinForms
 
         private void LoadValueBlocks(FlowLayoutPanel flp, IEnumerable<string> data)
         {
+            flp.Controls.Clear();
+            flp.FlowDirection = FlowDirection.TopDown;
             Control[] newBlocks = new Control[data.Count()];
             int nbIdx = 0;
             foreach (string dataString in data.OrderBy(x => x))
