@@ -207,10 +207,13 @@ namespace Levrum.UI.WinForms
         {
             parentPanel.Controls.Clear();
             parentPanel.FlowDirection = FlowDirection.TopDown;
+            parentPanel.SuspendLayout();
             foreach (ICategoryData data in categoryData)
             {
                 FlowLayoutPanel newPanel = AddSubPanel(parentPanel, data);
             }
+            parentPanel.Controls.Add(GenerateAddSubcategoryButton());
+            parentPanel.ResumeLayout();
         }
 
         private FlowLayoutPanel AddSubPanel(FlowLayoutPanel parentPanel, ICategoryData panelCatData)
@@ -222,14 +225,14 @@ namespace Levrum.UI.WinForms
                 FlowDirection = FlowDirection.TopDown,
                 Height = 200,
                 BorderStyle = BorderStyle.FixedSingle,
-                Dock = DockStyle.Top,
                 Margin = new Padding(10),
                 Padding = new Padding(8),
                 Name = panelName,
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 AutoScroll = false,
-                Anchor = (AnchorStyles.Left | AnchorStyles.Right),
+                Dock = DockStyle.Top,
+                Anchor = AnchorStyles.Left | AnchorStyles.Right,
                 BackColor = Color.WhiteSmoke,
                 AllowDrop = true,
                 Tag = panelCatData,
@@ -242,10 +245,10 @@ namespace Levrum.UI.WinForms
             {
                 Text = panelName,
                 Font = new Font("Microsoft Sans Serif", 10, FontStyle.Bold),
-                AutoSize = true,
                 Margin = new Padding(0, 0, 0, 4),
+                AutoSize = true,
                 Dock = DockStyle.Top,
-                Anchor = (AnchorStyles.Left | AnchorStyles.Right),
+                Anchor = AnchorStyles.Left | AnchorStyles.Right,
                 Cursor = MoveCursor
             };
             panelLabel.MouseDown += PanelLabel_MouseDown;
@@ -263,20 +266,8 @@ namespace Levrum.UI.WinForms
             {
                 AddSubPanel(newPanel, categoryData);
             }
-
-            Button btnSubPanelAddNewSub = new Button
-            {
-                Name = "Add Subcategory",
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Image = Properties.Resources.add_subcategory,
-                ImageAlign = ContentAlignment.MiddleCenter,
-                FlatStyle = FlatStyle.Flat,
-                Margin = new Padding(2)
-            };
-            btnSubPanelAddNewSub.FlatAppearance.BorderColor = Color.WhiteSmoke;
-            btnSubPanelAddNewSub.Click += AddSubcategory_Click;
-            newPanel.Controls.Add(btnSubPanelAddNewSub);
+            
+            newPanel.Controls.Add(GenerateAddSubcategoryButton());
 
             parentPanel.Controls.Add(newPanel);
 
@@ -400,7 +391,6 @@ namespace Levrum.UI.WinForms
 
         private void AddPanelToSelection(FlowLayoutPanel clickedPanel)
         {
-            Console.WriteLine((clickedPanel.Tag as ICategoryData).Name);
             clickedPanel.BackColor = Color.LightGray;
             if (!ListContainsPanel(m_selectedPanels, clickedPanel))
             {
@@ -586,6 +576,23 @@ namespace Levrum.UI.WinForms
             }
         }
 
+        private Button GenerateAddSubcategoryButton()
+        {
+            Button btnSubPanelAddNewSub = new Button
+            {
+                Name = "Add Subcategory",
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Image = Properties.Resources.add_subcategory,
+                ImageAlign = ContentAlignment.MiddleCenter,
+                FlatStyle = FlatStyle.Flat,
+                Margin = new Padding(2)
+            };
+            btnSubPanelAddNewSub.FlatAppearance.BorderColor = Color.WhiteSmoke;
+            btnSubPanelAddNewSub.Click += AddSubcategory_Click;
+
+            return btnSubPanelAddNewSub;
+        }
         private Control GenerateValueBlock(ICategorizedValue value)
         {
             Button newValueBlock = new Button
@@ -705,10 +712,11 @@ namespace Levrum.UI.WinForms
                         dataFieldValues.Add(incident.Data[selectedField].ToString());
                     }
                 }
-                PopulateUnorganizedDataWithValueBlocks(dataFieldValues);
+                LoadValueBlocks(m_flpUnorganizedData, dataFieldValues);
             };
             listBox.Location = new Point(m_btnLoadIncidents.Location.X, m_btnLoadIncidents.Location.Y - (m_btnLoadIncidents.Height + listBox.Height - listBox.Margin.Top - header.Margin.Bottom));
             listBox.Anchor = (AnchorStyles.Bottom | AnchorStyles.Right);
+            listBox.Font = new Font(listBox.Font.FontFamily, 9);
 
             header.Text = "Please choose a data field";
             header.Font = new Font(header.Font.FontFamily, 9, FontStyle.Bold);
@@ -726,7 +734,7 @@ namespace Levrum.UI.WinForms
             listBox.BringToFront();
         }
 
-        private void PopulateUnorganizedDataWithValueBlocks(IEnumerable<string> data)
+        private void LoadValueBlocks(FlowLayoutPanel flp, IEnumerable<string> data)
         {
             Control[] newBlocks = new Control[data.Count()];
             int nbIdx = 0;
@@ -737,7 +745,7 @@ namespace Levrum.UI.WinForms
                 newBlocks[nbIdx] = newBlock;
                 nbIdx++;
             }
-
+            m_flpUnorganizedData.Controls.Clear();
             m_flpUnorganizedData.Controls.AddRange(newBlocks);
         }
 
@@ -964,6 +972,70 @@ namespace Levrum.UI.WinForms
             }
         }
 
+        private void CreateDefaultTree_Causes()
+        {
+            List<CauseData> causeTree = new List<CauseData>
+            {
+                new CauseData
+                {
+                    Name = "Fire",
+                    Children = new List<ICategoryData>
+                    {
+                        new CauseData
+                        {
+                            Name = "Structure Fire",
+                        },
+                        new CauseData
+                        {
+                            Name = "Outdoor Fire"
+                        },
+                        new CauseData
+                        {
+                            Name = "Vehicle Fire"
+                        },
+                        new CauseData
+                        {
+                            Name = "Other Fire"
+                        }
+                    }
+                },
+                new CauseData
+                {
+                    Name = "EMS",
+                },
+                new CauseData
+                {
+                    Name = "MVA"
+                },
+                new CauseData
+                {
+                    Name = "Service"
+                },
+                new CauseData
+                {
+                    Name = "Rescue"
+                },
+                new CauseData
+                {
+                    Name = "Hazmat"
+                },
+                new CauseData
+                {
+                    Name = "AFA"
+                },
+                new CauseData
+                {
+                    Name = "Other"
+                },
+                new CauseData
+                {
+                    Name = "Non-Incident"
+                }
+            };
+
+            LoadTree(causeTree, m_flpOrganizedData);
+        }
+
         class DraggedData
         {
             public Type Type { get; set; }
@@ -971,9 +1043,12 @@ namespace Levrum.UI.WinForms
             public object Data { get; set; }
         }
 
-        private void m_scMain_Panel1_SizeChanged(object sender, EventArgs e)
+        private void m_cbDefaultTree_SelectedIndexChanged(object sender, EventArgs e)
         {
-            m_flpOrganizedData.MaximumSize = new Size(m_scMain.Panel1.Width, 9000000);
+            if (m_cbDefaultTree.SelectedItem.ToString() == "Causes")
+            {
+                CreateDefaultTree_Causes();
+            }
         }
     }
 }
