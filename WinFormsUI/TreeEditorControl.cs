@@ -157,12 +157,28 @@ namespace Levrum.UI.WinForms
             }
         }
 
+
+
         private void UnorganizedPanel_DragDrop(object sender, DragEventArgs e)
         {
             List<DraggedData> allDraggedData = e.Data.GetData(typeof(List<DraggedData>)) as List<DraggedData>;
 
             if (e.AllowedEffect == DragDropEffects.Move)
             {
+                // Suspent layout for all parent controls
+                HashSet<Control> parentControls = new HashSet<Control>();
+                foreach (DraggedData draggedData in allDraggedData)
+                {
+                    if (!parentControls.Contains(draggedData.Control.Parent))
+                    {
+                        parentControls.Add(draggedData.Control.Parent);
+                    }
+                }
+                foreach (Control control in parentControls)
+                {
+                    control.SuspendLayout();
+                }
+
                 foreach (DraggedData draggedData in allDraggedData)
                 {
                     ICategoryData oldParentData = draggedData.Control.Parent.Tag as ICategoryData;
@@ -173,8 +189,26 @@ namespace Levrum.UI.WinForms
                     else if (draggedData.Data is ICategorizedValue)
                     {
                         oldParentData?.Values?.Remove(draggedData.Data as ICategorizedValue);
+
+                        // Mark block as not added
+                        if (!ValueBlockIsAdded(draggedData.Data as ICategorizedValue, m_flpOrganizedData))
+                        {
+                            foreach (Control control in m_flpUnorganizedData.Controls)
+                            {
+                                if (control is Button && (control as Button).Tag == draggedData.Data)
+                                {
+                                    MarkValueBlockAsNotAdded(control as Button);
+                                    break;
+                                }
+                            }                            
+                        }                        
                     }
                     draggedData.Control.Parent.Controls.Remove(draggedData.Control);
+                }
+
+                foreach (Control control in parentControls)
+                {
+                    control.ResumeLayout();
                 }
             }
 
@@ -233,13 +267,14 @@ namespace Levrum.UI.WinForms
                 AutoScroll = false,
                 Dock = DockStyle.Top,
                 Anchor = AnchorStyles.Left | AnchorStyles.Right,
-                BackColor = Color.WhiteSmoke,
+                BackColor = Color.White,
                 AllowDrop = true,
                 Tag = panelCatData,
             };
             newPanel.MouseDown += SubPanel_MouseDown;
             newPanel.DragEnter += SubPanel_DragEnter;
             newPanel.DragDrop += SubPanel_DragDrop;
+            newPanel.Paint += SubPanel_Paint;
 
             Label panelLabel = new Label
             {
@@ -464,6 +499,7 @@ namespace Levrum.UI.WinForms
             }
 
             List<DraggedData> allDraggedData = e.Data.GetData(typeof(List<DraggedData>)) as List<DraggedData>;
+            m_flpUnorganizedData.SuspendLayout();
             receivingPanel.SuspendLayout();
             foreach (DraggedData draggedData in allDraggedData)
             {
@@ -524,6 +560,10 @@ namespace Levrum.UI.WinForms
                     {
                         draggedData.Control.Parent.Controls.Remove(draggedData.Control);
                     }
+                    else if (e.AllowedEffect == DragDropEffects.Copy && draggedData.Control.Parent == m_flpUnorganizedData)
+                    {
+                        MarkValueBlockAsAdded(draggedData.Control as Button);                       
+                    }
 
                     receivingPanelData.Values.Add(droppedData);
 
@@ -564,6 +604,7 @@ namespace Levrum.UI.WinForms
                 receivingPanel.Controls.Remove(addSubBtn);
                 receivingPanel.Controls.Add(addSubBtn);
             }
+            m_flpUnorganizedData.ResumeLayout();
             receivingPanel.ResumeLayout();
 
             if (m_selectedButtons.Count > 0)
@@ -588,7 +629,7 @@ namespace Levrum.UI.WinForms
                 FlatStyle = FlatStyle.Flat,
                 Margin = new Padding(2)
             };
-            btnSubPanelAddNewSub.FlatAppearance.BorderColor = Color.WhiteSmoke;
+            btnSubPanelAddNewSub.FlatAppearance.BorderColor = Color.White;
             btnSubPanelAddNewSub.Click += AddSubcategory_Click;
 
             return btnSubPanelAddNewSub;
@@ -882,6 +923,50 @@ namespace Levrum.UI.WinForms
             }
         }
 
+        private void MarkValueBlockAsAdded(Button valueBlock)
+        {
+            valueBlock.Image = Properties.Resources.ok_icon;
+            valueBlock.ImageAlign = ContentAlignment.MiddleLeft;
+            valueBlock.TextImageRelation = TextImageRelation.ImageBeforeText;
+        }
+        
+        private void MarkValueBlockAsNotAdded(Button valueBlock)
+        {
+            valueBlock.Image = null;
+        }
+
+        private bool ValueBlockIsAdded(ICategorizedValue vbData, FlowLayoutPanel parentPanel)
+        {
+            // Check parent panel's data
+            ICategoryData parentPanelData = parentPanel.Tag as ICategoryData;
+            if (parentPanelData != null)
+            {
+                foreach (ICategorizedValue value in parentPanelData.Values)
+                {
+                    if (value == vbData)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            // Check children's data
+            foreach (Control control in parentPanel.Controls)
+            {
+                if (!(control is FlowLayoutPanel))
+                {
+                    continue;
+                }
+
+                if (ValueBlockIsAdded(vbData, control as FlowLayoutPanel))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         private bool ListContainsValueBlock(IEnumerable<Button> blocks, Button valueBlock)
         {
             ICategorizedValue vbData = valueBlock.Tag as ICategorizedValue;
@@ -1049,6 +1134,11 @@ namespace Levrum.UI.WinForms
             {
                 CreateDefaultTree_Causes();
             }
+        }
+
+        private void SubPanel_Paint(object sender, PaintEventArgs e)
+        {
+            ControlPaint.DrawBorder(e.Graphics, m_flpOrganizedData.ClientRectangle, Color.LightGray, ButtonBorderStyle.Solid);
         }
     }
 }

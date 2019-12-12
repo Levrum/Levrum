@@ -48,6 +48,7 @@
             this.m_scMain.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_scMain.BackColor = System.Drawing.Color.White;
             this.m_scMain.Location = new System.Drawing.Point(0, 0);
             this.m_scMain.Name = "m_scMain";
             // 
@@ -72,6 +73,7 @@
             this.m_flpOrganizedData.Controls.Add(this.m_btnAddOrganizedCategory);
             this.m_flpOrganizedData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_flpOrganizedData.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.m_flpOrganizedData.ForeColor = System.Drawing.SystemColors.ControlText;
             this.m_flpOrganizedData.Location = new System.Drawing.Point(0, 0);
             this.m_flpOrganizedData.Name = "m_flpOrganizedData";
             this.m_flpOrganizedData.Size = new System.Drawing.Size(635, 473);
@@ -102,6 +104,7 @@
             this.m_flpUnorganizedData.AllowDrop = true;
             this.m_flpUnorganizedData.AutoScroll = true;
             this.m_flpUnorganizedData.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.m_flpUnorganizedData.BackColor = System.Drawing.Color.Transparent;
             this.m_flpUnorganizedData.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.m_flpUnorganizedData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_flpUnorganizedData.Location = new System.Drawing.Point(0, 0);
