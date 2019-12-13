@@ -201,7 +201,7 @@ namespace Levrum.UI.WinForms
             LoadTree(tree, m_flpUnorganizedData);
         }
 
-        public void LoadTree(IEnumerable<ICategoryData> categoryData, FlowLayoutPanel parentPanel)
+        private void LoadTree(IEnumerable<ICategoryData> categoryData, FlowLayoutPanel parentPanel)
         {
             parentPanel.Controls.Clear();
             parentPanel.FlowDirection = FlowDirection.TopDown;
@@ -212,6 +212,11 @@ namespace Levrum.UI.WinForms
             }
             parentPanel.Controls.Add(GenerateSubcategoryButton());
             parentPanel.ResumeLayout();
+        }
+
+        public void LoadTree(IEnumerable<ICategoryData> categoryData)
+        {
+            LoadTree(categoryData, m_flpOrganizedData);
         }
 
         private FlowLayoutPanel AddSubPanel(FlowLayoutPanel parentPanel, ICategoryData panelCatData)
