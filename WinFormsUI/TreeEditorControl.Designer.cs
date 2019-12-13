@@ -30,12 +30,13 @@
         {
             this.m_scMain = new System.Windows.Forms.SplitContainer();
             this.m_flpOrganizedData = new System.Windows.Forms.FlowLayoutPanel();
-            this.m_btnAddOrganizedCategory = new System.Windows.Forms.Button();
             this.m_flpUnorganizedData = new System.Windows.Forms.FlowLayoutPanel();
             this.m_btnLoadTree = new System.Windows.Forms.Button();
             this.m_btnSaveTree = new System.Windows.Forms.Button();
             this.m_btnLoadIncidents = new System.Windows.Forms.Button();
             this.m_cbDefaultTree = new System.Windows.Forms.ComboBox();
+            this.m_bgwLoadIncidentData = new System.ComponentModel.BackgroundWorker();
+            this.m_btnAddOrganizedCategory = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.m_scMain)).BeginInit();
             this.m_scMain.Panel1.SuspendLayout();
             this.m_scMain.Panel2.SuspendLayout();
@@ -81,23 +82,6 @@
             this.m_flpOrganizedData.Click += new System.EventHandler(this.m_flpOrganizedData_Click);
             this.m_flpOrganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.OrganizedPanel_DragDrop);
             this.m_flpOrganizedData.DragEnter += new System.Windows.Forms.DragEventHandler(this.OrganizedPanel_DragEnter);
-            // 
-            // m_btnAddOrganizedCategory
-            // 
-            this.m_btnAddOrganizedCategory.AutoSize = true;
-            this.m_btnAddOrganizedCategory.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.m_btnAddOrganizedCategory.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.m_btnAddOrganizedCategory.FlatAppearance.BorderColor = System.Drawing.SystemColors.Control;
-            this.m_btnAddOrganizedCategory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.m_btnAddOrganizedCategory.Image = global::Levrum.UI.WinForms.Properties.Resources.add_subcategory;
-            this.m_btnAddOrganizedCategory.Location = new System.Drawing.Point(10, 10);
-            this.m_btnAddOrganizedCategory.Margin = new System.Windows.Forms.Padding(10);
-            this.m_btnAddOrganizedCategory.Name = "m_btnAddOrganizedCategory";
-            this.m_btnAddOrganizedCategory.Size = new System.Drawing.Size(36, 36);
-            this.m_btnAddOrganizedCategory.TabIndex = 0;
-            this.m_btnAddOrganizedCategory.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.m_btnAddOrganizedCategory.UseVisualStyleBackColor = false;
-            this.m_btnAddOrganizedCategory.Click += new System.EventHandler(this.AddSubcategory_Click);
             // 
             // m_flpUnorganizedData
             // 
@@ -156,13 +140,36 @@
             this.m_cbDefaultTree.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.m_cbDefaultTree.FormattingEnabled = true;
             this.m_cbDefaultTree.Items.AddRange(new object[] {
-            "Causes"});
+            "Causes",
+            "NFIRS Causes"});
             this.m_cbDefaultTree.Location = new System.Drawing.Point(150, 487);
             this.m_cbDefaultTree.Name = "m_cbDefaultTree";
             this.m_cbDefaultTree.Size = new System.Drawing.Size(121, 21);
             this.m_cbDefaultTree.TabIndex = 4;
             this.m_cbDefaultTree.Text = "Use Default Tree";
             this.m_cbDefaultTree.SelectedIndexChanged += new System.EventHandler(this.m_cbDefaultTree_SelectedIndexChanged);
+            // 
+            // m_bgwLoadIncidentData
+            // 
+            this.m_bgwLoadIncidentData.DoWork += new System.ComponentModel.DoWorkEventHandler(this.m_bgwLoadIncidentData_DoWork);
+            this.m_bgwLoadIncidentData.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.m_bgwLoadIncidentData_RunWorkerCompleted);
+            // 
+            // m_btnAddOrganizedCategory
+            // 
+            this.m_btnAddOrganizedCategory.AutoSize = true;
+            this.m_btnAddOrganizedCategory.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.m_btnAddOrganizedCategory.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.m_btnAddOrganizedCategory.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            this.m_btnAddOrganizedCategory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.m_btnAddOrganizedCategory.Image = global::Levrum.UI.WinForms.Properties.Resources.add_subcategory;
+            this.m_btnAddOrganizedCategory.Location = new System.Drawing.Point(10, 10);
+            this.m_btnAddOrganizedCategory.Margin = new System.Windows.Forms.Padding(10);
+            this.m_btnAddOrganizedCategory.Name = "m_btnAddOrganizedCategory";
+            this.m_btnAddOrganizedCategory.Size = new System.Drawing.Size(36, 36);
+            this.m_btnAddOrganizedCategory.TabIndex = 0;
+            this.m_btnAddOrganizedCategory.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.m_btnAddOrganizedCategory.UseVisualStyleBackColor = false;
+            this.m_btnAddOrganizedCategory.Click += new System.EventHandler(this.AddSubcategory_Click);
             // 
             // TreeEditorControl
             // 
@@ -200,5 +207,6 @@
         // Cursors
         private System.Windows.Forms.Cursor MoveCursor;
         private System.Windows.Forms.ComboBox m_cbDefaultTree;
+        private System.ComponentModel.BackgroundWorker m_bgwLoadIncidentData;
     }
 }
