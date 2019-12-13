@@ -210,7 +210,7 @@ namespace Levrum.UI.WinForms
             {
                 FlowLayoutPanel newPanel = AddSubPanel(parentPanel, data);
             }
-            parentPanel.Controls.Add(GenerateAddSubcategoryButton());
+            parentPanel.Controls.Add(GenerateSubcategoryButton());
             parentPanel.ResumeLayout();
         }
 
@@ -238,7 +238,6 @@ namespace Levrum.UI.WinForms
             newPanel.MouseDown += SubPanel_MouseDown;
             newPanel.DragEnter += SubPanel_DragEnter;
             newPanel.DragDrop += SubPanel_DragDrop;
-            newPanel.Paint += SubPanel_Paint;
 
             Label panelLabel = new Label
             {
@@ -266,7 +265,7 @@ namespace Levrum.UI.WinForms
                 AddSubPanel(newPanel, categoryData);
             }
             
-            newPanel.Controls.Add(GenerateAddSubcategoryButton());
+            newPanel.Controls.Add(GenerateSubcategoryButton());
 
             parentPanel.Controls.Add(newPanel);
 
@@ -333,7 +332,7 @@ namespace Levrum.UI.WinForms
         {
             foreach (FlowLayoutPanel flp in m_selectedPanels)
             {
-                flp.BackColor = Color.WhiteSmoke;
+                flp.BackColor = Color.White;
             }
             m_selectedPanels.Clear();
         }
@@ -581,7 +580,7 @@ namespace Levrum.UI.WinForms
             }
         }
 
-        private Button GenerateAddSubcategoryButton()
+        private Button GenerateSubcategoryButton()
         {
             Button btnSubPanelAddNewSub = new Button
             {
@@ -610,6 +609,7 @@ namespace Levrum.UI.WinForms
                 TextImageRelation = TextImageRelation.ImageBeforeText,
                 Tag = value
             };
+            newValueBlock.FlatAppearance.BorderColor = Color.LightGray;
             newValueBlock.MouseDown += ValueBlock_MouseDown;
 
             return newValueBlock;
@@ -664,85 +664,21 @@ namespace Levrum.UI.WinForms
         private void m_btnLoadIncidents_Click(object sender, EventArgs e)
         {
             // Load incident json
-            List<IncidentData> incidents = null;
             OpenFileDialog ofd = new OpenFileDialog { Filter = "JOSN Files (*.JSON, *.json)|*.JSON;*.json" };
             if (ofd.ShowDialog() != DialogResult.OK)
             {
                 return;
             }
 
-            incidents = JsonConvert.DeserializeObject<List<IncidentData>>(File.ReadAllText(ofd.FileName), new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.All });
-            if (incidents == null)
-            {
-                MessageBox.Show("Could not load incidents");
-                return;
-            }
-
-            // Get list of all incident data fields
-            HashSet<string> incidentDataFields = new HashSet<string>();
-            foreach (IncidentData incident in incidents)
-            {
-                foreach (string key in incident.Data.Keys.ToList())
-                {
-                    if (!incidentDataFields.Contains(key))
-                    {
-                        incidentDataFields.Add(key);
-                    }
-                }
-            }
-            if (incidentDataFields.Count < 1)
-            {
-                MessageBox.Show("Could not find any data fields in incident data.");
-                return;
-            }
-
-            // Prompt user to select incident data field
-            string selectedField = null;
-            ListBox listBox = new ListBox();
-            Label header = new Label();
-            listBox.Items.AddRange(incidentDataFields.ToArray());
-            listBox.DoubleClick += (sdr, args) =>
-            {
-                selectedField = listBox.SelectedItem.ToString();
-                listBox.Hide();
-                this.Controls.Remove(listBox);
-                this.Controls.Remove(header);
-
-                // Populate unorganized data with data field values
-                HashSet<string> dataFieldValues = new HashSet<string>();
-                foreach (IncidentData incident in incidents)
-                {
-                    if (incident.Data.ContainsKey(selectedField) && !dataFieldValues.Contains(incident.Data[selectedField]))
-                    {
-                        dataFieldValues.Add(incident.Data[selectedField].ToString());
-                    }
-                }
-                LoadValueBlocks(m_flpUnorganizedData, dataFieldValues);
-            };
-            listBox.Location = new Point(m_btnLoadIncidents.Location.X, m_btnLoadIncidents.Location.Y - (m_btnLoadIncidents.Height + listBox.Height - listBox.Margin.Top - header.Margin.Bottom));
-            listBox.Anchor = (AnchorStyles.Bottom | AnchorStyles.Right);
-            listBox.Font = new Font(listBox.Font.FontFamily, 9);
-
-            header.Text = "Please choose a data field";
-            header.Font = new Font(header.Font.FontFamily, 9, FontStyle.Bold);
-            header.Padding = new Padding(2);
-            header.BackColor = Color.White;
-            header.Location = new Point(listBox.Location.X, listBox.Location.Y - header.Height);
-            header.Anchor = (AnchorStyles.Bottom | AnchorStyles.Right);
-            header.AutoSize = true;
-            header.BorderStyle = BorderStyle.FixedSingle;
-            listBox.Width = TextRenderer.MeasureText(header.Text, header.Font).Width + header.Padding.Right * 2 + 1;
-
-            this.Controls.Add(header);
-            this.Controls.Add(listBox);
-            header.BringToFront();
-            listBox.BringToFront();
+            m_btnLoadIncidents.Enabled = false;
+            this.Cursor = Cursors.WaitCursor;
+            m_bgwLoadIncidentData.RunWorkerAsync(ofd.FileName);
         }
 
         private void LoadValueBlocks(FlowLayoutPanel flp, IEnumerable<string> data)
         {
             flp.Controls.Clear();
-            flp.FlowDirection = FlowDirection.TopDown;
+            flp.FlowDirection = FlowDirection.LeftToRight;
             Control[] newBlocks = new Control[data.Count()];
             int nbIdx = 0;
             foreach (string dataString in data.OrderBy(x => x))
@@ -1023,32 +959,13 @@ namespace Levrum.UI.WinForms
             }
         }
 
-        private void CreateDefaultTree_Causes()
+        private List<ICategoryData> CreateDefaultTree_Causes()
         {
-            List<CauseData> causeTree = new List<CauseData>
+            List<ICategoryData> tree = new List<ICategoryData>
             {
                 new CauseData
                 {
                     Name = "Fire",
-                    Children = new List<ICategoryData>
-                    {
-                        new CauseData
-                        {
-                            Name = "Structure Fire",
-                        },
-                        new CauseData
-                        {
-                            Name = "Outdoor Fire"
-                        },
-                        new CauseData
-                        {
-                            Name = "Vehicle Fire"
-                        },
-                        new CauseData
-                        {
-                            Name = "Other Fire"
-                        }
-                    }
                 },
                 new CauseData
                 {
@@ -1084,7 +1001,166 @@ namespace Levrum.UI.WinForms
                 }
             };
 
-            LoadTree(causeTree, m_flpOrganizedData);
+            return tree;
+        }
+
+        private List<ICategoryData> CreateDefaultTree_NFIRSCauses()
+        {
+            List<ICategoryData> tree = new List<ICategoryData>();
+            Dictionary<string, HashSet<int>> NFIRSCodes = new Dictionary<string, HashSet<int>>
+                {
+                    {"Fire", new HashSet<int> { 111, 112, 113, 114, 115, 116, 117, 118, 121, 122, 123, 120, 131, 132, 133, 134, 135, 136, 137, 138, 141, 142, 143, 140, 151, 152, 153, 154, 155, 150, 161, 162, 163, 164, 160, 171, 172, 173, 170, 100 } },
+                    {"Rupture/Explosion",  new HashSet<int> { 211, 212, 213, 210, 221, 222, 223, 220, 231, 241, 242, 243, 244, 240, 251, 200 }},
+                    {"Rescue/EMS", new HashSet<int> { 311, 321, 322, 323, 324, 320, 331, 341, 342, 343, 340, 351, 352, 353, 354, 355, 356, 357, 350, 361, 362, 363, 364, 365, 360, 371, 372, 370, 381, 300 } },
+                    {"Hazardous Conditions", new HashSet<int> { 411, 412, 413, 410, 421, 422, 423, 424, 420, 431, 430, 441, 442, 443, 444, 445, 440, 451, 461, 462, 463, 460, 471, 481, 482, 480, 400 } },
+                    {"Service", new HashSet<int> { 511, 512, 510, 521, 522, 520, 531, 541, 542, 540, 551, 552, 553, 554, 555, 550, 561, 571, 500 } },
+                    {"Good Intent", new HashSet<int> { 611, 621, 622, 631, 632, 641, 651, 652, 653, 650, 661, 671, 672, 600 } },
+                    {"False Alarm", new HashSet<int> { 711, 712, 713, 714, 715, 710, 721, 731, 732, 733, 734, 735, 736, 730, 741, 742, 743, 744, 745, 746, 740, 751, 700 } },
+                    {"Severe Weather", new HashSet<int> { 811, 812, 813, 814, 815, 800 } },
+                    {"Special", new HashSet<int> { 911, 900 } }
+                };
+
+            if (m_flpUnorganizedData.Controls.Count > 0)
+            {
+
+            }
+            else
+            {
+                foreach (var entry in NFIRSCodes)
+                {
+                    CauseData causeData = new CauseData();
+                    causeData.Name = entry.Key;
+                    foreach (int code in entry.Value)
+                    {
+                        causeData.Values.Add(new NatureCode { Value = code.ToString() });
+                    }
+                    tree.Add(causeData);
+                }
+            }
+
+            return tree;
+        }
+
+        private List<ICategoryData> CreateDefaultTree_CharlotteResponse()
+        {
+            List<ICategoryData> tree = new List<ICategoryData>
+            {
+                new CauseData
+                {
+                    Name = "Alarms"
+                },
+                new CauseData
+                {
+                    Name = "Structure Fire"
+                },
+                new CauseData
+                {
+                    Name = "MVA"
+                },
+                new CauseData
+                {
+                    Name = "Non-Emergency"
+                },
+                new CauseData
+                {
+                    Name = "Rescue"
+                },
+                new CauseData
+                {
+                    Name = "Hazmat"
+                },
+                new CauseData
+                {
+                    Name = "ARFF"
+                },
+                new CauseData
+                {
+                    Name = "Other"
+                },
+                new CauseData
+                {
+                    Name = "EMS: Med-Urgent"
+                },
+                new CauseData
+                {
+                    Name = "EMS: Trauma"
+                },
+                new CauseData
+                {
+                    Name = "Med-Critical"
+                },
+                new CauseData
+                {
+                    Name = "Fire (other)"
+                }
+            };
+
+            return tree;
+        }
+
+        private List<ICategoryData> CreateDefaultTree_CharlotteRootCause()
+        {
+            List<ICategoryData> tree = new List<ICategoryData>
+            {
+                new CauseData
+                {
+                    Name = "Structure Fire"
+                },
+                new CauseData
+                {
+                    Name = "Fire (other)"
+                },
+                new CauseData
+                {
+                    Name = "MVA"
+                },
+                new CauseData
+                {
+                    Name = "EMS-Metabolic"
+                },
+                new CauseData
+                {
+                    Name = "EMS-Trauma-Gen"
+                },
+                new CauseData
+                {
+                    Name = "EMS-Trauma-Criminal"
+                },
+                new CauseData
+                {
+                    Name = "EMS-Respitory"
+                },
+                new CauseData
+                {
+                    Name = "EMS-Psych"
+                },
+                new CauseData
+                {
+                    Name = "EMS-Neuro"
+                },
+                new CauseData
+                {
+                    Name = "Hazmat"
+                },
+                new CauseData
+                {
+                    Name = "Rescue"
+                },
+                new CauseData
+                {
+                    Name = "Other"
+                },
+                new CauseData
+                {
+                    Name = "Non-Emergency"
+                },
+                new CauseData
+                {
+                    Name = "ARFF"
+                }
+            };
+
+            return tree;
         }
 
         class DraggedData
@@ -1096,15 +1172,130 @@ namespace Levrum.UI.WinForms
 
         private void m_cbDefaultTree_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (m_cbDefaultTree.SelectedItem.ToString() == "Causes")
+            List<ICategoryData> tree = null;
+            switch (m_cbDefaultTree.SelectedItem.ToString())
             {
-                CreateDefaultTree_Causes();
+                case "Causes":
+                    tree = CreateDefaultTree_Causes();
+                    break;
+                case "NFIRS Causes":
+                    tree = CreateDefaultTree_NFIRSCauses();
+                    break;
+                case "Charlotte (response)":
+                    tree = CreateDefaultTree_CharlotteResponse();
+                    break;
+                case "Charlotte (root cause)":
+                    tree = CreateDefaultTree_CharlotteRootCause();
+                    break;
             }
+            if (tree != null)
+            {
+                LoadTree(tree, m_flpOrganizedData);
+            }            
         }
 
         private void SubPanel_Paint(object sender, PaintEventArgs e)
         {
-            ControlPaint.DrawBorder(e.Graphics, m_flpOrganizedData.ClientRectangle, Color.LightGray, ButtonBorderStyle.Solid);
+            FlowLayoutPanel panel = sender as FlowLayoutPanel;
+            Color borderColor = Color.Gray;
+            int borderThickness = 2;
+            ButtonBorderStyle borderStyle = ButtonBorderStyle.Solid;
+            
+            ControlPaint.DrawBorder(e.Graphics, panel.ClientRectangle, borderColor, borderThickness, ButtonBorderStyle.Solid, borderColor, borderThickness, borderStyle, borderColor, borderThickness, borderStyle, borderColor, borderThickness, borderStyle);
+        }
+
+        private void m_bgwLoadIncidentData_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            string fileName = e.Argument.ToString();
+            List<IncidentData> incidents = null;
+            try
+            {
+                incidents = JsonConvert.DeserializeObject<List<IncidentData>>(File.ReadAllText(fileName), new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.All });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Could not load incidents");
+                Cursor.Current = Cursors.Default;
+                return;
+            }
+            if (incidents == null)
+            {
+                MessageBox.Show("Could not load incidents");
+                Cursor.Current = Cursors.Default;
+                return;
+            }
+
+            e.Result = incidents;
+        }
+
+        private void m_bgwLoadIncidentData_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
+        {
+            this.Cursor = Cursors.Default;
+            List<IncidentData> incidents = (List<IncidentData>)e.Result;
+
+            // Get list of all incident data fields
+            HashSet<string> incidentDataFields = new HashSet<string>();
+            foreach (IncidentData incident in incidents)
+            {
+                foreach (string key in incident.Data.Keys.ToList())
+                {
+                    if (!incidentDataFields.Contains(key))
+                    {
+                        incidentDataFields.Add(key);
+                    }
+                }
+            }
+            if (incidentDataFields.Count < 1)
+            {
+                MessageBox.Show("Could not find any data fields in incident data.");
+                return;
+            }
+            Cursor.Current = Cursors.Default;
+
+            // Prompt user to select incident data field
+            string selectedField = null;
+            ListBox listBox = new ListBox();
+            Label header = new Label();
+            listBox.Items.AddRange(incidentDataFields.ToArray());
+            listBox.DoubleClick += (sdr, args) =>
+            {
+                selectedField = listBox.SelectedItem.ToString();
+                listBox.Hide();
+                this.Controls.Remove(listBox);
+                this.Controls.Remove(header);                                
+
+                // Populate unorganized data with data field values
+                Cursor.Current = Cursors.WaitCursor;
+                HashSet<string> dataFieldValues = new HashSet<string>();
+                foreach (IncidentData incident in incidents)
+                {
+                    if (incident.Data.ContainsKey(selectedField) && !dataFieldValues.Contains(incident.Data[selectedField]))
+                    {
+                        dataFieldValues.Add(incident.Data[selectedField].ToString());
+                    }
+                }
+                LoadValueBlocks(m_flpUnorganizedData, dataFieldValues);
+                m_btnLoadIncidents.Enabled = true;
+            };
+            listBox.Location = new Point(m_btnLoadIncidents.Location.X, m_btnLoadIncidents.Location.Y - (m_btnLoadIncidents.Height + listBox.Height - listBox.Margin.Top - header.Margin.Bottom));
+            listBox.Anchor = (AnchorStyles.Bottom | AnchorStyles.Right);
+            listBox.Font = new Font(listBox.Font.FontFamily, 9);
+
+            header.Text = "Please choose a data field";
+            header.Font = new Font(header.Font.FontFamily, 9, FontStyle.Bold);
+            header.Padding = new Padding(2);
+            header.BackColor = Color.White;
+            header.Location = new Point(listBox.Location.X, listBox.Location.Y - header.Height);
+            header.Anchor = (AnchorStyles.Bottom | AnchorStyles.Right);
+            header.AutoSize = true;
+            header.BorderStyle = BorderStyle.FixedSingle;
+            listBox.Width = TextRenderer.MeasureText(header.Text, header.Font).Width + header.Padding.Right * 2 + 1;
+            Cursor.Current = Cursors.Default;
+
+            this.Controls.Add(header);
+            this.Controls.Add(listBox);
+            header.BringToFront();
+            listBox.BringToFront();
         }
     }
 }
