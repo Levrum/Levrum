@@ -110,10 +110,11 @@ namespace Levrum.UI.WinForms
 
         private void UnorganizedPanel_DragEnter(object sender, DragEventArgs e)
         {
-            // Allow dropping of category panels
-            if (e.Data.GetDataPresent(typeof(List<DraggedData>)))
+            List<DraggedData> data = e.Data.GetData(typeof(List<DraggedData>)) as List<DraggedData>;
+            if (data != null && data[0].Control.Parent != m_flpUnorganizedData)
             {
                 e.Effect = DragDropEffects.Move;
+                m_pDelete.Visible = true;
             }
             else
             {
@@ -184,6 +185,7 @@ namespace Levrum.UI.WinForms
             {
                 ClearPanelSelection();
             }
+            m_pDelete.Visible = false;
         }
 
         private void m_btnLoadTree_Click(object sender, EventArgs e)
@@ -1301,6 +1303,11 @@ namespace Levrum.UI.WinForms
             this.Controls.Add(listBox);
             header.BringToFront();
             listBox.BringToFront();
+        }
+
+        private void m_pDelete_DragLeave(object sender, EventArgs e)
+        {
+            m_pDelete.Visible = false;
         }
     }
 }
