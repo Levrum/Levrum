@@ -36,12 +36,16 @@
             this.m_btnLoadIncidents = new System.Windows.Forms.Button();
             this.m_cbDefaultTree = new System.Windows.Forms.ComboBox();
             this.m_bgwLoadIncidentData = new System.ComponentModel.BackgroundWorker();
+            this.m_pDelete = new System.Windows.Forms.Panel();
             this.m_btnAddOrganizedCategory = new System.Windows.Forms.Button();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.m_scMain)).BeginInit();
             this.m_scMain.Panel1.SuspendLayout();
             this.m_scMain.Panel2.SuspendLayout();
             this.m_scMain.SuspendLayout();
             this.m_flpOrganizedData.SuspendLayout();
+            this.m_pDelete.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // m_scMain
@@ -59,9 +63,10 @@
             // 
             // m_scMain.Panel2
             // 
+            this.m_scMain.Panel2.Controls.Add(this.m_pDelete);
             this.m_scMain.Panel2.Controls.Add(this.m_flpUnorganizedData);
             this.m_scMain.Size = new System.Drawing.Size(847, 473);
-            this.m_scMain.SplitterDistance = 635;
+            this.m_scMain.SplitterDistance = 664;
             this.m_scMain.TabIndex = 0;
             // 
             // m_flpOrganizedData
@@ -77,7 +82,7 @@
             this.m_flpOrganizedData.ForeColor = System.Drawing.SystemColors.ControlText;
             this.m_flpOrganizedData.Location = new System.Drawing.Point(0, 0);
             this.m_flpOrganizedData.Name = "m_flpOrganizedData";
-            this.m_flpOrganizedData.Size = new System.Drawing.Size(635, 473);
+            this.m_flpOrganizedData.Size = new System.Drawing.Size(664, 473);
             this.m_flpOrganizedData.TabIndex = 0;
             this.m_flpOrganizedData.Click += new System.EventHandler(this.m_flpOrganizedData_Click);
             this.m_flpOrganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.OrganizedPanel_DragDrop);
@@ -93,7 +98,7 @@
             this.m_flpUnorganizedData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_flpUnorganizedData.Location = new System.Drawing.Point(0, 0);
             this.m_flpUnorganizedData.Name = "m_flpUnorganizedData";
-            this.m_flpUnorganizedData.Size = new System.Drawing.Size(208, 473);
+            this.m_flpUnorganizedData.Size = new System.Drawing.Size(179, 473);
             this.m_flpUnorganizedData.TabIndex = 1;
             this.m_flpUnorganizedData.Click += new System.EventHandler(this.m_flpUnorganizedData_Click);
             this.m_flpUnorganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.UnorganizedPanel_DragDrop);
@@ -154,6 +159,21 @@
             this.m_bgwLoadIncidentData.DoWork += new System.ComponentModel.DoWorkEventHandler(this.m_bgwLoadIncidentData_DoWork);
             this.m_bgwLoadIncidentData.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.m_bgwLoadIncidentData_RunWorkerCompleted);
             // 
+            // m_pDelete
+            // 
+            this.m_pDelete.AllowDrop = true;
+            this.m_pDelete.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(235)))), ((int)(((byte)(235)))));
+            this.m_pDelete.Controls.Add(this.pictureBox1);
+            this.m_pDelete.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.m_pDelete.Location = new System.Drawing.Point(0, 0);
+            this.m_pDelete.Name = "m_pDelete";
+            this.m_pDelete.Size = new System.Drawing.Size(179, 473);
+            this.m_pDelete.TabIndex = 1;
+            this.m_pDelete.Visible = false;
+            this.m_pDelete.DragDrop += new System.Windows.Forms.DragEventHandler(this.UnorganizedPanel_DragDrop);
+            this.m_pDelete.DragEnter += new System.Windows.Forms.DragEventHandler(this.UnorganizedPanel_DragEnter);
+            this.m_pDelete.DragLeave += new System.EventHandler(this.m_pDelete_DragLeave);
+            // 
             // m_btnAddOrganizedCategory
             // 
             this.m_btnAddOrganizedCategory.AutoSize = true;
@@ -170,6 +190,17 @@
             this.m_btnAddOrganizedCategory.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.m_btnAddOrganizedCategory.UseVisualStyleBackColor = false;
             this.m_btnAddOrganizedCategory.Click += new System.EventHandler(this.AddSubcategory_Click);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.pictureBox1.Image = global::Levrum.UI.WinForms.Properties.Resources.delete;
+            this.pictureBox1.Location = new System.Drawing.Point(41, 182);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(100, 99);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox1.TabIndex = 0;
+            this.pictureBox1.TabStop = false;
             // 
             // TreeEditorControl
             // 
@@ -189,6 +220,8 @@
             this.m_scMain.ResumeLayout(false);
             this.m_flpOrganizedData.ResumeLayout(false);
             this.m_flpOrganizedData.PerformLayout();
+            this.m_pDelete.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -208,5 +241,7 @@
         private System.Windows.Forms.Cursor MoveCursor;
         private System.Windows.Forms.ComboBox m_cbDefaultTree;
         private System.ComponentModel.BackgroundWorker m_bgwLoadIncidentData;
+        private System.Windows.Forms.Panel m_pDelete;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
