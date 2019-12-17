@@ -35,6 +35,7 @@ namespace Levrum.UI.WinForms
 
         List<FlowLayoutPanel> m_selectedPanels = new List<FlowLayoutPanel>();
         List<Button> m_selectedButtons = new List<Button>();
+        List<DraggedData> m_recyclingBin = new List<DraggedData>();
 
         public TreeEditorControl()
         {
@@ -43,6 +44,12 @@ namespace Levrum.UI.WinForms
             MoveCursor = new Cursor(Properties.Resources.move_button.Handle);
         }
 
+        private void SetUndoDeleteTimer()
+        {
+            m_btnUndoDelete.Visible = true;
+            m_btnUndoDelete.BringToFront();
+            m_undoDeleteTimer.Enabled = true;
+        }
 
         private void OrganizedPanel_DragEnter(object sender, DragEventArgs e)
         {
@@ -122,58 +129,33 @@ namespace Levrum.UI.WinForms
             }
         }
 
+        private void DeletePanel_DragEnter(object sender, DragEventArgs e)
+        {
+            List<DraggedData> data = e.Data.GetData(typeof(List<DraggedData>)) as List<DraggedData>;
+            if (data != null && data[0].Control.Parent != m_flpUnorganizedData)
+            {
+                e.Effect = DragDropEffects.Move;
+                m_pDelete.Visible = true;
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+            }
+        }
 
 
-        private void UnorganizedPanel_DragDrop(object sender, DragEventArgs e)
+
+        private void DeletePanel_DragDrop(object sender, DragEventArgs e)
         {
             List<DraggedData> allDraggedData = e.Data.GetData(typeof(List<DraggedData>)) as List<DraggedData>;
 
             if (e.AllowedEffect == DragDropEffects.Move)
             {
-                // Suspent layout for all parent controls
-                HashSet<Control> parentControls = new HashSet<Control>();
+                DeleteRecycledItems();
+                m_recyclingBin = allDraggedData;
                 foreach (DraggedData draggedData in allDraggedData)
                 {
-                    if (!parentControls.Contains(draggedData.Control.Parent))
-                    {
-                        parentControls.Add(draggedData.Control.Parent);
-                    }
-                }
-                foreach (Control control in parentControls)
-                {
-                    control.SuspendLayout();
-                }
-
-                foreach (DraggedData draggedData in allDraggedData)
-                {
-                    ICategoryData oldParentData = draggedData.Control.Parent.Tag as ICategoryData;
-                    if (draggedData.Data is ICategoryData)
-                    {
-                        oldParentData?.Children?.Remove(draggedData.Data as ICategoryData);
-                    }
-                    else if (draggedData.Data is ICategorizedValue)
-                    {
-                        oldParentData?.Values?.Remove(draggedData.Data as ICategorizedValue);
-
-                        // Mark block as not added
-                        if (!ValueBlockIsAdded(draggedData.Data as ICategorizedValue, m_flpOrganizedData))
-                        {
-                            foreach (Control control in m_flpUnorganizedData.Controls)
-                            {
-                                if (control is Button && (control as Button).Tag == draggedData.Data)
-                                {
-                                    MarkValueBlockAsNotAdded(control as Button);
-                                    break;
-                                }
-                            }                            
-                        }                        
-                    }
-                    draggedData.Control.Parent.Controls.Remove(draggedData.Control);
-                }
-
-                foreach (Control control in parentControls)
-                {
-                    control.ResumeLayout();
+                    draggedData.Control.Visible = false;
                 }
             }
 
@@ -186,6 +168,63 @@ namespace Levrum.UI.WinForms
                 ClearPanelSelection();
             }
             m_pDelete.Visible = false;
+            SetUndoDeleteTimer();
+
+        }
+
+        private void DeleteRecycledItems()
+        {
+            // Suspent layout for all parent controls to smooth UI
+            HashSet<Control> parentControls = new HashSet<Control>();
+            foreach (DraggedData draggedData in m_recyclingBin)
+            {
+                if (!parentControls.Contains(draggedData.Control.Parent))
+                {
+                    parentControls.Add(draggedData.Control.Parent);
+                }
+            }
+            foreach (Control control in parentControls)
+            {
+                if (control != null)
+                {
+                    control.SuspendLayout();
+                }                
+            }
+
+            // Delete all dropped items
+            foreach (DraggedData draggedData in m_recyclingBin)
+            {
+                ICategoryData oldParentData = draggedData.Control.Parent.Tag as ICategoryData;
+                if (draggedData.Data is ICategoryData)
+                {
+                    oldParentData?.Children?.Remove(draggedData.Data as ICategoryData);
+                }
+                else if (draggedData.Data is ICategorizedValue)
+                {
+                    oldParentData?.Values?.Remove(draggedData.Data as ICategorizedValue);
+
+                    // Mark block as not added
+                    if (!ValueBlockIsAdded(draggedData.Data as ICategorizedValue, m_flpOrganizedData))
+                    {
+                        foreach (Control control in m_flpUnorganizedData.Controls)
+                        {
+                            if (control is Button && (control as Button).Tag == draggedData.Data)
+                            {
+                                MarkValueBlockAsNotAdded(control as Button);
+                                break;
+                            }
+                        }
+                    }
+                }
+                draggedData.Control.Parent.Controls.Remove(draggedData.Control);
+            }
+
+            foreach (Control control in parentControls)
+            {
+                control.ResumeLayout();
+            }
+
+            m_recyclingBin.Clear();
         }
 
         private void m_btnLoadTree_Click(object sender, EventArgs e)
@@ -245,6 +284,7 @@ namespace Levrum.UI.WinForms
             newPanel.MouseDown += SubPanel_MouseDown;
             newPanel.DragEnter += SubPanel_DragEnter;
             newPanel.DragDrop += SubPanel_DragDrop;
+            newPanel.QueryContinueDrag += SubPanel_QueryContinueDrag;
 
             Label panelLabel = new Label
             {
@@ -271,7 +311,7 @@ namespace Levrum.UI.WinForms
             {
                 AddSubPanel(newPanel, categoryData);
             }
-            
+
             newPanel.Controls.Add(GenerateSubcategoryButton());
 
             parentPanel.Controls.Add(newPanel);
@@ -326,12 +366,30 @@ namespace Levrum.UI.WinForms
                 }
 
                 DragDropEffects dragDropEffects = clickedPanel.Parent == m_flpUnorganizedData ? DragDropEffects.Copy : DragDropEffects.Move;
+                if (m_flpOrganizedData.Contains(clickedPanel))
+                {
+                    m_pDelete.Visible = true;
+                }
                 clickedPanel.DoDragDrop(selectedPanels, DragDropEffects.Move);
 
                 if (m_selectedPanels.Count > 1)
                 {
                     ClearPanelSelection();
                 }
+            }
+        }
+
+        private void SubPanel_QueryContinueDrag(object sender, QueryContinueDragEventArgs e)
+        {
+            FlowLayoutPanel draggedPanel = sender as FlowLayoutPanel;
+            if (draggedPanel == null)
+            {
+                return;
+            }
+
+            if (m_flpOrganizedData.Contains(draggedPanel) && e.Action != DragAction.Continue)
+            {
+                m_pDelete.Visible = false;
             }
         }
 
@@ -532,7 +590,7 @@ namespace Levrum.UI.WinForms
                     }
                     else if (e.AllowedEffect == DragDropEffects.Copy && draggedData.Control.Parent == m_flpUnorganizedData)
                     {
-                        MarkValueBlockAsAdded(draggedData.Control as Button);                       
+                        MarkValueBlockAsAdded(draggedData.Control as Button);
                     }
 
                     receivingPanelData.Values.Add(droppedData);
@@ -618,6 +676,7 @@ namespace Levrum.UI.WinForms
             };
             newValueBlock.FlatAppearance.BorderColor = Color.LightGray;
             newValueBlock.MouseDown += ValueBlock_MouseDown;
+            newValueBlock.QueryContinueDrag += ValueBlock_QueryContinueDrag;
 
             return newValueBlock;
         }
@@ -658,6 +717,10 @@ namespace Levrum.UI.WinForms
                     selectedValueBlocks.Add(new DraggedData { Type = valueBlock.Tag.GetType(), Control = valueBlock, Data = valueBlock.Tag });
                 }
                 DragDropEffects dragDropEffects = clickedValueBlock.Parent == m_flpUnorganizedData ? DragDropEffects.Copy : DragDropEffects.Move;
+                if (m_flpOrganizedData.Contains(clickedValueBlock))
+                {
+                    m_pDelete.Visible = true;
+                }
                 clickedValueBlock.DoDragDrop(selectedValueBlocks, dragDropEffects);
 
                 if (m_selectedButtons.Count > 1)
@@ -666,6 +729,20 @@ namespace Levrum.UI.WinForms
                 }
             }
 
+        }
+
+        private void ValueBlock_QueryContinueDrag(object sender, QueryContinueDragEventArgs e)
+        {
+            Button draggedBlock = sender as Button;
+            if (draggedBlock == null)
+            {
+                return;
+            }
+
+            if (m_flpOrganizedData.Contains(draggedBlock) && e.Action != DragAction.Continue)
+            {
+                m_pDelete.Visible = false;
+            }
         }
 
         private void m_btnLoadIncidents_Click(object sender, EventArgs e)
@@ -795,13 +872,13 @@ namespace Levrum.UI.WinForms
             }
         }
 
-        private void m_flpOrganizedData_Click(object sender, EventArgs e)
+        private void OrganizedData_Click(object sender, EventArgs e)
         {
             ClearValueBlockSelection();
             ClearPanelSelection();
         }
 
-        private void m_flpUnorganizedData_Click(object sender, EventArgs e)
+        private void UnorganizedData_Click(object sender, EventArgs e)
         {
             ClearValueBlockSelection();
             ClearPanelSelection();
@@ -838,7 +915,7 @@ namespace Levrum.UI.WinForms
             valueBlock.ImageAlign = ContentAlignment.MiddleLeft;
             valueBlock.TextImageRelation = TextImageRelation.ImageBeforeText;
         }
-        
+
         private void MarkValueBlockAsNotAdded(Button valueBlock)
         {
             valueBlock.Image = null;
@@ -1027,22 +1104,15 @@ namespace Levrum.UI.WinForms
                     {"Special", new HashSet<int> { 911, 900 } }
                 };
 
-            if (m_flpUnorganizedData.Controls.Count > 0)
+            foreach (var entry in NFIRSCodes)
             {
-
-            }
-            else
-            {
-                foreach (var entry in NFIRSCodes)
+                CauseData causeData = new CauseData();
+                causeData.Name = entry.Key;
+                foreach (int code in entry.Value)
                 {
-                    CauseData causeData = new CauseData();
-                    causeData.Name = entry.Key;
-                    foreach (int code in entry.Value)
-                    {
-                        causeData.Values.Add(new NatureCode { Value = code.ToString() });
-                    }
-                    tree.Add(causeData);
+                    causeData.Values.Add(new NatureCode { Value = code.ToString() });
                 }
+                tree.Add(causeData);
             }
 
             return tree;
@@ -1198,7 +1268,7 @@ namespace Levrum.UI.WinForms
             if (tree != null)
             {
                 LoadTree(tree, m_flpOrganizedData);
-            }            
+            }
         }
 
         private void SubPanel_Paint(object sender, PaintEventArgs e)
@@ -1207,7 +1277,7 @@ namespace Levrum.UI.WinForms
             Color borderColor = Color.Gray;
             int borderThickness = 2;
             ButtonBorderStyle borderStyle = ButtonBorderStyle.Solid;
-            
+
             ControlPaint.DrawBorder(e.Graphics, panel.ClientRectangle, borderColor, borderThickness, ButtonBorderStyle.Solid, borderColor, borderThickness, borderStyle, borderColor, borderThickness, borderStyle, borderColor, borderThickness, borderStyle);
         }
 
@@ -1269,7 +1339,7 @@ namespace Levrum.UI.WinForms
                 selectedField = listBox.SelectedItem.ToString();
                 listBox.Hide();
                 this.Controls.Remove(listBox);
-                this.Controls.Remove(header);                                
+                this.Controls.Remove(header);
 
                 // Populate unorganized data with data field values
                 Cursor.Current = Cursors.WaitCursor;
@@ -1305,9 +1375,23 @@ namespace Levrum.UI.WinForms
             listBox.BringToFront();
         }
 
-        private void m_pDelete_DragLeave(object sender, EventArgs e)
+        private void m_undoDeleteTimer_Tick(object sender, EventArgs e)
         {
-            m_pDelete.Visible = false;
+            m_btnUndoDelete.Visible = false;
+            m_undoDeleteTimer.Enabled = false;
+
+            DeleteRecycledItems();
+        }
+
+        private void m_btnUndoDelete_Click(object sender, EventArgs e)
+        {
+            foreach (DraggedData draggedData in m_recyclingBin)
+            {
+                draggedData.Control.Visible = true;
+            }
+            m_recyclingBin.Clear();
+            m_btnUndoDelete.Visible = false;
+            m_undoDeleteTimer.Enabled = false;
         }
     }
 }
