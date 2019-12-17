@@ -28,17 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.m_scMain = new System.Windows.Forms.SplitContainer();
             this.m_flpOrganizedData = new System.Windows.Forms.FlowLayoutPanel();
+            this.m_btnAddOrganizedCategory = new System.Windows.Forms.Button();
+            this.m_pDelete = new System.Windows.Forms.Panel();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.m_flpUnorganizedData = new System.Windows.Forms.FlowLayoutPanel();
+            this.m_btnUndoDelete = new System.Windows.Forms.Button();
             this.m_btnLoadTree = new System.Windows.Forms.Button();
             this.m_btnSaveTree = new System.Windows.Forms.Button();
             this.m_btnLoadIncidents = new System.Windows.Forms.Button();
             this.m_cbDefaultTree = new System.Windows.Forms.ComboBox();
             this.m_bgwLoadIncidentData = new System.ComponentModel.BackgroundWorker();
-            this.m_pDelete = new System.Windows.Forms.Panel();
-            this.m_btnAddOrganizedCategory = new System.Windows.Forms.Button();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.m_undoDeleteTimer = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.m_scMain)).BeginInit();
             this.m_scMain.Panel1.SuspendLayout();
             this.m_scMain.Panel2.SuspendLayout();
@@ -65,8 +68,9 @@
             // 
             this.m_scMain.Panel2.Controls.Add(this.m_pDelete);
             this.m_scMain.Panel2.Controls.Add(this.m_flpUnorganizedData);
+            this.m_scMain.Panel2.Controls.Add(this.m_btnUndoDelete);
             this.m_scMain.Size = new System.Drawing.Size(847, 473);
-            this.m_scMain.SplitterDistance = 664;
+            this.m_scMain.SplitterDistance = 668;
             this.m_scMain.TabIndex = 0;
             // 
             // m_flpOrganizedData
@@ -82,11 +86,53 @@
             this.m_flpOrganizedData.ForeColor = System.Drawing.SystemColors.ControlText;
             this.m_flpOrganizedData.Location = new System.Drawing.Point(0, 0);
             this.m_flpOrganizedData.Name = "m_flpOrganizedData";
-            this.m_flpOrganizedData.Size = new System.Drawing.Size(664, 473);
+            this.m_flpOrganizedData.Size = new System.Drawing.Size(668, 473);
             this.m_flpOrganizedData.TabIndex = 0;
-            this.m_flpOrganizedData.Click += new System.EventHandler(this.m_flpOrganizedData_Click);
+            this.m_flpOrganizedData.Click += new System.EventHandler(this.OrganizedData_Click);
             this.m_flpOrganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.OrganizedPanel_DragDrop);
             this.m_flpOrganizedData.DragEnter += new System.Windows.Forms.DragEventHandler(this.OrganizedPanel_DragEnter);
+            // 
+            // m_btnAddOrganizedCategory
+            // 
+            this.m_btnAddOrganizedCategory.AutoSize = true;
+            this.m_btnAddOrganizedCategory.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.m_btnAddOrganizedCategory.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.m_btnAddOrganizedCategory.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            this.m_btnAddOrganizedCategory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.m_btnAddOrganizedCategory.Image = global::Levrum.UI.WinForms.Properties.Resources.add_subcategory;
+            this.m_btnAddOrganizedCategory.Location = new System.Drawing.Point(10, 10);
+            this.m_btnAddOrganizedCategory.Margin = new System.Windows.Forms.Padding(10);
+            this.m_btnAddOrganizedCategory.Name = "m_btnAddOrganizedCategory";
+            this.m_btnAddOrganizedCategory.Size = new System.Drawing.Size(36, 36);
+            this.m_btnAddOrganizedCategory.TabIndex = 0;
+            this.m_btnAddOrganizedCategory.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.m_btnAddOrganizedCategory.UseVisualStyleBackColor = false;
+            this.m_btnAddOrganizedCategory.Click += new System.EventHandler(this.AddSubcategory_Click);
+            // 
+            // m_pDelete
+            // 
+            this.m_pDelete.AllowDrop = true;
+            this.m_pDelete.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(235)))), ((int)(((byte)(235)))));
+            this.m_pDelete.Controls.Add(this.pictureBox1);
+            this.m_pDelete.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.m_pDelete.Location = new System.Drawing.Point(0, 0);
+            this.m_pDelete.Name = "m_pDelete";
+            this.m_pDelete.Size = new System.Drawing.Size(175, 473);
+            this.m_pDelete.TabIndex = 1;
+            this.m_pDelete.Visible = false;
+            this.m_pDelete.DragDrop += new System.Windows.Forms.DragEventHandler(this.DeletePanel_DragDrop);
+            this.m_pDelete.DragEnter += new System.Windows.Forms.DragEventHandler(this.DeletePanel_DragEnter);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.pictureBox1.Image = global::Levrum.UI.WinForms.Properties.Resources.delete;
+            this.pictureBox1.Location = new System.Drawing.Point(39, 182);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(100, 99);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBox1.TabIndex = 0;
+            this.pictureBox1.TabStop = false;
             // 
             // m_flpUnorganizedData
             // 
@@ -98,11 +144,31 @@
             this.m_flpUnorganizedData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_flpUnorganizedData.Location = new System.Drawing.Point(0, 0);
             this.m_flpUnorganizedData.Name = "m_flpUnorganizedData";
-            this.m_flpUnorganizedData.Size = new System.Drawing.Size(179, 473);
+            this.m_flpUnorganizedData.Size = new System.Drawing.Size(175, 473);
             this.m_flpUnorganizedData.TabIndex = 1;
-            this.m_flpUnorganizedData.Click += new System.EventHandler(this.m_flpUnorganizedData_Click);
-            this.m_flpUnorganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.UnorganizedPanel_DragDrop);
-            this.m_flpUnorganizedData.DragEnter += new System.Windows.Forms.DragEventHandler(this.UnorganizedPanel_DragEnter);
+            this.m_flpUnorganizedData.Click += new System.EventHandler(this.UnorganizedData_Click);
+            this.m_flpUnorganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.DeletePanel_DragDrop);
+            this.m_flpUnorganizedData.DragEnter += new System.Windows.Forms.DragEventHandler(this.DeletePanel_DragEnter);
+            // 
+            // m_btnUndoDelete
+            // 
+            this.m_btnUndoDelete.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_btnUndoDelete.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.m_btnUndoDelete.BackColor = System.Drawing.Color.Black;
+            this.m_btnUndoDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.m_btnUndoDelete.ForeColor = System.Drawing.Color.LightGray;
+            this.m_btnUndoDelete.Image = global::Levrum.UI.WinForms.Properties.Resources.undo;
+            this.m_btnUndoDelete.Location = new System.Drawing.Point(0, 441);
+            this.m_btnUndoDelete.Name = "m_btnUndoDelete";
+            this.m_btnUndoDelete.Size = new System.Drawing.Size(175, 32);
+            this.m_btnUndoDelete.TabIndex = 3;
+            this.m_btnUndoDelete.Text = "Undo Delete";
+            this.m_btnUndoDelete.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.m_btnUndoDelete.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.m_btnUndoDelete.UseVisualStyleBackColor = false;
+            this.m_btnUndoDelete.Visible = false;
+            this.m_btnUndoDelete.Click += new System.EventHandler(this.m_btnUndoDelete_Click);
             // 
             // m_btnLoadTree
             // 
@@ -159,48 +225,10 @@
             this.m_bgwLoadIncidentData.DoWork += new System.ComponentModel.DoWorkEventHandler(this.m_bgwLoadIncidentData_DoWork);
             this.m_bgwLoadIncidentData.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.m_bgwLoadIncidentData_RunWorkerCompleted);
             // 
-            // m_pDelete
+            // m_undoDeleteTimer
             // 
-            this.m_pDelete.AllowDrop = true;
-            this.m_pDelete.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(235)))), ((int)(((byte)(235)))));
-            this.m_pDelete.Controls.Add(this.pictureBox1);
-            this.m_pDelete.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.m_pDelete.Location = new System.Drawing.Point(0, 0);
-            this.m_pDelete.Name = "m_pDelete";
-            this.m_pDelete.Size = new System.Drawing.Size(179, 473);
-            this.m_pDelete.TabIndex = 1;
-            this.m_pDelete.Visible = false;
-            this.m_pDelete.DragDrop += new System.Windows.Forms.DragEventHandler(this.UnorganizedPanel_DragDrop);
-            this.m_pDelete.DragEnter += new System.Windows.Forms.DragEventHandler(this.UnorganizedPanel_DragEnter);
-            this.m_pDelete.DragLeave += new System.EventHandler(this.m_pDelete_DragLeave);
-            // 
-            // m_btnAddOrganizedCategory
-            // 
-            this.m_btnAddOrganizedCategory.AutoSize = true;
-            this.m_btnAddOrganizedCategory.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.m_btnAddOrganizedCategory.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.m_btnAddOrganizedCategory.FlatAppearance.BorderColor = System.Drawing.Color.White;
-            this.m_btnAddOrganizedCategory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.m_btnAddOrganizedCategory.Image = global::Levrum.UI.WinForms.Properties.Resources.add_subcategory;
-            this.m_btnAddOrganizedCategory.Location = new System.Drawing.Point(10, 10);
-            this.m_btnAddOrganizedCategory.Margin = new System.Windows.Forms.Padding(10);
-            this.m_btnAddOrganizedCategory.Name = "m_btnAddOrganizedCategory";
-            this.m_btnAddOrganizedCategory.Size = new System.Drawing.Size(36, 36);
-            this.m_btnAddOrganizedCategory.TabIndex = 0;
-            this.m_btnAddOrganizedCategory.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.m_btnAddOrganizedCategory.UseVisualStyleBackColor = false;
-            this.m_btnAddOrganizedCategory.Click += new System.EventHandler(this.AddSubcategory_Click);
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.pictureBox1.Image = global::Levrum.UI.WinForms.Properties.Resources.delete;
-            this.pictureBox1.Location = new System.Drawing.Point(41, 182);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(100, 99);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
+            this.m_undoDeleteTimer.Interval = 5000;
+            this.m_undoDeleteTimer.Tick += new System.EventHandler(this.m_undoDeleteTimer_Tick);
             // 
             // TreeEditorControl
             // 
@@ -243,5 +271,7 @@
         private System.ComponentModel.BackgroundWorker m_bgwLoadIncidentData;
         private System.Windows.Forms.Panel m_pDelete;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Button m_btnUndoDelete;
+        private System.Windows.Forms.Timer m_undoDeleteTimer;
     }
 }
