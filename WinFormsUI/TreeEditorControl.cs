@@ -152,10 +152,34 @@ namespace Levrum.UI.WinForms
             if (e.AllowedEffect == DragDropEffects.Move)
             {
                 DeleteRecycledItems();
+                // Suspent layout for all parent controls to smooth UI
+                m_flpOrganizedData.SuspendLayout();
+                HashSet<Control> parentControls = new HashSet<Control>();
+                foreach (DraggedData draggedData in m_recyclingBin)
+                {
+                    if (!parentControls.Contains(draggedData.Control.Parent))
+                    {
+                        parentControls.Add(draggedData.Control.Parent);
+                    }
+                }
+                foreach (Control control in parentControls)
+                {
+                    if (control != null)
+                    {
+                        control.SuspendLayout();
+                    }
+                }
+
                 m_recyclingBin = allDraggedData;
                 foreach (DraggedData draggedData in allDraggedData)
                 {
                     draggedData.Control.Visible = false;
+                }
+
+                m_flpOrganizedData.ResumeLayout();
+                foreach (Control control in parentControls)
+                {
+                    control.ResumeLayout();
                 }
             }
 
@@ -174,23 +198,6 @@ namespace Levrum.UI.WinForms
 
         private void DeleteRecycledItems()
         {
-            // Suspent layout for all parent controls to smooth UI
-            HashSet<Control> parentControls = new HashSet<Control>();
-            foreach (DraggedData draggedData in m_recyclingBin)
-            {
-                if (!parentControls.Contains(draggedData.Control.Parent))
-                {
-                    parentControls.Add(draggedData.Control.Parent);
-                }
-            }
-            foreach (Control control in parentControls)
-            {
-                if (control != null)
-                {
-                    control.SuspendLayout();
-                }                
-            }
-
             // Delete all dropped items
             foreach (DraggedData draggedData in m_recyclingBin)
             {
@@ -217,11 +224,6 @@ namespace Levrum.UI.WinForms
                     }
                 }
                 draggedData.Control.Parent.Controls.Remove(draggedData.Control);
-            }
-
-            foreach (Control control in parentControls)
-            {
-                control.ResumeLayout();
             }
 
             m_recyclingBin.Clear();
