@@ -756,9 +756,14 @@ namespace Levrum.UI.WinForms
                 return;
             }
 
+            LoadIncidents(ofd.FileName);
+        }
+
+        public void LoadIncidents(string fileName)
+        {
             m_btnLoadIncidents.Enabled = false;
             this.Cursor = Cursors.WaitCursor;
-            m_bgwLoadIncidentData.RunWorkerAsync(ofd.FileName);
+            m_bgwLoadIncidentData.RunWorkerAsync(fileName);
         }
 
         private void LoadValueBlocks(FlowLayoutPanel flp, IEnumerable<string> data)
@@ -1309,8 +1314,12 @@ namespace Levrum.UI.WinForms
 
         private void m_bgwLoadIncidentData_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
+            GetDataFieldFromUser(e.Result as List<IncidentData>);
+        }
+
+        public void GetDataFieldFromUser(List<IncidentData> incidents)
+        {
             this.Cursor = Cursors.Default;
-            List<IncidentData> incidents = (List<IncidentData>)e.Result;
 
             // Get list of all incident data fields
             HashSet<string> incidentDataFields = new HashSet<string>();
