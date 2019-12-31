@@ -174,6 +174,7 @@ namespace Levrum.UI.WinForms
                 foreach (DraggedData draggedData in allDraggedData)
                 {
                     draggedData.Control.Visible = false;
+                    MarkValueBlockAsNotAdded(draggedData.Control as Button);
                 }
 
                 m_flpOrganizedData.ResumeLayout();
@@ -201,7 +202,7 @@ namespace Levrum.UI.WinForms
             // Delete all dropped items
             foreach (DraggedData draggedData in m_recyclingBin)
             {
-                ICategoryData oldParentData = draggedData.Control.Parent.Tag as ICategoryData;
+                ICategoryData oldParentData = draggedData.Control.Parent?.Tag as ICategoryData;
                 if (draggedData.Data is ICategoryData)
                 {
                     oldParentData?.Children?.Remove(draggedData.Data as ICategoryData);
@@ -213,14 +214,7 @@ namespace Levrum.UI.WinForms
                     // Mark block as not added
                     if (!ValueBlockIsAdded(draggedData.Data as ICategorizedValue, m_flpOrganizedData))
                     {
-                        foreach (Control control in m_flpUnorganizedData.Controls)
-                        {
-                            if (control is Button && (control as Button).Tag == draggedData.Data)
-                            {
-                                MarkValueBlockAsNotAdded(control as Button);
-                                break;
-                            }
-                        }
+                        MarkValueBlockAsNotAdded(draggedData.Control as Button);
                     }
                 }
                 draggedData.Control.Parent.Controls.Remove(draggedData.Control);
@@ -576,8 +570,17 @@ namespace Levrum.UI.WinForms
                         throw new Exception("Null data received");
                     }
 
+                    // Check if receving panel already contains dragged data
                     if (receivingPanelData.Values.Contains(droppedData))
                     {
+                        foreach (Control control in receivingPanel.Controls)
+                        {
+                            if (control.Tag == droppedData)
+                            {
+                                control.Visible = true;
+                                break;
+                            }
+                        }
                         continue;
                     }
 
@@ -597,7 +600,7 @@ namespace Levrum.UI.WinForms
 
                     receivingPanelData.Values.Add(droppedData);
 
-                    // Keep values on top and containers on bottome
+                    // Keep values on top and containers on bottom
                     List<Control> panels = new List<Control>();
                     foreach (Control control in receivingPanel.Controls)
                     {
@@ -918,14 +921,34 @@ namespace Levrum.UI.WinForms
 
         private void MarkValueBlockAsAdded(Button valueBlock)
         {
-            valueBlock.Image = Properties.Resources.ok_icon;
-            valueBlock.ImageAlign = ContentAlignment.MiddleLeft;
-            valueBlock.TextImageRelation = TextImageRelation.ImageBeforeText;
+            foreach (Control control in m_flpUnorganizedData.Controls)
+            {
+                if (control is Button)
+                {
+                    Button blockToMark = control as Button;
+                    if (blockToMark.Tag == valueBlock.Tag)
+                    {
+                        blockToMark.Image = Properties.Resources.ok_icon;
+                        blockToMark.ImageAlign = ContentAlignment.MiddleLeft;
+                        blockToMark.TextImageRelation = TextImageRelation.ImageBeforeText;
+                    }
+                }
+            }            
         }
 
         private void MarkValueBlockAsNotAdded(Button valueBlock)
         {
-            valueBlock.Image = null;
+            foreach (Control control in m_flpUnorganizedData.Controls)
+            {
+                if (control is Button)
+                {
+                    Button blockToMark = control as Button;
+                    if (blockToMark.Tag == valueBlock.Tag)
+                    {
+                        blockToMark.Image = null;
+                    }
+                }
+            }            
         }
 
         private bool ValueBlockIsAdded(ICategorizedValue vbData, FlowLayoutPanel parentPanel)
@@ -1399,6 +1422,7 @@ namespace Levrum.UI.WinForms
             foreach (DraggedData draggedData in m_recyclingBin)
             {
                 draggedData.Control.Visible = true;
+                MarkValueBlockAsAdded(draggedData.Control as Button);
             }
             m_recyclingBin.Clear();
             m_btnUndoDelete.Visible = false;
