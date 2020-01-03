@@ -921,19 +921,44 @@ namespace Levrum.UI.WinForms
 
         private void MarkValueBlockAsAdded(Button valueBlock)
         {
+            ICategorizedValue valueBlockData = valueBlock.Tag as ICategorizedValue;
+            MarkValueBlockAsAdded(valueBlockData);
+        }
+        
+        private void MarkValueBlockAsAdded(ICategorizedValue valueBlockData)
+        {
             foreach (Control control in m_flpUnorganizedData.Controls)
             {
                 if (control is Button)
                 {
                     Button blockToMark = control as Button;
-                    if (blockToMark.Tag == valueBlock.Tag)
+                    ICategorizedValue blockToMarkData = blockToMark.Tag as ICategorizedValue;
+                    if (blockToMarkData.Value == valueBlockData.Value)
                     {
                         blockToMark.Image = Properties.Resources.ok_icon;
                         blockToMark.ImageAlign = ContentAlignment.MiddleLeft;
                         blockToMark.TextImageRelation = TextImageRelation.ImageBeforeText;
                     }
                 }
-            }            
+            }
+        }
+
+        private void MarkAllBlocksInTreeAsAdded(List<ICategoryData> tree)
+        {
+            if (tree == null || tree.Count <= 0)
+            {
+                return;
+            }
+
+            foreach (ICategoryData catData in tree)
+            {
+                MarkAllBlocksInTreeAsAdded(catData.Children);
+
+                foreach (ICategorizedValue catValue in catData.Values)
+                {
+                    MarkValueBlockAsAdded(catValue);
+                }
+            }
         }
 
         private void MarkValueBlockAsNotAdded(Button valueBlock)
@@ -1298,6 +1323,9 @@ namespace Levrum.UI.WinForms
             if (tree != null)
             {
                 LoadTree(tree, m_flpOrganizedData);
+                Cursor.Current = Cursors.WaitCursor;
+                MarkAllBlocksInTreeAsAdded(tree);
+                Cursor.Current = Cursors.Default;
             }
         }
 
