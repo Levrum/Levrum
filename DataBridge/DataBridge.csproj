@@ -16,6 +16,7 @@
   <ItemGroup>
     <None Remove="BlankTemplate.png" />
     <None Remove="databridge.ico" />
+    <None Remove="datamap.ico" />
     <None Remove="SuperionTemplate.png" />
     <None Remove="Templates\Superion.dmap" />
     <None Remove="Templates\TriTech.dmap" />
@@ -50,8 +51,15 @@
     <Resource Include="databridge.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="datamap.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="SuperionTemplate.png" />
     <Resource Include="TritechTemplate.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>
