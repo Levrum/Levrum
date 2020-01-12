@@ -1,18 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 using Microsoft.Win32;
 
@@ -24,6 +16,8 @@ using Newtonsoft.Json;
 using Levrum.Data.Classes;
 using Levrum.Data.Map;
 using Levrum.UI.WPF;
+
+using CsvHelper;
 
 namespace Levrum.DataBridge
 {
@@ -102,7 +96,7 @@ namespace Levrum.DataBridge
                     }
 
                     FileInfo file = new FileInfo(ofd.FileName);
-                    DataMap map = JsonConvert.DeserializeObject<DataMap>(File.ReadAllText(ofd.FileName), new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All });
+                    DataMap map = JsonConvert.DeserializeObject<DataMap>(File.ReadAllText(ofd.FileName), new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All, Formatting = Formatting.Indented });
                     map.Name = file.Name;
                     map.Path = ofd.FileName;
 
@@ -117,7 +111,7 @@ namespace Levrum.DataBridge
                 }
             } catch (Exception ex)
             {
-
+                MessageBox.Show(string.Format("Unable to open DataMap: {0}", ex.Message));
             }
         }
 
@@ -244,6 +238,7 @@ namespace Levrum.DataBridge
                             CloseMenuItem.IsEnabled = true;
 
                             CreateIncidentJsonMenuItem.IsEnabled = true;
+                            CreateCallResponseCSVsMenuItem.IsEnabled = true;
 
                             DataSources.Map = map;
                             DataSources.IsEnabled = true;
@@ -256,6 +251,7 @@ namespace Levrum.DataBridge
                             updateInvertLongitudeHeader();                            
 
                             SelectCauseTreeMenuItem.IsEnabled = true;
+                            DefinePostProcessingScript.IsEnabled = true;
                             return;
                         }
                     }
@@ -268,12 +264,14 @@ namespace Levrum.DataBridge
                 CloseMenuItem.IsEnabled = false;
                 
                 CreateIncidentJsonMenuItem.IsEnabled = false;
+                CreateCallResponseCSVsMenuItem.IsEnabled = false;
 
                 DataSources.Map = null;
                 DataSources.IsEnabled = false;
                 CoordinateConversionMenuItem.IsEnabled = false;
                 DefineProjectionMenuItem.IsEnabled = false;
                 SelectCauseTreeMenuItem.IsEnabled = false;
+                DefinePostProcessingScript.IsEnabled = false;
             }
         }
 
@@ -390,6 +388,149 @@ namespace Levrum.DataBridge
             }
         }
 
+        private void CreateCallResponseCSVsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.InitialDirectory = string.Format("{0}\\Levrum", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+            sfd.Title = "Save Incident CSV";
+            sfd.DefaultExt = "csv";
+            sfd.Filter = "CSV Files (*.csv)|*.csv|All files (*.*)|*.*";
+            if (sfd.ShowDialog() == false)
+            {
+                return;
+            }
+            Cursor = Cursors.Wait;
+            string incidentCsvFileName = sfd.FileName;
+
+            FileInfo csvFileInfo = new FileInfo(incidentCsvFileName);
+            sfd.Title = "Save Response CSV";
+            sfd.FileName = string.Format("{0} Responses.csv", csvFileInfo.Name.Substring(0, csvFileInfo.Name.Length - 4));
+            if (sfd.ShowDialog() == false)
+            {
+                return;
+            }
+            string responseCsvFileName = sfd.FileName;
+
+            try
+            {
+                MapLoader loader = new MapLoader();
+                loader.LoadMap(DataSources.Map);
+
+                HashSet<string> incidentDataFields = new HashSet<string>();
+                HashSet<string> responseDataFields = new HashSet<string>();
+                HashSet<string> benchmarkNames = new HashSet<string>();
+                foreach (IncidentData incident in loader.Incidents)
+                {
+                    foreach (string key in incident.Data.Keys)
+                    {
+                        incidentDataFields.Add(key);
+                    }
+                    foreach (ResponseData response in incident.Responses)
+                    {
+                        foreach (string key in response.Data.Keys)
+                        {
+                            responseDataFields.Add(key);
+                        }
+                        foreach (BenchmarkData benchmark in response.Benchmarks)
+                        {
+                            benchmarkNames.Add(benchmark.Name);
+                        }
+                    }
+                }
+
+                List<dynamic> incidentRecords = new List<dynamic>();
+                List<dynamic> responseRecords = new List<dynamic>();
+                foreach (IncidentData incident in loader.Incidents)
+                {
+                    dynamic incidentRecord = new ExpandoObject();
+                    incidentRecord.Id = incident.Id;
+                    incidentRecord.Time = incident.Time;
+                    incidentRecord.Location = incident.Location;
+                    incidentRecord.Latitude = incident.Latitude;
+                    incidentRecord.Longitude = incident.Longitude;
+                    foreach (string field in incidentDataFields)
+                    {
+                        if (incident.Data.ContainsKey(field))
+                        {
+                            ((IDictionary<string, object>)incidentRecord).Add(field, incident.Data[field]);
+                        }
+                        else
+                        {
+                            ((IDictionary<string, object>)incidentRecord).Add(field, string.Empty);
+                        }
+                    }
+
+                    foreach (ResponseData response in incident.Responses)
+                    {
+                        dynamic responseRecord = new ExpandoObject();
+                        responseRecord.Id = incident.Id;
+                        foreach (string field in responseDataFields) { 
+                            if (response.Data.ContainsKey(field))
+                            {
+                                ((IDictionary<string, object>)responseRecord).Add(field, response.Data[field]);
+                            } else
+                            {
+                                ((IDictionary<string, object>)responseRecord).Add(field, string.Empty);
+                            }
+                        }
+
+                        foreach (string benchmarkName in benchmarkNames)
+                        {
+                            BenchmarkData benchmark = (from bmk in response.Benchmarks
+                                                       where bmk.Name == benchmarkName
+                                                       select bmk).FirstOrDefault();
+
+                            if (benchmark != null)
+                            {
+                                object value;
+                                if (benchmark.Data.ContainsKey("DateTime")) {
+                                    value = benchmark.Data["DateTime"];
+                                } else
+                                {
+                                    value = benchmark.Value;
+                                }
+                                ((IDictionary<string, object>)responseRecord).Add(benchmarkName, value);
+                            } else
+                            {
+                                ((IDictionary<string, object>)responseRecord).Add(benchmarkName, string.Empty);
+                            }
+                        }
+                        responseRecords.Add(responseRecord);
+                    }
+                    incidentRecords.Add(incidentRecord);
+                }
+
+                using (StringWriter writer = new StringWriter())
+                {
+                    using (CsvWriter csv = new CsvWriter(writer))
+                    {
+                        csv.WriteRecords(incidentRecords);
+                    }
+                    File.WriteAllText(incidentCsvFileName, writer.ToString());
+                }
+
+                using (StringWriter writer = new StringWriter())
+                {
+                    using (CsvWriter csv = new CsvWriter(writer))
+                    {
+                        csv.WriteRecords(responseRecords);
+                    }
+                    File.WriteAllText(responseCsvFileName, writer.ToString());
+                }
+                
+                MessageBox.Show(string.Format("Incidents saved as CSV files '{0}' and '{1}'", incidentCsvFileName, responseCsvFileName));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to create CSV files: {0}", ex.Message));
+            }
+            finally
+            {
+                GC.Collect();
+                Cursor = Cursors.Arrow;
+            }
+        }
+
         private void DockingManager_DocumentClosing(object sender, DocumentClosingEventArgs e)
         {
             LayoutDocument document = e.Document;
@@ -461,6 +602,23 @@ namespace Levrum.DataBridge
             {
                 ToggleInvertLatitude.Header = "Invert _Latitude Disabled";
                 ToggleInvertLatitude.IsChecked = false;
+            }
+        }
+
+        private void DefinePostProcessingScript_Click(object sender, RoutedEventArgs e)
+        {
+            string script = null;
+            if (!string.IsNullOrWhiteSpace(DataSources.Map.PostProcessingScript))
+            {
+                script = DataSources.Map.PostProcessingScript;
+            }
+            TextInputDialog dialog = new TextInputDialog("Define PostProcessing Script", "PostProcessing Script:", script);
+            dialog.ShowDialog();
+
+            if (dialog.Result != null)
+            {
+                DataSources.Map.PostProcessingScript = dialog.Result;
+                SetChangesMade(DataSources.Map, true);
             }
         }
     }
