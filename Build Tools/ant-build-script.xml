@@ -1,0 +1,67 @@
+<project>
+
+	<property name="DataBridge-version" value="0.0.3"/>
+	<property environment="env"/>
+    
+	<target name="backup-version-number">
+		<mkdir dir="backup"/>
+		<copy file="..\DataBridge\Properties\Version.cs" tofile="backup\DataBridge_Version.cs" overwrite="true"/>
+	</target>
+
+	<target name="restore-version-number">
+		<copy tofile="..\DataBridge\Properties\Version.cs" file="backup\DataBridge_Version.cs" overwrite="true"/>
+	</target>
+
+	<target name="update-version-number">
+		<!-- Code3Sim Version -->
+		<delete file="..\DataBridge\Properties\Version.cs"/>
+		<echo file="..\DataBridge\Properties\Version.cs">
+			using System.Reflection;
+			using System.Runtime.CompilerServices;
+			using System.Runtime.InteropServices;
+			[assembly: AssemblyVersion("${DataBridge-version}.${env.SVN_REVISION_1}")]
+			[assembly: AssemblyFileVersion("${DataBridge-version}.${env.SVN_REVISION_1}")]
+		</echo>
+	</target>
+	
+	<target name="create-output-folder">
+		<mkdir dir="..\output"/>
+	</target>
+	
+	<target name="zip-debug" depends="create-output-folder">
+		<!-- Levrum DataBridge -->
+		<zip basedir="..\DataBridge\bin\Debug"
+			destfile="..\output\Levrum DataBridge ${DataBridge-version}.${env.SVN_REVISION_1} - Debug.zip"
+			/>
+	</target>
+	
+	<target name="zip-release" depends="create-output-folder">
+		<!-- Levrum DataBridge -->
+		<zip basedir="..\DataBridge\bin\Release"
+			destfile="..\output\Levrum DataBridge ${DataBridge-version}.${env.SVN_REVISION_1} - Release.zip"
+			excludes="*.pdb"/>
+	</target>
+
+	<target name="build-installer" depends="create-output-folder">
+		<!-- Run the compiler -->
+		<exec executable="C:\Program Files (x86)\Inno Setup 5\ISCC.exe">
+			<arg value="Install Script.iss"/>
+		</exec>
+		
+		<!-- Move the installer to the output directory -->
+		<move file="Output\mysetup.exe"
+			tofile="..\output\Levrum DataBridge ${DataBridge-version}.${env.SVN_REVISION_1} Setup.exe"/>
+	</target>
+	
+	<target name="build-installer-local" depends="create-output-folder">
+		<!-- Run the compiler -->
+		<exec executable="ISCC.exe">
+			<arg value="Install Script.iss"/>
+		</exec>
+		
+		<!-- Move the installer to the output directory -->
+		<move file="Output\mysetup.exe"
+			tofile="..\output\Levrum DataBridge ${DataBridge-version}.${env.SVN_REVISION_1} Setup.exe"/>
+	</target>
+</project>
+

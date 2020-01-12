@@ -1,0 +1,11 @@
+Requirements - 
+
+The following tools must be installed and their bin directories must be found in the %PATH% in order for the build script to work:
+
+Java SE 11
+Apache Ant
+Visual Studio 2017 MS Build Tools
+.NET Framework Developer Pack 4.7.2
+InnoSetup 5
+
+After installing them, run build.bat to produce a local build. Local builds are numbered the same as Jenkins builds, except the revision number will always be 9999. Enjoy!
