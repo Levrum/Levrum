@@ -25,6 +25,23 @@ namespace Levrum.Data.Classes
             base.Add(realKey, realValue);
         }
 
+        public T2 GetValue(T1 key)
+        {
+            T2 output;
+            if (TryGetValue(key, out output))
+            {
+                return output;
+            } else
+            {
+                return default(T2);
+            }
+        }
+
+        public void SetValue(T1 key, T2 value)
+        {
+            this[key] = value;
+        }
+
         public void InternKeys()
         {
             List<T1> keys = Keys.ToList();

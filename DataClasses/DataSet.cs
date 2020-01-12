@@ -126,5 +126,39 @@ namespace Levrum.Data.Classes
 
             base.AddRange(items);
         }
+
+        public void SetItemDataValue(int index, string key, object value)
+        {
+            if (index >= Count)
+            {
+                return;
+            }
+
+            object item = this[index];
+            if (!(item is AnnotatedData))
+            {
+                return;
+            }
+
+            AnnotatedData data = item as AnnotatedData;
+            data.SetDataValue(key, value);
+        }
+
+        public object GetItemDataValue(int index, string key)
+        {
+            if (index >= Count)
+            {
+                return null;
+            }
+
+            object item = this[index];
+            if (!(item is AnnotatedData))
+            {
+                return null;
+            }
+
+            AnnotatedData data = item as AnnotatedData;
+            return data.GetDataValue(key);
+        }
     }
 }

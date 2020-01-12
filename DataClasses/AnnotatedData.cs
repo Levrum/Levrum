@@ -24,6 +24,16 @@ namespace Levrum.Data.Classes
             }
         }
 
+        public void SetDataValue(string key, object value)
+        {
+            Data[key] = value;
+        }
+
+        public object GetDataValue(string key)
+        {
+            return Data.GetValue(key);
+        }
+
         public void Intern()
         {
             if (m_data != null && m_data.Count > 0)
