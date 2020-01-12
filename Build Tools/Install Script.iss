@@ -44,6 +44,13 @@ Filename: {app}\netcoreapp3.1\DataBridge.exe; Description: {cm:LaunchProgram,{cm
 AppName=Levrum DataBridge
 LaunchProgram=Start Levrum DataBridge after finishing installation
 
+
+[Registry]
+Root: HKCR; Subkey: ".dmap"; ValueData: "{#ApplicationName}"; Flags: uninsdeletevalue; ValueType: string; ValueName: "";
+Root: HKCR; Subkey: "{#ApplicationName}"; ValueData: "Program {#ApplicationName}";  Flags: uninsdeletekey; ValueType: string; ValueName: "";
+Root: HKCR; Subkey: "{#ApplicationName}\DefaultIcon"; ValueData: "{app}\netcoreapp3.1\datamap.ico"; ValueType: string; ValueName: "";
+Root: HKCR; Subkey: "{#ApplicationName}\shell\open\command"; ValueData: """{app}\netcoreapp3.1\DataBridge.exe"" ""%1"""; ValueType: string; ValueName: "";
+
 [Code]
 /////////////////////////////////////////////////////////////////////
 function GetUninstallString(): String;
@@ -57,12 +64,6 @@ begin
     RegQueryStringValue(HKCU, sUnInstPath, 'UninstallString', sUnInstallString);
   Result := sUnInstallString;
 end;
-
-[Registry]
-Root: HKCR; Subkey: ".dmap"; ValueData: "{#ApplicationName}"; Flags: uninsdeletevalue; ValueType: string; ValueName: "";
-Root: HKCR; Subkey: "{#ApplicationName}"; ValueData: "Program {#ApplicationName}";  Flags: uninsdeletekey; ValueType: string; ValueName: ""
-Root: HKCR; Subkey: "{#ApplicationName}\DefaultIcon"; ValueData: "{app}\netcoreapp3.1\datamap.ico"; ValueType: string; ValueName: ""
-Root: HKCR; Subkey: "{#ApplicationName}\shell\open\command"; ValueData: """{app}\netcoreapp3.1\DataBridge.exe"" ""%1"""; ValueType: string; ValueName: ""
 
 /////////////////////////////////////////////////////////////////////
 function IsUpgrade(): Boolean;
