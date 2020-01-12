@@ -13,14 +13,14 @@
 	</target>
 
 	<target name="update-version-number">
-		<!-- Code3Sim Version -->
+		<!-- DataBridge Version -->
 		<delete file="..\DataBridge\Properties\Version.cs"/>
 		<echo file="..\DataBridge\Properties\Version.cs">
 			using System.Reflection;
 			using System.Runtime.CompilerServices;
 			using System.Runtime.InteropServices;
-			[assembly: AssemblyVersion("${DataBridge-version}.${env.SVN_REVISION_1}")]
-			[assembly: AssemblyFileVersion("${DataBridge-version}.${env.SVN_REVISION_1}")]
+			[assembly: AssemblyVersion("${DataBridge-version}.${env.BUILD_NUMBER}")]
+			[assembly: AssemblyFileVersion("${DataBridge-version}.${env.BUILD_NUMBER}")]
 		</echo>
 	</target>
 	
@@ -31,14 +31,14 @@
 	<target name="zip-debug" depends="create-output-folder">
 		<!-- Levrum DataBridge -->
 		<zip basedir="..\DataBridge\bin\Debug"
-			destfile="..\output\Levrum DataBridge ${DataBridge-version}.${env.SVN_REVISION_1} - Debug.zip"
+			destfile="..\output\Levrum DataBridge ${DataBridge-version}.${env.BUILD_NUMBER} - Debug.zip"
 			/>
 	</target>
 	
 	<target name="zip-release" depends="create-output-folder">
 		<!-- Levrum DataBridge -->
 		<zip basedir="..\DataBridge\bin\Release"
-			destfile="..\output\Levrum DataBridge ${DataBridge-version}.${env.SVN_REVISION_1} - Release.zip"
+			destfile="..\output\Levrum DataBridge ${DataBridge-version}.${env.BUILD_NUMBER} - Release.zip"
 			excludes="*.pdb"/>
 	</target>
 
@@ -50,7 +50,7 @@
 		
 		<!-- Move the installer to the output directory -->
 		<move file="Output\mysetup.exe"
-			tofile="..\output\Levrum DataBridge ${DataBridge-version}.${env.SVN_REVISION_1} Setup.exe"/>
+			tofile="..\output\Levrum DataBridge ${DataBridge-version}.${env.BUILD_NUMBER} Setup.exe"/>
 	</target>
 	
 	<target name="build-installer-local" depends="create-output-folder">
@@ -61,7 +61,7 @@
 		
 		<!-- Move the installer to the output directory -->
 		<move file="Output\mysetup.exe"
-			tofile="..\output\Levrum DataBridge ${DataBridge-version}.${env.SVN_REVISION_1} Setup.exe"/>
+			tofile="..\output\Levrum DataBridge ${DataBridge-version}.${env.BUILD_NUMBER} Setup.exe"/>
 	</target>
 </project>
 
