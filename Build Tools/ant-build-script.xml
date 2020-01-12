@@ -25,6 +25,7 @@
 	</target>
 	
 	<target name="create-output-folder">
+	  <delete dir="..\output"/>
 		<mkdir dir="..\output"/>
 	</target>
 	
