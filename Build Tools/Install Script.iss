@@ -31,13 +31,13 @@ Source: "..\Dependencies\vc_redist.x64.exe"; DestDir: {tmp}; Flags: ignoreversio
 Name: desktopicon; Description: "Create a desktop icon"; GroupDescription: "Additional icons:"
 
 [Icons]
-Name: "{group}\{#ApplicationName}"; Filename: "{app}\DataBridge.exe"; IconFilename: "{app}\icon.ico"
-Name: "{commondesktop}\{#ApplicationName}"; Filename: "{app}\DataBridge.exe"; IconFilename: "{app}\Shortcut Icon.ico"; Tasks: desktopicon
+Name: "{group}\{#ApplicationName}"; Filename: "{app}\netcoreapp3.1\DataBridge.exe"; IconFilename: "{app}\databridge.ico"
+Name: "{commondesktop}\{#ApplicationName}"; Filename: "{app}\netcoreapp3.1\DataBridge.exe"; IconFilename: "{app}\databridge.ico"; Tasks: desktopicon
 
 [Run]
 Filename: {tmp}\windowsdesktop-runtime-3.1.0-win-x64.exe; StatusMsg: "Installing Microsoft .NET Core 3.1"; Description: Install Microsoft .NET Core 3.1; Parameters: /passive /noreboot; Flags: skipifdoesntexist; Check: ShouldInstalldotNETCore31
 Filename: {tmp}\vc_redist.x64.exe; StatusMsg: "Installing Microsoft Visual C++ 2019 Redistributable"; Description: Install Visual C++ 2019 Redistributable; Parameters: /passive /noreboot; Flags: skipifdoesntexist; Check: ShouldInstallVCRedist
-Filename: {app}\DataBridge.exe; Description: {cm:LaunchProgram,{cm:AppName}}; Flags: nowait postinstall skipifsilent
+Filename: {app}\netcoreapp3.1\DataBridge.exe; Description: {cm:LaunchProgram,{cm:AppName}}; Flags: nowait postinstall skipifsilent
 
 [CustomMessages]
 AppName=Levrum DataBridge
