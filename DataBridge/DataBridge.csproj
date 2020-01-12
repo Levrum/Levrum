@@ -10,6 +10,7 @@
     <Company>Levrum Data Technologies</Company>
     <PackageId>Levrum.DataBridge</PackageId>
     <Copyright>(c) 2019 Levrum Data Technologies</Copyright>
+    <ApplicationIcon>databridge.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -46,7 +47,9 @@
 
   <ItemGroup>
     <Resource Include="BlankTemplate.png" />
-    <Resource Include="databridge.ico" />
+    <Resource Include="databridge.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="SuperionTemplate.png" />
     <Resource Include="TritechTemplate.png" />
   </ItemGroup>
