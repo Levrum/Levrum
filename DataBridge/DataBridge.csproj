@@ -48,12 +48,12 @@
 
   <ItemGroup>
     <Resource Include="BlankTemplate.png" />
-    <Resource Include="databridge.ico">
+    <Content Include="databridge.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="datamap.ico">
+    </Content>
+    <Content Include="datamap.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
+    </Content>
     <Resource Include="SuperionTemplate.png" />
     <Resource Include="TritechTemplate.png" />
   </ItemGroup>
