@@ -21,7 +21,7 @@ namespace Levrum.DataBridge
     /// </summary>
     public partial class DataMapEditor : UserControl
     {
-        public MainWindow Window { get; set; } = null;
+        public MainDataBridgeWindow Window { get; set; } = null;
         public DataMap DataMap { get; protected set; }
 
         public DataMapEditor(DataMap _map = null)

@@ -24,7 +24,7 @@ namespace Levrum.DataBridge
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainDataBridgeWindow : Window
     {
         public List<DataMapDocument> openDocuments = new List<DataMapDocument>();
 
@@ -32,10 +32,21 @@ namespace Levrum.DataBridge
 
         // public Dictionary<DataMap, LayoutDocument> openDocuments = new Dictionary<DataMap, LayoutDocument>();
 
-        public MainWindow()
+        public MainDataBridgeWindow()
         {
             InitializeComponent();
             DataSources.Window = this;
+            App app = Application.Current as App;
+            if (app != null && !string.IsNullOrWhiteSpace(app.StartupFileName))
+            {
+                try
+                {
+                    OpenDataMap(app.StartupFileName);
+                } catch (Exception ex)
+                {
+                    MessageBox.Show(string.Format("Unable to open DataMap file '{0}': {1}", app.StartupFileName, ex.Message));
+                }
+            }
         }
 
         public void NewMenuItem_Click(object sender, RoutedEventArgs e)
@@ -84,35 +95,40 @@ namespace Levrum.DataBridge
                 ofd.DefaultExt = "dmap";
                 ofd.Filter = "Levrum DataMap (*.dmap)|*.dmap|All files (*.*)|*.*";
                 if (ofd.ShowDialog() == true) {
-                    DataMapDocument mapDocument = (from DataMapDocument d in openDocuments
-                                                  where d.Map.Path == ofd.FileName
-                                                  select d).FirstOrDefault();
-
-                    if (mapDocument != null)
-                    {
-                        int index = DocumentPane.IndexOfChild(mapDocument.Document);
-                        DocumentPane.SelectedContentIndex = index;
-                        return;
-                    }
-
-                    FileInfo file = new FileInfo(ofd.FileName);
-                    DataMap map = JsonConvert.DeserializeObject<DataMap>(File.ReadAllText(ofd.FileName), new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All, Formatting = Formatting.Indented });
-                    map.Name = file.Name;
-                    map.Path = ofd.FileName;
-
-                    LayoutDocument document = new LayoutDocument();
-                    document.Title = map.Name;
-                    DataMapEditor editor = new DataMapEditor(map);
-                    ActiveEditor = editor;
-                    editor.Window = this;
-                    document.Content = editor;
-                    DocumentPane.Children.Add(document);
-                    openDocuments.Add(new DataMapDocument(map, document));
+                    OpenDataMap(ofd.FileName);
                 }
             } catch (Exception ex)
             {
                 MessageBox.Show(string.Format("Unable to open DataMap: {0}", ex.Message));
             }
+        }
+
+        public void OpenDataMap(string fileName)
+        {
+            DataMapDocument mapDocument = (from DataMapDocument d in openDocuments
+                                           where d.Map.Path == fileName
+                                           select d).FirstOrDefault();
+
+            if (mapDocument != null)
+            {
+                int index = DocumentPane.IndexOfChild(mapDocument.Document);
+                DocumentPane.SelectedContentIndex = index;
+                return;
+            }
+
+            FileInfo file = new FileInfo(fileName);
+            DataMap map = JsonConvert.DeserializeObject<DataMap>(File.ReadAllText(fileName), new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All, Formatting = Formatting.Indented });
+            map.Name = file.Name;
+            map.Path = fileName;
+
+            LayoutDocument document = new LayoutDocument();
+            document.Title = map.Name;
+            DataMapEditor editor = new DataMapEditor(map);
+            ActiveEditor = editor;
+            editor.Window = this;
+            document.Content = editor;
+            DocumentPane.Children.Add(document);
+            openDocuments.Add(new DataMapDocument(map, document));
         }
 
         public void CloseMenuItem_Click(object sender, RoutedEventArgs e)

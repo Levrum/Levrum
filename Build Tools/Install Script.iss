@@ -15,6 +15,7 @@ SolidCompression=yes
 AllowNoIcons=yes
 WizardSmallImageFile="Small Install Image.bmp"
 WizardImageFile="Big Install Image.bmp"
+ChangesAssociations=yes
 ;InfoBeforeFile="..\Dependencies\Changelog.txt"
 
 [Dirs]
@@ -31,8 +32,8 @@ Source: "..\Dependencies\vc_redist.x64.exe"; DestDir: {tmp}; Flags: ignoreversio
 Name: desktopicon; Description: "Create a desktop icon"; GroupDescription: "Additional icons:"
 
 [Icons]
-Name: "{group}\{#ApplicationName}"; Filename: "{app}\netcoreapp3.1\DataBridge.exe"; IconFilename: "{app}\databridge.ico"
-Name: "{commondesktop}\{#ApplicationName}"; Filename: "{app}\netcoreapp3.1\DataBridge.exe"; IconFilename: "{app}\databridge.ico"; Tasks: desktopicon
+Name: "{group}\{#ApplicationName}"; Filename: "{app}\netcoreapp3.1\DataBridge.exe"; IconFilename: "{app}\netcoreapp3.1\databridge.ico"
+Name: "{commondesktop}\{#ApplicationName}"; Filename: "{app}\netcoreapp3.1\DataBridge.exe"; IconFilename: "{app}\netcoreapp3.1\databridge.ico"; Tasks: desktopicon
 
 [Run]
 Filename: {tmp}\windowsdesktop-runtime-3.1.0-win-x64.exe; StatusMsg: "Installing Microsoft .NET Core 3.1"; Description: Install Microsoft .NET Core 3.1; Parameters: /passive /noreboot; Flags: skipifdoesntexist; Check: ShouldInstalldotNETCore31
@@ -57,6 +58,11 @@ begin
   Result := sUnInstallString;
 end;
 
+[Registry]
+Root: HKCR; Subkey: ".dmap"; ValueData: "{#ApplicationName}; Flags: uninsdeletevalue; ValueType: string; ValueName: "";
+Root: HKCR; Subkey: "{#ApplicationName}"; ValueData: "Program {#ApplicationName}";  Flags: uninsdeletekey; ValueType: string; ValueName: ""
+Root: HKCR; Subkey: "{#ApplicationName}\DefaultIcon"; ValueData: "{app}\netcoreapp3.1\datamap.ico"; ValueType: string; ValueName: ""
+Root: HKCR; Subkey: "{#ApplicationName}\shell\open\command"; ValueData: """{app}\netcoreapp3.1\DataBridge.exe"" ""%1"""; ValueType: string; ValueName: ""
 
 /////////////////////////////////////////////////////////////////////
 function IsUpgrade(): Boolean;

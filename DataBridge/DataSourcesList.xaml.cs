@@ -22,7 +22,7 @@ namespace Levrum.DataBridge
     /// </summary>
     public partial class DataSourcesList : UserControl
     {
-        public MainWindow Window { get; set; } = null;
+        public MainDataBridgeWindow Window { get; set; } = null;
 
         private DataMap m_dataMap = null;
         public DataMap Map 
