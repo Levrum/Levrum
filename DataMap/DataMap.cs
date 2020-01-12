@@ -36,6 +36,8 @@ namespace Levrum.Data.Map
 
         public List<CauseData> CauseTree { get; set; } = new List<CauseData>();
 
+        public string PostProcessingScript { get; set; } = string.Empty;
+
         public DataMap(string _name)
         {
             Name = _name;
