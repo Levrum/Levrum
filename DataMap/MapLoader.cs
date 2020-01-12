@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using Microsoft.ClearScript.V8;
+
 using Levrum.Data.Sources;
 using Levrum.Data.Classes;
 using Levrum.Utils.Geography;
@@ -49,6 +51,7 @@ namespace Levrum.Data.Map
                 cleanupBenchmarks(map);
 
                 calculateDerivedBenchmarks(map);
+                executePostProcessing(map);
             }
             finally
             {
@@ -594,6 +597,7 @@ namespace Levrum.Data.Map
                                 assigned.Value = (assignedTime - baseTime).TotalMinutes;
                             }
                         }
+                        assigned.Data["DateTime"] = assignedTime;
                     }
 
                     BenchmarkData responding = (from b in response.Benchmarks
@@ -619,6 +623,7 @@ namespace Levrum.Data.Map
                                 responding.Value = (respondingTime - baseTime).TotalMinutes;
                             }
                         }
+                        responding.Data["DateTime"] = respondingTime;
                     }
 
                     BenchmarkData turnout = (from b in response.Benchmarks
@@ -653,6 +658,7 @@ namespace Levrum.Data.Map
                                 onScene.Value = (onSceneTime - baseTime).TotalMinutes;
                             }
                         }
+                        onScene.Data["DateTime"] = onSceneTime;
                     }
 
                     BenchmarkData travel = (from b in response.Benchmarks
@@ -687,6 +693,7 @@ namespace Levrum.Data.Map
                                 clearScene.Value = (clearSceneTime - baseTime).TotalMinutes;
                             }
                         }
+                        clearScene.Data["DateTime"] = clearSceneTime;
                     }
 
                     BenchmarkData inService = (from b in response.Benchmarks
@@ -712,6 +719,7 @@ namespace Levrum.Data.Map
                                 inService.Value = (inServiceTime - baseTime).TotalMinutes;
                             }
                         }
+                        inService.Data["DateTime"] = inServiceTime;
                     }
 
                     if (clearSceneTime == DateTime.MinValue)
@@ -762,6 +770,7 @@ namespace Levrum.Data.Map
                                 inQuarters.Value = (inQuartersTime - baseTime).TotalMinutes;
                             }
                         }
+                        inQuarters.Data["DateTime"] = inQuartersTime;
                     }
                 }
             }
@@ -812,6 +821,34 @@ namespace Levrum.Data.Map
                     lastArrival.Benchmarks.Add(new BenchmarkData("FullComplement", lastOnScene));
                 if (firstResponse != null)
                     firstResponse.Benchmarks.Add(new BenchmarkData("FirstResponding", firstResponding));
+            }
+        }
+
+        private void executePostProcessing(DataMap map)
+        {
+            if (map.PostProcessingScript == string.Empty)
+            {
+                return;
+            }
+            try
+            {
+                using (V8ScriptEngine v8 = new V8ScriptEngine())
+                {
+                    v8.AddHostObject("Incidents", Incidents);
+                    v8.AddHostType("IncidentData", typeof(IncidentData));
+                    v8.AddHostType("ResponseData", typeof(ResponseData));
+                    v8.AddHostType("BenchmarkData", typeof(BenchmarkData));
+                    v8.AddHostType("bool", typeof(bool));
+                    v8.AddHostType("double", typeof(double));
+                    v8.AddHostType("int", typeof(int));
+                    v8.AddHostType("DateTime", typeof(DateTime));
+                    v8.AddHostType("TimeSpan", typeof(TimeSpan));
+
+                    v8.Execute(map.PostProcessingScript);
+                }
+            } catch (Exception ex)
+            {
+
             }
         }
     }
