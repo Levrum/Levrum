@@ -228,8 +228,16 @@ namespace Levrum.DataBridge
                     return;
                 }
 
-                CsvSource source = new CsvSource();
-                DataSource = source;
+                CsvSource source = DataSource as CsvSource;
+                if (source == null)
+                {
+                    IDataSource lastSource = DataSource;
+                    DataSource = source = new CsvSource();
+                    if (lastSource != null)
+                    {
+                        DataSource.Name = lastSource.Name;
+                    }
+                }
                 info = new FileInfo(ofd.FileName);
                 if (source.CsvFile != null && (info.FullName == source.CsvFile.FullName))
                 {
