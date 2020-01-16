@@ -129,12 +129,12 @@ namespace Levrum.Data.Map
         private void processIncidentMappings(DataMap map)
         {
             HashSet<IDataSource> dataSources = (from mapping in map.IncidentMappings
-                                                select mapping.Column.DataSource).ToHashSet();
+                                                select mapping?.Column?.DataSource).ToHashSet();
 
             foreach (IDataSource dataSource in dataSources)
             {
                 List<DataMapping> mappingsForSource = (from mapping in map.IncidentMappings
-                                                       where mapping.Column.DataSource == dataSource
+                                                       where ((null!=mapping)&&(mapping.Column.DataSource == dataSource))
                                                        select mapping).ToList();
 
                 if (mappingsForSource.Count == 0)
