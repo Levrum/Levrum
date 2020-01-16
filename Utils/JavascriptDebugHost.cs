@@ -8,6 +8,11 @@ namespace Levrum.Utils
     {
         public delegate void DebugMessageDelegate(object sender, string message);
 
+        public void WriteLine()
+        {
+            writeMessage("\r\n");
+        }
+
         public void Write(string message)
         {
             writeMessage(message);
