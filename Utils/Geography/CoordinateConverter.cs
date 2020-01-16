@@ -36,11 +36,24 @@ namespace Levrum.Utils.Geography
             CoordinateSystem = csFactory.CreateFromWkt(_projection);
 
             CoordinateTransformationFactory ctFactory = new CoordinateTransformationFactory();
+            
             XYToLonLatTransform = ctFactory.CreateFromCoordinateSystems(CoordinateSystem, WGS84).MathTransform;
-            LonLatToXYTransform = XYToLonLatTransform.Inverse();
+            if (CoordinateSystem.WKT != WGS84.WKT)
+            {
+                LonLatToXYTransform = XYToLonLatTransform.Inverse();
+            } else
+            {
+                LonLatToXYTransform = XYToLonLatTransform;
+            }
 
             XYToWebTransform = ctFactory.CreateFromCoordinateSystems(CoordinateSystem, WebMercator).MathTransform;
-            WebToXYTransform = XYToWebTransform.Inverse();
+            if (CoordinateSystem.WKT != WebMercator.WKT)
+            {
+                WebToXYTransform = XYToWebTransform.Inverse();
+            } else
+            {
+                WebToXYTransform = XYToWebTransform;
+            }
         }
 
         public double[] ConvertLatLonToXY(LatitudeLongitude latLon)
