@@ -18,6 +18,7 @@
     <PackageReference Include="GeoJSON.Net" Version="1.2.14" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="ProjNet" Version="2.0.0" />
+    <PackageReference Include="RabbitMQ.Client" Version="5.1.2" />
   </ItemGroup>
 
 </Project>
