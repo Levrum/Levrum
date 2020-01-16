@@ -24,7 +24,7 @@
             <TextBlock Height="16" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">Name:</TextBlock>
             <TextBox x:Name="NameTextBox" Height="24" Grid.Column="3" TextChanged="NameTextBox_TextChanged" VerticalContentAlignment="Center" Margin="0,0,8,0"></TextBox>
         </Grid>
-        <Grid x:Name="CsvOptionsGrid" Grid.Row="1" Visibility="Hidden">
+        <Grid x:Name="CsvOptionsGrid" Grid.Row="1" Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition Height="40"/>
                 <RowDefinition Height="300*"/>
@@ -120,7 +120,7 @@
                 <TextBox x:Name="SqlTableDetailsTextBox" Margin="8,0,8,0" TextWrapping="WrapWithOverflow" Visibility="Hidden"/>
             </Grid>
         </Grid>
-        <Grid x:Name="GeoOptionsGrid" Grid.Row="1" Visibility="Visible">
+        <Grid x:Name="GeoOptionsGrid" Grid.Row="1" Visibility="Hidden">
             <Grid.RowDefinitions>
                 <RowDefinition Height="40"/>
                 <RowDefinition Height="300*"/>

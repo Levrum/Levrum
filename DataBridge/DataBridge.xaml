@@ -30,7 +30,7 @@
                 <MenuItem Header="_New" Click="NewMenuItem_Click"/>
                 <MenuItem Header="_Open..." Click="OpenMenuItem_Click"/>
                 <Separator/>
-                <MenuItem Name="CloseMenuItem" Header="_Close" Click="CloseMenuItem_Click"/>
+                <MenuItem Name="CloseMenuItem" Header="_Close" Click="CloseMenuItem_Click" IsEnabled="False"/>
                 <Separator/>
                 <MenuItem Name="SaveMenuItem" Header="_Save" Click="SaveMenuItem_Click" IsEnabled="False"/>
                 <MenuItem Name="SaveAsMenuItem" Header="Save _As..." Click="SaveAsMenuItem_Click" IsEnabled="False"/>
@@ -40,22 +40,18 @@
                 <Separator/>
                 <MenuItem Header="E_xit" Click="ExitMenuItem_Click"/>
             </MenuItem>
-            <!--
-            <MenuItem Header="_Edit" IsTabStop="False">
-                    
-            </MenuItem>
-            -->
             <MenuItem Header="_Tools" IsTabStop="False">
-                <MenuItem x:Name="DefinePostProcessingScript" Header="Define PostProcessing _Script..." Click="DefinePostProcessingScript_Click" IsEnabled="False"/>
+                <MenuItem x:Name="ConvertJsonToCsv" Header="_Convert Incident JSON to CSV..." Click="ConvertJsonToCsv_Click" IsEnabled="True"/>
             </MenuItem>
             <MenuItem Header="_Settings" IsTabStop="False">
                 <MenuItem x:Name="CoordinateConversionMenuItem" Header="Enable _Coordinate Conversion" Click="CoordinateConversionMenuItem_Click" IsEnabled="False"/>
                 <MenuItem x:Name="DefineProjectionMenuItem" Header="Define _Projection For Conversion..." Click="DefineProjectionMenuItem_Click" IsEnabled="False"/>
                 <MenuItem x:Name="ToggleInvertLatitude" Header="Enable Invert _Latitude" Click="ToggleInvertLatitude_Click" IsEnabled="False"/>
                 <MenuItem x:Name="ToggleInvertLongitude" Header="Enable Invert Lon_gitude" Click="ToggleInvertLongitude_Click" IsEnabled="False"/>
-                
                 <Separator/>
                 <MenuItem x:Name="SelectCauseTreeMenuItem" Header="Select Cause _Tree JSON..." Click="SelectCauseTreeMenuItem_Click" IsEnabled="False"/>
+                <Separator/>
+                <MenuItem x:Name="DefinePostProcessingScript" Header="Define PostProcessing _Script..." Click="DefinePostProcessingScript_Click" IsEnabled="False"/>
             </MenuItem>
             <MenuItem Header="_Help" IsTabStop="False">
                 <MenuItem x:Name="ShowJSDebugMenuItem" Header="Show _JavaScript Debug Window..." Click="ShowJSDebugMenuItem_Click"/>

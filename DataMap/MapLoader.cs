@@ -54,6 +54,8 @@ namespace Levrum.Data.Map
                 cleanupResponseData(map);
                 cleanupBenchmarks(map);
 
+                processGeoSources(map);
+
                 calculateDerivedBenchmarks(map);
                 executePostProcessing(map);
             }
@@ -775,6 +777,97 @@ namespace Levrum.Data.Map
                             }
                         }
                         inQuarters.Data["DateTime"] = inQuartersTime;
+                    }
+                }
+            }
+        }
+
+        private void processGeoSources(DataMap map)
+        {
+            HashSet<IDataSource> incidentGeoSources = (from mapping in map.IncidentDataMappings
+                                                     where mapping.Column?.DataSource is GeoSource
+                                                     select mapping.Column.DataSource).ToHashSet();
+
+            HashSet<IDataSource> responseGeoSources = (from mapping in map.ResponseDataMappings
+                                                       where mapping.Column?.DataSource is GeoSource
+                                                       select mapping.Column.DataSource).ToHashSet();
+
+            HashSet<IDataSource> benchmarkGeoSources = (from mapping in map.IncidentDataMappings
+                                                        where mapping.Column?.DataSource is GeoSource
+                                                        select mapping.Column.DataSource).ToHashSet();
+
+            HashSet<IDataSource> allGeoSources = new HashSet<IDataSource>(incidentGeoSources);
+            foreach (IDataSource dataSource in responseGeoSources)
+            {
+                allGeoSources.Add(dataSource);
+            }
+
+            foreach (IDataSource dataSource in benchmarkGeoSources)
+            {
+                allGeoSources.Add(dataSource);
+            }
+
+            foreach (IncidentData incident in Incidents)
+            {
+                foreach (IDataSource dataSource in allGeoSources)
+                {
+                    GeoSource geoSource = (GeoSource)dataSource;
+                    Dictionary<string, object> attributes = geoSource.GetPropertiesForLatLon(incident.Latitude, incident.Longitude);
+
+                    List<DataMapping> incidentMappings = (from mapping in map.IncidentDataMappings
+                                                          where mapping.Column?.DataSource == geoSource
+                                                          select mapping).ToList();
+
+                    List<DataMapping> responseMappings = (from mapping in map.ResponseDataMappings
+                                                          where mapping.Column?.DataSource == geoSource
+                                                          select mapping).ToList();
+
+                    List<DataMapping> benchmarkMappings = (from mapping in map.BenchmarkMappings
+                                                          where mapping.Column?.DataSource == geoSource
+                                                          select mapping).ToList();
+
+                    foreach (DataMapping mapping in incidentMappings)
+                    {
+                        object value;
+                        if (attributes.TryGetValue(mapping.Column.ColumnName, out value))
+                        {
+                            incident.Data[mapping.Field] = value;
+                        }
+                    }
+
+                    List<KeyValuePair<string, object>> responseAttributes = new List<KeyValuePair<string, object>>();
+                    foreach (DataMapping mapping in responseMappings)
+                    {
+                        object value;
+                        if (attributes.TryGetValue(mapping.Column.ColumnName, out value))
+                        {
+                            responseAttributes.Add(new KeyValuePair<string, object>(mapping.Field, value));
+                        }
+                    }
+
+                    List<KeyValuePair<string, object>> bmkAttributes = new List<KeyValuePair<string, object>>();
+                    foreach (DataMapping mapping in benchmarkMappings)
+                    {
+                        object value;
+                        if (attributes.TryGetValue(mapping.Column.ColumnName, out value))
+                        {
+                            bmkAttributes.Add(new KeyValuePair<string, object>(mapping.Field, value));
+                        }
+                    }
+
+                    foreach (ResponseData response in incident.Responses)
+                    {
+                        foreach (var attr in responseAttributes)
+                        {
+                            response.Data[attr.Key] = attr.Value;
+                        }
+
+                        foreach (BenchmarkData bmk in response.Benchmarks)
+                        {
+                            foreach (var attr in bmkAttributes) {
+                                bmk.Data[attr.Key] = attr.Value;
+                            }
+                        }
                     }
                 }
             }

@@ -440,108 +440,7 @@ namespace Levrum.DataBridge
             try
             {
                 loader.LoadMap(DataSources.Map);
-
-                HashSet<string> incidentDataFields = new HashSet<string>();
-                HashSet<string> responseDataFields = new HashSet<string>();
-                HashSet<string> benchmarkNames = new HashSet<string>();
-                foreach (IncidentData incident in loader.Incidents)
-                {
-                    foreach (string key in incident.Data.Keys)
-                    {
-                        incidentDataFields.Add(key);
-                    }
-                    foreach (ResponseData response in incident.Responses)
-                    {
-                        foreach (string key in response.Data.Keys)
-                        {
-                            responseDataFields.Add(key);
-                        }
-                        foreach (BenchmarkData benchmark in response.Benchmarks)
-                        {
-                            benchmarkNames.Add(benchmark.Name);
-                        }
-                    }
-                }
-
-                List<dynamic> incidentRecords = new List<dynamic>();
-                List<dynamic> responseRecords = new List<dynamic>();
-                foreach (IncidentData incident in loader.Incidents)
-                {
-                    dynamic incidentRecord = new ExpandoObject();
-                    incidentRecord.Id = incident.Id;
-                    incidentRecord.Time = incident.Time;
-                    incidentRecord.Location = incident.Location;
-                    incidentRecord.Latitude = incident.Latitude;
-                    incidentRecord.Longitude = incident.Longitude;
-                    foreach (string field in incidentDataFields)
-                    {
-                        if (incident.Data.ContainsKey(field))
-                        {
-                            ((IDictionary<string, object>)incidentRecord).Add(field, incident.Data[field]);
-                        }
-                        else
-                        {
-                            ((IDictionary<string, object>)incidentRecord).Add(field, string.Empty);
-                        }
-                    }
-
-                    foreach (ResponseData response in incident.Responses)
-                    {
-                        dynamic responseRecord = new ExpandoObject();
-                        responseRecord.Id = incident.Id;
-                        foreach (string field in responseDataFields) { 
-                            if (response.Data.ContainsKey(field))
-                            {
-                                ((IDictionary<string, object>)responseRecord).Add(field, response.Data[field]);
-                            } else
-                            {
-                                ((IDictionary<string, object>)responseRecord).Add(field, string.Empty);
-                            }
-                        }
-
-                        foreach (string benchmarkName in benchmarkNames)
-                        {
-                            BenchmarkData benchmark = (from bmk in response.Benchmarks
-                                                       where bmk.Name == benchmarkName
-                                                       select bmk).FirstOrDefault();
-
-                            if (benchmark != null)
-                            {
-                                object value;
-                                if (benchmark.Data.ContainsKey("DateTime")) {
-                                    value = benchmark.Data["DateTime"];
-                                } else
-                                {
-                                    value = benchmark.Value;
-                                }
-                                ((IDictionary<string, object>)responseRecord).Add(benchmarkName, value);
-                            } else
-                            {
-                                ((IDictionary<string, object>)responseRecord).Add(benchmarkName, string.Empty);
-                            }
-                        }
-                        responseRecords.Add(responseRecord);
-                    }
-                    incidentRecords.Add(incidentRecord);
-                }
-
-                using (StringWriter writer = new StringWriter())
-                {
-                    using (CsvWriter csv = new CsvWriter(writer))
-                    {
-                        csv.WriteRecords(incidentRecords);
-                    }
-                    File.WriteAllText(incidentCsvFileName, writer.ToString());
-                }
-
-                using (StringWriter writer = new StringWriter())
-                {
-                    using (CsvWriter csv = new CsvWriter(writer))
-                    {
-                        csv.WriteRecords(responseRecords);
-                    }
-                    File.WriteAllText(responseCsvFileName, writer.ToString());
-                }
+                convertJsonToCsv(loader.Incidents, incidentCsvFileName, responseCsvFileName);
                 
                 MessageBox.Show(string.Format("Incidents saved as CSV files '{0}' and '{1}'", incidentCsvFileName, responseCsvFileName));
             }
@@ -557,6 +456,116 @@ namespace Levrum.DataBridge
 
                 GC.Collect();
                 Cursor = Cursors.Arrow;
+            }
+        }
+
+        private void convertJsonToCsv(DataSet<IncidentData> incidents, string incidentFile, string responseFile)
+        {
+            HashSet<string> incidentDataFields = new HashSet<string>();
+            HashSet<string> responseDataFields = new HashSet<string>();
+            HashSet<string> benchmarkNames = new HashSet<string>();
+            foreach (IncidentData incident in incidents)
+            {
+                foreach (string key in incident.Data.Keys)
+                {
+                    incidentDataFields.Add(key);
+                }
+                foreach (ResponseData response in incident.Responses)
+                {
+                    foreach (string key in response.Data.Keys)
+                    {
+                        responseDataFields.Add(key);
+                    }
+                    foreach (BenchmarkData benchmark in response.Benchmarks)
+                    {
+                        benchmarkNames.Add(benchmark.Name);
+                    }
+                }
+            }
+
+            List<dynamic> incidentRecords = new List<dynamic>();
+            List<dynamic> responseRecords = new List<dynamic>();
+            foreach (IncidentData incident in incidents)
+            {
+                dynamic incidentRecord = new ExpandoObject();
+                incidentRecord.Id = incident.Id;
+                incidentRecord.Time = incident.Time;
+                incidentRecord.Location = incident.Location;
+                incidentRecord.Latitude = incident.Latitude;
+                incidentRecord.Longitude = incident.Longitude;
+                foreach (string field in incidentDataFields)
+                {
+                    if (incident.Data.ContainsKey(field))
+                    {
+                        ((IDictionary<string, object>)incidentRecord).Add(field, incident.Data[field]);
+                    }
+                    else
+                    {
+                        ((IDictionary<string, object>)incidentRecord).Add(field, string.Empty);
+                    }
+                }
+
+                foreach (ResponseData response in incident.Responses)
+                {
+                    dynamic responseRecord = new ExpandoObject();
+                    responseRecord.Id = incident.Id;
+                    foreach (string field in responseDataFields)
+                    {
+                        if (response.Data.ContainsKey(field))
+                        {
+                            ((IDictionary<string, object>)responseRecord).Add(field, response.Data[field]);
+                        }
+                        else
+                        {
+                            ((IDictionary<string, object>)responseRecord).Add(field, string.Empty);
+                        }
+                    }
+
+                    foreach (string benchmarkName in benchmarkNames)
+                    {
+                        BenchmarkData benchmark = (from bmk in response.Benchmarks
+                                                   where bmk.Name == benchmarkName
+                                                   select bmk).FirstOrDefault();
+
+                        if (benchmark != null)
+                        {
+                            object value;
+                            if (benchmark.Data.ContainsKey("DateTime"))
+                            {
+                                value = benchmark.Data["DateTime"];
+                            }
+                            else
+                            {
+                                value = benchmark.Value;
+                            }
+                            ((IDictionary<string, object>)responseRecord).Add(benchmarkName, value);
+                        }
+                        else
+                        {
+                            ((IDictionary<string, object>)responseRecord).Add(benchmarkName, string.Empty);
+                        }
+                    }
+                    responseRecords.Add(responseRecord);
+                }
+                incidentRecords.Add(incidentRecord);
+            }
+
+            using (StringWriter writer = new StringWriter())
+            {
+                using (CsvWriter csv = new CsvWriter(writer))
+                {
+                    csv.WriteRecords(incidentRecords);
+                }
+                File.WriteAllText(incidentFile, writer.ToString());
+            }
+
+            using (StringWriter writer = new StringWriter())
+            {
+                using (CsvWriter csv = new CsvWriter(writer))
+                {
+                    csv.WriteRecords(responseRecords);
+                }
+                File.WriteAllText(responseFile, writer.ToString());
             }
         }
 
@@ -655,6 +664,56 @@ namespace Levrum.DataBridge
         {
             DebugWindow.Show();
             DebugWindow.BringIntoView();
+        }
+
+        private void ConvertJsonToCsv_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.InitialDirectory = string.Format("{0}\\Levrum", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+            ofd.Title = "Select Incident JSON File";
+            ofd.DefaultExt = "json";
+            ofd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
+            if (ofd.ShowDialog() == false)
+            {
+                return;
+            }
+
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.InitialDirectory = string.Format("{0}\\Levrum", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+            sfd.Title = "Save Incident CSV";
+            sfd.DefaultExt = "csv";
+            sfd.Filter = "CSV Files (*.csv)|*.csv|All files (*.*)|*.*";
+            if (sfd.ShowDialog() == false)
+            {
+                return;
+            }
+            string incidentCsvFileName = sfd.FileName;
+
+            FileInfo csvFileInfo = new FileInfo(incidentCsvFileName);
+            sfd.Title = "Save Response CSV";
+            sfd.FileName = string.Format("{0} Responses.csv", csvFileInfo.Name.Substring(0, csvFileInfo.Name.Length - 4));
+            if (sfd.ShowDialog() == false)
+            {
+                return;
+            }
+            string responseCsvFileName = sfd.FileName;
+
+            try
+            {
+                Cursor = Cursors.Wait;
+                string incidentJson = File.ReadAllText(ofd.FileName);
+                DataSet<IncidentData> incidents = JsonConvert.DeserializeObject<DataSet<IncidentData>>(incidentJson);
+
+                convertJsonToCsv(incidents, incidentCsvFileName, responseCsvFileName);
+
+                MessageBox.Show(string.Format("Incidents saved as CSV files '{0}' and '{1}'", incidentCsvFileName, responseCsvFileName));
+            } catch (Exception ex)
+            {
+                MessageBox.Show("Unable to convert Incident JSON to CSV: {0}", ex.Message);
+            } finally
+            {
+                Cursor = Cursors.Arrow;
+            }
         }
     }
 

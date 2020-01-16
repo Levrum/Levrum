@@ -7,12 +7,13 @@ using System.Windows.Controls;
 using System.Windows.Input;
 
 using Levrum.Data.Classes;
+using Levrum.Data.Map;
 using Levrum.Data.Sources;
 
 using Levrum.Utils.Data;
-
 using Levrum.Utils.Geography;
-using LPolygon = Levrum.Utils.Geometry.Polygon;
+
+using Levrum.UI.WPF;
 
 using Microsoft.Win32;
 using Microsoft.Data.SqlClient;
@@ -20,9 +21,9 @@ using Microsoft.Data.SqlClient;
 using ProjNet;
 
 using NetTopologySuite.IO.ShapeFile;
+using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
-using SPolygon = NetTopologySuite.Geometries.Polygon;
-using SMPolygon = NetTopologySuite.Geometries.MultiPolygon;
+using Point = NetTopologySuite.Geometries.Point;
 using NetTopologySuite.IO;
 
 
@@ -66,7 +67,9 @@ namespace Levrum.DataBridge
                 {
                     DataSourceTypeComboBox.SelectedItem = DataSourceTypes[0];
                     updateDataSourceOptionsDisplay();
-                    CsvFileNameTextBox.Text = _dataSource.Parameters["File"];
+                    if (_dataSource.Parameters.ContainsKey("File")) {
+                        CsvFileNameTextBox.Text = _dataSource.Parameters["File"];
+                    }
                     CsvSource csvSource = _dataSource as CsvSource;
                     if (csvSource == null)
                     {
@@ -106,16 +109,29 @@ namespace Levrum.DataBridge
                 {
                     DataSourceTypeComboBox.SelectedItem = DataSourceTypes[2];
                     updateDataSourceOptionsDisplay();
-                    GeoFileNameTextBox.Text = _dataSource.Parameters["File"];
+                    if (_dataSource.Parameters.ContainsKey("File"))
+                    {
+                        try
+                        {
+                            summarizeGeoFile(_dataSource.Parameters["File"]);
+                        } catch (Exception ex)
+                        {
+                            MessageBox.Show(string.Format("Unable to load GeoSource from file '{0}': {1}", _dataSource.Parameters["File"], ex.Message));
+                        }
+
+                        GeoFileNameTextBox.Text = _dataSource.Parameters["File"];
+                    }
                     GeoSource geoSource = _dataSource as GeoSource;
                     if (geoSource == null)
                     {
                         return;
                     }
 
-                    string projectionName = _dataSource.Parameters["ProjectionName"];
-
-                    ProjectionColumnComboBox.SelectedItem = projectionName;
+                    if (_dataSource.Parameters.ContainsKey("ProjectionName"))
+                    {
+                        string projectionName = _dataSource.Parameters["ProjectionName"];
+                        ProjectionColumnComboBox.SelectedItem = projectionName;
+                    }
                 }
                 ChangesMade = false;
             }
@@ -191,6 +207,7 @@ namespace Levrum.DataBridge
             }
             else if (DataSource is GeoSource)
             {
+                DataSource.Parameters["File"] = GeoFileNameTextBox.Text;
                 DataSource.Parameters["ProjectionName"] = ProjectionColumnComboBox.SelectedItem as string;
             }
             else
@@ -430,12 +447,41 @@ namespace Levrum.DataBridge
 
         private void ProjectionColumnComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            DataSource.Parameters["ProjectionName"] = ProjectionColumnComboBox.SelectedItem as string;
+            if (ProjectionColumnComboBox.SelectedIndex == 0)
+            {   
+                DataSource.Parameters["Projection"] = CoordinateConverter.WebMercator.WKT;
+            } else if (ProjectionColumnComboBox.SelectedIndex == 1)
+            {
+                DataSource.Parameters["Projection"] = CoordinateConverter.WGS84.WKT;
+            } else
+            {
+                DataSourceTypeInfo info = (DataSourceTypeInfo)ProjectionColumnComboBox.SelectedItem;
+                DataSource.Parameters["Projection"] = info.Data;
+            }
         }
 
         private void AddProjectionButton_Click(object sender, RoutedEventArgs e)
         {
+            SingleValueForm svf = new SingleValueForm("Enter Projection Name", "Enter Projection Name:", "Custom Projection");
+            svf.ShowDialog();
+            if (svf.DialogResult == false)
+                return;
 
+            TextInputDialog tid = new TextInputDialog("Enter Projection", "Enter Projection", null);
+            tid.ShowDialog();
+            if (tid.DialogResult == false)
+                return;
+
+            string projectionName = svf.Result;
+            string projection = tid.Result;
+            DataSourceTypeInfo newProjection = new DataSourceTypeInfo(projectionName);
+            newProjection.Data = projection;
+
+            Projections.Add(newProjection);
+
+            ProjectionColumnComboBox.ItemsSource = Projections;
+            ProjectionColumnComboBox.SelectedItem = newProjection;
         }
 
         private void GeoFileSelectButton_Click(object sender, RoutedEventArgs e)
@@ -450,81 +496,63 @@ namespace Levrum.DataBridge
 
             try
             {
-                GeometryFactory factory = GeometryFactory.Default;
-                var wktReader = new WKTReader(factory);
-                FileInfo file = new FileInfo(ofd.FileName);
-                GeoSource source = DataSource as GeoSource;
-                if (source == null)
-                {
-                    IDataSource lastSource = DataSource;
-                    DataSource = source = new GeoSource();
-                    source.Name = lastSource.Name;
-                }
-                source.GeoFile = file;
-                if (file.Extension == ".shp")
-                {
-                    List<AnnotatedObject<Geometry>> geoms = new List<AnnotatedObject<Geometry>>();
-                    
-                    HashSet<string> fields = new HashSet<string>();
-                    int fieldCount = 0;
-                    using (var reader = new ShapefileDataReader(ofd.FileName, factory))
-                    {
-                        while (reader.Read())
-                        {
-                            DbaseFileHeader h = reader.DbaseHeader;
-                            fieldCount = h.NumFields;
-                            var geom = reader.Geometry;
-                            geom.Normalize();
-                            var obj = new AnnotatedObject<Geometry>(geom);
-
-                            for (int i = 1; i <= fieldCount; i++)
-                            {
-                                fields.Add(h.Fields[i - 1].Name);
-                                obj.Data[h.Fields[i - 1].Name] = reader.GetValue(i);
-                            }
-
-                            geoms.Add(obj);
-                        }
-                    }
-
-                    StringBuilder summaryBuilder = new StringBuilder(string.Format("File contains {0} shapes with {1} properties:\n------------------------------------------------------------\n\n", geoms.Count, fieldCount));
-                    int index = 0;
-                    foreach (AnnotatedObject<Geometry> geom in geoms)
-                    {
-                        summaryBuilder.AppendFormat("[{0}]: Type={1} Area={2}\n", index, geom.Object.GeometryType, geom.Object.Area);
-                        foreach (KeyValuePair<string, object> kvp in geom.Data)
-                        {
-                            summaryBuilder.AppendLine(string.Format("{0}: {1}", kvp.Key, kvp.Value.ToString()));
-                        }
-                        summaryBuilder.AppendLine();
-                        index++;
-                    }
-                    GeoSummaryTextBox.Text = summaryBuilder.ToString();
-                }
-                else if (file.Extension == ".geojson")
-                {
-                    List<AnnotatedObject<Geometry>> geoms = new List<AnnotatedObject<Geometry>>();
-
-                    HashSet<string> fields = new HashSet<string>();
-                    int fieldCount = 0;
-
-                    GeoJsonReader reader = new GeoJsonReader(factory, new JsonSerializerSettings());
-                    string geoJson = File.ReadAllText(ofd.FileName);
-                    ProtoGeoJSON obj = reader.Read<ProtoGeoJSON>(geoJson);
-
-                }
-                else if (file.Extension == ".zip")
-                {
-
-                }
+                summarizeGeoFile(ofd.FileName);
                 GeoFileNameTextBox.Text = ofd.FileName;
-
             }
             catch (Exception ex)
             {
                 MessageBox.Show(string.Format("Unable to load polygons from file '{0}': {1}", ofd.FileName, ex.Message));
             }
         }
+
+        private void summarizeGeoFile(string fileName)
+        {
+            FileInfo file = new FileInfo(fileName);
+            GeoSource source = DataSource as GeoSource;
+            if (source == null)
+            {
+                IDataSource lastSource = DataSource;
+                DataSource = source = new GeoSource();
+                source.Name = lastSource.Name;
+            }
+            source.GeoFile = file;
+            List<AnnotatedObject<Geometry>> geoms = new List<AnnotatedObject<Geometry>>();
+
+            if (file.Extension == ".shp" || file.Extension == ".zip")
+            {
+                geoms.AddRange(GeoSource.GetGeomsFromShpFile(fileName));
+            }
+            else if (file.Extension == ".geojson")
+            {
+                string geoJson = File.ReadAllText(fileName);
+                geoms.AddRange(GeoSource.GetGeomsFromGeoJson(geoJson));
+            }
+
+            HashSet<string> fields = new HashSet<string>();
+            foreach (AnnotatedObject<Geometry> geom in geoms)
+            {
+                foreach (string field in geom.Data.Keys)
+                {
+                    fields.Add(field);
+                }
+            }
+
+            StringBuilder summaryBuilder = new StringBuilder(string.Format("File contains {0} shapes with {1} properties:\n------------------------------------------------------------\n\n", geoms.Count, fields.Count));
+            int index = 0;
+            foreach (AnnotatedObject<Geometry> geom in geoms)
+            {
+                summaryBuilder.AppendFormat("[{0}]: Type={1} Area={2}\n", index, geom.Object.GeometryType, geom.Object.Area);
+                foreach (KeyValuePair<string, object> kvp in geom.Data)
+                {
+                    string value = kvp.Value != null ? kvp.Value.ToString() : "null";
+                    summaryBuilder.AppendLine(string.Format("{0}: {1}", kvp.Key, value));
+                }
+                summaryBuilder.AppendLine();
+                index++;
+            }
+            GeoSummaryTextBox.Text = summaryBuilder.ToString();
+        }
+
 
         /*
         private List<AnnotatedObject<LPolygon>> getPolysFromGeoms(List<AnnotatedObject<Geometry>> geoms)
@@ -581,7 +609,7 @@ namespace Levrum.DataBridge
             return poly;
         }
         */
-    }
+            }
 
     public class DataSourceTypeInfo
     {
@@ -601,6 +629,11 @@ namespace Levrum.DataBridge
         public static implicit operator DataSourceTypeInfo(string _name)
         {
             return new DataSourceTypeInfo(_name);
+        }
+
+        public static implicit operator string(DataSourceTypeInfo _info)
+        {
+            return _info.Name;
         }
     }
 }
