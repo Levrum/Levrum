@@ -6,9 +6,12 @@
         xmlns:local="clr-namespace:Levrum.DataBridge"
         mc:Ignorable="d"
         Title="JavascriptDebugWindow" Height="450" Width="800"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        Closing="HandleFormClosing">
     <Grid>
-        <TextBox x:Name="DebugOutputTextBox" Text="Waiting for debug output..." TextWrapping="Wrap" Margin="8,8,8,8" IsReadOnly="True"/>
+        <TextBox x:Name="DebugOutputTextBox" Text="Waiting for debug output..." TextWrapping="Wrap" Margin="8,8,8,8" IsReadOnly="True" VerticalScrollBarVisibility="Visible"
+                 MouseRightButtonUp="HandleTextboxRightClick"
+                 />
 
     </Grid>
 </Window>
