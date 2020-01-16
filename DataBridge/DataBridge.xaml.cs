@@ -654,7 +654,7 @@ namespace Levrum.DataBridge
             {
                 script = DataSources.Map.PostProcessingScript;
             }
-            TextInputDialog dialog = new TextInputDialog("Define PostProcessing Script", "PostProcessing Script:", script);
+            EditScriptDialog dialog = new EditScriptDialog(null, null, script);
             dialog.Owner = this;
             dialog.ShowDialog();
 
