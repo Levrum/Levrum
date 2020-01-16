@@ -7,6 +7,8 @@ using Microsoft.ClearScript.V8;
 
 using Levrum.Data.Sources;
 using Levrum.Data.Classes;
+
+using Levrum.Utils;
 using Levrum.Utils.Geography;
 
 using Newtonsoft.Json;
@@ -23,6 +25,8 @@ namespace Levrum.Data.Map
         public Dictionary<IDataSource, List<Tuple<DataMapping, Record>>> ErrorRecords = new Dictionary<IDataSource, List<Tuple<DataMapping, Record>>>();
 
         public List<CauseData> CauseData { get; set; } = new List<CauseData>();
+
+        public JavascriptDebugHost DebugHost { get; set; } = new JavascriptDebugHost();
 
         public bool LoadMap(DataMap map)
         {
@@ -835,6 +839,7 @@ namespace Levrum.Data.Map
                 using (V8ScriptEngine v8 = new V8ScriptEngine())
                 {
                     v8.AddHostObject("Incidents", Incidents);
+                    v8.AddHostObject("Debug", DebugHost);
                     v8.AddHostType("IncidentData", typeof(IncidentData));
                     v8.AddHostType("ResponseData", typeof(ResponseData));
                     v8.AddHostType("BenchmarkData", typeof(BenchmarkData));
@@ -843,7 +848,7 @@ namespace Levrum.Data.Map
                     v8.AddHostType("int", typeof(int));
                     v8.AddHostType("DateTime", typeof(DateTime));
                     v8.AddHostType("TimeSpan", typeof(TimeSpan));
-
+                    
                     v8.Execute(map.PostProcessingScript);
                 }
             } catch (Exception ex)
@@ -852,4 +857,6 @@ namespace Levrum.Data.Map
             }
         }
     }
+
+    
 }
