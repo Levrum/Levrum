@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Levrum.DataBridge"
         mc:Ignorable="d"
-        Title="Define Field" Height="120" Width="500">
+        Title="Define Field" Height="120" Width="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>

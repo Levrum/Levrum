@@ -30,7 +30,7 @@ namespace Levrum.DataBridge
 
         public DataMapEditor ActiveEditor { get; set; } = null;
 
-        public JavascriptDebugWindow DebugWindow = new JavascriptDebugWindow();
+        public JavascriptDebugWindow DebugWindow { get; set; } = new JavascriptDebugWindow();
         // public Dictionary<DataMap, LayoutDocument> openDocuments = new Dictionary<DataMap, LayoutDocument>();
 
         public MainDataBridgeWindow()
@@ -53,6 +53,7 @@ namespace Levrum.DataBridge
         public void NewMenuItem_Click(object sender, RoutedEventArgs e)
         {
             NewDataMapWindow window = new NewDataMapWindow();
+            window.Owner = this;
             window.ShowDialog();
 
             if (window.Result == null)
@@ -82,6 +83,7 @@ namespace Levrum.DataBridge
             document.Content = editor;
             DocumentPane.Children.Add(document);
             openDocuments.Add(new DataMapDocument(newMap, document));
+            DocumentPane.SelectedContentIndex = DocumentPane.Children.Count - 1;
         }
 
         public void OpenMenuItem_Click(object sender, RoutedEventArgs e)
@@ -214,7 +216,7 @@ namespace Levrum.DataBridge
                     }
                 }
 
-                string mapJson = JsonConvert.SerializeObject(map, Formatting.Indented, new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All });
+                string mapJson = JsonConvert.SerializeObject(map, Formatting.Indented, new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All });
                 File.WriteAllText(map.Path, mapJson);
                 if (document != null) {
                     document.ChangesMade = false;
@@ -232,7 +234,6 @@ namespace Levrum.DataBridge
 
         public void ExitMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            DebugWindow.Close();
             Close();
         }
 
@@ -280,13 +281,15 @@ namespace Levrum.DataBridge
                 SaveMenuItem.Header = "_Save";
                 SaveMenuItem.IsEnabled = false;
                 CloseMenuItem.IsEnabled = false;
-                
+
                 CreateIncidentJsonMenuItem.IsEnabled = false;
                 CreateCallResponseCSVsMenuItem.IsEnabled = false;
 
                 DataSources.Map = null;
                 DataSources.IsEnabled = false;
                 CoordinateConversionMenuItem.IsEnabled = false;
+                ToggleInvertLatitude.IsEnabled = false;
+                ToggleInvertLongitude.IsEnabled = false;
                 DefineProjectionMenuItem.IsEnabled = false;
                 SelectCauseTreeMenuItem.IsEnabled = false;
                 DefinePostProcessingScript.IsEnabled = false;
@@ -331,6 +334,7 @@ namespace Levrum.DataBridge
                 projection = DataSources.Map.Projection;
             }
             TextInputDialog dialog = new TextInputDialog("Define Projection", "Projection:", projection);
+            dialog.Owner = this;
             dialog.ShowDialog();
 
             if (dialog.Result != null)
@@ -651,6 +655,7 @@ namespace Levrum.DataBridge
                 script = DataSources.Map.PostProcessingScript;
             }
             TextInputDialog dialog = new TextInputDialog("Define PostProcessing Script", "PostProcessing Script:", script);
+            dialog.Owner = this;
             dialog.ShowDialog();
 
             if (dialog.Result != null)
@@ -662,6 +667,7 @@ namespace Levrum.DataBridge
 
         private void ShowJSDebugMenuItem_Click(object sender, RoutedEventArgs e)
         {
+            DebugWindow.Owner = this;
             DebugWindow.Show();
             DebugWindow.BringIntoView();
         }
@@ -714,6 +720,25 @@ namespace Levrum.DataBridge
             {
                 Cursor = Cursors.Arrow;
             }
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            foreach (DataMapDocument doc in openDocuments)
+            {
+                if (doc.ChangesMade)
+                {
+                    MessageBoxResult result = MessageBox.Show(string.Format("Save changes to '{0}' before closing?", doc.Map.Name), "Save Changes?", MessageBoxButton.YesNoCancel);
+                    if (result == MessageBoxResult.Cancel)
+                    {
+                        e.Cancel = true;
+                    } else if (result == MessageBoxResult.Yes)
+                    {
+                        SaveMap(doc.Map, false);
+                    }
+                }
+            }
+            DebugWindow.Close();
         }
     }
 

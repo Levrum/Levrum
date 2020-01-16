@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Levrum.DataBridge"
         mc:Ignorable="d"
-        Title="Create New DataMap" Height="450" Width="800">
+        Title="Create New DataMap" Height="450" Width="800"
+        WindowStartupLocation="Manual">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="140*"/>
@@ -17,7 +18,7 @@
                 <RowDefinition Height="100*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0" Margin="8,8,0,0" FontSize="16" FontWeight="DemiBold">Please select a DataMap template:</TextBlock>
-            <ListBox x:Name="DataMapTemplateListBox" Margin="8,0,8,0" Grid.Row="1" SelectionChanged="DataMapTemplateListBox_SelectionChanged" VerticalContentAlignment="Top">
+            <ListBox x:Name="DataMapTemplateListBox" Margin="8,0,8,0" Grid.Row="1" SelectionChanged="DataMapTemplateListBox_SelectionChanged" VerticalContentAlignment="Top" MouseDoubleClick="DataMapTemplateListBox_MouseDoubleClick">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <VirtualizingStackPanel IsItemsHost="True" Orientation="Horizontal" VerticalAlignment="Top"/>
@@ -81,10 +82,10 @@
             </Grid>
         </Grid>
         <StackPanel Grid.Row="1" x:Name="ButtonStackPanel" HorizontalAlignment="Right" Orientation="Horizontal">
-            <Button x:Name="CancelButton" Width="80" Margin="0,8,8,8" Click="CancelButton_Click">Cancel</Button>
-            <Button x:Name="BackButton" Width="80" Margin="0,8,8,8" IsEnabled="False" Click="BackButton_Click">Back</Button>
-            <Button x:Name="NextButton" Width="80" Margin="0,8,8,8" IsEnabled="False" Click="NextButton_Click">Next</Button>
-            <Button x:Name="FinishButton" Width="80" Margin="0,8,8,8" Click="FinishButton_Click">Finish</Button>
+            <Button x:Name="CancelButton" Width="80" Margin="0,8,8,8" Click="CancelButton_Click">_Cancel</Button>
+            <Button x:Name="BackButton" Width="80" Margin="0,8,8,8" IsEnabled="False" Click="BackButton_Click">_Back</Button>
+            <Button x:Name="NextButton" Width="80" Margin="0,8,8,8" IsEnabled="False" Click="NextButton_Click">_Next</Button>
+            <Button x:Name="FinishButton" Width="80" Margin="0,8,8,8" Click="FinishButton_Click">_Finish</Button>
         </StackPanel>
     </Grid>
 </Window>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -43,7 +44,7 @@ namespace Levrum.DataBridge
 
         List<DataSourceTypeInfo> SqlSourceTypes { get; } = new List<DataSourceTypeInfo>(new DataSourceTypeInfo[] { "Table", "Query" });
 
-        List<DataSourceTypeInfo> Projections { get; } = new List<DataSourceTypeInfo>(new DataSourceTypeInfo[] { "EPSG:3857 Pseudo-Mercator", "EPSG:4326 Lat-Long" });
+        ObservableCollection<DataSourceTypeInfo> Projections { get; } = new ObservableCollection<DataSourceTypeInfo>(new DataSourceTypeInfo[] { "EPSG:3857 Pseudo-Mercator", "EPSG:4326 Lat-Long" });
 
         bool ChangesMade { get; set; } = false;
         private bool Loading { get; set; } = true;
@@ -208,7 +209,9 @@ namespace Levrum.DataBridge
             else if (DataSource is GeoSource)
             {
                 DataSource.Parameters["File"] = GeoFileNameTextBox.Text;
-                DataSource.Parameters["ProjectionName"] = ProjectionColumnComboBox.SelectedItem as string;
+                // DataSource.Parameters["ProjectionName"] = ProjectionColumnComboBox.SelectedItem as string;
+                // DataSource.Parameters["ProjectionName"] = "Texas North Central";
+                // DataSource.Parameters["Projection"] = "PROJCS[\"NAD_1983_StatePlane_Texas_North_Central_FIPS_4202_Feet\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Lambert_Conformal_Conic\"],PARAMETER[\"False_Easting\",1968500.0],PARAMETER[\"False_Northing\",6561666.666666666],PARAMETER[\"Central_Meridian\",-98.5],PARAMETER[\"Standard_Parallel_1\",32.13333333333333],PARAMETER[\"Standard_Parallel_2\",33.96666666666667],PARAMETER[\"Latitude_Of_Origin\",31.66666666666667],UNIT[\"Foot_US\",0.3048006096012192]]";
             }
             else
             {
@@ -480,7 +483,6 @@ namespace Levrum.DataBridge
 
             Projections.Add(newProjection);
 
-            ProjectionColumnComboBox.ItemsSource = Projections;
             ProjectionColumnComboBox.SelectedItem = newProjection;
         }
 
@@ -496,6 +498,23 @@ namespace Levrum.DataBridge
 
             try
             {
+                FileInfo file = new FileInfo(ofd.FileName);
+                GeoSource source = DataSource as GeoSource;
+                if (source == null)
+                {
+                    IDataSource lastSource = DataSource;
+                    DataSource = source = new GeoSource();
+                    source.Name = lastSource.Name;
+                }
+                source.GeoFile = file;
+
+                string projectionName, projection;
+                if (GeoSource.GetProjectionFromFile(file.FullName, out projectionName, out projection))
+                {
+                    source.Parameters["ProjectionName"] = projectionName;
+                    source.Parameters["Projection"] = projection;
+                }
+
                 summarizeGeoFile(ofd.FileName);
                 GeoFileNameTextBox.Text = ofd.FileName;
             }
@@ -508,14 +527,6 @@ namespace Levrum.DataBridge
         private void summarizeGeoFile(string fileName)
         {
             FileInfo file = new FileInfo(fileName);
-            GeoSource source = DataSource as GeoSource;
-            if (source == null)
-            {
-                IDataSource lastSource = DataSource;
-                DataSource = source = new GeoSource();
-                source.Name = lastSource.Name;
-            }
-            source.GeoFile = file;
             List<AnnotatedObject<Geometry>> geoms = new List<AnnotatedObject<Geometry>>();
 
             if (file.Extension == ".shp" || file.Extension == ".zip")

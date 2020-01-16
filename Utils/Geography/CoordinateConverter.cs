@@ -30,6 +30,28 @@ namespace Levrum.Utils.Geography
             WebToLonLatTransform = LonLatToWebTransform.Inverse();
         }
 
+        public static string GetProjectionName(string _projection)
+        {
+            CoordinateSystemFactory csFactory = new CoordinateSystemFactory();
+            CoordinateSystem system = csFactory.CreateFromWkt(_projection);
+
+            string output = string.Empty;
+            if (!string.IsNullOrEmpty(system.Name))
+            {
+                output = system.Name;
+            } else if (!string.IsNullOrEmpty(system.Abbreviation))
+            {
+                output = system.Abbreviation;
+            } else if (!string.IsNullOrEmpty(system.Alias))
+            {
+                output = system.Alias;
+            } else if (!string.IsNullOrEmpty(system.Authority))
+            {
+                output = string.Format("{0}:{1}", system.Authority, system.AuthorityCode);
+            }
+            return output;
+        }
+
         public CoordinateConverter(string _projection)
         {
             CoordinateSystemFactory csFactory = new CoordinateSystemFactory();

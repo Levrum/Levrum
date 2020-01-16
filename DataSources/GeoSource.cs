@@ -55,6 +55,8 @@ namespace Levrum.Data.Sources
         public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
 
         private CoordinateConverter m_converter = null;
+        
+        [JsonIgnore]
         public CoordinateConverter Converter { 
             get { 
                 if (m_converter == null)
@@ -66,6 +68,10 @@ namespace Levrum.Data.Sources
                 }
                 return m_converter;
             } 
+            set
+            {
+                m_converter = value;
+            }
         }
 
         public bool Connect()
@@ -78,19 +84,26 @@ namespace Levrum.Data.Sources
 
         }
 
+        private HashSet<string> m_columns = null;
+
         public List<string> GetColumns()
         {
+            if (m_columns != null)
+            {
+                return m_columns.ToList();
+            }
+
             List<AnnotatedObject<Geometry>> geoms = GetGeomsFromFile();
-            HashSet<string> columns = new HashSet<string>();
+            m_columns = new HashSet<string>();
             foreach (AnnotatedObject<Geometry> geom in geoms)
             {
                 foreach (string key in geom.Data.Keys)
                 {
-                    columns.Add(key);
+                    m_columns.Add(key);
                 }
             }
 
-            return columns.ToList();
+            return m_columns.ToList();
         }
 
         public List<string> GetColumnValues(string column)
@@ -128,11 +141,10 @@ namespace Levrum.Data.Sources
             Dictionary<string, object> output = new Dictionary<string, object>();
 
             List<AnnotatedObject<Geometry>> geoms = GetGeomsFromFile();
+            double[] xyPoint = Converter.ConvertLatLonToXY(latLon);
+            Point p = new Point(xyPoint[0], xyPoint[1]);
             foreach (AnnotatedObject<Geometry> geom in geoms)
             {
-                double[] xyPoint = Converter.ConvertLatLonToXY(latLon);
-                Point p = new Point(xyPoint[0], xyPoint[1]);
-
                 if (geom.Object.Contains(p))
                 {
                     foreach(KeyValuePair<string, object> kvp in geom.Data)
@@ -145,23 +157,104 @@ namespace Levrum.Data.Sources
             return output;
         }
 
+        private List<AnnotatedObject<Geometry>> m_annotatedGeoms = null;
+
+        public bool GetProjectionFromFile(out string projectionName, out string projection)
+        {
+            return GetProjectionFromFile(GeoFile.FullName, out projectionName, out projection);
+        }
+
+        public static bool GetProjectionFromFile(string fileName, out string projectionName, out string projection)
+        {
+            FileInfo fileInfo = new FileInfo(fileName);
+            try
+            {
+                if (!fileInfo.Exists)
+                {
+                    throw new FileNotFoundException(fileName);
+                } else if (fileInfo.Extension == ".shp" || fileInfo.Extension == ".zip")
+                {
+                    return GetProjectionFromShpFile(fileName, out projectionName, out projection);
+                } else if (fileInfo.Extension == ".geojson")
+                {
+                    return GetProjectionFromGeoJson(fileName, out projectionName, out projection);
+                } else
+                {
+                    throw new NotImplementedException(string.Format("Unable to parse file '{0}': invalid extension {1}", fileInfo.FullName, fileInfo.Extension));
+                }
+            } catch (Exception ex)
+            {
+                projectionName = string.Empty;
+                projection = string.Empty;
+                return false;
+            }
+        }
+
+        public static bool GetProjectionFromShpFile(string fileName, out string projectionName, out string projection)
+        {
+            FileInfo shpFile = new FileInfo(fileName);
+            projection = string.Empty;
+            projectionName = string.Empty;
+            try
+            {
+                if (shpFile.Extension == ".zip")
+                {
+                    DirectoryInfo tempDir = new DirectoryInfo(string.Format("{0}\\Levrum\\Temp\\{1}",
+                        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                        shpFile.Name));
+
+                    ZipFile.ExtractToDirectory(fileName, tempDir.FullName);
+                    FileInfo[] prjFiles = tempDir.GetFiles("*.prj");
+                    if (prjFiles.Length > 0)
+                    {
+                        projection = File.ReadAllText(prjFiles[0].FullName);
+                    }
+                    tempDir.Delete(true);
+                }
+                else
+                {
+                    FileInfo prjFile = new FileInfo(string.Format("{0}.prj", fileName.Substring(0, fileName.Length - shpFile.Extension.Length)));
+                    if (prjFile.Exists)
+                    {
+                        projection = File.ReadAllText(prjFile.FullName);
+                    }
+                }
+                if (projection != null)
+                {
+                    projectionName = CoordinateConverter.GetProjectionName(projection);
+                }
+            } catch (Exception ex)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        public static bool GetProjectionFromGeoJson(string fileName, out string projectionName, out string projection)
+        {
+            projectionName = string.Empty;
+            projection = string.Empty;
+            return true;
+        }
+
         public List<AnnotatedObject<Geometry>> GetGeomsFromFile()
         {
+            if (m_annotatedGeoms != null)
+                return m_annotatedGeoms;
             if (GeoFile == null)
             {
-                return new List<AnnotatedObject<Geometry>>();
+                return m_annotatedGeoms = new List<AnnotatedObject<Geometry>>();
             } else if (GeoFile.Extension == ".shp" || GeoFile.Extension == ".zip")
             {
-                return GetGeomsFromShpFile(GeoFile.FullName).ToList();
+                return m_annotatedGeoms = GetGeomsFromShpFile(GeoFile.FullName).ToList();
             } else if (GeoFile.Extension == ".geojson")
             {
-                return GetGeomsFromGeoJson(GeoFile.FullName).ToList();
+                return m_annotatedGeoms = GetGeomsFromGeoJson(GeoFile.FullName).ToList();
             } else
             {
                 throw new NotImplementedException(string.Format("Unable to parse file '{0}': invalid extension {1}", GeoFile.FullName, GeoFile.Extension));
             }
         }
-
 
         public static AnnotatedObject<Geometry>[] GetGeomsFromShpFile(string fileName)
         {
