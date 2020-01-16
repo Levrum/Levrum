@@ -807,12 +807,18 @@ namespace Levrum.Data.Map
                 allGeoSources.Add(dataSource);
             }
 
+            var index = 0;
             foreach (IncidentData incident in Incidents)
             {
+                index++;
                 foreach (IDataSource dataSource in allGeoSources)
                 {
                     GeoSource geoSource = (GeoSource)dataSource;
                     Dictionary<string, object> attributes = geoSource.GetPropertiesForLatLon(incident.Latitude, incident.Longitude);
+                    if (attributes.Count == 0)
+                    {
+                        continue;
+                    }
 
                     List<DataMapping> incidentMappings = (from mapping in map.IncidentDataMappings
                                                           where mapping.Column?.DataSource == geoSource
@@ -946,7 +952,8 @@ namespace Levrum.Data.Map
                 }
             } catch (Exception ex)
             {
-
+                DebugHost.WriteLine(ex.Message);
+                DebugHost.WriteLine(ex.StackTrace);
             }
         }
     }
