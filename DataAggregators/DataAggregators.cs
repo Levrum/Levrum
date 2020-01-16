@@ -6,6 +6,8 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
+using Levrum.Data.Classes;
+
 namespace Levrum.Data.Aggregators
 {
     public static class DataAggregators
@@ -36,7 +38,8 @@ namespace Levrum.Data.Aggregators
             foreach (Type type in GetAggregatorTypes())
             {
                 DataAggregatorAttribute nameAttribute = type.GetCustomAttribute(typeof(DataAggregatorAttribute)) as DataAggregatorAttribute;
-                if (nameAttribute.Name == name) {
+                if (nameAttribute.Name == name)
+                {
                     Type aggregatorType = type.MakeGenericType(typeof(T));
                     aggregator = (DataAggregator<T>)Activator.CreateInstance(aggregatorType);
                 }
@@ -53,9 +56,9 @@ namespace Levrum.Data.Aggregators
         private static List<Type> getTypesWithAttribute(Type attributeClass = null)
         {
             List<Type> output = new List<Type>();
-            foreach(Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                foreach(Type type in assembly.GetTypes())
+                foreach (Type type in assembly.GetTypes())
                 {
                     if (attributeClass != null && typeof(Attribute).IsAssignableFrom(attributeClass))
                     {
@@ -79,104 +82,20 @@ namespace Levrum.Data.Aggregators
 
     public delegate object[] DataAggregatorValueDelegate(object obj);
 
-    public class AggregatedData<T> : IComparable
+    public class AggregatedData<T> : AnnotatedObject<T>
     {
-        public T Data { get; set; } = default(T);
-        public Dictionary<string, object> AggregatorValues { get; set; } = new Dictionary<string, object>();
-
-        public AggregatedData(T _data)
-        {
-            Data = _data;
+        public Dictionary<string, object> AggregatorValues 
+        { 
+            get { return Data; }  
         }
 
-        public int CompareTo(object obj)
+        public AggregatedData(T _data) : base(_data)
         {
-            if (obj == null) return 1;
 
-            AggregatedData<T> otherData = obj as AggregatedData<T>;
-            if (otherData == null)
-                throw new ArgumentException(string.Format("Object is not AggregatedData<{0}>", typeof(T)));
-
-            foreach(KeyValuePair<string, object> kvp in AggregatorValues)
-            {
-                if (!otherData.AggregatorValues.ContainsKey(kvp.Key))
-                    return 1;
-
-                object thisObject = kvp.Value;
-                object thatObject = otherData.AggregatorValues[kvp.Key];
-
-                // Sort order is use object type comparator, DateTime, number, string
-
-                if (thisObject.GetType() == thatObject.GetType() && thisObject is IComparable)
-                {
-                    Type objectsType = thisObject.GetType();
-                    MethodInfo comparator = objectsType.GetMethod("CompareTo", new Type[] { thatObject.GetType() });
-                    return (int)comparator.Invoke(thisObject, new object[1] { thatObject });
-                }
-
-                DateTime thisObjectAsDateTime = thisObject is DateTime ? (DateTime)thisObject : DateTime.MinValue;
-                DateTime thatObjectAsDateTime = thatObject is DateTime ? (DateTime)thatObject : DateTime.MinValue;
-
-                if (thisObjectAsDateTime != DateTime.MinValue && thatObjectAsDateTime != DateTime.MinValue)
-                {
-                    return DateTime.Compare(thisObjectAsDateTime, thatObjectAsDateTime);
-                }
-
-                if (thisObjectAsDateTime != DateTime.MinValue)
-                {
-                    return 1;
-                }
-
-                if (thatObjectAsDateTime != DateTime.MinValue)
-                {
-                    return -1;
-                }
-
-                double thisObjectAsDouble = double.NaN;
-                double thatObjectAsDouble = double.NaN;
-                if (thisObject is double || thisObject is float || thisObject is long || thisObject is int)
-                {
-                    thisObjectAsDouble = (double)thisObject;
-                }
-
-                if (thatObject is double || thatObject is float || thatObject is long || thatObject is int)
-                {
-                    thatObjectAsDouble = (double)thatObject;
-                }
-
-                if (thisObjectAsDouble != double.NaN && thatObjectAsDouble != double.NaN)
-                {
-                    return thisObjectAsDouble.CompareTo(thatObjectAsDouble);
-                }
-
-                if (thisObjectAsDouble != double.NaN)
-                    return 1;
-
-                if (thatObjectAsDouble != double.NaN)
-                    return -1;
-
-                string thisObjectAsString = thisObject.ToString();
-                string thatObjectAsString = thatObject.ToString();
-
-                return thisObjectAsString.CompareTo(thatObjectAsString);
-            }
-
-            foreach(KeyValuePair<string, object> otherKvp in otherData.AggregatorValues)
-            {
-                if (!AggregatorValues.ContainsKey(otherKvp.Key))
-                    return -1;
-            }
-
-            return AggregatorValues.Count.CompareTo(otherData.AggregatorValues.Count);
         }
     }
 
-    public class AggregatedDataComparison<T>
-    {
-
-    }
-
-    [DataAggregator(Name="Base")]
+    [DataAggregator(Name = "Base")]
     public abstract class DataAggregator<T>
     {
         public virtual Type MemberType { get; protected set; } = typeof(object);
@@ -186,7 +105,8 @@ namespace Levrum.Data.Aggregators
 
         private string m_name = "";
 
-        public string Name {
+        public string Name
+        {
             get
             {
                 if (string.IsNullOrWhiteSpace(m_name))
@@ -227,7 +147,7 @@ namespace Levrum.Data.Aggregators
             Dictionary<object, object> output = new Dictionary<object, object>();
             List<AggregatedData<T>> aggregatedData = GetAggregatedData(aggregators, data);
             List<string> aggregatorNames = new List<string>();
-                
+
             foreach (DataAggregator<T> aggregator in aggregators)
             {
                 string name = aggregator.Name;
@@ -256,13 +176,13 @@ namespace Levrum.Data.Aggregators
             // Loop through aggregators and build dictionary<object, object> tree
             string[] aggregatorNamesArray = aggregatorNames.ToArray();
             output = buildSubDictionaries(new List<KeyValuePair<string, object>>(), aggregatorCategories, aggregatedData);
-            
+
             return output;
         }
 
         private static Dictionary<object, object> buildSubDictionaries(
             List<KeyValuePair<string, object>> parentCategories,
-            Dictionary<string, HashSet<object>> subCategories, 
+            Dictionary<string, HashSet<object>> subCategories,
             List<AggregatedData<T>> aggregatedData)
         {
             Dictionary<object, object> dictionary = new Dictionary<object, object>();
@@ -270,16 +190,18 @@ namespace Levrum.Data.Aggregators
             KeyValuePair<string, HashSet<object>> categories = subCategories.First();
             Dictionary<string, HashSet<object>> remainingSubCategories = new Dictionary<string, HashSet<object>>(subCategories);
             remainingSubCategories.Remove(categories.Key);
-            foreach (object category in categories.Value) {
+            foreach (object category in categories.Value)
+            {
                 List<KeyValuePair<string, object>> newParentCategories = new List<KeyValuePair<string, object>>(parentCategories);
                 newParentCategories.Add(new KeyValuePair<string, object>(categories.Key, category));
                 if (remainingSubCategories.Count > 0)
                 {
                     dictionary[category] = buildSubDictionaries(newParentCategories, remainingSubCategories, aggregatedData);
-                } else
+                }
+                else
                 {
                     List<AggregatedData<T>> filteredData = aggregatedData;
-                    foreach(KeyValuePair<string, object> parentCategory in newParentCategories)
+                    foreach (KeyValuePair<string, object> parentCategory in newParentCategories)
                     {
                         filteredData = (from AggregatedData<T> datum in filteredData
                                         where datum.AggregatorValues.ContainsKey(parentCategory.Key) &&
@@ -291,7 +213,7 @@ namespace Levrum.Data.Aggregators
                                             select datum.Data).ToList();
                 }
             }
-            
+
             return dictionary;
         }
 
@@ -304,7 +226,7 @@ namespace Levrum.Data.Aggregators
             }
 
             HashSet<string> usedNames = new HashSet<string>();
-            foreach(DataAggregator<T> dataAggregator in aggregators)
+            foreach (DataAggregator<T> dataAggregator in aggregators)
             {
                 Dictionary<object, List<T>> aggregation = dataAggregator.GetData(data);
                 string name = dataAggregator.Name;
@@ -393,13 +315,13 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [DataAggregator(Name="None")]
+    [DataAggregator(Name = "None")]
     public class NoAggregator<T> : DataAggregator<T>
     {
 
     }
 
-    [DataAggregator(Name="Hour of Day")]
+    [DataAggregator(Name = "Hour of Day")]
     public class HourOfDayAggregator<T> : DataAggregator<T>
     {
         public override Type MemberType { get; protected set; } = typeof(DateTime);
@@ -435,7 +357,7 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [DataAggregator(Name="Day of Week")]
+    [DataAggregator(Name = "Day of Week")]
     public class DayOfWeekAggregator<T> : DataAggregator<T>
     {
         static DayOfWeekAggregator()
@@ -488,7 +410,7 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [DataAggregator(Name="Month of Year")]
+    [DataAggregator(Name = "Month of Year")]
     public class MonthOfYearAggregator<T> : DataAggregator<T>
     {
         static MonthOfYearAggregator()
@@ -546,7 +468,7 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [DataAggregator(Name="Day")]
+    [DataAggregator(Name = "Day")]
     public class DayAggregator<T> : DataAggregator<T>
     {
         public override Type MemberType { get; protected set; } = typeof(DateTime);
@@ -592,7 +514,7 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [DataAggregator(Name="Month")]
+    [DataAggregator(Name = "Month")]
     public class MonthAggregator<T> : DataAggregator<T>
     {
         public override Type MemberType { get; protected set; } = typeof(DateTime);
@@ -631,7 +553,7 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [DataAggregator(Name="Year")]
+    [DataAggregator(Name = "Year")]
     public class YearAggregator<T> : DataAggregator<T>
     {
         public override Type MemberType { get; protected set; } = typeof(DateTime);
@@ -659,7 +581,7 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [DataAggregator(Name="Category")]
+    [DataAggregator(Name = "Category")]
     public class CategoryAggregator<T> : DataAggregator<T>
     {
         public override Dictionary<object, List<T>> GetData(List<T> data)
@@ -688,7 +610,7 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [DataAggregator(Name="Delegate")]
+    [DataAggregator(Name = "Delegate")]
     public class ValueDelegateAggregator<T> : DataAggregator<T>
     {
         public DataAggregatorValueDelegate ValueDelegate { get; set; }

@@ -29,7 +29,7 @@ namespace Levrum.Data.Sources
         List<Record> GetRecords();
     }
 
-    public enum DataSourceType { CsvSource, SqlSource, EmergencyReportingSource };
+    public enum DataSourceType { CsvSource, SqlSource, EmergencyReportingSource, GeoSource };
 
     public class IDataSourceConcreteClassConverter : DefaultContractResolver
     {

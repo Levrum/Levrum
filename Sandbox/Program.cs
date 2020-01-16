@@ -8,6 +8,8 @@ using Newtonsoft.Json;
 using Levrum.Data.Classes;
 using Levrum.Data.Sources;
 using Levrum.Data.Map;
+
+using Levrum.Utils.Messaging;
 using Levrum.Utils.Geography;
 
 namespace Sandbox
@@ -161,6 +163,56 @@ namespace Sandbox.DefaultCommands
                 return "Test failed.";
             }
             return "Test passed.";
+        }
+
+        private static RabbitMQProducer<IncidentData> producer;
+        private static RabbitMQConsumer<IncidentData> consumer;
+
+        public static string rmqprod(List<string> args)
+        {
+            try
+            {
+                producer = new RabbitMQProducer<IncidentData>("localhost", 5672, "test");
+                producer.Connect();
+                return "Producer Connected";
+            } catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        public static string rmqsend(List<string> args)
+        {
+            if (args.Count < 0)
+            {
+                return "rmqsend requires 1 argument";
+            }
+
+            producer.Connect();
+            IncidentData data = new IncidentData();
+            data.Data["Message"] = args[0];
+            producer.SendObject(data);
+
+            return "Message sent";
+        }
+
+        public static string rmqconsume(List<string> args)
+        {
+            try
+            {
+                consumer = new RabbitMQConsumer<IncidentData>("localhost", 5672, "test");
+                consumer.Connect();
+                consumer.MessageReceived += onReceive;
+                return "Consumer Connected";
+            } catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
+
+        private static void onReceive(object sender, string message, IncidentData obj)
+        {
+            Console.WriteLine(string.Format("Received Message: {0} Object: {1}", message, obj));
         }
     }
 }
