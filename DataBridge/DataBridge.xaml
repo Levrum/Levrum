@@ -7,7 +7,8 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
         mc:Ignorable="d"
-        Title="Levrum DataBridge" Height="700" Width="1368" Icon="databridge.ico">
+        Title="Levrum DataBridge" Height="700" Width="1368" Icon="databridge.ico"
+        Closing="Window_Closing">
     <Window.CommandBindings>
         <CommandBinding Command="New" Executed="NewMenuItem_Click"/>
         <CommandBinding Command="Open" Executed="OpenMenuItem_Click"/>

@@ -37,6 +37,7 @@ namespace Levrum.DataBridge
         private void AddIncidentFieldButton_Click(object sender, RoutedEventArgs e)
         {
             ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), null, false);
+            dialog.Owner = Window;
             dialog.ShowDialog();
             if (dialog.Result != null)
             {
@@ -64,6 +65,7 @@ namespace Levrum.DataBridge
         private void AddResponseFieldButton_Click(object sender, RoutedEventArgs e)
         {
             ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), null, false);
+            dialog.Owner = Window;
             dialog.ShowDialog();
             if (dialog.Result != null)
             {
@@ -115,6 +117,7 @@ namespace Levrum.DataBridge
                                       select m).FirstOrDefault();
 
             ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), fieldName, true);
+            dialog.Owner = Window;
             if (oldMapping != null)
             {
                 dialog.Result = oldMapping;
@@ -172,6 +175,7 @@ namespace Levrum.DataBridge
         private void AddBenchmarkButton_Click(object sender, RoutedEventArgs e)
         {
             ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), null, false);
+            dialog.Owner = Window;
             dialog.ShowDialog();
             if (dialog.Result != null)
             {
@@ -218,6 +222,7 @@ namespace Levrum.DataBridge
         {
             DataMapping selectedField = IncidentDataListBox.SelectedItem as DataMapping;
             ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), selectedField);
+            dialog.Owner = Window;
             dialog.ShowDialog();
             if (dialog.Result != null)
             {
@@ -235,6 +240,7 @@ namespace Levrum.DataBridge
         {
             DataMapping selectedField = ResponseDataListBox.SelectedItem as DataMapping;
             ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), selectedField);
+            dialog.Owner = Window;
             dialog.ShowDialog();
             if (dialog.Result != null)
             {
@@ -252,6 +258,7 @@ namespace Levrum.DataBridge
         {
             DataMapping selectedField = BenchmarkListBox.SelectedItem as DataMapping;
             ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), selectedField);
+            dialog.Owner = Window;
             dialog.ShowDialog();
             if (dialog.Result != null)
             {

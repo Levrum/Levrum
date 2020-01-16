@@ -47,6 +47,8 @@ namespace Levrum.DataBridge
         public NewDataMapWindow()
         {
             InitializeComponent();
+
+            WindowStartupLocation = WindowStartupLocation.CenterOwner;
             DataMapTemplateListBox.ItemsSource = Templates;
             DataMapTemplateListBox.SelectedItem = Templates[0];
         }
@@ -151,6 +153,28 @@ namespace Levrum.DataBridge
                     dataSource.Parameters["User"] = SqlServerUser.Text;
                     dataSource.Parameters["Password"] = SqlServerPassword.Password;
                 }
+            }
+        }
+
+        private void DataMapTemplateListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            DependencyObject obj = (DependencyObject)e.OriginalSource;
+
+            while (obj != null && obj != DataMapTemplateListBox)
+            {
+                if (obj.GetType() == typeof(ListBoxItem))
+                {
+                    if (NextButton.IsEnabled)
+                    {
+                        NextButton_Click(sender, new RoutedEventArgs(e.RoutedEvent));
+                    }
+                    else
+                    {
+                        FinishButton_Click(sender, new RoutedEventArgs(e.RoutedEvent));
+                    }
+                    return;
+                }
+                obj = VisualTreeHelper.GetParent(obj);
             }
         }
     }

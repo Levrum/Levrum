@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Levrum.UI.WPF"
         mc:Ignorable="d"
-        Title="Enter value" Height="130" Width="800">
+        Title="Enter value" Height="150" Width="800"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="38"/>

@@ -55,6 +55,7 @@ namespace Levrum.DataBridge
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
             DataSourceEditor editor = new DataSourceEditor(null);
+            editor.Owner = Window;
             editor.ShowDialog();
             IDataSource newSource = editor.DataSource;
             if (newSource != null)
@@ -71,6 +72,7 @@ namespace Levrum.DataBridge
         {
             IDataSource currentSource = DataSourcesListBox.SelectedItem as IDataSource;
             DataSourceEditor editor = new DataSourceEditor(currentSource);
+            editor.Owner = Window;
             editor.ShowDialog();
             int index = DataSources.IndexOf(currentSource);
             DataSources.RemoveAt(index);
@@ -89,7 +91,7 @@ namespace Levrum.DataBridge
         {
             foreach (DataMapping mapping in Map.IncidentMappings)
             {
-                if (mapping.Column.DataSource == oldSource)
+                if (mapping.Column?.DataSource == oldSource)
                 {
                     mapping.Column.DataSource = newSource;
                 }
@@ -97,7 +99,7 @@ namespace Levrum.DataBridge
 
             foreach (DataMapping mapping in Map.IncidentDataMappings)
             {
-                if (mapping.Column.DataSource == oldSource)
+                if (mapping.Column?.DataSource == oldSource)
                 {
                     mapping.Column.DataSource = newSource;
                 }
@@ -105,7 +107,7 @@ namespace Levrum.DataBridge
 
             foreach (DataMapping mapping in Map.ResponseDataMappings)
             {
-                if (mapping.Column.DataSource == oldSource)
+                if (mapping.Column?.DataSource == oldSource)
                 {
                     mapping.Column.DataSource = newSource;
                 }
@@ -113,7 +115,7 @@ namespace Levrum.DataBridge
 
             foreach (DataMapping mapping in Map.BenchmarkMappings)
             {
-                if (mapping.Column.DataSource == oldSource)
+                if (mapping.Column?.DataSource == oldSource)
                 {
                     mapping.Column.DataSource = newSource;
                 }
