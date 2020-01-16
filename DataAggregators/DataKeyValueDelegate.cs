@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
+using Levrum.Data.Classes;
+
 namespace Levrum.Data.Aggregators
 {
     public class DataKeyValueDelegate

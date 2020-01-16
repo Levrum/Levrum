@@ -45,16 +45,20 @@
                     
             </MenuItem>
             -->
+            <MenuItem Header="_Tools" IsTabStop="False">
+                <MenuItem x:Name="DefinePostProcessingScript" Header="Define PostProcessing _Script..." Click="DefinePostProcessingScript_Click" IsEnabled="False"/>
+            </MenuItem>
             <MenuItem Header="_Settings" IsTabStop="False">
                 <MenuItem x:Name="CoordinateConversionMenuItem" Header="Enable _Coordinate Conversion" Click="CoordinateConversionMenuItem_Click" IsEnabled="False"/>
                 <MenuItem x:Name="DefineProjectionMenuItem" Header="Define _Projection For Conversion..." Click="DefineProjectionMenuItem_Click" IsEnabled="False"/>
                 <MenuItem x:Name="ToggleInvertLatitude" Header="Enable Invert _Latitude" Click="ToggleInvertLatitude_Click" IsEnabled="False"/>
                 <MenuItem x:Name="ToggleInvertLongitude" Header="Enable Invert Lon_gitude" Click="ToggleInvertLongitude_Click" IsEnabled="False"/>
-                <MenuItem x:Name="DefinePostProcessingScript" Header="Define PostProcessing _Script..." Click="DefinePostProcessingScript_Click" IsEnabled="False"/>
+                
                 <Separator/>
                 <MenuItem x:Name="SelectCauseTreeMenuItem" Header="Select Cause _Tree JSON..." Click="SelectCauseTreeMenuItem_Click" IsEnabled="False"/>
             </MenuItem>
             <MenuItem Header="_Help" IsTabStop="False">
+                <MenuItem x:Name="ShowJSDebugMenuItem" Header="Show _JavaScript Debug Window..." Click="ShowJSDebugMenuItem_Click"/>
                 <MenuItem Header="_About"/>
             </MenuItem>
         </Menu>

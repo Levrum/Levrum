@@ -30,6 +30,7 @@ namespace Levrum.DataBridge
 
         public DataMapEditor ActiveEditor { get; set; } = null;
 
+        public JavascriptDebugWindow DebugWindow = new JavascriptDebugWindow();
         // public Dictionary<DataMap, LayoutDocument> openDocuments = new Dictionary<DataMap, LayoutDocument>();
 
         public MainDataBridgeWindow()
@@ -231,6 +232,7 @@ namespace Levrum.DataBridge
 
         public void ExitMenuItem_Click(object sender, RoutedEventArgs e)
         {
+            DebugWindow.Close();
             Close();
         }
 
@@ -381,11 +383,12 @@ namespace Levrum.DataBridge
             }
             Cursor = Cursors.Wait;
 
+            MapLoader loader = new MapLoader();
+            loader.DebugHost.OnDebugMessage += DebugWindow.OnMessageReceived;
             try
-            {    
-                MapLoader loader = new MapLoader();
+            {   
                 loader.LoadMap(DataSources.Map);
-
+                
                 JsonSerializerSettings settings = new JsonSerializerSettings();
                 settings.PreserveReferencesHandling = PreserveReferencesHandling.All;
                 settings.Formatting = Formatting.Indented;
@@ -399,6 +402,10 @@ namespace Levrum.DataBridge
                 MessageBox.Show(string.Format("Unable to create JSON: {0}", ex.Message));
             } finally
             {
+                loader.DebugHost.OnDebugMessage -= DebugWindow.OnMessageReceived;
+                loader.Incidents.Clear();
+                loader.IncidentsById.Clear();
+
                 GC.Collect();
                 Cursor = Cursors.Arrow;
             }
@@ -427,9 +434,11 @@ namespace Levrum.DataBridge
             }
             string responseCsvFileName = sfd.FileName;
 
+
+            MapLoader loader = new MapLoader();
+            loader.DebugHost.OnDebugMessage += DebugWindow.OnMessageReceived;
             try
             {
-                MapLoader loader = new MapLoader();
                 loader.LoadMap(DataSources.Map);
 
                 HashSet<string> incidentDataFields = new HashSet<string>();
@@ -542,6 +551,10 @@ namespace Levrum.DataBridge
             }
             finally
             {
+                loader.DebugHost.OnDebugMessage -= DebugWindow.OnMessageReceived;
+                loader.Incidents.Clear();
+                loader.IncidentsById.Clear();
+
                 GC.Collect();
                 Cursor = Cursors.Arrow;
             }
@@ -636,6 +649,12 @@ namespace Levrum.DataBridge
                 DataSources.Map.PostProcessingScript = dialog.Result;
                 SetChangesMade(DataSources.Map, true);
             }
+        }
+
+        private void ShowJSDebugMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            DebugWindow.Show();
+            DebugWindow.BringIntoView();
         }
     }
 
