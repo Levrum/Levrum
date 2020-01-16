@@ -47,7 +47,7 @@ namespace Levrum.DataBridge
 
         private void HandleFormClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            this.WindowState = WindowState.Minimized;
+            Hide();
             e.Cancel = true;
         }
     }
