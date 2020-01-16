@@ -667,6 +667,7 @@ namespace Levrum.DataBridge
 
         private void ShowJSDebugMenuItem_Click(object sender, RoutedEventArgs e)
         {
+
             DebugWindow.Owner = this;
             DebugWindow.Show();
             DebugWindow.BringIntoView();
