@@ -314,7 +314,8 @@ namespace Levrum.Data.Sources
                 return m_annotatedGeoms = GetGeomsFromShpFile(GeoFile.FullName).ToList();
             } else if (GeoFile.Extension == ".geojson")
             {
-                return m_annotatedGeoms = GetGeomsFromGeoJson(GeoFile.FullName).ToList();
+                string geoJson = File.ReadAllText(GeoFile.FullName);
+                return m_annotatedGeoms = GetGeomsFromGeoJson(geoJson).ToList();
             } else
             {
                 throw new NotImplementedException(string.Format("Unable to parse file '{0}': invalid extension {1}", GeoFile.FullName, GeoFile.Extension));

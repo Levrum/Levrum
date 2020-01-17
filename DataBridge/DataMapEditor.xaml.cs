@@ -36,57 +36,83 @@ namespace Levrum.DataBridge
 
         private void AddIncidentFieldButton_Click(object sender, RoutedEventArgs e)
         {
-            ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), null, false);
-            dialog.Owner = Window;
-            dialog.ShowDialog();
-            if (dialog.Result != null)
+            try
             {
-                DataMap.IncidentDataMappings.Add(dialog.Result);
-                if (Window != null)
+                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), null, false);
+                dialog.Owner = Window;
+                dialog.ShowDialog();
+                if (dialog.Result != null)
                 {
-                    Window.SetChangesMade(DataMap, true);
+                    DataMap.IncidentDataMappings.Add(dialog.Result);
+                    if (Window != null)
+                    {
+                        Window.SetChangesMade(DataMap, true);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to add Incident Field: {0}", ex.Message));
             }
         }
 
         private void RemoveIncidentFieldButton_Click(object sender, RoutedEventArgs e)
         {
-            DataMapping incidentMapping = IncidentDataListBox.SelectedItem as DataMapping;
-            if (incidentMapping != null)
+            try
             {
-                DataMap.IncidentDataMappings.Remove(incidentMapping);
-                if (Window != null)
+                DataMapping incidentMapping = IncidentDataListBox.SelectedItem as DataMapping;
+                if (incidentMapping != null)
                 {
-                    Window.SetChangesMade(DataMap, true);
+                    DataMap.IncidentDataMappings.Remove(incidentMapping);
+                    if (Window != null)
+                    {
+                        Window.SetChangesMade(DataMap, true);
+                    }
                 }
+            } catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to remove Incident Field: {0}", ex.Message));
             }
         }
 
         private void AddResponseFieldButton_Click(object sender, RoutedEventArgs e)
         {
-            ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), null, false);
-            dialog.Owner = Window;
-            dialog.ShowDialog();
-            if (dialog.Result != null)
+            try
             {
-                DataMap.ResponseDataMappings.Add(dialog.Result);
-                if (Window != null)
+                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), null, false);
+                dialog.Owner = Window;
+                dialog.ShowDialog();
+                if (dialog.Result != null)
                 {
-                    Window.SetChangesMade(DataMap, true);
+                    DataMap.ResponseDataMappings.Add(dialog.Result);
+                    if (Window != null)
+                    {
+                        Window.SetChangesMade(DataMap, true);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to add Incident Field: {0}", ex.Message));
             }
         }
 
         private void RemoveResponseFieldButton_Click(object sender, RoutedEventArgs e)
         {
-            DataMapping responseMapping = ResponseDataListBox.SelectedItem as DataMapping;
-            if (responseMapping != null)
+            try
             {
-                DataMap.ResponseDataMappings.Remove(responseMapping);
-                if (Window != null)
+                DataMapping responseMapping = ResponseDataListBox.SelectedItem as DataMapping;
+                if (responseMapping != null)
                 {
-                    Window.SetChangesMade(DataMap, true);
+                    DataMap.ResponseDataMappings.Remove(responseMapping);
+                    if (Window != null)
+                    {
+                        Window.SetChangesMade(DataMap, true);
+                    }
                 }
+            } catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to remove Response Field: {0}", ex.Message));
             }
         }
 
@@ -112,29 +138,36 @@ namespace Levrum.DataBridge
 
         private void editStaticMapping(string fieldName)
         {
-            DataMapping oldMapping = (from m in DataMap.IncidentMappings
-                                      where m.Field == fieldName
-                                      select m).FirstOrDefault();
+            try
+            {
+                DataMapping oldMapping = (from m in DataMap.IncidentMappings
+                                          where m.Field == fieldName
+                                          select m).FirstOrDefault();
 
-            ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), fieldName, true);
-            dialog.Owner = Window;
-            if (oldMapping != null)
-            {
-                dialog.Result = oldMapping;
-            }
+                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), fieldName, true);
+                dialog.Owner = Window;
+                if (oldMapping != null)
+                {
+                    dialog.Result = oldMapping;
+                }
 
-            dialog.ShowDialog();
-            DataMapping newMapping = dialog.Result;
-            if (oldMapping != null)
-            {
-                DataMap.IncidentMappings.Remove(oldMapping);
+                dialog.ShowDialog();
+                DataMapping newMapping = dialog.Result;
+                if (oldMapping != null)
+                {
+                    DataMap.IncidentMappings.Remove(oldMapping);
+                }
+                DataMap.IncidentMappings.Add(newMapping);
+                if (Window != null)
+                {
+                    Window.SetChangesMade(DataMap, true);
+                }
+                UpdateStaticMappingButtons();
             }
-            DataMap.IncidentMappings.Add(newMapping);
-            if (Window != null)
+            catch (Exception ex)
             {
-                Window.SetChangesMade(DataMap, true);
+                MessageBox.Show(string.Format("Unable to edit mapping: {0}", ex.Message));
             }
-            UpdateStaticMappingButtons();
         }
 
         public void UpdateStaticMappingButtons()
@@ -174,29 +207,42 @@ namespace Levrum.DataBridge
 
         private void AddBenchmarkButton_Click(object sender, RoutedEventArgs e)
         {
-            ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), null, false);
-            dialog.Owner = Window;
-            dialog.ShowDialog();
-            if (dialog.Result != null)
+            try
             {
-                DataMap.BenchmarkMappings.Add(dialog.Result);
-                if (Window != null)
+                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), null, false);
+                dialog.Owner = Window;
+                dialog.ShowDialog();
+                if (dialog.Result != null)
                 {
-                    Window.SetChangesMade(DataMap, true);
+                    DataMap.BenchmarkMappings.Add(dialog.Result);
+                    if (Window != null)
+                    {
+                        Window.SetChangesMade(DataMap, true);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to add Response Timing Field: {0}", ex.Message));
             }
         }
 
         private void RemoveBenchmarkButton_Click(object sender, RoutedEventArgs e)
         {
-            DataMapping benchmarkMapping = BenchmarkListBox.SelectedItem as DataMapping;
-            if (benchmarkMapping != null)
+            try
             {
-                DataMap.BenchmarkMappings.Remove(benchmarkMapping);
-                if (Window != null)
+                DataMapping benchmarkMapping = BenchmarkListBox.SelectedItem as DataMapping;
+                if (benchmarkMapping != null)
                 {
-                    Window.SetChangesMade(DataMap, true);
+                    DataMap.BenchmarkMappings.Remove(benchmarkMapping);
+                    if (Window != null)
+                    {
+                        Window.SetChangesMade(DataMap, true);
+                    }
                 }
+            } catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to remove Response Timing Field: {0}", ex.Message));
             }
         }
 
@@ -220,55 +266,76 @@ namespace Levrum.DataBridge
 
         private void EditIncidentFieldButton_Click(object sender, RoutedEventArgs e)
         {
-            DataMapping selectedField = IncidentDataListBox.SelectedItem as DataMapping;
-            ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), selectedField);
-            dialog.Owner = Window;
-            dialog.ShowDialog();
-            if (dialog.Result != null)
+            try
             {
-                int index = DataMap.IncidentDataMappings.IndexOf(selectedField);
-                DataMap.IncidentDataMappings.Remove(selectedField);
-                DataMap.IncidentDataMappings.Insert(index, dialog.Result);
-                if (Window != null)
+                DataMapping selectedField = IncidentDataListBox.SelectedItem as DataMapping;
+                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), selectedField);
+                dialog.Owner = Window;
+                dialog.ShowDialog();
+                if (dialog.Result != null)
                 {
-                    Window.SetChangesMade(DataMap, true);
+                    int index = DataMap.IncidentDataMappings.IndexOf(selectedField);
+                    DataMap.IncidentDataMappings.Remove(selectedField);
+                    DataMap.IncidentDataMappings.Insert(index, dialog.Result);
+                    if (Window != null)
+                    {
+                        Window.SetChangesMade(DataMap, true);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to edit Incident Field: {0}", ex.Message));
             }
         }
 
         private void EditResponseFieldButton_Click(object sender, RoutedEventArgs e)
         {
-            DataMapping selectedField = ResponseDataListBox.SelectedItem as DataMapping;
-            ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), selectedField);
-            dialog.Owner = Window;
-            dialog.ShowDialog();
-            if (dialog.Result != null)
+            try
             {
-                int index = DataMap.ResponseDataMappings.IndexOf(selectedField);
-                DataMap.ResponseDataMappings.Remove(selectedField);
-                DataMap.ResponseDataMappings.Insert(index, dialog.Result);
-                if (Window != null)
+                DataMapping selectedField = ResponseDataListBox.SelectedItem as DataMapping;
+                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), selectedField);
+                dialog.Owner = Window;
+                dialog.ShowDialog();
+                if (dialog.Result != null)
                 {
-                    Window.SetChangesMade(DataMap, true);
+                    int index = DataMap.ResponseDataMappings.IndexOf(selectedField);
+                    DataMap.ResponseDataMappings.Remove(selectedField);
+                    DataMap.ResponseDataMappings.Insert(index, dialog.Result);
+                    if (Window != null)
+                    {
+                        Window.SetChangesMade(DataMap, true);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to edit Response Field: {0}", ex.Message));
             }
         }
 
         private void EditBenchmarkButton_Click(object sender, RoutedEventArgs e)
         {
-            DataMapping selectedField = BenchmarkListBox.SelectedItem as DataMapping;
-            ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), selectedField);
-            dialog.Owner = Window;
-            dialog.ShowDialog();
-            if (dialog.Result != null)
+            try
             {
-                int index = DataMap.BenchmarkMappings.IndexOf(selectedField);
-                DataMap.BenchmarkMappings.Remove(selectedField);
-                DataMap.BenchmarkMappings.Insert(index, dialog.Result);
-                if (Window != null)
+                DataMapping selectedField = BenchmarkListBox.SelectedItem as DataMapping;
+                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), selectedField);
+                dialog.Owner = Window;
+                dialog.ShowDialog();
+                if (dialog.Result != null)
                 {
-                    Window.SetChangesMade(DataMap, true);
+                    int index = DataMap.BenchmarkMappings.IndexOf(selectedField);
+                    DataMap.BenchmarkMappings.Remove(selectedField);
+                    DataMap.BenchmarkMappings.Insert(index, dialog.Result);
+                    if (Window != null)
+                    {
+                        Window.SetChangesMade(DataMap, true);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Unable to edit Response Timing Field: {0}", ex.Message));
             }
         }
     }
