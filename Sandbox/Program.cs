@@ -214,5 +214,18 @@ namespace Sandbox.DefaultCommands
         {
             Console.WriteLine(string.Format("Received Message: {0} Object: {1}", message, obj));
         }
+
+        public static string getproj(List<string> args)
+        {
+            if (args.Count < 0)
+            {
+                return "getproj requires at least 1 argument";
+            }
+
+            string authCode = args[0];
+            string projection = AutoProjection.GetProjection(authCode);
+
+            return projection;
+        }
     }
 }

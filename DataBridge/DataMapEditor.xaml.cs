@@ -226,9 +226,9 @@ namespace Levrum.DataBridge
             dialog.ShowDialog();
             if (dialog.Result != null)
             {
-                int index = DataMap.IncidentMappings.IndexOf(selectedField);
-                DataMap.IncidentMappings.Remove(selectedField);
-                DataMap.IncidentMappings.Insert(index, dialog.Result);
+                int index = DataMap.IncidentDataMappings.IndexOf(selectedField);
+                DataMap.IncidentDataMappings.Remove(selectedField);
+                DataMap.IncidentDataMappings.Insert(index, dialog.Result);
                 if (Window != null)
                 {
                     Window.SetChangesMade(DataMap, true);

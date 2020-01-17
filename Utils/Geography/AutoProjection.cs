@@ -45,6 +45,23 @@ namespace Levrum.Utils.Geography
             return projection;
         }
 
+        public static string GetProjection(string authCode)
+        {
+            ExtractZipFiles();
+            List<Projection> projectionList = GetSRID();
+            RemoveTempFiles();
+            Projection proj = (from Projection p in projectionList
+                               where p.AuthCode == authCode
+                               select p).FirstOrDefault();
+
+            if (proj != null)
+            {
+                return proj.RawProjectionString;
+            }
+
+            return string.Empty;
+        }
+
         public static string StatePlaneOrLatLon(double yLat, double xLon)
         {
             if (xLon < 0 && yLat < 100 && Math.Abs(xLon + yLat) < 200)
@@ -60,7 +77,7 @@ namespace Levrum.Utils.Geography
         private static bool IsUnitSupported(string unit)
         {
             unit = unit.ToLower();
-            if(unit == "us survey foot" || unit == "metre" || unit == "foot")
+            if (unit == "us survey foot" || unit == "metre" || unit == "foot")
             {
                 return true;
             }
@@ -71,47 +88,56 @@ namespace Levrum.Utils.Geography
         private static void ExtractZipFiles()
         {
             string dir = Directory.GetCurrentDirectory();
-            dir = Path.GetFullPath(Path.Combine(dir, @"..\..\..\..\"));
-            try
+            FileInfo sridZip = new FileInfo(dir + @"\Geography\SRID.zip");
+            if (sridZip.Exists)
             {
-                if (File.Exists(dir + @"Utils\Geography\SRID\SRID.csv"))
+                DirectoryInfo dirInfo = new DirectoryInfo(
+                    string.Format("{0}\\Levrum\\Temp\\SRID", 
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData))
+                    );
+
+                if (dirInfo.Exists)
                 {
-                    Directory.Delete(dir + @"Utils\Geography\SRID\", true);
+                    dirInfo.Delete(true);
                 }
-                ZipFile.ExtractToDirectory(dir + @"Utils\Geography\SRID.zip", dir + @"Utils\Geography\SRID\");
+
+                dirInfo.Create();
+
+                ZipFile.ExtractToDirectory(sridZip.FullName, dirInfo.FullName);
             }
-            catch
+            else
             {
-                if (File.Exists(dir + @"Utils\Geography\SRID\SRID.csv"))
-                {
-                    Directory.Delete(dir + @"Utils\Geography\SRID\", true);
-                }
+                throw new Exception("Moo");
             }
         }
 
         private static void RemoveTempFiles()
         {
-            string dir = Directory.GetCurrentDirectory();
-            dir = Path.GetFullPath(Path.Combine(dir, @"..\..\..\..\"));
-            if (File.Exists(dir + @"Utils\Geography\SRID\SRID.csv"))
-            {
-                Directory.Delete(dir + @"Utils\Geography\SRID\", true);
-            }
+            DirectoryInfo dirInfo = new DirectoryInfo(
+                string.Format("{0}\\Levrum\\Temp\\SRID",
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData))
+                );
+
+            dirInfo.Delete(true);
         }
 
         private static List<Projection> GetSRID()
         {
             List<Projection> projectionList = new List<Projection>();
             string dir = Directory.GetCurrentDirectory();
-            dir = Path.GetFullPath(Path.Combine(dir, @"..\..\..\..\"));
+            DirectoryInfo dirInfo = new DirectoryInfo(
+                string.Format("{0}\\Levrum\\Temp\\SRID",
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData))
+                );
+
             try
             {
-                using (StreamReader reader = new StreamReader(dir + @"Utils\Geography\SRID\SRID.csv"))
+                using (StreamReader reader = new StreamReader(dirInfo.FullName + @"\SRID.csv"))
                 {
                     string line = reader.ReadLine();
                     while (line != null)
                     {
-                        Projection p = ProcessSRID(line.Split(';')[1]);
+                        Projection p = ProcessSRID(line);
                         projectionList.Add(p);
                         line = reader.ReadLine();
                     }
@@ -160,10 +186,12 @@ namespace Levrum.Utils.Geography
         private static List<StatePlanePolygon> LoadStatePlanePolygons()
         {
             List<StatePlanePolygon> polygons = new List<StatePlanePolygon>();
-            string dir = Directory.GetCurrentDirectory();
-            dir = Path.GetFullPath(Path.Combine(dir, @"..\..\..\..\"));
+            DirectoryInfo dirInfo = new DirectoryInfo(
+                string.Format("{0}\\Levrum\\Temp\\SRID",
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData))
+                );
 
-            using (StreamReader reader = new StreamReader(dir + @"Utils\Geography\SRID\StateProjectionShapes.geojson"))
+            using (StreamReader reader = new StreamReader(dirInfo.FullName + @"\StateProjectionShapes.geojson"))
             {
                 string geoJSON = reader.ReadToEnd();
                 int nodeCount = 0;
@@ -236,9 +264,13 @@ namespace Levrum.Utils.Geography
             return "Unable to find projection";
         }
 
-        private static Projection ProcessSRID(string srid)
+        private static Projection ProcessSRID(string record)
         {
+            string[] pieces = record.Split(';');
+            string authCode = pieces[0];
+            string srid = pieces[1];
             Projection p = new Projection();
+            p.AuthCode = authCode;
             p.RawProjectionString = srid;
             Tuple<string, string> keyValueTuple = SeperateKeyAndValue(srid);
             string key = keyValueTuple.Item1;
@@ -470,6 +502,7 @@ namespace Levrum.Utils.Geography
     }
     class Projection
     {
+        public string AuthCode { get; set; }
         public string Unit { get; set; }
         public Dictionary<string, string> ParameterDict { get; set; } = new Dictionary<string, string>();
         public string RawProjectionString { get; set; }
