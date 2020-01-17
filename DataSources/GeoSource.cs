@@ -9,6 +9,12 @@ using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 
+using GeoJSON.Net.CoordinateReferenceSystem;
+using GFeature = GeoJSON.Net.Feature.Feature;
+using GFeatureCollection = GeoJSON.Net.Feature.FeatureCollection;
+using GPolygon = GeoJSON.Net.Geometry.Polygon;
+using GMultiPolygon = GeoJSON.Net.Geometry.MultiPolygon;
+
 using Newtonsoft.Json;
 
 using Levrum.Data.Classes;
@@ -232,8 +238,67 @@ namespace Levrum.Data.Sources
 
         public static bool GetProjectionFromGeoJson(string fileName, out string projectionName, out string projection)
         {
+            string geoJson = File.ReadAllText(fileName);
+            ProtoGeoJSON obj = JsonConvert.DeserializeObject<ProtoGeoJSON>(geoJson);
             projectionName = string.Empty;
             projection = string.Empty;
+            ICRSObject crs = null;
+            switch (obj.Type)
+            {
+                case "FeatureCollection":
+                    GFeatureCollection features = JsonConvert.DeserializeObject<GFeatureCollection>(geoJson);
+                    crs = features.CRS;
+                    break;
+                case "Feature":
+                    GFeature feature = JsonConvert.DeserializeObject<GFeature>(geoJson);
+                    crs = feature.CRS;
+                    break;
+                case "MultiPolygon":
+                    GMultiPolygon multiPoly = JsonConvert.DeserializeObject<GMultiPolygon>(geoJson);
+                    crs = multiPoly.CRS;
+                    break;
+                case "Polygon":
+                    GPolygon poly = JsonConvert.DeserializeObject<GPolygon>(geoJson);
+                    crs = poly.CRS;
+                    break;
+                default:
+                    break;
+            }
+
+            if (crs is NamedCRS)
+            {
+                NamedCRS nCrs = crs as NamedCRS;
+                object value;
+                if (nCrs.Properties.TryGetValue("name", out value))
+                {
+                    string name = value as string;
+                    if (name != null)
+                    {
+                        name = name.ToLower();
+                        if (name.EndsWith("3857"))
+                        {
+                            projectionName = "EPSG:3857 Pseudo-Mercator";
+                            projection = CoordinateConverter.WebMercator.WKT;
+                            return true;
+                        }
+                        else
+                        {
+                            int index = name.IndexOf("epsg::");
+                            string epsgStr = name.Substring(index);
+                            string authNumber = epsgStr.Substring(epsgStr.IndexOf("::") + 2);
+                            projection = AutoProjection.GetProjection(authNumber);
+                            if (projection != string.Empty)
+                            {
+                                projectionName = string.Format("EPSG:{0}", authNumber);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            projectionName = "EPSG:4326 Lat-Long";
+            projection = CoordinateConverter.WGS84.WKT;
             return true;
         }
 

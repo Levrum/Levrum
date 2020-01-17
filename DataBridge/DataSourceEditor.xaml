@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Levrum.DataBridge"
+        xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
         mc:Ignorable="d"
         Title="DataSource Editor" Height="350" Width="800"
         WindowStartupLocation="CenterOwner">
@@ -55,9 +56,9 @@
                         <RowDefinition Height="280*"/>
                     </Grid.RowDefinitions>
                     <TextBlock Margin="10,0,0,0" FontSize="14">Summary</TextBlock>
-                    <TextBox x:Name="CsvSummaryTextBox" Grid.Row="1" Margin="8,0,8,0" Foreground="DarkSlateGray" IsReadOnly="True" VerticalScrollBarVisibility="Auto">
+                    <avalonEdit:TextEditor x:Name="CsvSummaryTextBox" Grid.Row="1" Margin="8,0,8,0" Foreground="DarkSlateGray" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="WhiteSmoke">
                         No data available...
-                    </TextBox>
+                    </avalonEdit:TextEditor>
                 </Grid>
             </Grid>
         </Grid>
@@ -117,8 +118,8 @@
                 </DockPanel>
             </Grid>
             <Grid Grid.Row="2">
-                <TextBox x:Name="SqlQueryTextBox" Margin="8,0,8,0" TextWrapping="WrapWithOverflow" AcceptsReturn="True" Visibility="Visible"/>
-                <TextBox x:Name="SqlTableDetailsTextBox" Margin="8,0,8,0" TextWrapping="WrapWithOverflow" Visibility="Hidden"/>
+                <avalonEdit:TextEditor x:Name="SqlQueryTextBox" Margin="8,0,8,0" Visibility="Visible" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="WhiteSmoke"/>
+                <avalonEdit:TextEditor x:Name="SqlTableDetailsTextBox" Margin="8,0,8,0" Visibility="Hidden" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="WhiteSmoke"/>
             </Grid>
         </Grid>
         <Grid x:Name="GeoOptionsGrid" Grid.Row="1" Visibility="Hidden">
@@ -149,9 +150,9 @@
                         <RowDefinition Height="280*"/>
                     </Grid.RowDefinitions>
                     <TextBlock Margin="10,0,0,0" FontSize="14">Summary</TextBlock>
-                    <TextBox x:Name="GeoSummaryTextBox" Grid.Row="1" Margin="8,0,8,0" Foreground="DarkSlateGray" IsReadOnly="True" VerticalScrollBarVisibility="Auto">
+                    <avalonEdit:TextEditor x:Name="GeoSummaryTextBox" Grid.Row="1" Margin="10,0,8,0" Foreground="DarkSlateGray" IsReadOnly="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="WhiteSmoke">
                         No file selected...
-                    </TextBox>
+                    </avalonEdit:TextEditor>
                 </Grid>
             </Grid>
         </Grid>

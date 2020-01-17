@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -44,7 +45,7 @@ namespace Levrum.DataBridge
 
         List<DataSourceTypeInfo> SqlSourceTypes { get; } = new List<DataSourceTypeInfo>(new DataSourceTypeInfo[] { "Table", "Query" });
 
-        ObservableCollection<DataSourceTypeInfo> Projections { get; } = new ObservableCollection<DataSourceTypeInfo>(new DataSourceTypeInfo[] { "EPSG:3857 Pseudo-Mercator", "EPSG:4326 Lat-Long" });
+        ObservableCollection<DataSourceTypeInfo> Projections { get; } = new ObservableCollection<DataSourceTypeInfo>();
 
         bool ChangesMade { get; set; } = false;
         private bool Loading { get; set; } = true;
@@ -56,6 +57,9 @@ namespace Levrum.DataBridge
             DataSourceTypeComboBox.DisplayMemberPath = "Name";
             SqlDataTypeComboBox.ItemsSource = SqlSourceTypes;
             SqlDataTypeComboBox.DisplayMemberPath = "Name";
+
+            Projections.Add(new DataSourceTypeInfo("EPSG:3857 Pseudo-Mercator", CoordinateConverter.WebMercator.WKT));
+            Projections.Add(new DataSourceTypeInfo("EPSG:4326 Lat-Long", CoordinateConverter.WGS84.WKT));
             ProjectionColumnComboBox.ItemsSource = Projections;
             ProjectionColumnComboBox.DisplayMemberPath = "Name";
 
@@ -131,7 +135,22 @@ namespace Levrum.DataBridge
                     if (_dataSource.Parameters.ContainsKey("ProjectionName"))
                     {
                         string projectionName = _dataSource.Parameters["ProjectionName"];
-                        ProjectionColumnComboBox.SelectedItem = projectionName;
+                        var proj = (from p in Projections
+                                    where p.Name == projectionName
+                                    select p).FirstOrDefault();
+                        if (proj != null)
+                        {
+                            ProjectionColumnComboBox.SelectedItem = proj;
+                        } else
+                        {
+                            DataSourceTypeInfo info = new DataSourceTypeInfo(projectionName);
+                            if (_dataSource.Parameters.ContainsKey("Projection"))
+                            {
+                                info.Data = _dataSource.Parameters["Projection"];
+                            }
+                            Projections.Add(info);
+                            ProjectionColumnComboBox.SelectedItem = info;
+                        }
                     }
                 }
                 ChangesMade = false;
@@ -209,9 +228,9 @@ namespace Levrum.DataBridge
             else if (DataSource is GeoSource)
             {
                 DataSource.Parameters["File"] = GeoFileNameTextBox.Text;
-                // DataSource.Parameters["ProjectionName"] = ProjectionColumnComboBox.SelectedItem as string;
-                // DataSource.Parameters["ProjectionName"] = "Texas North Central";
-                // DataSource.Parameters["Projection"] = "PROJCS[\"NAD_1983_StatePlane_Texas_North_Central_FIPS_4202_Feet\",GEOGCS[\"GCS_North_American_1983\",DATUM[\"D_North_American_1983\",SPHEROID[\"GRS_1980\",6378137.0,298.257222101]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Lambert_Conformal_Conic\"],PARAMETER[\"False_Easting\",1968500.0],PARAMETER[\"False_Northing\",6561666.666666666],PARAMETER[\"Central_Meridian\",-98.5],PARAMETER[\"Standard_Parallel_1\",32.13333333333333],PARAMETER[\"Standard_Parallel_2\",33.96666666666667],PARAMETER[\"Latitude_Of_Origin\",31.66666666666667],UNIT[\"Foot_US\",0.3048006096012192]]";
+                DataSourceTypeInfo info = ProjectionColumnComboBox.SelectedItem as DataSourceTypeInfo;
+                DataSource.Parameters["Projection"] = info.Data;
+                DataSource.Parameters["ProjectionName"] = info.Name;
             }
             else
             {
@@ -450,18 +469,9 @@ namespace Levrum.DataBridge
 
         private void ProjectionColumnComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            DataSource.Parameters["ProjectionName"] = ProjectionColumnComboBox.SelectedItem as string;
-            if (ProjectionColumnComboBox.SelectedIndex == 0)
-            {   
-                DataSource.Parameters["Projection"] = CoordinateConverter.WebMercator.WKT;
-            } else if (ProjectionColumnComboBox.SelectedIndex == 1)
-            {
-                DataSource.Parameters["Projection"] = CoordinateConverter.WGS84.WKT;
-            } else
-            {
-                DataSourceTypeInfo info = (DataSourceTypeInfo)ProjectionColumnComboBox.SelectedItem;
-                DataSource.Parameters["Projection"] = info.Data;
-            }
+            DataSourceTypeInfo info = (DataSourceTypeInfo)ProjectionColumnComboBox.SelectedItem;
+            DataSource.Parameters["ProjectionName"] = info.Name;
+            DataSource.Parameters["Projection"] = info.Data;
         }
 
         private void AddProjectionButton_Click(object sender, RoutedEventArgs e)
@@ -513,6 +523,19 @@ namespace Levrum.DataBridge
                 {
                     source.Parameters["ProjectionName"] = projectionName;
                     source.Parameters["Projection"] = projection;
+                }
+                var existingProjection = (from DataSourceTypeInfo t in Projections
+                                          where t.Name == projectionName
+                                          select t).FirstOrDefault();
+                if (existingProjection == null)
+                {
+                    DataSourceTypeInfo newProjection = new DataSourceTypeInfo(projectionName);
+                    newProjection.Data = projection;
+                    Projections.Add(newProjection);
+                    ProjectionColumnComboBox.SelectedItem = newProjection;
+                } else
+                {
+                    ProjectionColumnComboBox.SelectedItem = existingProjection;
                 }
 
                 summarizeGeoFile(ofd.FileName);
@@ -624,12 +647,13 @@ namespace Levrum.DataBridge
 
     public class DataSourceTypeInfo
     {
-        public string Name { get; set; } = "";
-        public string Data { get; set; } = "";
+        public string Name { get; set; } = string.Empty;
+        public string Data { get; set; } = string.Empty;
 
-        public DataSourceTypeInfo(string _name)
+        public DataSourceTypeInfo(string _name, string _data = "")
         {
             Name = _name;
+            Data = _data;
         }
 
         public override string ToString()

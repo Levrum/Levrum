@@ -82,6 +82,10 @@ namespace Levrum.Data.Sources
                 {
                     output = JsonConvert.DeserializeObject<SqlSource>(jo.ToString(), s_serializerSettings);
                 }
+                else if (type == DataSourceType.GeoSource)
+                {
+                    output = JsonConvert.DeserializeObject<GeoSource>(jo.ToString(), s_serializerSettings);
+                }
                 else
                 {
                     throw new NotImplementedException();
