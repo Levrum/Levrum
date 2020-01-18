@@ -8,7 +8,7 @@
     <Version>0.0.3</Version>
     <Authors>Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
-    <Copyright>(c) 2019 Levrum Data Technologies</Copyright>
+    <Copyright>(c) 2019, 2020 Levrum Data Technologies</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 

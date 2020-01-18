@@ -37,7 +37,9 @@ namespace Levrum.DataBridge
             const string fn = "JavascriptDebugWindow.HandleTextboxRightClick()";
             try
             {
-                DebugOutputTextBox.Text = "";  // should do this with a right click menu item, but need time to figure out how to do that in WPF
+                // should do this with a right click menu item, but need time to figure out how to do that in WPF
+                DebugOutput.Clear();
+                DebugOutputTextBox.Text = DebugOutput.ToString();  
             }
             catch(Exception exc)
             {
