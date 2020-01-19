@@ -7,7 +7,8 @@
         xmlns:local="clr-namespace:Levrum.DataBridge"
         mc:Ignorable="d"
         Title="Edit Script" Height="450" Width="800"
-        WindowStartupLocation="CenterOwner">
+        WindowStartupLocation="CenterOwner"
+        Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="38"/>
@@ -15,11 +16,15 @@
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <Label Grid.Row="0" x:Name="Label" Content="Define PostProcessing Script:" FontSize="18" FontWeight="DemiBold" Margin="4,0,0,0"/>
+        <TextBlock Grid.Row="1" x:Name="WaitingForEditorText" Text="Waiting for external editor to close..." FontSize="24" Margin="8,8,8,8"/>
         <avalonEdit:TextEditor Grid.Row="1" x:Name="TextBox" Text="Enter JavaScript here..." Margin="8,0,8,0" FontSize="14" TextChanged="TextBox_TextChanged" Foreground="DarkGray" GotFocus="TextBox_GotFocus" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left"/>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left">
+            <Button x:Name="LoadButton" Width="80" Margin="8,8,8,8" Click="LoadButton_Click">_Load...</Button>
+            <Button x:Name="EditButton" Width="120" Margin="8,8,8,8" Click="EditButton_Click">Launch _Editor...</Button>
+        </StackPanel>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button x:Name="SaveButton" Width="80" Margin="0,8,0,8" Click="SaveButton_Click">Save</Button>
-            <Button x:Name="CancelButton" Width="80" Margin="8,8,8,8" Click="CancelButton_Click">Cancel</Button>
+            <Button x:Name="SaveButton" Width="80" Margin="8,8,0,8" Click="SaveButton_Click">_Save</Button>
+            <Button x:Name="CancelButton" Width="80" Margin="8,8,8,8" Click="CancelButton_Click">_Cancel</Button>
         </StackPanel>
     </Grid>
 </Window>
