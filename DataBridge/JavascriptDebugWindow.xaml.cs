@@ -28,6 +28,11 @@ namespace Levrum.DataBridge
 
         public void OnMessageReceived(object sender, string message)
         {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(new Action(() => { OnMessageReceived(sender, message); }));
+                return;
+            }
             DebugOutput.Append(message);
             DebugOutputTextBox.Text = DebugOutput.ToString();
         }

@@ -25,11 +25,12 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="22" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="22" />
         </Grid.RowDefinitions>
         <Menu Grid.Row="0" Height="20">
-            <MenuItem Header="_File" IsTabStop="False">
-                <MenuItem Header="_New" Click="NewMenuItem_Click"/>
-                <MenuItem Header="_Open..." Click="OpenMenuItem_Click"/>
+            <MenuItem Name="FileMenu" Header="_File" IsTabStop="False">
+                <MenuItem Name="NewMenuItem" Header="_New" Click="NewMenuItem_Click"/>
+                <MenuItem Name="OpenMenuItem" Header="_Open..." Click="OpenMenuItem_Click"/>
                 <Separator/>
                 <MenuItem Name="CloseMenuItem" Header="_Close" Click="CloseMenuItem_Click" IsEnabled="False"/>
                 <Separator/>
@@ -41,10 +42,10 @@
                 <Separator/>
                 <MenuItem Header="E_xit" Click="ExitMenuItem_Click"/>
             </MenuItem>
-            <MenuItem Header="_Tools" IsTabStop="False">
+            <MenuItem Name="ToolsMenu" Header="_Tools" IsTabStop="False">
                 <MenuItem x:Name="ConvertJsonToCsv" Header="_Convert Incident JSON to CSV..." Click="ConvertJsonToCsv_Click" IsEnabled="True"/>
             </MenuItem>
-            <MenuItem Header="_Settings" IsTabStop="False">
+            <MenuItem Name="SettingsMenu" Header="_Settings" IsTabStop="False">
                 <MenuItem x:Name="CoordinateConversionMenuItem" Header="Enable _Coordinate Conversion" Click="CoordinateConversionMenuItem_Click" IsEnabled="False"/>
                 <MenuItem x:Name="DefineProjectionMenuItem" Header="Define _Projection For Conversion..." Click="DefineProjectionMenuItem_Click" IsEnabled="False"/>
                 <MenuItem x:Name="ToggleInvertLatitude" Header="Enable Invert _Latitude" Click="ToggleInvertLatitude_Click" IsEnabled="False"/>
@@ -54,12 +55,12 @@
                 <Separator/>
                 <MenuItem x:Name="DefinePostProcessingScript" Header="Define PostProcessing _Script..." Click="DefinePostProcessingScript_Click" IsEnabled="False"/>
             </MenuItem>
-            <MenuItem Header="_Help" IsTabStop="False">
+            <MenuItem Name="HelpMenu" Header="_Help" IsTabStop="False">
                 <MenuItem x:Name="ShowJSDebugMenuItem" Header="Show _JavaScript Debug Window..." Click="ShowJSDebugMenuItem_Click"/>
                 <MenuItem Header="_About"/>
             </MenuItem>
         </Menu>
-        <xcad:DockingManager Grid.Row="1" DocumentClosing="DockingManager_DocumentClosing">
+        <xcad:DockingManager Name="DockingManager" Grid.Row="1" DocumentClosing="DockingManager_DocumentClosing">
             <xcad:DockingManager.Theme>
                 <xcad:Vs2013LightTheme/>
             </xcad:DockingManager.Theme>
@@ -86,5 +87,13 @@
                 </xcad:LayoutPanel>
             </xcad:LayoutRoot>
         </xcad:DockingManager>
+        <StatusBar Grid.Row="2">
+            <StatusBarItem>
+                <ProgressBar x:Name="StatusBarProgress" Width="200" Height="18" Maximum="100" Margin="2,-2,0,0"/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <TextBlock Name="StatusBarText" Margin="0,-2,0,0"></TextBlock>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </Window>

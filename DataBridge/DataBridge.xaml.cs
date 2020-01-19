@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -31,7 +34,8 @@ namespace Levrum.DataBridge
         public DataMapEditor ActiveEditor { get; set; } = null;
 
         public JavascriptDebugWindow DebugWindow { get; set; } = new JavascriptDebugWindow();
-        // public Dictionary<DataMap, LayoutDocument> openDocuments = new Dictionary<DataMap, LayoutDocument>();
+        
+        public BackgroundWorker Worker { get; set; } = null;
 
         public MainDataBridgeWindow()
         {
@@ -43,11 +47,24 @@ namespace Levrum.DataBridge
                 try
                 {
                     OpenDataMap(app.StartupFileName);
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     MessageBox.Show(string.Format("Unable to open DataMap file '{0}': {1}", app.StartupFileName, ex.Message));
                 }
             }
+        }
+
+        private void onLoaderProgress(object sender, string message, double progress)
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(new Action(() => { onLoaderProgress(sender, message, progress); }));
+                return;
+            }
+
+            StatusBarProgress.Value = progress;
+            StatusBarText.Text = message;
         }
 
         public void NewMenuItem_Click(object sender, RoutedEventArgs e)
@@ -96,11 +113,13 @@ namespace Levrum.DataBridge
                 OpenFileDialog ofd = new OpenFileDialog();
                 ofd.InitialDirectory = di.FullName;
                 ofd.DefaultExt = "dmap";
-                ofd.Filter = "Levrum DataMap (*.dmap)|*.dmap|All files (*.*)|*.*";
-                if (ofd.ShowDialog() == true) {
+                ofd.Filter = "Levrum DataMap files (*.dmap)|*.dmap|All files (*.*)|*.*";
+                if (ofd.ShowDialog() == true)
+                {
                     OpenDataMap(ofd.FileName);
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 MessageBox.Show(string.Format("Unable to open DataMap: {0}", ex.Message));
             }
@@ -153,7 +172,7 @@ namespace Levrum.DataBridge
                 }
                 else if (result == MessageBoxResult.Yes)
                 {
-                    if(!SaveMap(map))
+                    if (!SaveMap(map))
                     {
                         return;
                     }
@@ -201,7 +220,7 @@ namespace Levrum.DataBridge
                     SaveFileDialog sfd = new SaveFileDialog();
                     sfd.InitialDirectory = di.FullName;
                     sfd.DefaultExt = "dmap";
-                    sfd.Filter = "Levrum DataMap (*.dmap)|*.dmap|All files (*.*)|*.*";
+                    sfd.Filter = "Levrum DataMap files (*.dmap)|*.dmap|All files (*.*)|*.*";
                     if (sfd.ShowDialog() == false)
                     {
                         return false;
@@ -218,14 +237,16 @@ namespace Levrum.DataBridge
 
                 string mapJson = JsonConvert.SerializeObject(map, Formatting.Indented, new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All });
                 File.WriteAllText(map.Path, mapJson);
-                if (document != null) {
+                if (document != null)
+                {
                     document.ChangesMade = false;
                 }
 
                 SaveAsMenuItem.Header = string.Format("Save {0} _As...", map.Name);
                 SaveMenuItem.Header = string.Format("_Save {0}", map.Name);
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
 
             }
@@ -242,7 +263,8 @@ namespace Levrum.DataBridge
             if (e.PropertyName == "SelectedContentIndex")
             {
                 LayoutDocument document = DocumentPane.SelectedContent as LayoutDocument;
-                if (document != null) {
+                if (document != null)
+                {
                     DataMapEditor editor = document.Content as DataMapEditor;
                     ActiveEditor = editor;
                     if (editor != null)
@@ -267,7 +289,7 @@ namespace Levrum.DataBridge
                             ToggleInvertLatitude.IsEnabled = true;
                             ToggleInvertLongitude.IsEnabled = true;
                             updateInvertLatitudeHeader();
-                            updateInvertLongitudeHeader();                            
+                            updateInvertLongitudeHeader();
 
                             SelectCauseTreeMenuItem.IsEnabled = true;
                             DefinePostProcessingScript.IsEnabled = true;
@@ -294,6 +316,46 @@ namespace Levrum.DataBridge
                 SelectCauseTreeMenuItem.IsEnabled = false;
                 DefinePostProcessingScript.IsEnabled = false;
             }
+        }
+
+        public void EnableControls()
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(new Action(() => { EnableControls(); }));
+                return;
+            }
+
+            Cursor = Cursors.Arrow;
+            NewMenuItem.IsEnabled = true;
+            OpenMenuItem.IsEnabled = true;
+            SaveMenuItem.IsEnabled = true;
+            SaveAsMenuItem.IsEnabled = true;
+            CreateCallResponseCSVsMenuItem.IsEnabled = true;
+            CreateIncidentJsonMenuItem.IsEnabled = true;
+            ToolsMenu.IsEnabled = true;
+            SettingsMenu.IsEnabled = true;
+            DockingManager.IsEnabled = true;
+        }
+
+        public void DisableControls()
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(new Action(() => { DisableControls(); }));
+                return;
+            }
+
+            Cursor = Cursors.Wait;
+            NewMenuItem.IsEnabled = false;
+            OpenMenuItem.IsEnabled = false;
+            SaveMenuItem.IsEnabled = false;
+            SaveAsMenuItem.IsEnabled = false;
+            CreateCallResponseCSVsMenuItem.IsEnabled = false;
+            CreateIncidentJsonMenuItem.IsEnabled = false;
+            ToolsMenu.IsEnabled = false;
+            SettingsMenu.IsEnabled = false;
+            DockingManager.IsEnabled = false;
         }
 
         private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -348,7 +410,7 @@ namespace Levrum.DataBridge
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.DefaultExt = "json";
-            ofd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
+            ofd.Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*";
             if (ofd.ShowDialog() == true)
             {
                 try
@@ -356,7 +418,8 @@ namespace Levrum.DataBridge
                     List<CauseData> causeTree = JsonConvert.DeserializeObject<List<CauseData>>(File.ReadAllText(ofd.FileName), new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All });
                     DataSources.Map.CauseTree = causeTree;
                     SetChangesMade(DataSources.Map, true);
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     MessageBox.Show(string.Format("Unable to load cause JSON from file '{0}':\n{1}", ofd.FileName, ex.Message));
                 }
@@ -380,7 +443,7 @@ namespace Levrum.DataBridge
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.InitialDirectory = string.Format("{0}\\Levrum", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
             sfd.DefaultExt = "json";
-            sfd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
+            sfd.Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*";
             if (sfd.ShowDialog() == false)
             {
                 return;
@@ -388,31 +451,46 @@ namespace Levrum.DataBridge
             Cursor = Cursors.Wait;
 
             MapLoader loader = new MapLoader();
+            loader.OnProgressUpdate += onLoaderProgress;
             loader.DebugHost.OnDebugMessage += DebugWindow.OnMessageReceived;
-            try
-            {   
-                loader.LoadMap(DataSources.Map);
-                
-                JsonSerializerSettings settings = new JsonSerializerSettings();
-                settings.PreserveReferencesHandling = PreserveReferencesHandling.All;
-                settings.Formatting = Formatting.Indented;
-                string incidentJson = JsonConvert.SerializeObject(loader.Incidents, settings);
-                File.WriteAllText(sfd.FileName, incidentJson);
-                
-                FileInfo file = new FileInfo(sfd.FileName);
-                MessageBox.Show(string.Format("Incidents saved as JSON file '{0}'", file.Name));
-            } catch (Exception ex)
+            Worker = new BackgroundWorker();
+            Worker.WorkerSupportsCancellation = true;
+            loader.Worker = Worker;
+            Worker.DoWork += new DoWorkEventHandler((object sender, DoWorkEventArgs e) =>
             {
-                MessageBox.Show(string.Format("Unable to create JSON: {0}", ex.Message));
-            } finally
+                try
+                {
+                    DisableControls();
+                    
+                    loader.LoadMap(DataSources.Map);
+
+                    JsonSerializerSettings settings = new JsonSerializerSettings();
+                    settings.PreserveReferencesHandling = PreserveReferencesHandling.All;
+                    settings.Formatting = Formatting.Indented;
+                    string incidentJson = JsonConvert.SerializeObject(loader.Incidents, settings);
+                    File.WriteAllText(sfd.FileName, incidentJson);
+
+                    FileInfo file = new FileInfo(sfd.FileName);
+                    MessageBox.Show(string.Format("Incidents saved as JSON file '{0}'", file.Name));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(string.Format("Unable to create JSON: {0}", ex.Message));
+                }
+            });
+            Worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((object obj, RunWorkerCompletedEventArgs e) =>
             {
                 loader.DebugHost.OnDebugMessage -= DebugWindow.OnMessageReceived;
                 loader.Incidents.Clear();
                 loader.IncidentsById.Clear();
 
                 GC.Collect();
-                Cursor = Cursors.Arrow;
-            }
+                EnableControls();
+                StatusBarProgress.Value = 0;
+                StatusBarText.Text = "Ready";
+            });
+
+            Worker.RunWorkerAsync();
         }
 
         private void CreateCallResponseCSVsMenuItem_Click(object sender, RoutedEventArgs e)
@@ -421,7 +499,7 @@ namespace Levrum.DataBridge
             sfd.InitialDirectory = string.Format("{0}\\Levrum", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
             sfd.Title = "Save Incident CSV";
             sfd.DefaultExt = "csv";
-            sfd.Filter = "CSV Files (*.csv)|*.csv|All files (*.*)|*.*";
+            sfd.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
             if (sfd.ShowDialog() == false)
             {
                 return;
@@ -440,30 +518,40 @@ namespace Levrum.DataBridge
 
 
             MapLoader loader = new MapLoader();
+            loader.OnProgressUpdate += onLoaderProgress;
             loader.DebugHost.OnDebugMessage += DebugWindow.OnMessageReceived;
-            try
+            Worker = new BackgroundWorker();
+            Worker.WorkerSupportsCancellation = true;
+            loader.Worker = Worker;
+            Worker.DoWork += new DoWorkEventHandler((object sender, DoWorkEventArgs e) =>
             {
-                loader.LoadMap(DataSources.Map);
-                convertJsonToCsv(loader.Incidents, incidentCsvFileName, responseCsvFileName);
-                
-                MessageBox.Show(string.Format("Incidents saved as CSV files '{0}' and '{1}'", incidentCsvFileName, responseCsvFileName));
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(string.Format("Unable to create CSV files: {0}", ex.Message));
-            }
-            finally
+                try
+                {
+                    DisableControls();
+                    loader.LoadMap(DataSources.Map);
+                    convertJsonToCsv(loader.Incidents, incidentCsvFileName, responseCsvFileName);
+                    MessageBox.Show(string.Format("Incidents saved as CSV files '{0}' and '{1}'", incidentCsvFileName, responseCsvFileName));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(string.Format("Unable to create CSV files: {0}", ex.Message));
+                }
+            });
+            Worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((object obj, RunWorkerCompletedEventArgs e) =>
             {
                 loader.DebugHost.OnDebugMessage -= DebugWindow.OnMessageReceived;
                 loader.Incidents.Clear();
                 loader.IncidentsById.Clear();
 
                 GC.Collect();
-                Cursor = Cursors.Arrow;
-            }
+                EnableControls();
+                StatusBarProgress.Value = 0;
+                StatusBarText.Text = "Ready";
+            });
+            Worker.RunWorkerAsync();
         }
 
-        private void convertJsonToCsv(DataSet<IncidentData> incidents, string incidentFile, string responseFile)
+        private void convertJsonToCsv(DataSet<IncidentData> incidents, string incidentFile, string responseFile, BackgroundWorker worker = null)
         {
             HashSet<string> incidentDataFields = new HashSet<string>();
             HashSet<string> responseDataFields = new HashSet<string>();
@@ -491,6 +579,10 @@ namespace Levrum.DataBridge
             List<dynamic> responseRecords = new List<dynamic>();
             foreach (IncidentData incident in incidents)
             {
+                if (worker != null && worker.CancellationPending)
+                {
+                    return;
+                }
                 dynamic incidentRecord = new ExpandoObject();
                 incidentRecord.Id = incident.Id;
                 incidentRecord.Time = incident.Time;
@@ -678,7 +770,7 @@ namespace Levrum.DataBridge
             ofd.InitialDirectory = string.Format("{0}\\Levrum", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
             ofd.Title = "Select Incident JSON File";
             ofd.DefaultExt = "json";
-            ofd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
+            ofd.Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*";
             if (ofd.ShowDialog() == false)
             {
                 return;
@@ -688,7 +780,7 @@ namespace Levrum.DataBridge
             sfd.InitialDirectory = string.Format("{0}\\Levrum", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
             sfd.Title = "Save Incident CSV";
             sfd.DefaultExt = "csv";
-            sfd.Filter = "CSV Files (*.csv)|*.csv|All files (*.*)|*.*";
+            sfd.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
             if (sfd.ShowDialog() == false)
             {
                 return;
@@ -704,26 +796,46 @@ namespace Levrum.DataBridge
             }
             string responseCsvFileName = sfd.FileName;
 
-            try
+            Worker = new BackgroundWorker();
+            Worker.WorkerSupportsCancellation = true;
+            Worker.DoWork += new DoWorkEventHandler((object sender, DoWorkEventArgs e) =>
             {
-                Cursor = Cursors.Wait;
-                string incidentJson = File.ReadAllText(ofd.FileName);
-                DataSet<IncidentData> incidents = JsonConvert.DeserializeObject<DataSet<IncidentData>>(incidentJson);
+                try
+                {
+                    DisableControls();
+                    string incidentJson = File.ReadAllText(ofd.FileName);
+                    DataSet<IncidentData> incidents = JsonConvert.DeserializeObject<DataSet<IncidentData>>(incidentJson);
 
-                convertJsonToCsv(incidents, incidentCsvFileName, responseCsvFileName);
+                    convertJsonToCsv(incidents, incidentCsvFileName, responseCsvFileName, Worker);
 
-                MessageBox.Show(string.Format("Incidents saved as CSV files '{0}' and '{1}'", incidentCsvFileName, responseCsvFileName));
-            } catch (Exception ex)
+                    MessageBox.Show(string.Format("Incidents saved as CSV files '{0}' and '{1}'", incidentCsvFileName, responseCsvFileName));
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(string.Format("Unable to convert Incident JSON to CSV: {0}", ex.Message));
+                }
+            });
+            Worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((object obj, RunWorkerCompletedEventArgs e) =>
             {
-                MessageBox.Show("Unable to convert Incident JSON to CSV: {0}", ex.Message);
-            } finally
-            {
-                Cursor = Cursors.Arrow;
-            }
+                EnableControls();
+                StatusBarProgress.Value = 0;
+                StatusBarText.Text = "Ready";
+            });
+            Worker.RunWorkerAsync();
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            if (Worker != null && Worker.IsBusy)
+            {
+                MessageBoxResult result = MessageBox.Show(string.Format("A data processing operation is in progress. Cancel and exit?", "Cancel operation?", MessageBoxButton.YesNo));
+                if (result == MessageBoxResult.No)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+                Worker.CancelAsync();
+            }
             foreach (DataMapDocument doc in openDocuments)
             {
                 if (doc.ChangesMade)
@@ -732,13 +844,16 @@ namespace Levrum.DataBridge
                     if (result == MessageBoxResult.Cancel)
                     {
                         e.Cancel = true;
-                    } else if (result == MessageBoxResult.Yes)
+                        return;
+                    }
+                    else if (result == MessageBoxResult.Yes)
                     {
                         SaveMap(doc.Map, false);
                     }
                 }
             }
             DebugWindow.Close();
+            Application.Current.Shutdown();
         }
     }
 
@@ -748,7 +863,7 @@ namespace Levrum.DataBridge
         public LayoutDocument Document { get; set; } = null;
         public bool ChangesMade { get; set; } = false;
 
-        public DataMapDocument (DataMap _map, LayoutDocument _document, bool _changesMade = false)
+        public DataMapDocument(DataMap _map, LayoutDocument _document, bool _changesMade = false)
         {
             Map = _map;
             Document = _document;
