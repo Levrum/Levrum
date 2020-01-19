@@ -24,14 +24,26 @@ namespace Levrum.Data.Classes
             }
         }
 
-        public void SetDataValue(string key, object value)
-        {
-            Data[key] = value;
-        }
 
         public object GetDataValue(string key)
         {
             return Data.GetValue(key);
+        }
+
+        public bool SetDataValue(string key, object value)
+        {
+            const string fn = "AnnotatedData.SetDataValue()";
+            try
+            {
+                if (!Data.ContainsKey(key)) { Data.Add(key, value); }
+                else { Data[key] = value; }
+                return (true);
+            }
+            catch (Exception exc)
+            {
+                // Event logging goes here
+                return (false);
+            }
         }
 
         public void Intern()
