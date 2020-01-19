@@ -1,0 +1,152 @@
+{
+  "$id": "1",
+  "$type": "Levrum.Data.Map.DataMap, Levrum.Data.Map",
+  "Name": "Code3Strategist.dmap",
+  "EnableCoordinateConversion": false,
+  "IncidentMappings": {
+    "$id": "2",
+    "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Levrum.Data.Map.DataMapping, Levrum.Data.Map]], System.ObjectModel",
+    "$values": []
+  },
+  "IncidentDataMappings": {
+    "$id": "3",
+    "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Levrum.Data.Map.DataMapping, Levrum.Data.Map]], System.ObjectModel",
+    "$values": [
+      {
+        "$id": "4",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Code",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "5",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": null,
+          "DataSource": null
+        }
+      },
+      {
+        "$id": "6",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "CallProcessed",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "7",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": null,
+          "DataSource": null
+        }
+      },
+      {
+        "$id": "8",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Cancelled",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "9",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": null,
+          "DataSource": null
+        }
+      }
+    ]
+  },
+  "ResponseDataMappings": {
+    "$id": "10",
+    "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Levrum.Data.Map.DataMapping, Levrum.Data.Map]], System.ObjectModel",
+    "$values": [
+      {
+        "$id": "11",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Unit",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "12",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": null,
+          "DataSource": null
+        }
+      },
+      {
+        "$id": "13",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Priority",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "14",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": null,
+          "DataSource": null
+        }
+      }
+    ]
+  },
+  "BenchmarkMappings": {
+    "$id": "15",
+    "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Levrum.Data.Map.DataMapping, Levrum.Data.Map]], System.ObjectModel",
+    "$values": [
+      {
+        "$id": "16",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Assigned",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "17",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": null,
+          "DataSource": null
+        }
+      },
+      {
+        "$id": "18",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Responding",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "19",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": null,
+          "DataSource": null
+        }
+      },
+      {
+        "$id": "20",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "OnScene",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "21",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": null,
+          "DataSource": null
+        }
+      },
+      {
+        "$id": "22",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "ClearScene",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "23",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": null,
+          "DataSource": null
+        }
+      }
+    ]
+  },
+  "DataSources": {
+    "$id": "24",
+    "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Levrum.Data.Sources.IDataSource, Levrum.Data.Sources]], System.ObjectModel",
+    "$values": []
+  },
+  "ResponseIdColumn": "",
+  "Projection": "",
+  "InvertLongitude": false,
+  "InvertLatitude": false,
+  "CauseTree": {
+    "$id": "25",
+    "$type": "System.Collections.Generic.List`1[[Levrum.Data.Classes.CauseData, Levrum.Data.Classes]], System.Private.CoreLib",
+    "$values": []
+  },
+  "PostProcessingScript": ""
+}
