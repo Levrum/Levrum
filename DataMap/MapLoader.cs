@@ -12,8 +12,11 @@ using Levrum.Data.Classes;
 using Levrum.Utils;
 using Levrum.Utils.Geography;
 
-using Newtonsoft.Json;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
 
+using Newtonsoft.Json;
 
 namespace Levrum.Data.Map
 {
@@ -33,6 +36,13 @@ namespace Levrum.Data.Map
         public event MapLoaderProgressListener OnProgressUpdate;
 
         private const int c_numSteps = 10;
+
+        public Logger Logger { get; set; }
+
+        public MapLoader()
+        {
+            Logger = LogManager.GetCurrentClassLogger();
+        }
 
         public bool LoadMap(DataMap map)
         {
@@ -1137,6 +1147,18 @@ namespace Levrum.Data.Map
             }
         }
 
+        public void UpdateJSProgress(string message, string percentage)
+        {
+            double value = 0;
+            double.TryParse(percentage, out value);
+            UpdateJSProgress(message, value);
+        }
+
+        public void UpdateJSProgress(string message, double percentage)
+        {
+            updateProgress(10, message, percentage);
+        }
+
         private void executePostProcessing(DataMap map)
         {
             if (map.PostProcessingScript == string.Empty)
@@ -1150,7 +1172,9 @@ namespace Levrum.Data.Map
                 {
                     v8.AddHostObject("Incidents", Incidents);
                     v8.AddHostObject("Debug", DebugHost);
+                    v8.AddHostObject("Logger", Logger);
                     v8.AddHostObject("MapLoader", this);
+                    v8.AddHostType("LogLevel", typeof(LogLevel));
                     v8.AddHostType("IncidentData", typeof(IncidentData));
                     v8.AddHostType("ResponseData", typeof(ResponseData));
                     v8.AddHostType("BenchmarkData", typeof(BenchmarkData));
