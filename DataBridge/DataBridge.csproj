@@ -24,6 +24,7 @@
     <None Remove="GlobeIcon.png" />
     <None Remove="JsonIcon.png" />
     <None Remove="NewIcon.png" />
+    <None Remove="nlog.config" />
     <None Remove="OpenIcon.png" />
     <None Remove="Resources\BugIcon.png" />
     <None Remove="SaveIcon.png" />
@@ -37,6 +38,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="nlog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Templates\Code3Strategist.dmap">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -53,10 +57,10 @@
     <PackageReference Include="Dirkster.AvalonDock" Version="3.6.2" />
     <PackageReference Include="Dirkster.AvalonDock.Themes.VS2013" Version="3.6.2" />
     <PackageReference Include="DotNetProjects.Extended.Wpf.Toolkit" Version="4.6.78" />
-    <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="2.0.1" />
     <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="NLog" Version="4.6.8" />
   </ItemGroup>
 
   <ItemGroup>
