@@ -67,6 +67,8 @@
             </MenuItem>
             <MenuItem Name="HelpMenu" Header="_Help" IsTabStop="False">
                 <MenuItem x:Name="ShowJSDebugMenuItem" Header="Show _JavaScript Debug Window..." Click="ShowJSDebugMenuItem_Click"/>
+                <MenuItem x:Name="ViewLogsMenuItem" Header="View _Logs..." Click="ViewLogsMenuItem_Click" Visibility="Collapsed"/>
+                <Separator/>
                 <MenuItem Header="_About"/>
             </MenuItem>
         </Menu>

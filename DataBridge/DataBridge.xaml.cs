@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
@@ -33,7 +34,7 @@ namespace Levrum.DataBridge
 
         public DataMapEditor ActiveEditor { get; set; } = null;
 
-        public JavascriptDebugWindow DebugWindow { get; set; } = new JavascriptDebugWindow();
+        public JavascriptDebugWindow JSDebugWindow { get; set; } = new JavascriptDebugWindow();
         
         public BackgroundWorker Worker { get; set; } = null;
 
@@ -42,22 +43,39 @@ namespace Levrum.DataBridge
             InitializeComponent();
             DataSources.Window = this;
             App app = Application.Current as App;
-            if (app != null && !string.IsNullOrWhiteSpace(app.StartupFileName))
-            {
-                try
+            if (app != null) {
+                if (app.StartupFileNames.Length > 0)
                 {
-                    OpenDataMap(app.StartupFileName);
+                    DataMapDocument firstDocument = null;
+                    foreach (string fileName in app.StartupFileNames)
+                    {
+                        try
+                        {
+                            var document = OpenDataMap(fileName);
+                            if (firstDocument == null)
+                            {
+                                firstDocument = document;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            logException(this, string.Format("Unable to open DataMap file '{0}'", fileName), ex);
+                        }
+                    }
+
+                    if (firstDocument != null)
+                    {
+                        int index = DocumentPane.IndexOfChild(firstDocument.Document);
+                        DocumentPane.SelectedContentIndex = index;
+                    }
                 }
-                catch (Exception ex)
+                
+                if (app.DebugMode)
                 {
-                    logException(this, string.Format("Unable to open DataMap file '{0}'", app.StartupFileName), ex);
-                    updateToolbarsAndMenus();
+                    ViewLogsMenuItem.Visibility = Visibility.Visible;
                 }
             }
-            else
-            {
-                updateToolbarsAndMenus();
-            }
+            updateToolbarsAndMenus();    
         }
 
         private void onLoaderProgress(object sender, string message, double progress)
@@ -74,10 +92,11 @@ namespace Levrum.DataBridge
 
         private void logException(object sender, string message, Exception ex)
         {
-            MessageBox.Show(string.Format("{0}: {1}", message, ex.Message));
+            App app = Application.Current as App;
+            app.LogException(ex, message, true);
         }
 
-        public void OpenDataMap(string fileName)
+        public DataMapDocument OpenDataMap(string fileName)
         {
             try
             {
@@ -89,7 +108,7 @@ namespace Levrum.DataBridge
                 {
                     int index = DocumentPane.IndexOfChild(mapDocument.Document);
                     DocumentPane.SelectedContentIndex = index;
-                    return;
+                    return mapDocument;
                 }
 
                 FileInfo file = new FileInfo(fileName);
@@ -104,10 +123,13 @@ namespace Levrum.DataBridge
                 editor.Window = this;
                 document.Content = editor;
                 DocumentPane.Children.Add(document);
-                openDocuments.Add(new DataMapDocument(map, document));
+                mapDocument = new DataMapDocument(map, document);
+                openDocuments.Add(mapDocument);
+                return mapDocument;
             } catch (Exception ex)
             {
                 logException(this, "Unable to open DataMap", ex);
+                return null;
             }
         }
 
@@ -517,9 +539,9 @@ namespace Levrum.DataBridge
 
         private void ShowJSDebugMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            DebugWindow.Owner = this;
-            DebugWindow.Show();
-            DebugWindow.BringIntoView();
+            JSDebugWindow.Owner = this;
+            JSDebugWindow.Show();
+            JSDebugWindow.BringIntoView();
         }
 
         private void ConvertJsonToCsv_Click(object sender, RoutedEventArgs e)
@@ -618,7 +640,7 @@ namespace Levrum.DataBridge
                         }
                     }
                 }
-                DebugWindow.Close();
+                JSDebugWindow.Close();
             }
             catch (Exception ex)
             {
@@ -738,7 +760,7 @@ namespace Levrum.DataBridge
 
                 MapLoader loader = new MapLoader();
                 loader.OnProgressUpdate += onLoaderProgress;
-                loader.DebugHost.OnDebugMessage += DebugWindow.OnMessageReceived;
+                loader.DebugHost.OnDebugMessage += JSDebugWindow.OnMessageReceived;
                 Worker = new BackgroundWorker();
                 Worker.WorkerSupportsCancellation = true;
                 loader.Worker = Worker;
@@ -766,7 +788,7 @@ namespace Levrum.DataBridge
                 });
                 Worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((object obj, RunWorkerCompletedEventArgs e) =>
                 {
-                    loader.DebugHost.OnDebugMessage -= DebugWindow.OnMessageReceived;
+                    loader.DebugHost.OnDebugMessage -= JSDebugWindow.OnMessageReceived;
                     loader.Incidents.Clear();
                     loader.IncidentsById.Clear();
 
@@ -834,7 +856,7 @@ namespace Levrum.DataBridge
 
                 MapLoader loader = new MapLoader();
                 loader.OnProgressUpdate += onLoaderProgress;
-                loader.DebugHost.OnDebugMessage += DebugWindow.OnMessageReceived;
+                loader.DebugHost.OnDebugMessage += JSDebugWindow.OnMessageReceived;
                 Worker = new BackgroundWorker();
                 Worker.WorkerSupportsCancellation = true;
                 loader.Worker = Worker;
@@ -854,7 +876,7 @@ namespace Levrum.DataBridge
                 });
                 Worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((object obj, RunWorkerCompletedEventArgs e) =>
                 {
-                    loader.DebugHost.OnDebugMessage -= DebugWindow.OnMessageReceived;
+                    loader.DebugHost.OnDebugMessage -= JSDebugWindow.OnMessageReceived;
                     loader.Incidents.Clear();
                     loader.IncidentsById.Clear();
 
@@ -1030,13 +1052,24 @@ namespace Levrum.DataBridge
         {
             try
             {
-                DebugWindow.Owner = this;
-                DebugWindow.Show();
-                DebugWindow.BringIntoView();
-                DebugWindow.Activate();
+                JSDebugWindow.Owner = this;
+                JSDebugWindow.Show();
+                JSDebugWindow.BringIntoView();
+                JSDebugWindow.Activate();
             } catch (Exception ex)
             {
                 logException(sender, "Unable to show script debug window", ex);
+            }
+        }
+
+        private void ViewLogsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Process.Start("explorer.exe", string.Format("{0}\\Levrum\\Logs", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)));
+            } catch (Exception ex)
+            {
+                logException(sender, "Unable to view logs folder", ex);
             }
         }
     }
