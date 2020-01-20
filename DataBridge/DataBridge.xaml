@@ -9,10 +9,19 @@
         mc:Ignorable="d"
         Title="Levrum DataBridge" Height="700" Width="1368" Icon="databridge.ico"
         Closing="Window_Closing">
+    <Window.Resources>
+        <Style TargetType="Image" x:Key="DynamicImageOpacity">
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
     <Window.CommandBindings>
-        <CommandBinding Command="New" Executed="NewMenuItem_Click"/>
-        <CommandBinding Command="Open" Executed="OpenMenuItem_Click"/>
-        <CommandBinding Command="Save" Executed="SaveMenuItem_Click"/>
+        <CommandBinding Command="New" Executed="New_Click"/>
+        <CommandBinding Command="Open" Executed="Open_Click"/>
+        <CommandBinding Command="Save" Executed="Save_Click"/>
         <CommandBinding Command="Close" Executed="CloseMenuItem_Click"/>
     </Window.CommandBindings>
     <Window.InputBindings>
@@ -24,43 +33,104 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="22" />
+            <RowDefinition Height="34" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="22" />
+            <RowDefinition Height="24" />
         </Grid.RowDefinitions>
         <Menu Grid.Row="0" Height="20">
             <MenuItem Name="FileMenu" Header="_File" IsTabStop="False">
-                <MenuItem Name="NewMenuItem" Header="_New" Click="NewMenuItem_Click"/>
-                <MenuItem Name="OpenMenuItem" Header="_Open..." Click="OpenMenuItem_Click"/>
+                <MenuItem Name="NewMenuItem" Header="_New" Click="New_Click"/>
+                <MenuItem Name="OpenMenuItem" Header="_Open..." Click="Open_Click"/>
                 <Separator/>
                 <MenuItem Name="CloseMenuItem" Header="_Close" Click="CloseMenuItem_Click" IsEnabled="False"/>
                 <Separator/>
-                <MenuItem Name="SaveMenuItem" Header="_Save" Click="SaveMenuItem_Click" IsEnabled="False"/>
+                <MenuItem Name="SaveMenuItem" Header="_Save" Click="Save_Click" IsEnabled="False"/>
                 <MenuItem Name="SaveAsMenuItem" Header="Save _As..." Click="SaveAsMenuItem_Click" IsEnabled="False"/>
                 <Separator/>
-                <MenuItem Name="CreateIncidentJsonMenuItem" Header="Create _JSON..." Click="CreateIncidentJsonMenuItem_Click" IsEnabled="False"/>
-                <MenuItem Name="CreateCallResponseCSVsMenuItem" Header="Create CS_Vs..." Click="CreateCallResponseCSVsMenuItem_Click" IsEnabled="False"/>
+                <MenuItem Name="CreateIncidentJsonMenuItem" Header="Create _JSON..." Click="CreateJson_Click" IsEnabled="False"/>
+                <MenuItem Name="CreateCallResponseCSVsMenuItem" Header="Create CS_Vs..." Click="CreateCsv_Click" IsEnabled="False"/>
                 <Separator/>
                 <MenuItem Header="E_xit" Click="ExitMenuItem_Click"/>
             </MenuItem>
             <MenuItem Name="ToolsMenu" Header="_Tools" IsTabStop="False">
                 <MenuItem x:Name="ConvertJsonToCsv" Header="_Convert Incident JSON to CSV..." Click="ConvertJsonToCsv_Click" IsEnabled="True"/>
             </MenuItem>
-            <MenuItem Name="SettingsMenu" Header="_Settings" IsTabStop="False">
-                <MenuItem x:Name="CoordinateConversionMenuItem" Header="Enable _Coordinate Conversion" Click="CoordinateConversionMenuItem_Click" IsEnabled="False"/>
-                <MenuItem x:Name="DefineProjectionMenuItem" Header="Define _Projection For Conversion..." Click="DefineProjectionMenuItem_Click" IsEnabled="False"/>
-                <MenuItem x:Name="ToggleInvertLatitude" Header="Enable Invert _Latitude" Click="ToggleInvertLatitude_Click" IsEnabled="False"/>
-                <MenuItem x:Name="ToggleInvertLongitude" Header="Enable Invert Lon_gitude" Click="ToggleInvertLongitude_Click" IsEnabled="False"/>
+            <MenuItem Name="PropertiesMenu" Header="_Properties" IsTabStop="False">
+                <MenuItem x:Name="CoordinateConversionMenuItem" Header="Enable _Coordinate Conversion" Click="ToggleConvertCoordinate_Click" IsEnabled="False"/>
+                <MenuItem x:Name="EditProjectionMenuItem" Header="Edit Conversion _Projection..." Click="EditProjection_Click" IsEnabled="False"/>
+                <MenuItem x:Name="ToggleInvertLongitudeMenuItem" Header="Enable Invert Lon_gitude" Click="ToggleInvertLongitude_Click" IsEnabled="False"/>
+                <MenuItem x:Name="ToggleInvertLatitudeMenuItem" Header="Enable Invert _Latitude" Click="ToggleInvertLatitude_Click" IsEnabled="False"/>
                 <Separator/>
-                <MenuItem x:Name="SelectCauseTreeMenuItem" Header="Select Cause _Tree JSON..." Click="SelectCauseTreeMenuItem_Click" IsEnabled="False"/>
+                <MenuItem x:Name="EditCauseTreeMenuItem" Header="Edit Cause _Tree..." Click="EditCauseTree_Click" IsEnabled="False"/>
                 <Separator/>
-                <MenuItem x:Name="DefinePostProcessingScript" Header="Define PostProcessing _Script..." Click="DefinePostProcessingScript_Click" IsEnabled="False"/>
+                <MenuItem x:Name="EditPostProcessingScript" Header="Edit PostProcessing _Script..." Click="EditPostProcessingScript_Click" IsEnabled="False"/>
             </MenuItem>
             <MenuItem Name="HelpMenu" Header="_Help" IsTabStop="False">
                 <MenuItem x:Name="ShowJSDebugMenuItem" Header="Show _JavaScript Debug Window..." Click="ShowJSDebugMenuItem_Click"/>
                 <MenuItem Header="_About"/>
             </MenuItem>
         </Menu>
-        <xcad:DockingManager Name="DockingManager" Grid.Row="1" DocumentClosing="DockingManager_DocumentClosing">
+        <ToolBarTray Grid.Row="1" Margin="0,-1,0,0">
+            <ToolBar>
+                <Button x:Name="NewButton" Click="New_Click">
+                    <Image Source="/DataBridge;component/Resources/NewIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
+                </Button>
+                <Button x:Name="OpenButton" Click="Open_Click">
+                    <Image Source="/DataBridge;component/Resources/OpenIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
+                </Button>
+                <Button x:Name="SaveButton" Click="Save_Click">
+                    <Image Source="/DataBridge;component/Resources/SaveIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
+                </Button>
+                <Separator/>
+                <Button x:Name="CreateJsonButton" Margin="0,0,0,-1" Click="CreateJson_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/DataBridge;component/Resources/JsonIcon.png" Width="24" Height="24" Margin="0,0,0,0" Style="{StaticResource DynamicImageOpacity}"/>
+                        <Label Height="28">Create JSON...</Label>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="CreateCsvButton" Margin="0,0,0,-1" Click="CreateCsv_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/DataBridge;component/Resources/CsvIcon.png" Width="24" Height="24" Margin="0,0,0,0"  Style="{StaticResource DynamicImageOpacity}"/>
+                        <Label Height="28">Create CSVs...</Label>
+                    </StackPanel>
+                </Button>
+            </ToolBar>
+            <ToolBar>
+                <ToggleButton x:Name="ConvertCoordinateButton" Margin="0,0,0,-1" Click="ToggleConvertCoordinate_Click" ToolTip="Toggle Coordinate Conversion">
+                    <Image x:Name="ConvertCoordinateButtonIcon" Source="/DataBridge;component/Resources/CoordinateIcon.png" Width="24" Height="24" Margin="0,0,0,0" Style="{StaticResource DynamicImageOpacity}"/>
+                </ToggleButton>
+                <ToggleButton x:Name="InvertLongitudeButton" Margin="0,0,0,-1" Click="ToggleInvertLongitude_Click" ToolTip="Toggle Invert Longitude">
+                    <Image x:Name="InvertLongitudeButtonIcon" Source="/DataBridge;component/Resources/XIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
+                </ToggleButton>
+                <ToggleButton x:Name="InvertLatitudeButton" Margin="0,0,0,-1" Click="ToggleInvertLatitude_Click" ToolTip="Toggle Invert Latitude">
+                    <Image x:Name="InvertLatitudeButtonIcon" Source="/DataBridge;component/Resources/YIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
+                </ToggleButton>
+                <Button x:Name="EditProjectionButton" Margin="0,0,0,-1" Click="EditProjection_Click" ToolTip="Edit Projection...">
+                    <StackPanel Orientation="Horizontal">
+                        <Image x:Name="EditProjectionButtonIcon" Source="/DataBridge;component/Resources/GlobeIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
+                        <Label Height="28">Edit Projection...</Label>
+                    </StackPanel>
+                </Button>
+                <Separator/>
+                <Button x:Name="EditCauseTreeButton" Margin="0,0,0,-1" Click="EditCauseTree_Click" ToolTip="Edit Cause Tree">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/DataBridge;component/Resources/CauseTreeIcon.png" Width="24" Height="24" Margin="0,0,0,0" Style="{StaticResource DynamicImageOpacity}"/>
+                        <Label Height="28">Edit Cause Tree...</Label>
+                    </StackPanel>
+                </Button>
+                <Separator/>
+                <Button x:Name="EditPostProcessingButton" Margin="0,0,0,-1" Click="EditPostProcessingScript_Click" ToolTip="Edit PostProcessing Script">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/DataBridge;component/Resources/CodeIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
+                        <Label Height="28">PostProcessing Script...</Label>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="ShowJSDebugWindowButton" Margin="0,0,0,-1" Click="ShowJSDebugWindowButton_Click" ToolTip="Toggle Script Debug Window">
+                    <Image Source="/DataBridge;component/Resources/BugIcon.png" Width="24" Height="24"/>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+        <xcad:DockingManager Name="DockingManager" Grid.Row="2" DocumentClosing="DockingManager_DocumentClosing">
             <xcad:DockingManager.Theme>
                 <xcad:Vs2013LightTheme/>
             </xcad:DockingManager.Theme>
@@ -87,12 +157,12 @@
                 </xcad:LayoutPanel>
             </xcad:LayoutRoot>
         </xcad:DockingManager>
-        <StatusBar Grid.Row="2">
+        <StatusBar Grid.Row="3">
             <StatusBarItem>
-                <ProgressBar x:Name="StatusBarProgress" Width="200" Height="18" Maximum="100" Margin="2,-2,0,0"/>
+                <ProgressBar x:Name="StatusBarProgress" Width="200" Height="18" Maximum="100" Margin="2,0,0,0"/>
             </StatusBarItem>
             <StatusBarItem>
-                <TextBlock Name="StatusBarText" Margin="0,-2,0,0"></TextBlock>
+                <TextBlock Name="StatusBarText" Margin="0,0,0,0"></TextBlock>
             </StatusBarItem>
         </StatusBar>
     </Grid>

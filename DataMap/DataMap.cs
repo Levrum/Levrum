@@ -11,7 +11,7 @@ using Levrum.Utils.Data;
 
 namespace Levrum.Data.Map
 {
-    public class DataMap
+    public class DataMap : AnnotatedData
     {
         public string Name { get; set; } = string.Empty;
 
