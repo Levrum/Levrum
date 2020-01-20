@@ -105,12 +105,22 @@ namespace Levrum.Data.Sources
 
         public List<string> GetColumns()
         {
-            using (StreamReader sr = new StreamReader(CsvFile.OpenRead()))
-            using (CsvReader csvReader = new CsvReader(sr))
+            const string fn = "CsvSource.GetColumns()";
+            try
             {
-                csvReader.Read();
-                csvReader.ReadHeader();
-                return new List<string>(csvReader.Context.HeaderRecord);
+                if ((!CsvFile.Directory.Exists) || (!CsvFile.Exists)) { return (new List<string>()); }
+                using (StreamReader sr = new StreamReader(CsvFile.OpenRead()))
+                using (CsvReader csvReader = new CsvReader(sr))
+                {
+                    csvReader.Read();
+                    csvReader.ReadHeader();
+                    return new List<string>(csvReader.Context.HeaderRecord);
+                }
+            }
+            catch (Exception exc)
+            {
+                // add logging here
+                return (new List<string>());
             }
         }
 
