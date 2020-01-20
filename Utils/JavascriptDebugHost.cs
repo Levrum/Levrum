@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using Newtonsoft.Json;
+
 namespace Levrum.Utils
 {
     public class JavascriptDebugHost
@@ -11,6 +13,12 @@ namespace Levrum.Utils
         public void WriteLine()
         {
             writeMessage("\r\n");
+        }
+
+        public void Write(object obj)
+        {
+            string json = JsonConvert.SerializeObject(obj);
+            WriteLine(json);
         }
 
         public void Write(string message)
