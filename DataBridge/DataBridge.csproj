@@ -15,15 +15,31 @@
 
   <ItemGroup>
     <None Remove="BlankTemplate.png" />
+    <None Remove="CauseTreeIcon.png" />
+    <None Remove="CodeIcon.png" />
+    <None Remove="CoordinateIcon.png" />
+    <None Remove="CsvIcon.png" />
     <None Remove="databridge.ico" />
     <None Remove="datamap.ico" />
+    <None Remove="GlobeIcon.png" />
+    <None Remove="JsonIcon.png" />
+    <None Remove="NewIcon.png" />
+    <None Remove="OpenIcon.png" />
+    <None Remove="Resources\BugIcon.png" />
+    <None Remove="SaveIcon.png" />
     <None Remove="SuperionTemplate.png" />
+    <None Remove="Templates\Code3Strategist.dmap" />
     <None Remove="Templates\Superion.dmap" />
     <None Remove="Templates\TriTech.dmap" />
     <None Remove="TritechTemplate.png" />
+    <None Remove="XIcon.png" />
+    <None Remove="YIcon.png" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Templates\Code3Strategist.dmap">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Templates\Superion.dmap">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -37,6 +53,7 @@
     <PackageReference Include="Dirkster.AvalonDock" Version="3.6.2" />
     <PackageReference Include="Dirkster.AvalonDock.Themes.VS2013" Version="3.6.2" />
     <PackageReference Include="DotNetProjects.Extended.Wpf.Toolkit" Version="4.6.78" />
+    <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON" Version="2.0.1" />
     <PackageReference Include="NetTopologySuite.IO.ShapeFile" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
@@ -50,15 +67,27 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="BlankTemplate.png" />
+    <Resource Include="Resources\BlankTemplate.png" />
     <Content Include="databridge.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="datamap.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Resource Include="SuperionTemplate.png" />
-    <Resource Include="TritechTemplate.png" />
+    <Resource Include="Resources\BugIcon.png" />
+    <Resource Include="Resources\CauseTreeIcon.png" />
+    <Resource Include="Resources\CodeIcon.png" />
+    <Resource Include="Resources\CoordinateIcon.png" />
+    <Resource Include="Resources\CsvIcon.png" />
+    <Resource Include="Resources\GlobeIcon.png" />
+    <Resource Include="Resources\JsonIcon.png" />
+    <Resource Include="Resources\NewIcon.png" />
+    <Resource Include="Resources\OpenIcon.png" />
+    <Resource Include="Resources\SaveIcon.png" />
+    <Resource Include="Resources\SuperionTemplate.png" />
+    <Resource Include="Resources\TritechTemplate.png" />
+    <Resource Include="Resources\XIcon.png" />
+    <Resource Include="Resources\YIcon.png" />
   </ItemGroup>
 
   <ItemGroup>

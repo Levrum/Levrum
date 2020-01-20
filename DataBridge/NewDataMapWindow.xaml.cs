@@ -31,10 +31,10 @@ namespace Levrum.DataBridge
 
         public List<DataMapTemplateInfo> Templates { get; protected set; } = new List<DataMapTemplateInfo>(
             new DataMapTemplateInfo[] {
-                new DataMapTemplateInfo(){ Image = "/DataBridge;component/BlankTemplate.png", Description = "Empty DataMap", Template = null, Type = DataMapType.CsvFile },
-                new DataMapTemplateInfo(){ Image = "/DataBridge;component/BlankTemplate.png", Description = "Code3 Strategist", Template = "Templates\\Code3Strategist.dmap", Type = DataMapType.CsvFile },
-                new DataMapTemplateInfo(){ Image = "/DataBridge;component/SuperionTemplate.png", Description = "Superion", Template = "Templates\\Superion.dmap", Type = DataMapType.SqlServer },
-                new DataMapTemplateInfo(){ Image = "/DataBridge;component/TritechTemplate.png", Description = "TriTech Inform", Template = "Templates\\TriTech.dmap", Type = DataMapType.SqlServer },
+                new DataMapTemplateInfo(){ Image = "/DataBridge;component/Resources/BlankTemplate.png", Description = "Empty DataMap", Template = null, Type = DataMapType.CsvFile },
+                new DataMapTemplateInfo(){ Image = "/DataBridge;component/Resources/BlankTemplate.png", Description = "Code3 Strategist", Template = "Templates\\Code3Strategist.dmap", Type = DataMapType.CsvFile },
+                new DataMapTemplateInfo(){ Image = "/DataBridge;component/Resources/SuperionTemplate.png", Description = "Superion", Template = "Templates\\Superion.dmap", Type = DataMapType.SqlServer },
+                new DataMapTemplateInfo(){ Image = "/DataBridge;component/Resources/TritechTemplate.png", Description = "TriTech Inform", Template = "Templates\\TriTech.dmap", Type = DataMapType.SqlServer },
                 }
             );
 

@@ -87,12 +87,14 @@ namespace Levrum.DataBridge
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            DialogResult = true;
             Result = TextBox.Text;
             Close();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
+            DialogResult = false;
             Result = InitialText;
             Close();
         }
