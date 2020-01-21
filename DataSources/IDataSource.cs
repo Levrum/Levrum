@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
+using Levrum.Utils;
 
 namespace Levrum.Data.Sources
 {
@@ -63,15 +64,16 @@ namespace Levrum.Data.Sources
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            JObject jo = JObject.Load(reader);
-            if (jo.First.Path == "$ref")
-            {
-                return JsonObjectRefs[jo.Value<int>("$ref")];
-            }
-
-            int index = jo["Type"].Value<int>();
             try
             {
+                JObject jo = JObject.Load(reader);
+                if (jo.First.Path == "$ref")
+                {
+                    return JsonObjectRefs[jo.Value<int>("$ref")];
+                }
+
+                int index = jo["Type"].Value<int>();
+
                 DataSourceType type = (DataSourceType)index;
                 object output;
                 if (type == DataSourceType.CsvSource)
@@ -96,8 +98,8 @@ namespace Levrum.Data.Sources
             }
             catch (Exception ex)
             {
-                // Do stuff and things
-                throw new NotImplementedException();
+                LogHelper.LogException(ex, "Unable to deserialize DataSource", false);
+                return null;
             }
         }
 
