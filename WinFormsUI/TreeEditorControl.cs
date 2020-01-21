@@ -1,11 +1,14 @@
-﻿using Levrum.Data.Classes;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
+
+using Newtonsoft.Json;
+
+using Levrum.Data.Classes;
+using Levrum.Utils;
 
 namespace Levrum.UI.WinForms
 {
@@ -32,6 +35,11 @@ namespace Levrum.UI.WinForms
                 return ConvertToTree();
             }
         }
+
+        public bool SaveTreeToFile { get; set; } = true;
+        public event SaveTreeDelegate OnSaveTree;
+
+        public delegate void SaveTreeDelegate(List<ICategoryData> tree);
 
         List<FlowLayoutPanel> m_selectedPanels = new List<FlowLayoutPanel>();
         List<Button> m_selectedButtons = new List<Button>();
@@ -225,17 +233,23 @@ namespace Levrum.UI.WinForms
 
         private void m_btnLoadTree_Click(object sender, EventArgs e)
         {
-            OpenFileDialog ofd = new OpenFileDialog();
-            ofd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
-            if (ofd.ShowDialog() != DialogResult.OK)
+            try
             {
-                return;
+                OpenFileDialog ofd = new OpenFileDialog();
+                ofd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
+                if (ofd.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+
+                string fileName = ofd.FileName;
+
+                List<ICategoryData> tree = JsonConvert.DeserializeObject<List<ICategoryData>>(File.ReadAllText(fileName), new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All });
+                LoadTree(tree, m_flpUnorganizedData);
+            } catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "Exception loading tree", true);
             }
-
-            string fileName = ofd.FileName;
-
-            List<ICategoryData> tree = JsonConvert.DeserializeObject<List<ICategoryData>>(File.ReadAllText(fileName), new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All });
-            LoadTree(tree, m_flpUnorganizedData);
         }
 
         private void LoadTree(IEnumerable<ICategoryData> categoryData, FlowLayoutPanel parentPanel)
@@ -311,6 +325,12 @@ namespace Levrum.UI.WinForms
             newPanel.Controls.Add(GenerateSubcategoryButton());
 
             parentPanel.Controls.Add(newPanel);
+
+            if (parentPanel.Tag is ICategoryData)
+            {
+                ICategoryData data = parentPanel.Tag as ICategoryData;
+                data.Children.Add(panelCatData);
+            }
 
             return newPanel;
         }
@@ -752,14 +772,20 @@ namespace Levrum.UI.WinForms
 
         private void m_btnLoadIncidents_Click(object sender, EventArgs e)
         {
-            // Load incident json
-            OpenFileDialog ofd = new OpenFileDialog { Filter = "JOSN Files (*.JSON, *.json)|*.JSON;*.json" };
-            if (ofd.ShowDialog() != DialogResult.OK)
+            try
             {
-                return;
-            }
+                // Load incident json
+                OpenFileDialog ofd = new OpenFileDialog { Filter = "JOSN Files (*.JSON, *.json)|*.JSON;*.json" };
+                if (ofd.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
 
-            LoadIncidents(ofd.FileName);
+                LoadIncidents(ofd.FileName);
+            } catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "Exception loading incidents", true);
+            }
         }
 
         public void LoadIncidents(string fileName)
@@ -863,23 +889,27 @@ namespace Levrum.UI.WinForms
         private void SaveTree()
         {
             List<ICategoryData> tree = ConvertToTree();
-            SaveFileDialog ofd = new SaveFileDialog();
-            ofd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
-            if (ofd.ShowDialog() == DialogResult.OK)
+            if (SaveTreeToFile)
             {
-                string fileName = ofd.FileName;
-                try
+                SaveFileDialog ofd = new SaveFileDialog();
+                ofd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
+                if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    string jsonTree = JsonConvert.SerializeObject(tree, new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All });
-                    File.WriteAllText(fileName, jsonTree);
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Could not save tree.");
-                }
+                    string fileName = ofd.FileName;
+                    try
+                    {
+                        string jsonTree = JsonConvert.SerializeObject(tree, new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All });
+                        File.WriteAllText(fileName, jsonTree);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Could not save tree.");
+                    }
 
-                MessageBox.Show("Successfully Saved Tree!");
+                    MessageBox.Show("Successfully Saved Tree!");
+                }
             }
+            OnSaveTree?.Invoke(tree);
         }
 
         private void OrganizedData_Click(object sender, EventArgs e)
