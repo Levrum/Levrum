@@ -16,6 +16,8 @@ using Newtonsoft.Json;
 using Levrum.Data.Map;
 using Levrum.Data.Sources;
 
+using Levrum.Utils;
+
 namespace Levrum.DataBridge
 {
     /// <summary>
@@ -71,20 +73,25 @@ namespace Levrum.DataBridge
 
         private DataMap loadTemplate(DataMapTemplateInfo info)
         {
-            if (info.Type == DataMapType.CsvFile)
+            try
             {
-                return new DataMap("New DataMap.dmap");
-            } else
-            {
-                FileInfo template = new FileInfo(info.Template);
-                if (!template.Exists)
-                {
-                    throw new FileNotFoundException(info.Template);
-                }
+                if (info.Template != null)
+                { 
+                    FileInfo template = new FileInfo(info.Template);
+                    if (!template.Exists)
+                    {
+                        throw new FileNotFoundException(info.Template);
+                    }
 
-                string templateJson = File.ReadAllText(info.Template);
-                return JsonConvert.DeserializeObject<DataMap>(templateJson);
+                    string templateJson = File.ReadAllText(info.Template);
+                    return JsonConvert.DeserializeObject<DataMap>(templateJson);
+                }
+            } catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "Exception loading template", true);
             }
+
+            return new DataMap("New DataMap.dmap");
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
