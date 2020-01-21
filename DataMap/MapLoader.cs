@@ -13,6 +13,7 @@ using Levrum.Utils;
 using Levrum.Utils.Geography;
 
 using NLog;
+using NLogLevel = NLog.LogLevel;
 using NLog.Config;
 using NLog.Targets;
 
@@ -1174,7 +1175,7 @@ namespace Levrum.Data.Map
                     v8.AddHostObject("Debug", DebugHost);
                     v8.AddHostObject("Logger", Logger);
                     v8.AddHostObject("MapLoader", this);
-                    v8.AddHostType("LogLevel", typeof(LogLevel));
+                    v8.AddHostType("LogLevel", typeof(NLogLevel));
                     v8.AddHostType("IncidentData", typeof(IncidentData));
                     v8.AddHostType("ResponseData", typeof(ResponseData));
                     v8.AddHostType("BenchmarkData", typeof(BenchmarkData));
