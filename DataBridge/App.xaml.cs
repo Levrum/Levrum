@@ -43,7 +43,7 @@ namespace Levrum.DataBridge
             Dispatcher.UnhandledException += Dispatcher_UnhandledException;
             LogHelper.OnMessageBox += LogHelper_OnMessageBox;
             LogHelper.OnFatalError += LogHelper_OnFatalError;
-            LogHelper.LogMessage(LogLevel.Debug, string.Format("Started DataBridge: Assembly {0}", Assembly.GetExecutingAssembly().FullName));
+            LogHelper.LogMessage(LogLevel.Info, string.Format("Started Application {0}", Assembly.GetExecutingAssembly().FullName));
             Exit += App_Exit;
         }
 
@@ -59,12 +59,12 @@ namespace Levrum.DataBridge
 
         private void App_Exit(object sender, ExitEventArgs e)
         {
-            LogHelper.LogMessage(LogLevel.Debug, string.Format("DataBridge shutdown"));
+            LogHelper.LogMessage(LogLevel.Info, string.Format("DataBridge shutdown"));
         }
 
         private void Dispatcher_UnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            LogHelper.LogMessage(LogLevel.Fatal, "Unhandled Exception", e.Exception);
+            LogHelper.LogMessage(LogLevel.Fatal, string.Format("Unhandled Exception: {0} {1}", e.Exception.Message, e.Exception.StackTrace), e.Exception);
             e.Handled = true;
         }
     }

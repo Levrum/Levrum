@@ -24,15 +24,12 @@ namespace Levrum.Utils
 
         static LogHelper()
         {
-
             Logger = LogManager.GetCurrentClassLogger();
         }
 
         public static void LogMessage(LogLevel level, string message = "", Exception ex = null)
         {
             LogMessage(GetNLogLevel(level), ex, message);
-            
-            LogException(ex, message, true);
         }
 
         public static NLogLevel GetNLogLevel(LogLevel level)
@@ -60,6 +57,10 @@ namespace Levrum.Utils
             try
             {
                 Logger.Error(ex, message);
+                if (showMessageBox)
+                {
+                    OnMessageBox?.Invoke(message, "Exception Occured");
+                }
             }
             catch (Exception loggingException)
             {
