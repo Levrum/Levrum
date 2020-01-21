@@ -5,7 +5,7 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>Levrum.UI.WPF</AssemblyName>
     <RootNamespace>Levrum.UI.WPF</RootNamespace>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <Authors>Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
