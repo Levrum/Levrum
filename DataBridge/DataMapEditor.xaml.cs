@@ -13,8 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 using Levrum.Data.Map;
-
-using NLog;
+using Levrum.Utils;
 
 namespace Levrum.DataBridge
 {
@@ -36,20 +35,6 @@ namespace Levrum.DataBridge
             UpdateStaticMappingButtons();
         }
 
-        private void logMessage(LogLevel level, string message = "", Exception ex = null)
-        {
-            App app = Application.Current as App;
-            if (ex == null || level == LogLevel.Debug || level == LogLevel.Info)
-            {
-                app.LogMessage(level, ex, message);
-            }
-            else
-            {
-                app.LogException(ex, message, true);
-            }
-
-        }
-
         private void AddIncidentFieldButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -68,7 +53,7 @@ namespace Levrum.DataBridge
             }
             catch (Exception ex)
             {
-                logMessage(LogLevel.Error, "Unable to add Incident Field", ex);
+                LogHelper.LogMessage(LogLevel.Error, "Unable to add Incident Field", ex);
             }
         }
 
@@ -87,7 +72,7 @@ namespace Levrum.DataBridge
                 }
             } catch (Exception ex)
             {
-                logMessage(LogLevel.Error, "Unable to remove Incident Field", ex);
+                LogHelper.LogMessage(LogLevel.Error, "Unable to remove Incident Field", ex);
             }
         }
 
@@ -109,7 +94,7 @@ namespace Levrum.DataBridge
             }
             catch (Exception ex)
             {
-                logMessage(LogLevel.Error, "Unable to add Response Field", ex);
+                LogHelper.LogMessage(LogLevel.Error, "Unable to add Response Field", ex);
             }
         }
 
@@ -128,7 +113,7 @@ namespace Levrum.DataBridge
                 }
             } catch (Exception ex)
             {
-                logMessage(LogLevel.Error, "Unable to remove Response Field", ex);
+                LogHelper.LogMessage(LogLevel.Error, "Unable to remove Response Field", ex);
             }
         }
 
@@ -182,7 +167,7 @@ namespace Levrum.DataBridge
             }
             catch (Exception ex)
             {
-                logMessage(LogLevel.Error, "Unable to edit mapping", ex);
+                LogHelper.LogMessage(LogLevel.Error, "Unable to edit mapping", ex);
             }
         }
 
@@ -239,7 +224,7 @@ namespace Levrum.DataBridge
             }
             catch (Exception ex)
             {
-                logMessage(LogLevel.Error, "Unable to add Response Timing Field", ex);
+                LogHelper.LogMessage(LogLevel.Error, "Unable to add Response Timing Field", ex);
             }
         }
 
@@ -258,7 +243,7 @@ namespace Levrum.DataBridge
                 }
             } catch (Exception ex)
             {
-                logMessage(LogLevel.Error, "Unable to remove Response Timing Field", ex);
+                LogHelper.LogMessage(LogLevel.Error, "Unable to remove Response Timing Field", ex);
             }
         }
 
@@ -301,7 +286,7 @@ namespace Levrum.DataBridge
             }
             catch (Exception ex)
             {
-                logMessage(LogLevel.Error, "Unable to edit Incident Field", ex);
+                LogHelper.LogMessage(LogLevel.Error, "Unable to edit Incident Field", ex);
             }
         }
 
@@ -326,7 +311,7 @@ namespace Levrum.DataBridge
             }
             catch (Exception ex)
             {
-                logMessage(LogLevel.Error, "Unable to edit Response Field", ex);
+                LogHelper.LogMessage(LogLevel.Error, "Unable to edit Response Field", ex);
             }
         }
 
@@ -351,7 +336,7 @@ namespace Levrum.DataBridge
             }
             catch (Exception ex)
             {
-                logMessage(LogLevel.Error, "Unable to edit Response Timing Field", ex);
+                LogHelper.LogMessage(LogLevel.Error, "Unable to edit Response Timing Field", ex);
             }
         }
     }

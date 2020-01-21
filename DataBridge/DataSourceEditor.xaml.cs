@@ -8,18 +8,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-using Levrum.Data.Classes;
-using Levrum.Data.Map;
-using Levrum.Data.Sources;
-
-using Levrum.Utils.Data;
-using Levrum.Utils.Geography;
-
-using Levrum.UI.WPF;
-
-using Microsoft.Win32;
-using Microsoft.Data.SqlClient;
-
 using ProjNet;
 
 using NetTopologySuite.IO.ShapeFile;
@@ -28,8 +16,20 @@ using NetTopologySuite.Geometries;
 using Point = NetTopologySuite.Geometries.Point;
 using NetTopologySuite.IO;
 
-
 using Newtonsoft.Json;
+
+using Levrum.Data.Classes;
+using Levrum.Data.Map;
+using Levrum.Data.Sources;
+
+using Levrum.Utils;
+using Levrum.Utils.Data;
+using Levrum.Utils.Geography;
+
+using Levrum.UI.WPF;
+
+using Microsoft.Win32;
+using Microsoft.Data.SqlClient;
 
 namespace Levrum.DataBridge
 {
@@ -121,7 +121,7 @@ namespace Levrum.DataBridge
                             summarizeGeoFile(_dataSource.Parameters["File"]);
                         } catch (Exception ex)
                         {
-                            MessageBox.Show(string.Format("Unable to load GeoSource from file '{0}': {1}", _dataSource.Parameters["File"], ex.Message));
+                            LogHelper.LogMessage(LogLevel.Error, string.Format("Unable to load GeoSource from file '{0}'", _dataSource.Parameters["File"]), ex);
                         }
 
                         GeoFileNameTextBox.Text = _dataSource.Parameters["File"];
@@ -357,7 +357,7 @@ namespace Levrum.DataBridge
                 string name = "Unknown";
                 if (info != null)
                     name = info.Name;
-                MessageBox.Show(string.Format("Exception reading CSV File '{0}': {1}", name, ex.Message));
+                LogHelper.LogMessage(LogLevel.Error, string.Format("Exception reading CSV File '{0}'", name), ex);
             }
         }
 
@@ -543,7 +543,7 @@ namespace Levrum.DataBridge
             }
             catch (Exception ex)
             {
-                MessageBox.Show(string.Format("Unable to load polygons from file '{0}': {1}", ofd.FileName, ex.Message));
+                LogHelper.LogMessage(LogLevel.Error, string.Format("Unable to load polygons from file '{0}'", ofd.FileName), ex);
             }
         }
 

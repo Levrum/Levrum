@@ -20,6 +20,7 @@ using Newtonsoft.Json;
 using Levrum.Data.Classes;
 using Levrum.Data.Map;
 using Levrum.UI.WPF;
+using Levrum.Utils;
 
 using CsvHelper;
 
@@ -92,8 +93,7 @@ namespace Levrum.DataBridge
 
         private void logException(object sender, string message, Exception ex)
         {
-            App app = Application.Current as App;
-            app.LogException(ex, message, true);
+            LogHelper.LogMessage(LogLevel.Error, message, ex);
         }
 
         public DataMapDocument OpenDataMap(string fileName)

@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 using Levrum.Data.Map;
 using Levrum.Data.Sources;
 
-using NLog;
+using Levrum.Utils;
 
 namespace Levrum.DataBridge
 {
@@ -56,15 +56,7 @@ namespace Levrum.DataBridge
 
         private void logMessage(LogLevel level, string message = "", Exception ex = null)
         {
-            App app = Application.Current as App;
-            if (ex == null || level == LogLevel.Debug)
-            {
-                app.LogMessage(level, ex, message);
-            } else
-            {
-                app.LogException(ex, message, true);
-            }
-                   
+            LogHelper.LogMessage(level, message, ex);
         }
 
         private void AddButton_Click(object sender, RoutedEventArgs e)

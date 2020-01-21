@@ -16,6 +16,8 @@ using System.Windows.Shapes;
 
 using Microsoft.Win32;
 
+using Levrum.Utils;
+
 namespace Levrum.DataBridge
 {
     /// <summary>
@@ -178,7 +180,7 @@ namespace Levrum.DataBridge
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show(string.Format("Unable to launch editor: {0}", ex.Message));
+                    LogHelper.LogMessage(LogLevel.Error, "Unable to launch editor", ex);
                 }
             });
 
