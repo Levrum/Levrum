@@ -7,6 +7,8 @@ using Newtonsoft.Json;
 using CsvHelper;
 using CsvHelper.Expressions;
 
+using Levrum.Utils;
+
 namespace Levrum.Data.Sources
 {
     public class CsvSource : IDataSource
@@ -23,21 +25,21 @@ namespace Levrum.Data.Sources
         private FileInfo s_file = null;
 
         [JsonIgnore]
-        public FileInfo CsvFile 
-        { 
-            get 
-            { 
+        public FileInfo CsvFile
+        {
+            get
+            {
                 if (s_file == null && (Parameters.ContainsKey("File") && !string.IsNullOrWhiteSpace(Parameters["File"])))
                 {
                     s_file = new FileInfo(Parameters["File"]);
                 }
-                return s_file; 
-            } 
-            set 
-            { 
-                s_file = value; 
-                Parameters["File"] = s_file.FullName; 
-            } 
+                return s_file;
+            }
+            set
+            {
+                s_file = value;
+                Parameters["File"] = s_file.FullName;
+            }
         }
 
         static readonly string[] s_requiredParameters = new string[] { "File" };
@@ -106,61 +108,133 @@ namespace Levrum.Data.Sources
         public List<string> GetColumns()
         {
             const string fn = "CsvSource.GetColumns()";
+            Stream stream = null;
             try
             {
-                if ((!CsvFile.Directory.Exists) || (!CsvFile.Exists)) { return (new List<string>()); }
-                using (StreamReader sr = new StreamReader(CsvFile.OpenRead()))
-                using (CsvReader csvReader = new CsvReader(sr))
+                if (Parameters.ContainsKey("CompressedContents"))
                 {
-                    csvReader.Read();
-                    csvReader.ReadHeader();
-                    return new List<string>(csvReader.Context.HeaderRecord);
+                    string compressedContents = Parameters["CompressedContents"];
+                    string csvContents = LZString.decompressFromUTF16(compressedContents);
+
+                    stream = new MemoryStream(Encoding.UTF8.GetBytes(csvContents));
                 }
+                else
+                {
+                    stream = CsvFile.OpenRead();
+                }
+                if ((!CsvFile.Directory.Exists) || (!CsvFile.Exists)) { return (new List<string>()); }
+                    using (StreamReader sr = new StreamReader(stream))
+                    using (CsvReader csvReader = new CsvReader(sr))
+                    {
+                        csvReader.Read();
+                        csvReader.ReadHeader();
+                        return new List<string>(csvReader.Context.HeaderRecord);
+                    }
             }
-            catch (Exception exc)
+            catch (Exception ex)
             {
-                // add logging here
+                LogHelper.LogException(ex, "Exception in GetColumns");
                 return (new List<string>());
+            } finally
+            {
+                if (stream != null)
+                {
+                    stream.Dispose();
+                }
             }
         }
 
         public List<string> GetColumnValues(string column)
         {
-            List<string> values = new List<string>();
-            using (StreamReader sr = new StreamReader(CsvFile.OpenRead()))
-            using (CsvReader csvReader = new CsvReader(sr))
+            Stream stream = null;
+            try
             {
-                csvReader.Read();
-                csvReader.ReadHeader();
-                while (csvReader.Read())
+                if (Parameters.ContainsKey("CompressedContents"))
                 {
-                    values.Add(csvReader.GetField(column));
-                };
-            }
+                    string compressedContents = Parameters["CompressedContents"];
+                    string csvContents = LZString.decompressFromUTF16(compressedContents);
 
-            return values;
+                    stream = new MemoryStream(Encoding.UTF8.GetBytes(csvContents));
+                }
+                else
+                {
+                    stream = CsvFile.OpenRead();
+                }
+
+                List<string> values = new List<string>();
+                using (StreamReader sr = new StreamReader(stream))
+                using (CsvReader csvReader = new CsvReader(sr))
+                {
+                    csvReader.Read();
+                    csvReader.ReadHeader();
+                    while (csvReader.Read())
+                    {
+                        values.Add(csvReader.GetField(column));
+                    };
+                }
+
+                return values;
+            } catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "Exception in GetColumnValues");
+                return new List<string>();
+            }
+            finally
+            {
+                if (stream != null)
+                {
+                    stream.Dispose();
+                }
+            }
         }
 
         public List<Record> GetRecords()
         {
-            List<Record> records = new List<Record>();
-            using (StreamReader sr = new StreamReader(CsvFile.OpenRead()))
-            using (CsvReader csvReader = new CsvReader(sr))
+            Stream stream = null;
+            try
             {
-                csvReader.Read();
-                csvReader.ReadHeader();
-                while (csvReader.Read())
+                if (Parameters.ContainsKey("CompressedContents"))
                 {
-                    Record record = new Record();
-                    foreach (string column in csvReader.Context.HeaderRecord)
-                    {
-                        record.AddValue(column, csvReader.GetField(column));
-                    }
-                    records.Add(record);
-                };
-            }
+                    string compressedContents = Parameters["CompressedContents"];
+                    string csvContents = LZString.decompressFromUTF16(compressedContents);
 
-            return records;
+                    stream = new MemoryStream(Encoding.UTF8.GetBytes(csvContents));
+                }
+                else
+                {
+                    stream = CsvFile.OpenRead();
+                }
+
+                List<Record> records = new List<Record>();
+                using (StreamReader sr = new StreamReader(stream))
+                using (CsvReader csvReader = new CsvReader(sr))
+                {
+                    csvReader.Read();
+                    csvReader.ReadHeader();
+                    while (csvReader.Read())
+                    {
+                        Record record = new Record();
+                        foreach (string column in csvReader.Context.HeaderRecord)
+                        {
+                            record.AddValue(column, csvReader.GetField(column));
+                        }
+                        records.Add(record);
+                    };
+                }
+
+                return records;
+            } catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "Exception in GetRecords");
+                return new List<Record>();
+            }
+            finally
+            {
+                if (stream != null)
+                {
+                    stream.Dispose();
+                }
+            }
         }
 
         public void Dispose()
