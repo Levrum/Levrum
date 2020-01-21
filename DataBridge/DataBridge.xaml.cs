@@ -348,6 +348,10 @@ namespace Levrum.DataBridge
                     SaveAsMenuItem.Header = "Save _As...";
                     SaveMenuItem.Header = "_Save";
                     DataSources.Map = null;
+
+                    InvertLatitudeButton.IsChecked = false;
+                    InvertLongitudeButton.IsChecked = false;
+                    ConvertCoordinateButton.IsChecked = false;
                 }
 
                 DataSources.IsEnabled = documentOpen;
