@@ -27,6 +27,8 @@
     <None Remove="nlog.config" />
     <None Remove="OpenIcon.png" />
     <None Remove="Resources\BugIcon.png" />
+    <None Remove="Resources\CloseIcon.png" />
+    <None Remove="Resources\RightArrowIcon.png" />
     <None Remove="SaveIcon.png" />
     <None Remove="SuperionTemplate.png" />
     <None Remove="Templates\Code3Strategist.dmap" />
@@ -67,6 +69,7 @@
     <ProjectReference Include="..\DataMap\DataMap.csproj" />
     <ProjectReference Include="..\DataSources\DataSources.csproj" />
     <ProjectReference Include="..\Utils\Utils.csproj" />
+    <ProjectReference Include="..\WinFormsUI\WinFormsUI.csproj" />
     <ProjectReference Include="..\WPFUI\WPFUI.csproj" />
   </ItemGroup>
 
@@ -80,6 +83,7 @@
     </Content>
     <Resource Include="Resources\BugIcon.png" />
     <Resource Include="Resources\CauseTreeIcon.png" />
+    <Resource Include="Resources\CloseIcon.png" />
     <Resource Include="Resources\CodeIcon.png" />
     <Resource Include="Resources\CoordinateIcon.png" />
     <Resource Include="Resources\CsvIcon.png" />
@@ -87,6 +91,7 @@
     <Resource Include="Resources\JsonIcon.png" />
     <Resource Include="Resources\NewIcon.png" />
     <Resource Include="Resources\OpenIcon.png" />
+    <Resource Include="Resources\RightArrowIcon.png" />
     <Resource Include="Resources\SaveIcon.png" />
     <Resource Include="Resources\SuperionTemplate.png" />
     <Resource Include="Resources\TritechTemplate.png" />
