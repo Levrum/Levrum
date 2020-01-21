@@ -162,6 +162,7 @@
         </StackPanel>
         <StackPanel x:Name="CsvOptionsButtons" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Visibility="Visible">
             <Button x:Name="SummarizeCsvButton" Width="80" Margin="8,8,0,8" Click="SummarizeCsvButton_Click">Summarize</Button>
+            <CheckBox x:Name="EmbedCsvCheckBox" Margin="8,8,0,8" Click="EmbedCsvCheckBox_Click" VerticalContentAlignment="Center" ToolTip="Saves the CSV file as part of your DataMap">Embed CSV file in DataMap</CheckBox>
         </StackPanel>
         <StackPanel x:Name="GeoOptionsPanel" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Visibility="Hidden">
             

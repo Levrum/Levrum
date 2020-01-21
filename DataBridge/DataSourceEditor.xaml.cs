@@ -80,6 +80,14 @@ namespace Levrum.DataBridge
                     {
                         return;
                     }
+                    if (_dataSource.Parameters.ContainsKey("EmbedCSV"))
+                    {
+                        bool embedCsv = false;
+                        if (bool.TryParse(_dataSource.Parameters["EmbedCSV"], out embedCsv))
+                        {
+                            EmbedCsvCheckBox.IsChecked = true;
+                        }
+                    }
 
                     List<string> columns = csvSource.GetColumns();
                     IdColumnComboBox.ItemsSource = columns;
@@ -200,6 +208,16 @@ namespace Levrum.DataBridge
             if (DataSource is CsvSource)
             {
                 DataSource.Parameters["File"] = CsvFileNameTextBox.Text;
+                bool embedCsv;
+                if (DataSource.Parameters.ContainsKey("EmbedCSV") &&
+                    bool.TryParse(DataSource.Parameters["EmbedCSV"], out embedCsv)
+                    && embedCsv)
+                {
+                    string fileContents = File.ReadAllText(CsvFileNameTextBox.Text);
+                    string compressedContents = LZString.compressToUTF16(fileContents);
+                    DataSource.Parameters["CompressedContentsTimeStamp"] = File.GetLastWriteTime(CsvFileNameTextBox.Text).Ticks.ToString();
+                    DataSource.Parameters["CompressedContents"] = compressedContents;
+                }
             }
             else if (DataSource is SqlSource)
             {
@@ -587,63 +605,18 @@ namespace Levrum.DataBridge
             GeoSummaryTextBox.Text = summaryBuilder.ToString();
         }
 
-
-        /*
-        private List<AnnotatedObject<LPolygon>> getPolysFromGeoms(List<AnnotatedObject<Geometry>> geoms)
+        private void EmbedCsvCheckBox_Click(object sender, RoutedEventArgs e)
         {
-            List<AnnotatedObject<LPolygon>> output = new List<AnnotatedObject<LPolygon>>();
-
-            foreach (AnnotatedObject<Geometry> geom in geoms)
+            try
             {
-                List<LPolygon> polys = getPolysFromGeom(geom.Object);
-                foreach (LPolygon poly in polys)
-                {
-                    AnnotatedObject<LPolygon> aPoly = new AnnotatedObject<LPolygon>(poly);
-                    foreach (KeyValuePair<string, object> kvp in geom.Data)
-                    {
-                        aPoly.Data.Add(kvp.Key, kvp.Value);
-                    }
-                    output.Add(aPoly);
-                }
-            }
-
-            return output;
-        }
-
-        private List<LPolygon> getPolysFromGeom(Geometry geom)
-        {
-            List<LPolygon> output = new List<LPolygon>();
-            switch (geom.GeometryType)
+                CsvSource source = DataSource as CsvSource;
+                source.Parameters["EmbedCSV"] = (bool)EmbedCsvCheckBox.IsChecked ? "true" : "false";
+            } catch (Exception ex)
             {
-                case "MultiPolygon":
-                    SMPolygon mp = geom as SMPolygon;
-                    foreach (Geometry subGeom in mp.Geometries)
-                    {
-                        output.Add(getPolyFromGeom(subGeom));
-                    }
-                    break;
-                case "Polygon":
-                    output.Add(getPolyFromGeom(geom));
-                    break;
-                default:
-                    break;
+                LogHelper.LogException(ex, "Unable to toggle Embed CSV", true);
             }
-
-            return output;
         }
-
-        private LPolygon getPolyFromGeom(Geometry geom)
-        {
-            LPolygon poly = new LPolygon();
-            foreach (Coordinate v in geom.Coordinates)
-            {
-                poly.AddPoint(v.X, v.Y);
-            }
-
-            return poly;
-        }
-        */
-            }
+    }
 
     public class DataSourceTypeInfo
     {
