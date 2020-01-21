@@ -15,6 +15,8 @@ using System.Windows.Shapes;
 using Levrum.Data.Map;
 using Levrum.Data.Sources;
 
+using NLog;
+
 namespace Levrum.DataBridge
 {
     /// <summary>
@@ -52,126 +54,177 @@ namespace Levrum.DataBridge
             DataSourcesListBox.DisplayMemberPath = "Info";
         }
 
+        private void logMessage(LogLevel level, string message = "", Exception ex = null)
+        {
+            App app = Application.Current as App;
+            if (ex == null || level == LogLevel.Debug)
+            {
+                app.LogMessage(level, ex, message);
+            } else
+            {
+                app.LogException(ex, message, true);
+            }
+                   
+        }
+
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
-            DataSourceEditor editor = new DataSourceEditor(null);
-            editor.Owner = Window;
-            editor.ShowDialog();
-            IDataSource newSource = editor.DataSource;
-            if (newSource != null)
+            try
             {
-                DataSources.Add(newSource);
-                if (Window != null)
+                DataSourceEditor editor = new DataSourceEditor(null);
+                editor.Owner = Window;
+                editor.ShowDialog();
+                IDataSource newSource = editor.DataSource;
+                if (newSource != null)
                 {
-                    Window.SetChangesMade(Map, true);
+                    DataSources.Add(newSource);
+                    if (Window != null)
+                    {
+                        Window.SetChangesMade(Map, true);
+                    }
                 }
+            } catch (Exception ex)
+            {
+                logMessage(LogLevel.Error, "Exception adding DataSource", ex);
             }
         }
 
         private void EditButton_Click(object sender, RoutedEventArgs e)
         {
-            IDataSource currentSource = DataSourcesListBox.SelectedItem as IDataSource;
-            DataSourceEditor editor = new DataSourceEditor(currentSource);
-            editor.Owner = Window;
-            editor.ShowDialog();
-            int index = DataSources.IndexOf(currentSource);
-            DataSources.RemoveAt(index);
-            IDataSource newSource = editor.DataSource;
-            updateDataSource(currentSource, newSource);
-            
-            currentSource = editor.DataSource;
-            DataSources.Insert(index, currentSource);
-            if (Window != null)
+            try
             {
-                Window.SetChangesMade(Map, true);
+                IDataSource currentSource = DataSourcesListBox.SelectedItem as IDataSource;
+                DataSourceEditor editor = new DataSourceEditor(currentSource);
+                editor.Owner = Window;
+                editor.ShowDialog();
+                int index = DataSources.IndexOf(currentSource);
+                DataSources.RemoveAt(index);
+                IDataSource newSource = editor.DataSource;
+                updateDataSource(currentSource, newSource);
+
+                currentSource = editor.DataSource;
+                DataSources.Insert(index, currentSource);
+                if (Window != null)
+                {
+                    Window.SetChangesMade(Map, true);
+                }
+            } catch (Exception ex)
+            {
+                logMessage(LogLevel.Error, "Exception editing DataSource", ex);
             }
         }
 
         private void updateDataSource(IDataSource oldSource, IDataSource newSource)
         {
-            foreach (DataMapping mapping in Map.IncidentMappings)
+            try
             {
-                if (mapping.Column?.DataSource == oldSource)
+                foreach (DataMapping mapping in Map.IncidentMappings)
                 {
-                    mapping.Column.DataSource = newSource;
+                    if (mapping.Column?.DataSource == oldSource)
+                    {
+                        mapping.Column.DataSource = newSource;
+                    }
                 }
-            }
 
-            foreach (DataMapping mapping in Map.IncidentDataMappings)
-            {
-                if (mapping.Column?.DataSource == oldSource)
+                foreach (DataMapping mapping in Map.IncidentDataMappings)
                 {
-                    mapping.Column.DataSource = newSource;
+                    if (mapping.Column?.DataSource == oldSource)
+                    {
+                        mapping.Column.DataSource = newSource;
+                    }
                 }
-            }
 
-            foreach (DataMapping mapping in Map.ResponseDataMappings)
-            {
-                if (mapping.Column?.DataSource == oldSource)
+                foreach (DataMapping mapping in Map.ResponseDataMappings)
                 {
-                    mapping.Column.DataSource = newSource;
+                    if (mapping.Column?.DataSource == oldSource)
+                    {
+                        mapping.Column.DataSource = newSource;
+                    }
                 }
-            }
 
-            foreach (DataMapping mapping in Map.BenchmarkMappings)
-            {
-                if (mapping.Column?.DataSource == oldSource)
+                foreach (DataMapping mapping in Map.BenchmarkMappings)
                 {
-                    mapping.Column.DataSource = newSource;
+                    if (mapping.Column?.DataSource == oldSource)
+                    {
+                        mapping.Column.DataSource = newSource;
+                    }
                 }
+            } catch (Exception ex)
+            {
+                logMessage(LogLevel.Error, "Exception updating DataSource", ex);
             }
         }
 
         private void DeleteButton_Click(object sender, RoutedEventArgs e)
         {
-            IDataSource currentSource = DataSourcesListBox.SelectedItem as IDataSource;
-            if (dataSourceInUse(currentSource))
+            try
             {
-                MessageBoxResult result = MessageBox.Show(string.Format("DataSource {0} is in use. Would you like to remove mappings that reference it?", currentSource.Name), "DataSource in use!", MessageBoxButton.YesNoCancel);
-                if (result == MessageBoxResult.Cancel)
+                IDataSource currentSource = DataSourcesListBox.SelectedItem as IDataSource;
+                if (dataSourceInUse(currentSource))
                 {
-                    return;
-                } else if (result == MessageBoxResult.Yes)
-                {
-                    deleteDataSourceReferences(currentSource);
-                    if (Window != null && Window.ActiveEditor != null)
+                    MessageBoxResult result = MessageBox.Show(string.Format("DataSource {0} is in use. Would you like to remove mappings that reference it?", currentSource.Name), "DataSource in use!", MessageBoxButton.YesNoCancel);
+                    if (result == MessageBoxResult.Cancel)
                     {
-                        Window.ActiveEditor.UpdateStaticMappingButtons();
+                        return;
+                    }
+                    else if (result == MessageBoxResult.Yes)
+                    {
+                        deleteDataSourceReferences(currentSource);
+                        if (Window != null && Window.ActiveEditor != null)
+                        {
+                            Window.ActiveEditor.UpdateStaticMappingButtons();
+                        }
                     }
                 }
-            }
 
-            DataSources.Remove(currentSource);
-            if (Window != null)
+                DataSources.Remove(currentSource);
+                if (Window != null)
+                {
+                    Window.SetChangesMade(Map, true);
+                }
+            } catch (Exception ex)
             {
-                Window.SetChangesMade(Map, true);
+                logMessage(LogLevel.Error, "Exception deleting DataSource", ex);
             }
         }
 
         private bool dataSourceInUse(IDataSource dataSource)
         {
-            bool inUse = false;
-            foreach (DataMapping mapping in Map.IncidentMappings)
-                inUse = inUse || mapping.Column.DataSource == dataSource;
+            try
+            {
+                bool inUse = false;
+                foreach (DataMapping mapping in Map.IncidentMappings)
+                    inUse = inUse || mapping.Column.DataSource == dataSource;
 
-            foreach (DataMapping mapping in Map.IncidentDataMappings)
-                inUse = inUse || mapping.Column.DataSource == dataSource;
+                foreach (DataMapping mapping in Map.IncidentDataMappings)
+                    inUse = inUse || mapping.Column.DataSource == dataSource;
 
-            foreach (DataMapping mapping in Map.ResponseDataMappings)
-                inUse = inUse || mapping.Column.DataSource == dataSource;
+                foreach (DataMapping mapping in Map.ResponseDataMappings)
+                    inUse = inUse || mapping.Column.DataSource == dataSource;
 
-            foreach (DataMapping mapping in Map.BenchmarkMappings)
-                inUse = inUse || mapping.Column.DataSource == dataSource;
+                foreach (DataMapping mapping in Map.BenchmarkMappings)
+                    inUse = inUse || mapping.Column.DataSource == dataSource;
 
-            return inUse;
+                return inUse;
+            } catch (Exception ex)
+            {
+                logMessage(LogLevel.Error, "Exception checking if DataSource is in use", ex);
+                return false;
+            }
         }
 
         private void deleteDataSourceReferences(IDataSource dataSource)
         {
-            removeMappingFromList(Map.IncidentMappings, dataSource);
-            removeMappingFromList(Map.IncidentDataMappings, dataSource);
-            removeMappingFromList(Map.ResponseDataMappings, dataSource);
-            removeMappingFromList(Map.BenchmarkMappings, dataSource);
+            try
+            {
+                removeMappingFromList(Map.IncidentMappings, dataSource);
+                removeMappingFromList(Map.IncidentDataMappings, dataSource);
+                removeMappingFromList(Map.ResponseDataMappings, dataSource);
+                removeMappingFromList(Map.BenchmarkMappings, dataSource);
+            } catch (Exception ex)
+            {
+                logMessage(LogLevel.Error, "Exception removing DataSource references", ex);
+            }
         }
 
         private void removeMappingFromList(IList<DataMapping> list, IDataSource dataSource)
