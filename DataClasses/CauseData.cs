@@ -15,6 +15,20 @@ namespace Levrum.Data.Classes
         {
 
         }
+
+        public static CauseData ConvertICategoryData(ICategoryData input)
+        {
+            CauseData output = new CauseData();
+            output.Name = input.Name;
+            output.Description = input.Description;
+            output.Values = input.Values;
+            foreach(ICategoryData child in input.Children)
+            {
+                output.Children.Add(ConvertICategoryData(child));
+            }
+
+            return output;
+        }
     }
 
     public class NatureCode : ICategorizedValue
