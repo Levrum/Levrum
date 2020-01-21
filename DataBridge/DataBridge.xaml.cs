@@ -36,7 +36,8 @@ namespace Levrum.DataBridge
         public DataMapEditor ActiveEditor { get; set; } = null;
 
         public JavascriptDebugWindow JSDebugWindow { get; set; } = new JavascriptDebugWindow();
-        
+        public JsonViewerWindow JsonViewWindow { get; set; } = new JsonViewerWindow();
+
         public BackgroundWorker Worker { get; set; } = null;
 
         public MainDataBridgeWindow()
@@ -1014,12 +1015,22 @@ namespace Levrum.DataBridge
         {
             try
             {
-                OpenFileDialog ofd = new OpenFileDialog();
-                ofd.DefaultExt = "json";
-                ofd.Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*";
-                if (ofd.ShowDialog() == true)
+                List<ICategoryData> tree = new List<ICategoryData>();
+                foreach (CauseData cause in DataSources.Map.CauseTree)
                 {
-                    List<CauseData> causeTree = JsonConvert.DeserializeObject<List<CauseData>>(File.ReadAllText(ofd.FileName), new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All });
+                    tree.Add(cause);
+                }
+                TreeEditorWindow window = new TreeEditorWindow(tree);
+                window.ShowDialog();
+                if (window.DialogResult == true)
+                {
+                    List<ICategoryData> result = window.Result;
+                    List<CauseData> causeTree = new List<CauseData>();
+                    foreach (ICategoryData item in result)
+                    {
+                        causeTree.Add(CauseData.ConvertICategoryData(item));
+                    }
+
                     DataSources.Map.CauseTree = causeTree;
                     SetChangesMade(DataSources.Map, true);
                 }
@@ -1074,6 +1085,20 @@ namespace Levrum.DataBridge
             } catch (Exception ex)
             {
                 logException(sender, "Unable to view logs folder", ex);
+            }
+        }
+
+        private void JsonViewerMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                JsonViewWindow.Owner = this;
+                JsonViewWindow.Show();
+                JsonViewWindow.BringIntoView();
+                JsonViewWindow.Activate();
+            } catch (Exception ex)
+            {
+                logException(sender, "Unable to show JSON viewer window", ex);
             }
         }
     }

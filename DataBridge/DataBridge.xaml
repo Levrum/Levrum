@@ -54,6 +54,8 @@
             </MenuItem>
             <MenuItem Name="ToolsMenu" Header="_Tools" IsTabStop="False">
                 <MenuItem x:Name="ConvertJsonToCsv" Header="_Convert Incident JSON to CSV..." Click="ConvertJsonToCsv_Click" IsEnabled="True"/>
+                <Separator/>
+                <MenuItem x:Name="JsonViewerMenuItem" Header="Open _JSON Viewer..." Click="JsonViewerMenuItem_Click" IsEnabled="True"/>
             </MenuItem>
             <MenuItem Name="PropertiesMenu" Header="_Properties" IsTabStop="False">
                 <MenuItem x:Name="CoordinateConversionMenuItem" Header="Enable _Coordinate Conversion" Click="ToggleConvertCoordinate_Click" IsEnabled="False"/>
