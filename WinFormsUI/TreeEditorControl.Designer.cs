@@ -190,7 +190,7 @@
             this.m_btnSaveTree.Name = "m_btnSaveTree";
             this.m_btnSaveTree.Size = new System.Drawing.Size(99, 23);
             this.m_btnSaveTree.TabIndex = 2;
-            this.m_btnSaveTree.Text = "&Save Tree to File";
+            this.m_btnSaveTree.Text = "&Save Tree";
             this.m_btnSaveTree.UseVisualStyleBackColor = true;
             this.m_btnSaveTree.Click += new System.EventHandler(this.m_btnSaveTree_Click);
             // 
