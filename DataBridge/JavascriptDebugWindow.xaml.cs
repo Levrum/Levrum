@@ -46,9 +46,9 @@ namespace Levrum.DataBridge
                 DebugOutput.Clear();
                 DebugOutputTextBox.Text = DebugOutput.ToString();  
             }
-            catch(Exception exc)
+            catch(Exception ex)
             {
-                MessageBox.Show("Exception: " + exc.Message + "r\n" + exc.StackTrace);
+                LogHelper.LogMessage(LogLevel.Error, "Exception clearing log output", ex);
             }
         }
 
