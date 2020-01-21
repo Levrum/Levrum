@@ -598,7 +598,7 @@ namespace Levrum.DataBridge
                     }
                     catch (Exception ex)
                     {
-                        MessageBox.Show(string.Format("Unable to convert Incident JSON to CSV: {0}", ex.Message));
+                        logException(this, "Unable to convert Incident JSON to CSV", ex);
                     }
                 });
                 Worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((object obj, RunWorkerCompletedEventArgs e) =>
