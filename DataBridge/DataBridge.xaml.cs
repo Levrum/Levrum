@@ -45,7 +45,8 @@ namespace Levrum.DataBridge
             InitializeComponent();
             DataSources.Window = this;
             App app = Application.Current as App;
-            if (app != null) {
+            if (app != null)
+            {
                 if (app.StartupFileNames.Length > 0)
                 {
                     DataMapDocument firstDocument = null;
@@ -71,13 +72,13 @@ namespace Levrum.DataBridge
                         DocumentPane.SelectedContentIndex = index;
                     }
                 }
-                
+
                 if (app.DebugMode)
                 {
                     ViewLogsMenuItem.Visibility = Visibility.Visible;
                 }
             }
-            updateToolbarsAndMenus();    
+            updateToolbarsAndMenus();
         }
 
         private void onLoaderProgress(object sender, string message, double progress)
@@ -127,7 +128,8 @@ namespace Levrum.DataBridge
                 mapDocument = new DataMapDocument(map, document);
                 openDocuments.Add(mapDocument);
                 return mapDocument;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(this, "Unable to open DataMap", ex);
                 return null;
@@ -168,7 +170,8 @@ namespace Levrum.DataBridge
                     DocumentPane.Children.Remove(document);
                     openDocuments.Remove(openDocument);
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(sender, "Error closing DataMap", ex);
             }
@@ -182,7 +185,8 @@ namespace Levrum.DataBridge
                 DataMapEditor editor = document.Content as DataMapEditor;
                 DataMap map = editor.DataMap;
                 SaveMap(map, true);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(sender, "Error saving DataMap", ex);
             }
@@ -229,7 +233,8 @@ namespace Levrum.DataBridge
                 SaveAsMenuItem.Header = string.Format("Save {0} _As...", map.Name);
                 SaveMenuItem.Header = string.Format("_Save {0}", map.Name);
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(this, "Error saving DataMap", ex);
                 return false;
@@ -356,7 +361,8 @@ namespace Levrum.DataBridge
                 }
 
                 DataSources.IsEnabled = documentOpen;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(this, "Unable to update menus", ex);
             }
@@ -366,7 +372,7 @@ namespace Levrum.DataBridge
         {
 
         }
-        
+
         public void SetChangesMade(DataMap map, bool status)
         {
             DataMapDocument document = (from DataMapDocument d in openDocuments
@@ -493,7 +499,8 @@ namespace Levrum.DataBridge
                     }
                     File.WriteAllText(responseFile, writer.ToString());
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(this, "Error converting JSON to CSV", ex);
             }
@@ -536,7 +543,8 @@ namespace Levrum.DataBridge
                 }
 
                 openDocuments.Remove(openDocument);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(this, "Error on document close", ex);
             }
@@ -585,7 +593,7 @@ namespace Levrum.DataBridge
 
                 Worker = new BackgroundWorker();
                 Worker.WorkerSupportsCancellation = true;
-                Worker.DoWork += new DoWorkEventHandler((object sender, DoWorkEventArgs e) =>
+                Worker.DoWork += new DoWorkEventHandler((object otherSender, DoWorkEventArgs args) =>
                 {
                     try
                     {
@@ -602,14 +610,22 @@ namespace Levrum.DataBridge
                         logException(this, "Unable to convert Incident JSON to CSV", ex);
                     }
                 });
-                Worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((object obj, RunWorkerCompletedEventArgs e) =>
+                Worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((object obj, RunWorkerCompletedEventArgs args) =>
                 {
-                    EnableControls();
-                    StatusBarProgress.Value = 0;
-                    StatusBarText.Text = "Ready";
+                    try
+                    {
+                        EnableControls();
+                        StatusBarProgress.Value = 0;
+                        StatusBarText.Text = "Ready";
+                    }
+                    catch (Exception ex)
+                    {
+                        logException(obj, "Error on work complete", ex);
+                    }
                 });
                 Worker.RunWorkerAsync();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(sender, "Error converting JSON to CSV", ex);
             }
@@ -693,7 +709,8 @@ namespace Levrum.DataBridge
                 DocumentPane.Children.Add(document);
                 openDocuments.Add(new DataMapDocument(newMap, document));
                 DocumentPane.SelectedContentIndex = DocumentPane.Children.Count - 1;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(sender, "Unable to create new DataMap", ex);
             }
@@ -729,7 +746,8 @@ namespace Levrum.DataBridge
                 DataMapEditor editor = document.Content as DataMapEditor;
                 DataMap map = editor.DataMap;
                 SaveMap(map);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(sender, "Unable to save DataMap", ex);
             }
@@ -743,7 +761,7 @@ namespace Levrum.DataBridge
                 if (DataSources.Map.Data.ContainsKey("LastJsonExport"))
                 {
                     sfd.FileName = DataSources.Map.Data["LastJsonExport"] as string;
-                } 
+                }
                 else
                 {
                     sfd.InitialDirectory = string.Format("{0}\\Levrum", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
@@ -769,7 +787,7 @@ namespace Levrum.DataBridge
                 Worker = new BackgroundWorker();
                 Worker.WorkerSupportsCancellation = true;
                 loader.Worker = Worker;
-                Worker.DoWork += new DoWorkEventHandler((object sender, DoWorkEventArgs e) =>
+                Worker.DoWork += new DoWorkEventHandler((object newSender, DoWorkEventArgs args) =>
                 {
                     try
                     {
@@ -788,23 +806,31 @@ namespace Levrum.DataBridge
                     }
                     catch (Exception ex)
                     {
-                        logException(sender, "Unable to create JSON", ex);
+                        logException(newSender, "Unable to create JSON", ex);
                     }
                 });
-                Worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((object obj, RunWorkerCompletedEventArgs e) =>
+                Worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((object obj, RunWorkerCompletedEventArgs args) =>
                 {
-                    loader.DebugHost.OnDebugMessage -= JSDebugWindow.OnMessageReceived;
-                    loader.Incidents.Clear();
-                    loader.IncidentsById.Clear();
+                    try
+                    {
+                        loader.DebugHost.OnDebugMessage -= JSDebugWindow.OnMessageReceived;
+                        loader.Incidents.Clear();
+                        loader.IncidentsById.Clear();
 
-                    GC.Collect();
-                    EnableControls();
-                    StatusBarProgress.Value = 0;
-                    StatusBarText.Text = "Ready";
+                        GC.Collect();
+                        EnableControls();
+                        StatusBarProgress.Value = 0;
+                        StatusBarText.Text = "Ready";
+                    }
+                    catch (Exception ex)
+                    {
+                        logException(obj, "Error on work complete", ex);
+                    }
                 });
 
                 Worker.RunWorkerAsync();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(sender, "Unable to create JSON", ex);
             }
@@ -850,7 +876,7 @@ namespace Levrum.DataBridge
                     return;
                 }
                 string responseCsvFileName = sfd.FileName;
-                if (!DataSources.Map.Data.ContainsKey("LastCsvIncidentExport") || DataSources.Map.Data["LastCsvIncidentExport"] as string != incidentCsvFileName || 
+                if (!DataSources.Map.Data.ContainsKey("LastCsvIncidentExport") || DataSources.Map.Data["LastCsvIncidentExport"] as string != incidentCsvFileName ||
                     !DataSources.Map.Data.ContainsKey("LastCsvResponseExport") || DataSources.Map.Data["LastCsvResponseExport"] as string != responseCsvFileName)
                 {
                     DataSources.Map.Data["LastCsvIncidentExport"] = incidentCsvFileName;
@@ -865,7 +891,7 @@ namespace Levrum.DataBridge
                 Worker = new BackgroundWorker();
                 Worker.WorkerSupportsCancellation = true;
                 loader.Worker = Worker;
-                Worker.DoWork += new DoWorkEventHandler((object sender, DoWorkEventArgs e) =>
+                Worker.DoWork += new DoWorkEventHandler((object obj, DoWorkEventArgs args) =>
                 {
                     try
                     {
@@ -876,27 +902,35 @@ namespace Levrum.DataBridge
                     }
                     catch (Exception ex)
                     {
-                        logException(sender, "Unable to create CSV files", ex);
+                        logException(obj, "Unable to create CSV files", ex);
                     }
                 });
-                Worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((object obj, RunWorkerCompletedEventArgs e) =>
+                Worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler((object obj, RunWorkerCompletedEventArgs args) =>
                 {
-                    loader.DebugHost.OnDebugMessage -= JSDebugWindow.OnMessageReceived;
-                    loader.Incidents.Clear();
-                    loader.IncidentsById.Clear();
+                    try
+                    {
+                        loader.DebugHost.OnDebugMessage -= JSDebugWindow.OnMessageReceived;
+                        loader.Incidents.Clear();
+                        loader.IncidentsById.Clear();
 
-                    GC.Collect();
-                    EnableControls();
-                    StatusBarProgress.Value = 0;
-                    StatusBarText.Text = "Ready";
+                        GC.Collect();
+                        EnableControls();
+                        StatusBarProgress.Value = 0;
+                        StatusBarText.Text = "Ready";
+                    }
+                    catch (Exception ex)
+                    {
+                        logException(obj, "Error on work complete", ex);
+                    }
                 });
                 Worker.RunWorkerAsync();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(sender, "Unable to create CSV files", ex);
             }
         }
-        
+
         private void ToggleConvertCoordinate_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -905,7 +939,8 @@ namespace Levrum.DataBridge
                 updateCoordinateConversionControls();
 
                 SetChangesMade(DataSources.Map, true);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(sender, "Unable to toggle coordinate conversion", ex);
             }
@@ -945,7 +980,8 @@ namespace Levrum.DataBridge
                     DataSources.Map.Projection = dialog.Result;
                     SetChangesMade(DataSources.Map, true);
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(sender, "Unable to edit projection", ex);
             }
@@ -959,7 +995,8 @@ namespace Levrum.DataBridge
                 updateInvertLatitude();
 
                 SetChangesMade(DataSources.Map, true);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(sender, "Unable to toggle invert latitude", ex);
             }
@@ -989,7 +1026,8 @@ namespace Levrum.DataBridge
                 updateInvertLongitude();
 
                 SetChangesMade(DataSources.Map, true);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(sender, "Unable to toggle invert longitude", ex);
             }
@@ -1034,7 +1072,9 @@ namespace Levrum.DataBridge
                     DataSources.Map.CauseTree = causeTree;
                     SetChangesMade(DataSources.Map, true);
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 logException(sender, "Unable to edit Cause Tree", ex);
             }
         }
@@ -1057,7 +1097,8 @@ namespace Levrum.DataBridge
                     DataSources.Map.PostProcessingScript = dialog.Result;
                     SetChangesMade(DataSources.Map, true);
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(sender, "Unable to edit PostProcessing Script", ex);
             }
@@ -1071,7 +1112,8 @@ namespace Levrum.DataBridge
                 JSDebugWindow.Show();
                 JSDebugWindow.BringIntoView();
                 JSDebugWindow.Activate();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(sender, "Unable to show script debug window", ex);
             }
@@ -1082,7 +1124,8 @@ namespace Levrum.DataBridge
             try
             {
                 Process.Start("explorer.exe", string.Format("{0}\\Levrum\\Logs", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)));
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(sender, "Unable to view logs folder", ex);
             }
@@ -1096,7 +1139,8 @@ namespace Levrum.DataBridge
                 JsonViewWindow.Show();
                 JsonViewWindow.BringIntoView();
                 JsonViewWindow.Activate();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(sender, "Unable to show JSON viewer window", ex);
             }

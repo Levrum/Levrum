@@ -184,7 +184,7 @@ namespace Levrum.DataBridge
                 }
             });
 
-            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler((object obj, RunWorkerCompletedEventArgs e) =>
+            bw.RunWorkerCompleted += new RunWorkerCompletedEventHandler((object obj, RunWorkerCompletedEventArgs args) =>
             {
                 string contents = File.ReadAllText(fileName);
                 setText(contents);
