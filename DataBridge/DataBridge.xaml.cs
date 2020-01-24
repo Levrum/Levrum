@@ -814,13 +814,17 @@ namespace Levrum.DataBridge
 
                         GC.Collect();
 
-                        JsonSerializerSettings settings = new JsonSerializerSettings();
-                        settings.PreserveReferencesHandling = PreserveReferencesHandling.All;
-                        settings.Formatting = Formatting.Indented;
-                        string incidentJson = JsonConvert.SerializeObject(loader.Incidents, settings);
-                        File.WriteAllText(sfd.FileName, incidentJson);
-
                         FileInfo file = new FileInfo(sfd.FileName);
+                        JsonSerializerSettings settings = new JsonSerializerSettings();
+                        settings.TypeNameHandling = TypeNameHandling.All;
+                        settings.Formatting = Formatting.Indented;
+                        using (TextWriter writer = File.CreateText(sfd.FileName)) {
+                            var serializer = new JsonSerializer();
+                            serializer.Formatting = Formatting.Indented;
+                            serializer.TypeNameHandling = TypeNameHandling.All;
+                            serializer.Serialize(writer, loader.Incidents);
+                        }
+
                         MessageBox.Show(string.Format("Incidents saved as JSON file '{0}'", file.Name));
                     }
                     catch (Exception ex)
