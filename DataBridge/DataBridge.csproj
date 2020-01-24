@@ -14,6 +14,10 @@
     <ApplicationIcon>databridge.ico</ApplicationIcon>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Remove="BlankTemplate.png" />
     <None Remove="CauseTreeIcon.png" />
@@ -30,6 +34,7 @@
     <None Remove="Resources\BugIcon.png" />
     <None Remove="Resources\CloseIcon.png" />
     <None Remove="Resources\RightArrowIcon.png" />
+    <None Remove="Resources\StopIcon.png" />
     <None Remove="SaveIcon.png" />
     <None Remove="SuperionTemplate.png" />
     <None Remove="Templates\Code3Strategist.dmap" />
@@ -92,6 +97,7 @@
     <Resource Include="Resources\OpenIcon.png" />
     <Resource Include="Resources\RightArrowIcon.png" />
     <Resource Include="Resources\SaveIcon.png" />
+    <Resource Include="Resources\StopIcon.png" />
     <Resource Include="Resources\SuperionTemplate.png" />
     <Resource Include="Resources\TritechTemplate.png" />
     <Resource Include="Resources\XIcon.png" />
