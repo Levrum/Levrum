@@ -198,8 +198,10 @@ namespace Levrum.DataBridge
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            Cursor = Cursors.Wait;
             updateParameters();
             DataSource.Disconnect();
+            Cursor = Cursors.Arrow;
             Close();
         }
 

@@ -760,7 +760,12 @@ namespace Levrum.DataBridge
                 SaveFileDialog sfd = new SaveFileDialog();
                 if (DataSources.Map.Data.ContainsKey("LastJsonExport"))
                 {
-                    sfd.FileName = DataSources.Map.Data["LastJsonExport"] as string;
+                    FileInfo file = new FileInfo(DataSources.Map.Data["LastJsonExport"] as string);
+                    if (file.Exists)
+                    {
+                        sfd.InitialDirectory = file.DirectoryName;
+                        sfd.FileName = DataSources.Map.Data["LastJsonExport"] as string;
+                    }
                 }
                 else
                 {
@@ -843,7 +848,12 @@ namespace Levrum.DataBridge
                 SaveFileDialog sfd = new SaveFileDialog();
                 if (DataSources.Map.Data.ContainsKey("LastCsvIncidentExport"))
                 {
-                    sfd.FileName = DataSources.Map.Data["LastCsvIncidentExport"] as string;
+                    FileInfo file = new FileInfo(DataSources.Map.Data["LastCsvIncidentExport"] as string);
+                    if (file.Exists)
+                    {
+                        sfd.InitialDirectory = file.DirectoryName;
+                        sfd.FileName = DataSources.Map.Data["LastCsvIncidentExport"] as string;
+                    }
                 }
                 else
                 {
@@ -864,7 +874,12 @@ namespace Levrum.DataBridge
                 sfd.Title = "Save Response CSV";
                 if (DataSources.Map.Data.ContainsKey("LastCsvReponseExport"))
                 {
-                    sfd.FileName = DataSources.Map.Data["LastCsvResponseExport"] as string;
+                    FileInfo file = new FileInfo(DataSources.Map.Data["LastCsvResponseExport"] as string);
+                    if (file.Exists)
+                    {
+                        sfd.InitialDirectory = file.DirectoryName;
+                        sfd.FileName = DataSources.Map.Data["LastCsvResponseExport"] as string;
+                    }
                 }
                 else
                 {

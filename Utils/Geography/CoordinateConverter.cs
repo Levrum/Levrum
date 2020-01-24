@@ -60,22 +60,10 @@ namespace Levrum.Utils.Geography
             CoordinateTransformationFactory ctFactory = new CoordinateTransformationFactory();
             
             XYToLonLatTransform = ctFactory.CreateFromCoordinateSystems(CoordinateSystem, WGS84).MathTransform;
-            if (CoordinateSystem.WKT != WGS84.WKT)
-            {
-                LonLatToXYTransform = XYToLonLatTransform.Inverse();
-            } else
-            {
-                LonLatToXYTransform = XYToLonLatTransform;
-            }
-
+            LonLatToXYTransform = ctFactory.CreateFromCoordinateSystems(WGS84, CoordinateSystem).MathTransform;
+            
             XYToWebTransform = ctFactory.CreateFromCoordinateSystems(CoordinateSystem, WebMercator).MathTransform;
-            if (CoordinateSystem.WKT != WebMercator.WKT)
-            {
-                WebToXYTransform = XYToWebTransform.Inverse();
-            } else
-            {
-                WebToXYTransform = XYToWebTransform;
-            }
+            WebToXYTransform = ctFactory.CreateFromCoordinateSystems(WebMercator, CoordinateSystem).MathTransform;
         }
 
         public double[] ConvertLatLonToXY(LatitudeLongitude latLon)

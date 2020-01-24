@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 using Microsoft.ClearScript.V8;
 
@@ -40,6 +42,8 @@ namespace Levrum.Data.Map
 
         public Logger Logger { get; set; }
 
+        public DataMap Map { get; set; }
+
         public MapLoader()
         {
             Logger = LogManager.GetCurrentClassLogger();
@@ -49,6 +53,7 @@ namespace Levrum.Data.Map
         {
             try
             {
+                Map = map;
                 foreach (IDataSource dataSource in map.DataSources)
                 {
                     dataSource.Connect();
@@ -983,112 +988,248 @@ namespace Levrum.Data.Map
             }
         }
 
+        private ConcurrentBag<IncidentData> m_incidentQueue = new ConcurrentBag<IncidentData>();
+        private HashSet<IDataSource> m_geoSources = new HashSet<IDataSource>();
+
+        private void geoSourceThread()
+        {
+            IncidentData incident;
+            while (m_incidentQueue.TryTake(out incident))
+            {
+                try
+                {
+                    if (Cancelling())
+                        return;
+
+                    double incidentCount = Incidents.Count;
+                    double incidentNum = incidentCount - (double)m_incidentQueue.Count;
+                    double progress = (incidentNum / incidentCount) * 100;
+                    updateProgress(8, string.Format("Processing geographic data for incident {0} of {1}", incidentNum, incidentCount), progress, incidentNum == Incidents.Count);
+                    foreach (IDataSource dataSource in m_geoSources)
+                    {
+                        GeoSource geoSource = (GeoSource)dataSource;
+                        Dictionary<string, object> attributes = geoSource.GetPropertiesForLatLon(incident.Latitude, incident.Longitude);
+                        if (attributes.Count == 0)
+                        {
+                            continue;
+                        }
+
+                        List<DataMapping> incidentMappings = (from mapping in Map.IncidentDataMappings
+                                                              where mapping.Column?.DataSource == geoSource
+                                                              select mapping).ToList();
+
+                        List<DataMapping> responseMappings = (from mapping in Map.ResponseDataMappings
+                                                              where mapping.Column?.DataSource == geoSource
+                                                              select mapping).ToList();
+
+                        List<DataMapping> benchmarkMappings = (from mapping in Map.BenchmarkMappings
+                                                               where mapping.Column?.DataSource == geoSource
+                                                               select mapping).ToList();
+
+                        foreach (DataMapping mapping in incidentMappings)
+                        {
+                            object value;
+                            if (attributes.TryGetValue(mapping.Column.ColumnName, out value))
+                            {
+                                incident.Data[mapping.Field] = value;
+                            }
+                        }
+
+                        List<KeyValuePair<string, object>> responseAttributes = new List<KeyValuePair<string, object>>();
+                        foreach (DataMapping mapping in responseMappings)
+                        {
+                            object value;
+                            if (attributes.TryGetValue(mapping.Column.ColumnName, out value))
+                            {
+                                responseAttributes.Add(new KeyValuePair<string, object>(mapping.Field, value));
+                            }
+                        }
+
+                        List<KeyValuePair<string, object>> bmkAttributes = new List<KeyValuePair<string, object>>();
+                        foreach (DataMapping mapping in benchmarkMappings)
+                        {
+                            object value;
+                            if (attributes.TryGetValue(mapping.Column.ColumnName, out value))
+                            {
+                                bmkAttributes.Add(new KeyValuePair<string, object>(mapping.Field, value));
+                            }
+                        }
+
+                        foreach (ResponseData response in incident.Responses)
+                        {
+                            foreach (var attr in responseAttributes)
+                            {
+                                response.Data[attr.Key] = attr.Value;
+                            }
+
+                            foreach (BenchmarkData bmk in response.Benchmarks)
+                            {
+                                foreach (var attr in bmkAttributes)
+                                {
+                                    bmk.Data[attr.Key] = attr.Value;
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception ex)
+                {
+                    LogHelper.LogMessage(Utils.LogLevel.Warn, string.Format("Exception processing geographic data for incident {0}", incident.Id), ex);
+                }
+            }
+        }
+
         private void processGeoSources(DataMap map)
         {
-            HashSet<IDataSource> incidentGeoSources = (from mapping in map.IncidentDataMappings
-                                                     where mapping.Column?.DataSource is GeoSource
-                                                     select mapping.Column.DataSource).ToHashSet();
-
-            HashSet<IDataSource> responseGeoSources = (from mapping in map.ResponseDataMappings
-                                                       where mapping.Column?.DataSource is GeoSource
-                                                       select mapping.Column.DataSource).ToHashSet();
-
-            HashSet<IDataSource> benchmarkGeoSources = (from mapping in map.IncidentDataMappings
-                                                        where mapping.Column?.DataSource is GeoSource
-                                                        select mapping.Column.DataSource).ToHashSet();
-
-            HashSet<IDataSource> allGeoSources = new HashSet<IDataSource>(incidentGeoSources);
-            foreach (IDataSource dataSource in responseGeoSources)
+            try
             {
-                allGeoSources.Add(dataSource);
-            }
+                HashSet<IDataSource> incidentGeoSources = (from mapping in map.IncidentDataMappings
+                                                           where mapping.Column?.DataSource is GeoSource
+                                                           select mapping.Column.DataSource).ToHashSet();
 
-            foreach (IDataSource dataSource in benchmarkGeoSources)
-            {
-                allGeoSources.Add(dataSource);
-            }
+                HashSet<IDataSource> responseGeoSources = (from mapping in map.ResponseDataMappings
+                                                           where mapping.Column?.DataSource is GeoSource
+                                                           select mapping.Column.DataSource).ToHashSet();
 
-            if (allGeoSources.Count == 0)
-            {
-                return;
-            }
+                HashSet<IDataSource> benchmarkGeoSources = (from mapping in map.IncidentDataMappings
+                                                            where mapping.Column?.DataSource is GeoSource
+                                                            select mapping.Column.DataSource).ToHashSet();
 
-            updateProgress(8, string.Format("Processing geographic data from {0} sources for {1} incidents", allGeoSources.Count, Incidents.Count), 0, true);
-
-            var incidentNum = 0;
-            foreach (IncidentData incident in Incidents)
-            {
-                if (Cancelling())
-                    return;
-
-                incidentNum++;
-                double progress = ((double)incidentNum / (double)Incidents.Count) * 100;
-                updateProgress(8, string.Format("Processing geographic data for incident {0} of {1}", incidentNum, Incidents.Count), progress, incidentNum == Incidents.Count);
-                foreach (IDataSource dataSource in allGeoSources)
+                m_geoSources = new HashSet<IDataSource>(incidentGeoSources);
+                foreach (IDataSource dataSource in responseGeoSources)
                 {
-                    GeoSource geoSource = (GeoSource)dataSource;
-                    Dictionary<string, object> attributes = geoSource.GetPropertiesForLatLon(incident.Latitude, incident.Longitude);
-                    if (attributes.Count == 0)
+                    m_geoSources.Add(dataSource);
+                }
+
+                foreach (IDataSource dataSource in benchmarkGeoSources)
+                {
+                    m_geoSources.Add(dataSource);
+                }
+
+                if (m_geoSources.Count == 0)
+                {
+                    return;
+                }
+
+                foreach (IDataSource dataSource in m_geoSources)
+                {
+                    GeoSource geoSource = dataSource as GeoSource;
+                    if (geoSource != null)
                     {
-                        continue;
+                        geoSource.Load();
                     }
+                }
 
-                    List<DataMapping> incidentMappings = (from mapping in map.IncidentDataMappings
-                                                          where mapping.Column?.DataSource == geoSource
-                                                          select mapping).ToList();
+                updateProgress(8, string.Format("Processing geographic data from {0} sources for {1} incidents", m_geoSources.Count, Incidents.Count), 0, true);
 
-                    List<DataMapping> responseMappings = (from mapping in map.ResponseDataMappings
-                                                          where mapping.Column?.DataSource == geoSource
-                                                          select mapping).ToList();
+                foreach (IncidentData incident in Incidents)
+                {
+                    m_incidentQueue.Add(incident);
+                }
 
-                    List<DataMapping> benchmarkMappings = (from mapping in map.BenchmarkMappings
-                                                          where mapping.Column?.DataSource == geoSource
-                                                          select mapping).ToList();
+                int threadCount = Environment.ProcessorCount - 1;
+                Thread[] threads = new Thread[threadCount];
 
-                    foreach (DataMapping mapping in incidentMappings)
+                for (int i = 0; i < threadCount; i++)
+                {
+                    Thread thread = new Thread(geoSourceThread);
+                    threads[i] = thread;
+                    thread.Start();
+                }
+
+                bool running = true;
+                while (running)
+                {
+                    for (int i = 0; i < threadCount; i++)
                     {
-                        object value;
-                        if (attributes.TryGetValue(mapping.Column.ColumnName, out value))
+                        if (threads[i].IsAlive)
                         {
-                            incident.Data[mapping.Field] = value;
+                            break;
                         }
+                        running = false;
                     }
+                    Thread.Sleep(1000);
+                }
 
-                    List<KeyValuePair<string, object>> responseAttributes = new List<KeyValuePair<string, object>>();
-                    foreach (DataMapping mapping in responseMappings)
-                    {
-                        object value;
-                        if (attributes.TryGetValue(mapping.Column.ColumnName, out value))
-                        {
-                            responseAttributes.Add(new KeyValuePair<string, object>(mapping.Field, value));
-                        }
-                    }
+                running = false;
+                /*
+                foreach (IncidentData incident in Incidents) { 
+                    if (Cancelling())
+                        return;
 
-                    List<KeyValuePair<string, object>> bmkAttributes = new List<KeyValuePair<string, object>>();
-                    foreach (DataMapping mapping in benchmarkMappings)
+                    incidentNum++;
+                    double progress = ((double)incidentNum / (double)Incidents.Count) * 100;
+                    updateProgress(8, string.Format("Processing geographic data for incident {0} of {1}", incidentNum, Incidents.Count), progress, incidentNum == Incidents.Count);
+                    foreach (IDataSource dataSource in allGeoSources)
                     {
-                        object value;
-                        if (attributes.TryGetValue(mapping.Column.ColumnName, out value))
+                        GeoSource geoSource = (GeoSource)dataSource;
+                        Dictionary<string, object> attributes = geoSource.GetPropertiesForLatLon(incident.Latitude, incident.Longitude);
+                        if (attributes.Count == 0)
                         {
-                            bmkAttributes.Add(new KeyValuePair<string, object>(mapping.Field, value));
-                        }
-                    }
-
-                    foreach (ResponseData response in incident.Responses)
-                    {
-                        foreach (var attr in responseAttributes)
-                        {
-                            response.Data[attr.Key] = attr.Value;
+                            continue;
                         }
 
-                        foreach (BenchmarkData bmk in response.Benchmarks)
+                        List<DataMapping> incidentMappings = (from mapping in map.IncidentDataMappings
+                                                              where mapping.Column?.DataSource == geoSource
+                                                              select mapping).ToList();
+
+                        List<DataMapping> responseMappings = (from mapping in map.ResponseDataMappings
+                                                              where mapping.Column?.DataSource == geoSource
+                                                              select mapping).ToList();
+
+                        List<DataMapping> benchmarkMappings = (from mapping in map.BenchmarkMappings
+                                                               where mapping.Column?.DataSource == geoSource
+                                                               select mapping).ToList();
+
+                        foreach (DataMapping mapping in incidentMappings)
                         {
-                            foreach (var attr in bmkAttributes) {
-                                bmk.Data[attr.Key] = attr.Value;
+                            object value;
+                            if (attributes.TryGetValue(mapping.Column.ColumnName, out value))
+                            {
+                                incident.Data[mapping.Field] = value;
+                            }
+                        }
+
+                        List<KeyValuePair<string, object>> responseAttributes = new List<KeyValuePair<string, object>>();
+                        foreach (DataMapping mapping in responseMappings)
+                        {
+                            object value;
+                            if (attributes.TryGetValue(mapping.Column.ColumnName, out value))
+                            {
+                                responseAttributes.Add(new KeyValuePair<string, object>(mapping.Field, value));
+                            }
+                        }
+
+                        List<KeyValuePair<string, object>> bmkAttributes = new List<KeyValuePair<string, object>>();
+                        foreach (DataMapping mapping in benchmarkMappings)
+                        {
+                            object value;
+                            if (attributes.TryGetValue(mapping.Column.ColumnName, out value))
+                            {
+                                bmkAttributes.Add(new KeyValuePair<string, object>(mapping.Field, value));
+                            }
+                        }
+
+                        foreach (ResponseData response in incident.Responses)
+                        {
+                            foreach (var attr in responseAttributes)
+                            {
+                                response.Data[attr.Key] = attr.Value;
+                            }
+
+                            foreach (BenchmarkData bmk in response.Benchmarks)
+                            {
+                                foreach (var attr in bmkAttributes)
+                                {
+                                    bmk.Data[attr.Key] = attr.Value;
+                                }
                             }
                         }
                     }
                 }
+                */
+            } catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "Exception processing geographic data", true);
             }
         }
 
@@ -1160,6 +1301,20 @@ namespace Levrum.Data.Map
             updateProgress(10, message, percentage);
         }
 
+        private class ProgressInfo
+        {
+            public int Number { get; set; } = 0;
+            public int Count { get; set; } = 0;
+            public double Progress { get
+                {
+                    if (Count == 0)
+                        return 100.0;
+
+                    return ((double)Number / (double)Count) * 100.0;
+                }
+            }
+        }
+
         private void executePostProcessing(DataMap map)
         {
             if (map.PostProcessingScript == string.Empty)
@@ -1171,10 +1326,15 @@ namespace Levrum.Data.Map
             {
                 using (V8ScriptEngine v8 = new V8ScriptEngine())
                 {
+                    ProgressInfo pInfo = new ProgressInfo();
+                    pInfo.Count = Incidents.Count;
+                    pInfo.Number = 0;
+
                     v8.AddHostObject("Incidents", Incidents);
                     v8.AddHostObject("Debug", DebugHost);
                     v8.AddHostObject("Logger", Logger);
                     v8.AddHostObject("MapLoader", this);
+                    v8.AddHostObject("ProgressInfo", pInfo);
                     v8.AddHostType("LogLevel", typeof(NLogLevel));
                     v8.AddHostType("IncidentData", typeof(IncidentData));
                     v8.AddHostType("ResponseData", typeof(ResponseData));
@@ -1182,10 +1342,26 @@ namespace Levrum.Data.Map
                     v8.AddHostType("bool", typeof(bool));
                     v8.AddHostType("double", typeof(double));
                     v8.AddHostType("int", typeof(int));
+                    v8.AddHostType("string", typeof(string));
                     v8.AddHostType("DateTime", typeof(DateTime));
                     v8.AddHostType("TimeSpan", typeof(TimeSpan));
-                    
                     v8.Execute(map.PostProcessingScript);
+
+                    /*
+                    foreach (IncidentData incident in Incidents)
+                    {
+                        pInfo.Number++;
+                        updateProgress(10, string.Format("Executing PostProcessing script for incident {0} of {1}", pInfo.Number, pInfo.Count), pInfo.Progress, pInfo.Number == pInfo.Count);
+                        v8.AddHostObject("Incident", incident);
+                        try
+                        {
+                            
+                        } catch (Exception ex)
+                        {
+                            LogHelper.LogMessage(Utils.LogLevel.Warn, string.Format("Exception running PostProcessing script for incident {0}", incident.Id), ex);
+                        }
+                    }
+                    */
                 }
             } catch (Exception ex)
             {

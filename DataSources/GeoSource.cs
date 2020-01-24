@@ -19,7 +19,9 @@ using Newtonsoft.Json;
 
 using Levrum.Data.Classes;
 
+using Levrum.Utils;
 using Levrum.Utils.Geography;
+using Levrum.Utils.Geometry;
 
 namespace Levrum.Data.Sources
 {
@@ -61,19 +63,25 @@ namespace Levrum.Data.Sources
         public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
 
         private CoordinateConverter m_converter = null;
-        
+        private string m_projection = string.Empty;
+        private string m_projectionName = string.Empty;
+
+
         [JsonIgnore]
-        public CoordinateConverter Converter { 
-            get { 
+        public CoordinateConverter Converter
+        {
+            get
+            {
                 if (m_converter == null)
                 {
                     string projection;
-                    if (Parameters.TryGetValue("Projection", out projection)) {
+                    if (Parameters.TryGetValue("Projection", out projection))
+                    {
                         m_converter = new CoordinateConverter(projection);
                     }
                 }
                 return m_converter;
-            } 
+            }
             set
             {
                 m_converter = value;
@@ -143,31 +151,65 @@ namespace Levrum.Data.Sources
             return GetPropertiesForLatLon(new LatitudeLongitude(latitude, longitude));
         }
 
-        public Dictionary<string, object> GetPropertiesForLatLon(LatitudeLongitude latLon) { 
+        public Dictionary<string, object> GetPropertiesForLatLon(LatitudeLongitude latLon)
+        {
             Dictionary<string, object> output = new Dictionary<string, object>();
 
-            List<AnnotatedObject<Geometry>> geoms = GetGeomsFromFile();
+            List<ComplexPolygon> cPolys = GetComplexPolysFromFile();
             double[] xyPoint = Converter.ConvertLatLonToXY(latLon);
-            Point p = new Point(xyPoint[0], xyPoint[1]);
-            foreach (AnnotatedObject<Geometry> geom in geoms)
+            ComplexPolygon lastContainingPoly = null;
+            foreach (ComplexPolygon cPoly in cPolys)
             {
-                if (geom.Object.Contains(p))
+                if (cPoly.Contains(xyPoint[0], xyPoint[1]))
                 {
-                    foreach(KeyValuePair<string, object> kvp in geom.Data)
+                    foreach (KeyValuePair<string, object> kvp in cPoly.Data)
                     {
-                        output.Add(kvp.Key, kvp.Value);
+                        if (output.ContainsKey(kvp.Key))
+                        {
+                            bool test = lastContainingPoly.Contains(xyPoint[0], xyPoint[1]);
+                            LogHelper.LogMessage(LogLevel.Warn, string.Format("Discarding data {0}={1} at coordinates {2},{3}", kvp.Key, output[kvp.Key], latLon.Latitude, latLon.Longitude));
+                        }
+                        else
+                        {
+                            output[kvp.Key] = kvp.Value;
+                        }
                     }
+                    lastContainingPoly = cPoly;
                 }
             }
 
             return output;
         }
 
+        private void rationalizeCoordinate(Coordinate coord)
+        {
+            long maxPrecision = 10000000000;
+            long value = (long)(coord[0] * maxPrecision);
+            coord[0] = (double)value / maxPrecision;
+            value = (long)(coord[1] * maxPrecision);
+            coord[1] = (double)value / maxPrecision;
+        }
+
         private List<AnnotatedObject<Geometry>> m_annotatedGeoms = null;
+
+        public void Load()
+        {
+            string str1, str2;
+            GetProjectionFromFile(out str1, out str2);
+            GetComplexPolysFromFile();
+        }
 
         public bool GetProjectionFromFile(out string projectionName, out string projection)
         {
-            return GetProjectionFromFile(GeoFile.FullName, out projectionName, out projection);
+            bool result = true;
+            if (m_projection == string.Empty || m_projectionName == string.Empty)
+            {
+                result = GetProjectionFromFile(GeoFile.FullName, out m_projectionName, out m_projection);
+            }
+
+            projectionName = m_projectionName;
+            projection = m_projection;
+            return result;
         }
 
         public static bool GetProjectionFromFile(string fileName, out string projectionName, out string projection)
@@ -178,17 +220,21 @@ namespace Levrum.Data.Sources
                 if (!fileInfo.Exists)
                 {
                     throw new FileNotFoundException(fileName);
-                } else if (fileInfo.Extension == ".shp" || fileInfo.Extension == ".zip")
+                }
+                else if (fileInfo.Extension == ".shp" || fileInfo.Extension == ".zip")
                 {
                     return GetProjectionFromShpFile(fileName, out projectionName, out projection);
-                } else if (fileInfo.Extension == ".geojson")
+                }
+                else if (fileInfo.Extension == ".geojson")
                 {
                     return GetProjectionFromGeoJson(fileName, out projectionName, out projection);
-                } else
+                }
+                else
                 {
                     throw new NotImplementedException(string.Format("Unable to parse file '{0}': invalid extension {1}", fileInfo.FullName, fileInfo.Extension));
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 projectionName = string.Empty;
                 projection = string.Empty;
@@ -229,7 +275,8 @@ namespace Levrum.Data.Sources
                 {
                     projectionName = CoordinateConverter.GetProjectionName(projection);
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return false;
             }
@@ -302,6 +349,85 @@ namespace Levrum.Data.Sources
             return true;
         }
 
+        List<ComplexPolygon> m_complexPolygons = null;
+        ComplexPolygonAreaComparer m_comparer = new ComplexPolygonAreaComparer();
+
+        public List<ComplexPolygon> GetComplexPolysFromFile()
+        {
+            if (m_complexPolygons != null)
+            {
+                return m_complexPolygons;
+            }
+            List<ComplexPolygon> output = new List<ComplexPolygon>();
+            
+            List<AnnotatedObject<Geometry>> geoms = GetGeomsFromFile();
+            foreach (AnnotatedObject<Geometry> geom in geoms)
+            {
+                ComplexPolygon poly = GetComplexPolygonFromGeometry(geom.Object);
+                foreach(KeyValuePair<string, object> kvp in geom.Data)
+                {
+                    poly.Data.Add(kvp.Key, kvp.Value);
+                }
+                poly.ComputeArea();
+                output.Add(poly);
+            }
+
+            output.Sort(m_comparer);
+
+            return m_complexPolygons = output;
+        }
+
+        public ComplexPolygon GetComplexPolygonFromGeometry(Geometry geom)
+        {
+            ComplexPolygon output = new ComplexPolygon();
+            if (geom is NetTopologySuite.Geometries.Polygon)
+            {
+                NetTopologySuite.Geometries.Polygon p = geom as NetTopologySuite.Geometries.Polygon;
+                if (p.ExteriorRing == null)
+                {
+                    foreach (Coordinate coord in p.Coordinates)
+                    {
+                        output.Polygon.AddPoint(coord.X, coord.Y);
+                    }
+                } else
+                {
+                    foreach (Coordinate coord in p.ExteriorRing.Coordinates)
+                    {
+                        output.Polygon.AddPoint(coord.X, coord.Y);
+                    }
+                }
+                
+                foreach (LineString lstr in p.InteriorRings)
+                {
+                    Utils.Geometry.Polygon poly = new Utils.Geometry.Polygon();
+                    foreach (Coordinate coord in lstr.Coordinates)
+                    {
+                        poly.AddPoint(coord.X, coord.Y);
+                    }
+                    output.SubPolygons.Add(poly);
+                }
+            } else if (geom is MultiPolygon)
+            {
+                MultiPolygon mp = geom as MultiPolygon;
+                int geomIndex = 0;
+                foreach (Geometry subGeom in mp.Geometries)
+                {
+                    ComplexPolygon cp = GetComplexPolygonFromGeometry(subGeom);
+                    if (geomIndex == 0)
+                    {
+                        output.Polygon = cp.Polygon;
+                        output.SubPolygons.AddRange(cp.SubPolygons);
+                    } else
+                    {
+                        output.SubPolygons.AddRange(cp.Polygons);
+                    }
+                    geomIndex++;
+                }
+            }
+
+            return output;
+        }
+
         public List<AnnotatedObject<Geometry>> GetGeomsFromFile()
         {
             if (m_annotatedGeoms != null)
@@ -309,14 +435,17 @@ namespace Levrum.Data.Sources
             if (GeoFile == null)
             {
                 return m_annotatedGeoms = new List<AnnotatedObject<Geometry>>();
-            } else if (GeoFile.Extension == ".shp" || GeoFile.Extension == ".zip")
+            }
+            else if (GeoFile.Extension == ".shp" || GeoFile.Extension == ".zip")
             {
                 return m_annotatedGeoms = GetGeomsFromShpFile(GeoFile.FullName).ToList();
-            } else if (GeoFile.Extension == ".geojson")
+            }
+            else if (GeoFile.Extension == ".geojson")
             {
                 string geoJson = File.ReadAllText(GeoFile.FullName);
                 return m_annotatedGeoms = GetGeomsFromGeoJson(geoJson).ToList();
-            } else
+            }
+            else
             {
                 throw new NotImplementedException(string.Format("Unable to parse file '{0}': invalid extension {1}", GeoFile.FullName, GeoFile.Extension));
             }
@@ -328,8 +457,8 @@ namespace Levrum.Data.Sources
             FileInfo file = new FileInfo(fileName);
             if (file.Extension == ".zip")
             {
-                DirectoryInfo tempDir = new DirectoryInfo(string.Format("{0}\\Levrum\\Temp\\{1}", 
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), 
+                DirectoryInfo tempDir = new DirectoryInfo(string.Format("{0}\\Levrum\\Temp\\{1}",
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                     file.Name));
 
                 ZipFile.ExtractToDirectory(fileName, tempDir.FullName);
@@ -339,7 +468,8 @@ namespace Levrum.Data.Sources
                     output.AddRange(getGeomsFromShpFile(shpFile.FullName));
                 }
                 tempDir.Delete(true);
-            } else
+            }
+            else
             {
                 output.AddRange(getGeomsFromShpFile(fileName));
             }
@@ -396,7 +526,7 @@ namespace Levrum.Data.Sources
                     annotatedGeom.Object = reader.Read<LineString>(geoJson);
                     break;
                 case "Polygon":
-                    annotatedGeom.Object = reader.Read<Polygon>(geoJson);
+                    annotatedGeom.Object = reader.Read<NetTopologySuite.Geometries.Polygon>(geoJson);
                     break;
                 case "MultiPoint":
                     annotatedGeom.Object = reader.Read<MultiPoint>(geoJson);

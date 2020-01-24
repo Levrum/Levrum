@@ -29,7 +29,12 @@ namespace Levrum.Utils
 
         public static void LogMessage(LogLevel level, string message = "", Exception ex = null)
         {
-            LogMessage(GetNLogLevel(level), ex, message);
+            if (ex != null && level == LogLevel.Error)
+            {
+                LogException(ex, message, true);
+            } else {
+                LogMessage(GetNLogLevel(level), message, ex);
+            }
         }
 
         public static NLogLevel GetNLogLevel(LogLevel level)
@@ -73,10 +78,10 @@ namespace Levrum.Utils
 
         public static void LogMessage(NLogLevel level, string message)
         {
-            LogMessage(level, null, message);
+            LogMessage(level, message, null);
         }
 
-        public static void LogMessage(NLogLevel level, Exception ex = null, string message = "")
+        public static void LogMessage(NLogLevel level, string message = "", Exception ex = null)
         {
             try
             {

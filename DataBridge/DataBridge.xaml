@@ -98,6 +98,9 @@
                         <Label Height="28">Create CSVs...</Label>
                     </StackPanel>
                 </Button>
+                <Button x:Name="StopButton" IsEnabled="False" Click="StopButton_Click">
+                    <Image Source="/DataBridge;component/Resources/StopIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
+                </Button>
             </ToolBar>
             <ToolBar>
                 <ToggleButton x:Name="ConvertCoordinateButton" Margin="0,0,0,-1" Click="ToggleConvertCoordinate_Click" ToolTip="Toggle Coordinate Conversion">
