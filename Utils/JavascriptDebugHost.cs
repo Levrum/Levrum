@@ -15,9 +15,10 @@ namespace Levrum.Utils
             writeMessage("\r\n");
         }
 
-        public void Write(object obj)
+        public void WriteObject(object obj)
         {
             string json = JsonConvert.SerializeObject(obj);
+            throw new Exception();
             WriteLine(json);
         }
 

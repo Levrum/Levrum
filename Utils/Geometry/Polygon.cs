@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 
+using ClipperLib;
+
 namespace Levrum.Utils.Geometry
 {
     public class LineSegment2 : ICloneable
@@ -357,25 +359,27 @@ namespace Levrum.Utils.Geometry
         private double[] m_multiple;
         private bool m_precalcDone = false;
 
+        private long[] m_longConstant;
+        private long[] m_longMultiple;
+
+        List<IntPoint> m_path = new List<IntPoint>();
+
         private void precalcValues()
         {
-            m_constant = new double[Points.Count];
-            m_multiple = new double[Points.Count];
-            int j = Points.Count - 1;
-            for (int i = 0; i < Points.Count; i++)
+            lock (m_path)
             {
-                if (Points[j].Y == Points[i].Y)
+                if (m_precalcDone)
+                    return;
+
+                for (int i = 0; i < Points.Count; i++)
                 {
-                    m_constant[i] = Points[i].X;
-                    m_multiple[i] = 0;
-                } else
-                {
-                    m_constant[i] = Points[i].X - (Points[i].Y * Points[j].X) / (Points[j].Y - Points[i].Y) + (Points[i].Y * Points[i].X) / (Points[j].Y - Points[i].Y);
-                    m_multiple[i] = (Points[j].X - Points[i].X) / (Points[j].Y - Points[i].Y);
+                    long pX = (long)(Points[i].X * 10000000.0);
+                    long pY = (long)(Points[i].Y * 10000000.0);
+                    m_path.Add(new IntPoint(pX, pY));
                 }
-                j = i;
+
+                m_precalcDone = true;
             }
-            m_precalcDone = true;
         }
 
         private bool pointInPolygon(Point2 point)
@@ -383,20 +387,10 @@ namespace Levrum.Utils.Geometry
             if (!m_precalcDone)
                 precalcValues();
 
-            int j = Points.Count - 1;
-            bool oddNodes = false;
-
-            for (int i = 0; i < Points.Count; i++)
-            {
-                if( (Points[i].Y < point.Y && Points[j].Y >= point.Y) ||
-                    (Points[j].Y < point.Y && Points[i].Y >= point.Y))
-                {
-                    oddNodes ^= (point.Y * m_multiple[i] + m_constant[i] < point.X);
-                }
-                j = i;
-            }
-
-            return oddNodes;
+            long pointLongY = (long)(point.Y * 10000000.0);
+            long pointLongX = (long)(point.X * 10000000.0);
+            IntPoint intPoint = new IntPoint(pointLongX, pointLongY);
+            return Clipper.PointInPolygon(intPoint, m_path) != 0;
         }
 
         /// <summary>

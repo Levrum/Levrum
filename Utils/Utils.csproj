@@ -28,8 +28,13 @@
     <PackageReference Include="GeoJSON.Net" Version="1.2.14" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="NLog" Version="4.6.8" />
+    <PackageReference Include="ParagonClipper" Version="6.4.2" />
     <PackageReference Include="ProjNet" Version="2.0.0" />
     <PackageReference Include="RabbitMQ.Client" Version="5.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataClasses\DataClasses.csproj" />
   </ItemGroup>
 
 </Project>
