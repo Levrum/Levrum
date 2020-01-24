@@ -64,7 +64,7 @@ namespace Levrum.Utils
                 Logger.Error(ex, message);
                 if (showMessageBox)
                 {
-                    OnMessageBox?.Invoke(message, "Exception Occured");
+                    OnMessageBox?.Invoke(string.Format("{0}: {1}", message, ex.Message), "Exception Occured");
                 }
             }
             catch (Exception loggingException)
