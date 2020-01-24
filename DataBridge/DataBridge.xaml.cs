@@ -799,6 +799,20 @@ namespace Levrum.DataBridge
                         DisableControls();
 
                         loader.LoadMap(DataSources.Map);
+                        foreach (IncidentData incident in loader.Incidents)
+                        {
+                            incident.Intern();
+                            foreach (ResponseData response in incident.Responses)
+                            {
+                                response.Intern();
+                                foreach (BenchmarkData benchmark in response.Benchmarks)
+                                {
+                                    response.Intern();
+                                }
+                            }
+                        }
+
+                        GC.Collect();
 
                         JsonSerializerSettings settings = new JsonSerializerSettings();
                         settings.PreserveReferencesHandling = PreserveReferencesHandling.All;
@@ -912,6 +926,21 @@ namespace Levrum.DataBridge
                     {
                         DisableControls();
                         loader.LoadMap(DataSources.Map);
+                        foreach (IncidentData incident in loader.Incidents)
+                        {
+                            incident.Intern();
+                            foreach (ResponseData response in incident.Responses)
+                            {
+                                response.Intern();
+                                foreach (BenchmarkData benchmark in response.Benchmarks)
+                                {
+                                    response.Intern();
+                                }
+                            }
+                        }
+
+                        GC.Collect();
+
                         convertJsonToCsv(loader.Incidents, incidentCsvFileName, responseCsvFileName);
                         MessageBox.Show(string.Format("Incidents saved as CSV files '{0}' and '{1}'", incidentCsvFileName, responseCsvFileName));
                     }
@@ -1159,6 +1188,11 @@ namespace Levrum.DataBridge
             {
                 logException(sender, "Unable to show JSON viewer window", ex);
             }
+        }
+
+        private void StopButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 
