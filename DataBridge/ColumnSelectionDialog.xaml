@@ -7,7 +7,8 @@
         mc:Ignorable="d"
         Title="Define Field" Height="120" Width="500"
         WindowStartupLocation="CenterOwner"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize"
+        Closing="Window_Closing">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>

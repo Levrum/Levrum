@@ -164,7 +164,7 @@ namespace Levrum.DataBridge
                         deleteDataSourceReferences(currentSource);
                         if (Window != null && Window.ActiveEditor != null)
                         {
-                            Window.ActiveEditor.UpdateStaticMappingButtons();
+                            //Window.ActiveEditor.UpdateStaticMappingButtons();
                         }
                     }
                 }

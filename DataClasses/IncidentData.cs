@@ -15,11 +15,17 @@ namespace Levrum.Data.Classes
         {
             get
             {
-                return new string(m_id);
+                if (Data.ContainsKey("Id"))
+                {
+                    return Data["Id"] as string;
+                } else
+                {
+                    return string.Empty;
+                }
             }
             set
             {
-                m_id = value.ToCharArray();
+                Data["Id"] = value;
             }
         }
 
@@ -27,11 +33,23 @@ namespace Levrum.Data.Classes
         {
             get
             {
-                return new DateTime(m_time);
+                DateTime output  = DateTime.MinValue;
+                if (Data.ContainsKey("Time"))
+                {
+                    if (Data["Time"] is string)
+                    {
+                        DateTime.TryParse((string)Data["Time"], out output);
+                    }
+                    else if (Data["Time"] is DateTime)
+                    {
+                        return (DateTime)Data["Time"];
+                    }
+                }
+                return output;
             }
             set
             {
-                m_time = value.Ticks;
+                Data["Time"] = value;
             }
         }
 
@@ -39,16 +57,66 @@ namespace Levrum.Data.Classes
         {
             get
             {
-                return new string(m_location);
+                if (Data.ContainsKey("Location"))
+                {
+                    return Data["Location"] as string;
+                }
+                return string.Empty;
             }
             set
             {
-                m_location = value.ToCharArray();
+                Data["Location"] = value;
             }
         }
 
-        public double Longitude { get; set; } = 0.0;
-        public double Latitude { get; set; } = 0.0;
+        public double Longitude
+        {
+            get
+            {
+                double output = double.NaN;
+                if (Data.ContainsKey("Longitude"))
+                {
+                    if (Data["Longitude"] is string)
+                    {
+                        double.TryParse(Data["Longitude"] as string, out output);
+                    } else if (Data["Longitude"] is double)
+                    {
+                        return (double)Data["Longitude"];
+                    }
+                }
+
+                return output;
+            }
+            set
+            {
+                Data["Longitude"] = value;
+            }
+        }
+
+        public double Latitude
+        {
+            get
+            {
+                double output = double.NaN;
+                if (Data.ContainsKey("Latitude"))
+                {
+                    if (Data["Latitude"] is string)
+                    {
+                        double.TryParse(Data["Latitude"] as string, out output);
+                    }
+                    else if (Data["Latitude"] is double)
+                    {
+                        return (double)Data["Latitude"];
+                    }
+                }
+
+                return output;
+            }
+            set
+            {
+                Data["Latitude"] = value;
+            }
+        }
 
         public DataSet<ResponseData> Responses { get; set; }
 

@@ -30,11 +30,12 @@
             <GroupBox.Header>
                 <TextBlock Text="Incident Data" FontSize="16" FontWeight="DemiBold"/>
             </GroupBox.Header>
-            <Grid Margin="0,4,0,0">
-                <Grid.RowDefinitions>
+            <Grid Margin="0,0,0,0">
+                <!-- <Grid.RowDefinitions>
                     <RowDefinition Height="80"/>
                     <RowDefinition Height="300*"/>
-                </Grid.RowDefinitions>
+                </Grid.RowDefinitions> -->
+                <!--
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="75"/>
@@ -61,14 +62,15 @@
                         </Button>
                     </StackPanel>
                 </Grid>
+                -->
                 <Grid Grid.Row="1" Margin="0,4,0,0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="22"/>
+                        <!-- <RowDefinition Height="22"/> -->
                         <RowDefinition Height="200*"/>
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Height="28" FontSize="16" Grid.Row="0">Data</TextBlock>
-                    <ListBox x:Name="IncidentDataListBox" Grid.Row="1" SelectionChanged="IncidentDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch">
+                    <!-- <TextBlock Height="28" FontSize="16" Grid.Row="0">Data</TextBlock> -->
+                    <ListBox x:Name="IncidentDataListBox" Grid.Row="0" SelectionChanged="IncidentDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="0,2">
@@ -84,7 +86,7 @@
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="2">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
                         <Button Name="AddIncidentFieldButton" Margin="8,8,8,8" Width="60" Click="AddIncidentFieldButton_Click">Add</Button>
                         <Button Name="EditIncidentFieldButton" Margin="8,8,8,8" Width="60" Click="EditIncidentFieldButton_Click" IsEnabled="False">Edit</Button>
                         <Button Name="RemoveIncidentFieldButton" Margin="8,8,8,8" Width="60" Click="RemoveIncidentFieldButton_Click" IsEnabled="False">Remove</Button>

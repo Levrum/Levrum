@@ -76,13 +76,13 @@
         </Menu>
         <ToolBarTray Grid.Row="1" Margin="0,-1,0,0">
             <ToolBar>
-                <Button x:Name="NewButton" Click="New_Click">
+                <Button x:Name="NewButton" Click="New_Click" ToolTip="New DataMap">
                     <Image Source="/DataBridge;component/Resources/NewIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
                 </Button>
-                <Button x:Name="OpenButton" Click="Open_Click">
+                <Button x:Name="OpenButton" Click="Open_Click" ToolTip="Open DataMap">
                     <Image Source="/DataBridge;component/Resources/OpenIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
                 </Button>
-                <Button x:Name="SaveButton" Click="Save_Click">
+                <Button x:Name="SaveButton" Click="Save_Click" ToolTip="Save DataMap">
                     <Image Source="/DataBridge;component/Resources/SaveIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
                 </Button>
                 <Separator/>
