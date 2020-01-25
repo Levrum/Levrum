@@ -655,6 +655,14 @@ namespace Levrum.Data.Map
                         if (parsedValue is double)
                         {
                             benchmark.Value = (double)parsedValue;
+                            if ((benchmark.Value<0)||(benchmark.Value>300)||(double.IsNaN(benchmark.Value)))
+                            {
+                                DebugHost.WriteLine("Uh-oh:  funky benchmark!");    // great place for a breakpoint...
+                            }
+                        }
+                        if (parsedValue is DateTime)
+                        {
+                            benchmark.SetDataValue("DateTime", parsedValue);    // This ensures data will be written as absolute timestamps in the output CSV files
                         }
                         benchmark.Data["RawData"] = parsedValue;
                         response.Benchmarks.Add(benchmark);

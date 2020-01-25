@@ -83,7 +83,7 @@
                     <Image Source="/DataBridge;component/Resources/OpenIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
                 </Button>
                 <Button x:Name="SaveButton" Click="Save_Click" ToolTip="Save DataMap">
-                    <Image Source="/DataBridge;component/Resources/SaveIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
+                        <Image Source="/DataBridge;component/Resources/SaveIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
                 </Button>
                 <Separator/>
                 <Button x:Name="CreateJsonButton" Margin="0,0,0,-1" Click="CreateJson_Click">
