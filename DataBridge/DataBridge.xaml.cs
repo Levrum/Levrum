@@ -830,6 +830,7 @@ namespace Levrum.DataBridge
                         {
                             return;
                         }
+                        onLoaderProgress(this, "Generating and saving JSON", 0);
                         FileInfo file = new FileInfo(sfd.FileName);
                         JsonSerializerSettings settings = new JsonSerializerSettings();
                         settings.TypeNameHandling = TypeNameHandling.All;
@@ -960,7 +961,7 @@ namespace Levrum.DataBridge
                         }
 
                         GC.Collect();
-
+                        onLoaderProgress(this, "Generating and saving CSVs", 0);
                         convertJsonToCsv(loader.Incidents, incidentCsvFileName, responseCsvFileName);
                         MessageBox.Show(string.Format("Incidents saved as CSV files '{0}' and '{1}'", incidentCsvFileName, responseCsvFileName));
                     }
