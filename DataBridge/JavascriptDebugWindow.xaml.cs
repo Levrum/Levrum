@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -20,10 +22,47 @@ namespace Levrum.DataBridge
     public partial class JavascriptDebugWindow : Window
     {
         public StringBuilder DebugOutput { get; set; } = new StringBuilder();
+        public DateTime LastUpdateTime { get; set; } = DateTime.MinValue;
+        public BackgroundWorker UpdateWorker { get; set; } = new BackgroundWorker();
 
         public JavascriptDebugWindow()
         {
             InitializeComponent();
+            UpdateWorker.WorkerSupportsCancellation = true;
+            UpdateWorker.DoWork += UpdateWorker_DoWork;
+        }
+
+        private void UpdateWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            while ((DateTime.Now - LastUpdateTime).TotalMilliseconds < 100) {
+                Thread.Sleep(100);
+            }
+
+            SetOutputText(this, DebugOutput.ToString());
+            LastUpdateTime = DateTime.Now;
+        }
+
+        public void SetOutputText(object sender, string outputText)
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(new Action(() => { SetOutputText(sender, outputText); }));
+                return;
+            }
+
+            int caretPosition = DebugOutputTextBox.CaretOffset;
+            bool resetCaret = false;
+            if (caretPosition >= (DebugOutputTextBox.Text.Length - 1))
+            {
+                resetCaret = true;
+            }
+
+            DebugOutputTextBox.Text = outputText;
+            if (resetCaret)
+            {
+                DebugOutputTextBox.CaretOffset = outputText.Length - 1;
+                DebugOutputTextBox.ScrollToEnd();
+            }
         }
 
         public void OnMessageReceived(object sender, string message)
@@ -33,8 +72,12 @@ namespace Levrum.DataBridge
                 Dispatcher.Invoke(new Action(() => { OnMessageReceived(sender, message); }));
                 return;
             }
+
             DebugOutput.Append(message);
-            DebugOutputTextBox.Text = DebugOutput.ToString();
+            if (!UpdateWorker.IsBusy)
+            {
+                UpdateWorker.RunWorkerAsync();
+            }
         }
 
         private void HandleTextboxRightClick(object sender, MouseButtonEventArgs e)
@@ -54,8 +97,17 @@ namespace Levrum.DataBridge
 
         private void HandleFormClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            UpdateWorker.CancelAsync();
             Hide();
             e.Cancel = true;
+        }
+
+        private void Window_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (Visibility == Visibility.Visible)
+            {
+                DebugOutputTextBox.Text = DebugOutput.ToString();
+            }
         }
     }
 }

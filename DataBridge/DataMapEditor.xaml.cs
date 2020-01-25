@@ -32,7 +32,7 @@ namespace Levrum.DataBridge
             IncidentDataListBox.ItemsSource = _map.IncidentDataMappings;
             ResponseDataListBox.ItemsSource = _map.ResponseDataMappings;
             BenchmarkListBox.ItemsSource = _map.BenchmarkMappings;
-            UpdateStaticMappingButtons();
+            //UpdateStaticMappingButtons();
         }
 
         private void AddIncidentFieldButton_Click(object sender, RoutedEventArgs e)
@@ -117,7 +117,7 @@ namespace Levrum.DataBridge
             }
         }
 
-        private void IncidentTimeButton_Click(object sender, RoutedEventArgs e)
+/*        private void IncidentTimeButton_Click(object sender, RoutedEventArgs e)
         {
             editStaticMapping("Time");
         }
@@ -136,8 +136,8 @@ namespace Levrum.DataBridge
         {
             editStaticMapping("Location");
         }
-
-        private void editStaticMapping(string fieldName)
+*/
+/*        private void editStaticMapping(string fieldName)
         {
             try
             {
@@ -169,25 +169,25 @@ namespace Levrum.DataBridge
             {
                 LogHelper.LogMessage(LogLevel.Error, "Unable to edit mapping", ex);
             }
-        }
+        }*/
 
-        public void UpdateStaticMappingButtons()
+/*        public void UpdateStaticMappingButtons()
         {
             DataMapping timeMapping = (from m in DataMap.IncidentMappings
                                        where m != null && m.Field == "Time"
                                        select m).FirstOrDefault();
 
             DataMapping latMapping = (from m in DataMap.IncidentMappings
-                                       where m != null && m.Field == "Latitude"
-                                       select m).FirstOrDefault();
+                                      where m != null && m.Field == "Latitude"
+                                      select m).FirstOrDefault();
 
             DataMapping longMapping = (from m in DataMap.IncidentMappings
                                        where m != null && m.Field == "Longitude"
                                        select m).FirstOrDefault();
 
             DataMapping locMapping = (from m in DataMap.IncidentMappings
-                                       where m != null && m.Field == "Location"
-                                       select m).FirstOrDefault();
+                                      where m != null && m.Field == "Location"
+                                      select m).FirstOrDefault();
 
             IncidentTimeButtonText.Text = getStaticMappingButtonText(timeMapping);
             IncidentLatitudeButtonText.Text = getStaticMappingButtonText(latMapping);
@@ -200,11 +200,12 @@ namespace Levrum.DataBridge
             try
             {
                 return string.Format("{0}: {1}", mapping.Column.DataSource.Name, mapping.Column.ColumnName);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return "Click here to select...";
             }
-        }
+        }*/
 
         private void AddBenchmarkButton_Click(object sender, RoutedEventArgs e)
         {

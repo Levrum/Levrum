@@ -21,7 +21,7 @@ namespace Levrum.DataBridge
     public partial class ColumnSelectionDialog : Window
     {
         DataMapping m_result;
-        bool m_closing = false;
+        bool m_saving = false;
 
         public DataMapping Result 
         { 
@@ -32,7 +32,7 @@ namespace Levrum.DataBridge
             set 
             {
                 m_result = value;
-                if (!m_closing)
+                if (m_saving)
                 {
                     FieldNameComboBox.Text = value.Field;
                     FieldSourceComboBox.SelectedItem = value.Column.DataSource;
@@ -41,7 +41,7 @@ namespace Levrum.DataBridge
             } 
         }
 
-        public List<string> DefaultFieldNames = new List<string>(new string[] { "Code", "Category", "Type", "Jurisdiction", "District", "Priority", "CallProcessed", "Cancelled", "Unit", "UnitType", "Shift", "Assigned", "Responding", "OnScene", "ClearScene", "InService", "InQuarters" });
+        public List<string> DefaultFieldNames = new List<string>(new string[] { "Time", "Latitude", "Longitude", "Location", "Code", "Category", "Type", "Jurisdiction", "District", "Priority", "CallProcessed", "Cancelled", "Unit", "UnitType", "Shift", "Assigned", "Responding", "OnScene", "ClearScene", "InService", "InQuarters" });
 
         public ColumnSelectionDialog(List<IDataSource> _dataSources, DataMapping _mapping)
         {
@@ -87,20 +87,27 @@ namespace Levrum.DataBridge
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            Result.Field = FieldNameComboBox.Text; 
+            Result.Field = FieldNameComboBox.Text;
+            m_saving = true;
             Close();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            m_closing = true;
-            Result = null;
             Close();
         }
 
         private void FieldNameComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             FieldNameComboBox.Text = FieldNameComboBox.SelectedItem as string;
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (!m_saving)
+            {
+                Result = null;
+            }
         }
     }
 }

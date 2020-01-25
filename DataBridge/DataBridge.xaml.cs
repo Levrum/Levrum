@@ -650,7 +650,7 @@ namespace Levrum.DataBridge
             {
                 if (Worker != null && Worker.IsBusy)
                 {
-                    MessageBoxResult result = MessageBox.Show(string.Format("A data processing operation is in progress. Cancel and exit?", "Cancel operation?", MessageBoxButton.YesNo));
+                    MessageBoxResult result = MessageBox.Show("A data processing operation is in progress. Cancel and exit?", "Cancel operation?", MessageBoxButton.YesNo);
                     if (result == MessageBoxResult.No)
                     {
                         e.Cancel = true;

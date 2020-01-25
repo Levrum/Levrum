@@ -38,7 +38,7 @@ namespace Levrum.Data.Map
         public BackgroundWorker Worker { get; set; }
         public event MapLoaderProgressListener OnProgressUpdate;
 
-        private const int c_numSteps = 10;
+        private const int c_numSteps = 9;
 
         public Logger Logger { get; set; }
 
@@ -59,10 +59,10 @@ namespace Levrum.Data.Map
                     dataSource.Connect();
                 }
 
-                processIncidentMappings(map);
+                //processIncidentMappings(map);
                 
-                if (Cancelling())
-                    return false;
+                //if (Cancelling())
+                //    return false;
 
                 processIncidentDataMappings(map);
                 
@@ -368,7 +368,7 @@ namespace Levrum.Data.Map
             HashSet<IDataSource> dataSources = (from mapping in map.IncidentDataMappings
                                                 select mapping.Column.DataSource).ToHashSet();
 
-            updateProgress(2, string.Format("Loading incident data records from {0} data sources", dataSources.Count), 0, true);
+            updateProgress(1, string.Format("Loading incident data records from {0} data sources", dataSources.Count), 0, true);
 
             int numSources = dataSources.Count;
             int completedSources = 0;
@@ -385,7 +385,7 @@ namespace Levrum.Data.Map
 
                 double progressPerSource = 100 / numSources;
                 double progress = completedSources * progressPerSource;
-                updateProgress(2, string.Format("Getting incident data records from data source {0}", dataSource.Name), progress);
+                updateProgress(1, string.Format("Getting incident data records from data source {0}", dataSource.Name), progress);
                 List<Record> recordsFromSource = dataSource.GetRecords();
                 int recordNumber = 0;
                 foreach (Record record in recordsFromSource)
@@ -396,7 +396,7 @@ namespace Levrum.Data.Map
                     recordNumber++;
 
                     double recordProgress = progressPerSource / recordsFromSource.Count;
-                    updateProgress(2, string.Format("Processing incident data record {0} out of {1} from data source {2}", recordNumber, recordsFromSource.Count, dataSource.Name), progress + (recordProgress * recordNumber), recordNumber == recordsFromSource.Count);
+                    updateProgress(1, string.Format("Processing incident data record {0} out of {1} from data source {2}", recordNumber, recordsFromSource.Count, dataSource.Name), progress + (recordProgress * recordNumber), recordNumber == recordsFromSource.Count);
                     IncidentData incident;
                     object value = record.GetValue(dataSource.IDColumn);
                     string recordIncidentId = null;
@@ -440,7 +440,7 @@ namespace Levrum.Data.Map
             HashSet<IDataSource> dataSources = (from mapping in map.ResponseDataMappings
                                                 select mapping.Column.DataSource).ToHashSet();
 
-            updateProgress(3, string.Format("Loading response data records from {0} data sources", dataSources.Count), 0, true);
+            updateProgress(2, string.Format("Loading response data records from {0} data sources", dataSources.Count), 0, true);
 
             int numSources = dataSources.Count;
             int completedSources = 0;
@@ -464,7 +464,7 @@ namespace Levrum.Data.Map
 
                 double progressPerSource = 100 / numSources;
                 double progress = completedSources * progressPerSource;
-                updateProgress(3, string.Format("Getting response data records from data source {0}", dataSource.Name), progress);
+                updateProgress(2, string.Format("Getting response data records from data source {0}", dataSource.Name), progress);
                 List<Record> recordsFromSource = dataSource.GetRecords();
                 int recordNumber = 0;
                 foreach (Record record in recordsFromSource)
@@ -475,7 +475,7 @@ namespace Levrum.Data.Map
                     recordNumber++;
 
                     double recordProgress = progressPerSource / recordsFromSource.Count;
-                    updateProgress(3, string.Format("Processing response data record {0} out of {1} from data source {2}", recordNumber, recordsFromSource.Count, dataSource.Name), progress + (recordProgress * recordNumber), recordNumber == recordsFromSource.Count);
+                    updateProgress(2, string.Format("Processing response data record {0} out of {1} from data source {2}", recordNumber, recordsFromSource.Count, dataSource.Name), progress + (recordProgress * recordNumber), recordNumber == recordsFromSource.Count);
                     IncidentData incident;
                     object value = record.GetValue(dataSource.IDColumn);
                     string recordIncidentId = null;
@@ -544,7 +544,7 @@ namespace Levrum.Data.Map
             HashSet<IDataSource> dataSources = (from mapping in map.BenchmarkMappings
                                                 select mapping.Column.DataSource).ToHashSet();
 
-            updateProgress(4, string.Format("Loading response timing records from {0} data sources", dataSources.Count), 0, true);
+            updateProgress(3, string.Format("Loading response timing records from {0} data sources", dataSources.Count), 0, true);
 
             int numSources = dataSources.Count;
             int completedSources = 0;
@@ -568,7 +568,7 @@ namespace Levrum.Data.Map
 
                 double progressPerSource = 100 / numSources;
                 double progress = completedSources * progressPerSource;
-                updateProgress(4, string.Format("Getting response timing records from data source {0}", dataSource.Name), progress);
+                updateProgress(3, string.Format("Getting response timing records from data source {0}", dataSource.Name), progress);
                 List<Record> recordsFromSource = dataSource.GetRecords();
                 int recordNumber = 0;
                 foreach (Record record in recordsFromSource)
@@ -579,7 +579,7 @@ namespace Levrum.Data.Map
                     recordNumber++;
 
                     double recordProgress = progressPerSource / recordsFromSource.Count;
-                    updateProgress(4, string.Format("Processing response timing record {0} out of {1} from data source {2}", recordNumber, recordsFromSource.Count, dataSource.Name), progress + (recordProgress * recordNumber), recordNumber == recordsFromSource.Count);
+                    updateProgress(3, string.Format("Processing response timing record {0} out of {1} from data source {2}", recordNumber, recordsFromSource.Count, dataSource.Name), progress + (recordProgress * recordNumber), recordNumber == recordsFromSource.Count);
                     IncidentData incident;
                     object value = record.GetValue(dataSource.IDColumn);
                     string recordIncidentId = null;
@@ -702,7 +702,7 @@ namespace Levrum.Data.Map
             {
                 convertCoordinates = false;
             }
-            updateProgress(5, string.Format("Processing incident data and nature codes for {0} incidents", Incidents.Count), 0, true);
+            updateProgress(4, string.Format("Processing incident data and nature codes for {0} incidents", Incidents.Count), 0, true);
 
             int incidentNum = 0;
             foreach (IncidentData incident in Incidents)
@@ -712,7 +712,7 @@ namespace Levrum.Data.Map
 
                 incidentNum++;
                 double progress = ((double)incidentNum / (double)Incidents.Count) * 100;
-                updateProgress(5, string.Format("Cleaning incident {0} of {1}", incidentNum, Incidents.Count), progress, incidentNum == Incidents.Count);
+                updateProgress(4, string.Format("Cleaning incident {0} of {1}", incidentNum, Incidents.Count), progress, incidentNum == Incidents.Count);
                 if (convertCoordinates)
                 {
                     double[] xyPoint = { incident.Longitude, incident.Latitude };
@@ -751,12 +751,12 @@ namespace Levrum.Data.Map
 
         private void cleanupResponseData(DataMap map)
         {
-            updateProgress(6, string.Format("Processing response data for {0} incidents", Incidents.Count), 0, true);
+            updateProgress(5, string.Format("Processing response data for {0} incidents", Incidents.Count), 0, true);
         }
 
         private void cleanupBenchmarks(DataMap map)
         {
-            updateProgress(7, string.Format("Processing response timings for {0} incidents", Incidents.Count), 0, true);
+            updateProgress(6, string.Format("Processing response timings for {0} incidents", Incidents.Count), 0, true);
             int incidentNum = 0;
             foreach (IncidentData incident in Incidents)
             {
@@ -765,8 +765,14 @@ namespace Levrum.Data.Map
 
                 incidentNum++;
                 double progress = ((double)incidentNum / (double)Incidents.Count) * 100;
-                updateProgress(7, string.Format("Processing response timings for incident {0} of {1}", incidentNum, Incidents.Count), progress, incidentNum == Incidents.Count);
+                updateProgress(6, string.Format("Processing response timings for incident {0} of {1}", incidentNum, Incidents.Count), progress, incidentNum == Incidents.Count);
                 DateTime baseTime = incident.Time;
+                if (baseTime == DateTime.MinValue)
+                {
+                    ErrorRecords.Add(new MapLoaderError(MapLoaderErrorType.BadValue, null, null, null, string.Format("Unable to generate benchmarks for Incident '{0}', no incident Time.", incident.Id)));
+                    continue;
+                }
+
                 if (incident.Data.ContainsKey("FirstEffAction"))
                 {
                     object firstEffAction = incident.Data["FirstEffAction"];
@@ -1004,7 +1010,7 @@ namespace Levrum.Data.Map
                     double incidentCount = Incidents.Count;
                     double incidentNum = incidentCount - (double)m_incidentQueue.Count;
                     double progress = (incidentNum / incidentCount) * 100;
-                    updateProgress(8, string.Format("Processing geographic data for incident {0} of {1}", incidentNum, incidentCount), progress, incidentNum == Incidents.Count);
+                    updateProgress(7, string.Format("Processing geographic data for incident {0} of {1}", incidentNum, incidentCount), progress, incidentNum == Incidents.Count);
                     foreach (IDataSource dataSource in m_geoSources)
                     {
                         GeoSource geoSource = (GeoSource)dataSource;
@@ -1119,7 +1125,7 @@ namespace Levrum.Data.Map
                     }
                 }
 
-                updateProgress(8, string.Format("Processing geographic data from {0} sources for {1} incidents", m_geoSources.Count, Incidents.Count), 0, true);
+                updateProgress(7, string.Format("Processing geographic data from {0} sources for {1} incidents", m_geoSources.Count, Incidents.Count), 0, true);
 
                 foreach (IncidentData incident in Incidents)
                 {
@@ -1235,7 +1241,7 @@ namespace Levrum.Data.Map
 
         private void calculateDerivedBenchmarks(DataMap map)
         {
-            updateProgress(9, string.Format("Calculating derived response timings for {0} incidents", Incidents.Count), 0);
+            updateProgress(8, string.Format("Calculating derived response timings for {0} incidents", Incidents.Count), 0);
             int incidentNum = 0;
             foreach (IncidentData incident in Incidents)
             {
@@ -1244,7 +1250,7 @@ namespace Levrum.Data.Map
 
                 incidentNum++;
                 double progress = ((double)incidentNum / (double)Incidents.Count) * 100;
-                updateProgress(9, string.Format("Calculating derived response timings for incident {0} of {1}", incidentNum, Incidents.Count), progress, incidentNum == Incidents.Count);
+                updateProgress(8, string.Format("Calculating derived response timings for incident {0} of {1}", incidentNum, Incidents.Count), progress, incidentNum == Incidents.Count);
                 ResponseData firstArrival = null;
                 ResponseData lastArrival = null;
                 ResponseData firstResponse = null;
@@ -1298,7 +1304,7 @@ namespace Levrum.Data.Map
 
         public void UpdateJSProgress(string message, double percentage)
         {
-            updateProgress(10, message, percentage);
+            updateProgress(9, message, percentage);
         }
 
         private class ProgressInfo
@@ -1321,7 +1327,7 @@ namespace Levrum.Data.Map
             {
                 return;
             }
-            updateProgress(10, string.Format("Executing post processing script"), 0, true);
+            updateProgress(9, string.Format("Executing post processing script"), 0, true);
             try
             {
                 using (V8ScriptEngine v8 = new V8ScriptEngine())
