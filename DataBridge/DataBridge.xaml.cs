@@ -260,18 +260,10 @@ namespace Levrum.DataBridge
             {
                 Dispatcher.Invoke(new Action(() => { EnableControls(); }));
                 return;
-            }
+            } else
 
             Cursor = Cursors.Arrow;
-            NewMenuItem.IsEnabled = true;
-            OpenMenuItem.IsEnabled = true;
-            SaveMenuItem.IsEnabled = true;
-            SaveAsMenuItem.IsEnabled = true;
-            CreateCallResponseCSVsMenuItem.IsEnabled = true;
-            CreateIncidentJsonMenuItem.IsEnabled = true;
-            ToolsMenu.IsEnabled = true;
-            PropertiesMenu.IsEnabled = true;
-            DockingManager.IsEnabled = true;
+            toggleControls(false);
         }
 
         public void DisableControls()
@@ -280,18 +272,39 @@ namespace Levrum.DataBridge
             {
                 Dispatcher.Invoke(new Action(() => { DisableControls(); }));
                 return;
-            }
+            } else
 
             Cursor = Cursors.Wait;
-            NewMenuItem.IsEnabled = false;
-            OpenMenuItem.IsEnabled = false;
-            SaveMenuItem.IsEnabled = false;
-            SaveAsMenuItem.IsEnabled = false;
-            CreateCallResponseCSVsMenuItem.IsEnabled = false;
-            CreateIncidentJsonMenuItem.IsEnabled = false;
-            ToolsMenu.IsEnabled = false;
-            PropertiesMenu.IsEnabled = false;
-            DockingManager.IsEnabled = false;
+            toggleControls(true);
+        }
+
+        private void toggleControls(bool runningOperation)
+        {
+            bool controlsEnabled = !runningOperation;
+            
+            NewMenuItem.IsEnabled = controlsEnabled;
+            OpenMenuItem.IsEnabled = controlsEnabled;
+            SaveMenuItem.IsEnabled = controlsEnabled;
+            SaveAsMenuItem.IsEnabled = controlsEnabled;
+            CreateCallResponseCSVsMenuItem.IsEnabled = controlsEnabled;
+            CreateIncidentJsonMenuItem.IsEnabled = controlsEnabled;
+            ToolsMenu.IsEnabled = controlsEnabled;
+            PropertiesMenu.IsEnabled = controlsEnabled;
+            DockingManager.IsEnabled = controlsEnabled;
+
+            NewButton.IsEnabled = controlsEnabled;
+            OpenButton.IsEnabled = controlsEnabled;
+            SaveButton.IsEnabled = controlsEnabled;
+            CreateJsonButton.IsEnabled = controlsEnabled;
+            CreateCsvButton.IsEnabled = controlsEnabled;
+            InvertLatitudeButton.IsEnabled = controlsEnabled;
+            InvertLongitudeButton.IsEnabled = controlsEnabled;
+            EditProjectionButton.IsEnabled = controlsEnabled;
+            ConvertCoordinateButton.IsEnabled = controlsEnabled;
+            EditPostProcessingButton.IsEnabled = controlsEnabled;
+            EditCauseTreeButton.IsEnabled = controlsEnabled;
+
+            StopButton.IsEnabled = runningOperation;
         }
 
         public void updateToolbarsAndMenus()
@@ -813,7 +826,10 @@ namespace Levrum.DataBridge
                         }
 
                         GC.Collect();
-
+                        if (Worker.CancellationPending)
+                        {
+                            return;
+                        }
                         FileInfo file = new FileInfo(sfd.FileName);
                         JsonSerializerSettings settings = new JsonSerializerSettings();
                         settings.TypeNameHandling = TypeNameHandling.All;
@@ -1196,7 +1212,19 @@ namespace Levrum.DataBridge
 
         private void StopButton_Click(object sender, RoutedEventArgs e)
         {
+            if (Worker == null || !Worker.IsBusy)
+            {
+                EnableControls();
+                return;
+            }
 
+            MessageBoxResult result = MessageBox.Show("Are you sure you want to cancel the current operation?", "Cancel Operation?", MessageBoxButton.YesNo);
+            if (result == MessageBoxResult.No)
+            {
+                return;
+            }
+
+            Worker.CancelAsync();
         }
     }
 
