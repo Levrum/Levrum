@@ -43,5 +43,21 @@ namespace Levrum.Data.Classes
             Value = value;
             Details = details;
         }
+
+
+        public bool HasAbsoluteTimestamp()
+        {
+            if (null==this.Data) { return (false); }
+            if (!Data.ContainsKey("RawData")) { return (false); }
+            object oval = Data["RawData"];
+            return (oval is DateTime);
+        }
+        public DateTime GetAbsoluteTimestamp()
+        {
+            DateTime errval = DateTime.MinValue;
+            if (!HasAbsoluteTimestamp()) { return (errval); }
+            DateTime retval = (DateTime)Data["RawData"];
+            return (retval);
+        }
     }
 }
