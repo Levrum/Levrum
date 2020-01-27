@@ -5,23 +5,31 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
+using Newtonsoft.Json;
+
 namespace Levrum.Data.Classes
 {
     public class DataSet<T> : List<T>
     {
         public object Parent { get; set; }
 
-        private char[] m_id;
-
+        [JsonIgnore]
         public string Id
         {
             get
             {
-                return new string(m_id);
+                if (Data.ContainsKey("Id"))
+                {
+                    return Data["Id"] as string;
+                }
+                else
+                {
+                    return string.Empty;
+                }
             }
             set
             {
-                m_id = value.ToCharArray();
+                Data["Id"] = value;
             }
         }
 

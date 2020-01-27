@@ -144,7 +144,7 @@ namespace Levrum.Data.Aggregators
                 {
                     foreach (ResponseData response in incident.Responses)
                     {
-                        double dispatchTime = (from BenchmarkData bmk in response.Benchmarks
+                        double dispatchTime = (from TimingData bmk in response.TimingData
                                                where bmk.Name == "Assigned"
                                                select bmk.Value).FirstOrDefault();
 
@@ -183,7 +183,7 @@ namespace Levrum.Data.Aggregators
                 {
                     foreach (ResponseData response in incident.Responses)
                     {
-                        double turnoutTime = (from BenchmarkData bmk in response.Benchmarks
+                        double turnoutTime = (from TimingData bmk in response.TimingData
                                               where bmk.Name == "TurnoutTime"
                                               select bmk.Value).FirstOrDefault();
 
@@ -223,14 +223,14 @@ namespace Levrum.Data.Aggregators
                 {
                     foreach (ResponseData response in incident.Responses)
                     {
-                        double sceneTime = (from BenchmarkData bmk in response.Benchmarks
+                        double sceneTime = (from TimingData bmk in response.TimingData
                                             where bmk.Name == "OnScene"
                                             select bmk.Value).FirstOrDefault();
 
                         if (sceneTime == default(double))
                             continue;
 
-                        double turnoutTime = (from BenchmarkData bmk in response.Benchmarks
+                        double turnoutTime = (from TimingData bmk in response.TimingData
                                               where bmk.Name == "TurnoutTime"
                                               select bmk.Value).FirstOrDefault();
 
@@ -269,7 +269,7 @@ namespace Levrum.Data.Aggregators
                     double firstArrival = double.MaxValue;
                     foreach (ResponseData response in incident.Responses)
                     {
-                        double firstArrivalBmk = (from BenchmarkData bmk in response.Benchmarks
+                        double firstArrivalBmk = (from TimingData bmk in response.TimingData
                                                   where bmk.Name == "FirstArrival"
                                                   select bmk.Value).FirstOrDefault();
 
@@ -279,7 +279,7 @@ namespace Levrum.Data.Aggregators
                             break;
                         }
 
-                        double onScene = (from BenchmarkData bmk in response.Benchmarks
+                        double onScene = (from TimingData bmk in response.TimingData
                                           where bmk.Name == "OnScene"
                                           select bmk.Value).FirstOrDefault();
 
@@ -328,7 +328,7 @@ namespace Levrum.Data.Aggregators
                     double fullComplement = double.MinValue;
                     foreach (ResponseData response in incident.Responses)
                     {
-                        double fullComplementBmk = (from BenchmarkData bmk in response.Benchmarks
+                        double fullComplementBmk = (from TimingData bmk in response.TimingData
                                                   where bmk.Name == "FullComplement"
                                                   select bmk.Value).FirstOrDefault();
 
@@ -338,7 +338,7 @@ namespace Levrum.Data.Aggregators
                             break;
                         }
 
-                        double onScene = (from BenchmarkData bmk in response.Benchmarks
+                        double onScene = (from TimingData bmk in response.TimingData
                                           where bmk.Name == "OnScene"
                                           select bmk.Value).FirstOrDefault();
 
@@ -386,14 +386,14 @@ namespace Levrum.Data.Aggregators
                 {
                     foreach (ResponseData response in incident.Responses)
                     {
-                        double onScene = (from BenchmarkData bmk in response.Benchmarks
+                        double onScene = (from TimingData bmk in response.TimingData
                                           where bmk.Name == "OnScene"
                                           select bmk.Value).FirstOrDefault();
 
                         if (onScene == default)
                             continue;
 
-                        double clearScene = (from BenchmarkData bmk in response.Benchmarks
+                        double clearScene = (from TimingData bmk in response.TimingData
                                              where bmk.Name == "ClearScene"
                                              select bmk.Value).FirstOrDefault();
 
@@ -433,7 +433,7 @@ namespace Levrum.Data.Aggregators
                 {
                     foreach (ResponseData response in incident.Responses)
                     {
-                        double committedHours = (from BenchmarkData bmk in response.Benchmarks
+                        double committedHours = (from TimingData bmk in response.TimingData
                                                  where bmk.Name == "CommittedHours"
                                                  select bmk.Value).FirstOrDefault();
 
@@ -443,14 +443,14 @@ namespace Levrum.Data.Aggregators
                             continue;
                         }
 
-                        double dispatched = (from BenchmarkData bmk in response.Benchmarks
+                        double dispatched = (from TimingData bmk in response.TimingData
                                              where bmk.Name == "Assigned"
                                              select bmk.Value).FirstOrDefault();
 
                         if (dispatched == default)
                             continue;
 
-                        double clearScene = (from BenchmarkData bmk in response.Benchmarks
+                        double clearScene = (from TimingData bmk in response.TimingData
                                              where bmk.Name == "ClearScene"
                                              select bmk.Value).FirstOrDefault();
 
@@ -525,7 +525,7 @@ namespace Levrum.Data.Aggregators
 
                         double committedTime = 0.0;
 
-                        double committedHours = (from BenchmarkData bmk in response.Benchmarks
+                        double committedHours = (from TimingData bmk in response.TimingData
                                                  where bmk.Name == "CommittedHours"
                                                  select bmk.Value).FirstOrDefault();
 
@@ -535,14 +535,14 @@ namespace Levrum.Data.Aggregators
                         }
                         else
                         {
-                            double dispatched = (from BenchmarkData bmk in response.Benchmarks
+                            double dispatched = (from TimingData bmk in response.TimingData
                                                  where bmk.Name == "Assigned"
                                                  select bmk.Value).FirstOrDefault();
 
                             if (dispatched == default)
                                 continue;
 
-                            double clearScene = (from BenchmarkData bmk in response.Benchmarks
+                            double clearScene = (from TimingData bmk in response.TimingData
                                                  where bmk.Name == "ClearScene"
                                                  select bmk.Value).FirstOrDefault();
 

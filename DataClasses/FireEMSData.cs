@@ -244,20 +244,21 @@ namespace Levrum.Data.Classes
 
         private DateTime getBenchmarkDateTime(string benchmarkName)
         {
-            BenchmarkData benchmark = (from BenchmarkData b in Benchmarks
+            TimingData benchmark = (from TimingData b in TimingData
                                        where b.Name == benchmarkName
                                        select b).FirstOrDefault();
 
             
-            if (benchmark == default(BenchmarkData)) {
+            if (benchmark == default(TimingData)) {
                 return DateTime.MinValue;
             }
 
             if (!benchmark.Data.ContainsKey("DateTime"))
             {
-                if(Parent != null && Parent.Time != DateTime.MinValue && benchmark.Value != Double.NaN) 
+                FireEMSIncident parent = Parent as FireEMSIncident;
+                if(parent != null && parent.Time != DateTime.MinValue && benchmark.Value != Double.NaN) 
                 {
-                    return Parent.Time.AddMinutes(benchmark.Value);
+                    return parent.Time.AddMinutes(benchmark.Value);
                 }
             }
 
@@ -278,18 +279,18 @@ namespace Levrum.Data.Classes
 
         private void setBenchmarkDateTime(string benchmarkName, DateTime time)
         {
-            BenchmarkData benchmark = (from BenchmarkData b in Benchmarks
+            TimingData benchmark = (from TimingData b in TimingData
                                        where b.Name == benchmarkName
                                        select b).FirstOrDefault();
 
-            if (benchmark == default(BenchmarkData))
+            if (benchmark == default(TimingData))
             {
-                benchmark = new BenchmarkData(benchmarkName);
+                benchmark = new TimingData(benchmarkName);
             }
 
-            if (Parent != null)
+            FireEMSIncident incident = Parent as FireEMSIncident;
+            if (incident != null)
             {
-                IncidentData incident = Parent;
                 if (incident.Time != DateTime.MinValue)
                 {
                     TimeSpan timeSpan = time - incident.Time;
@@ -302,11 +303,11 @@ namespace Levrum.Data.Classes
 
         private TimeSpan getBenchmarkTimeSpan(string benchmarkName)
         {
-            BenchmarkData benchmark = (from BenchmarkData b in Benchmarks
+            TimingData benchmark = (from TimingData b in TimingData
                                        where b.Name == benchmarkName
                                        select b).FirstOrDefault();
 
-            if (benchmark == default(BenchmarkData))
+            if (benchmark == default(TimingData))
             {
                 return TimeSpan.Zero;
             }
@@ -334,13 +335,13 @@ namespace Levrum.Data.Classes
 
         private void setBenchmarkTimeSpan(string benchmarkName, TimeSpan timeSpan)
         {
-            BenchmarkData benchmark = (from BenchmarkData b in Benchmarks
+            TimingData benchmark = (from TimingData b in TimingData
                                        where b.Name == benchmarkName
                                        select b).FirstOrDefault();
 
-            if (benchmark == default(BenchmarkData))
+            if (benchmark == default(TimingData))
             {
-                benchmark = new BenchmarkData(benchmarkName);
+                benchmark = new TimingData(benchmarkName);
             }
 
             benchmark.Value = timeSpan.TotalMinutes;
