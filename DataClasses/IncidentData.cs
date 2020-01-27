@@ -16,15 +16,7 @@ namespace Levrum.Data.Classes
             {
                 if (Data.ContainsKey("Id"))
                 {
-                    object id = Data["Id"];
-                    if (id is char[])
-                    {
-                        return new string(Data["Id"] as char[]);
-                    }
-                    else
-                    {
-                        return Data["Id"] as string;
-                    }
+                    return Data["Id"] as string;
                 } else
                 {
                     return string.Empty;
@@ -32,7 +24,7 @@ namespace Levrum.Data.Classes
             }
             set
             {
-                Data["Id"] = value.ToCharArray();
+                Data["Id"] = value;
             }
         }
 
@@ -60,7 +52,7 @@ namespace Levrum.Data.Classes
             }
             set
             {
-                Data["Time"] = value.Ticks;
+                Data["Time"] = value;
             }
         }
 
@@ -71,21 +63,13 @@ namespace Levrum.Data.Classes
             {
                 if (Data.ContainsKey("Location"))
                 {
-                    object loc = Data["Location"];
-                    if (loc is char[])
-                    {
-                        return new string(loc as char[]);
-                    }
-                    else
-                    {
-                        return Data["Location"] as string;
-                    }
+                    return Data["Location"] as string;
                 }
                 return string.Empty;
             }
             set
             {
-                Data["Location"] = value.ToCharArray();
+                Data["Location"] = value;
             }
         }
 
