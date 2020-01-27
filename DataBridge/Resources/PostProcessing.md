@@ -1,8 +1,6 @@
 Levrum DataBridge Post-Processing Scripts
 =========================================
 
-## Overview
-
 Levrum DataBridge uses the Microsoft ClearScript engine to execute post-processing scripts written in JavaScript.
 
 Levrum DataBridge connects to your Data Sources and combines them to create three different types of objects which are then combined to create JSON, CSV, and Microsoft Excel exports for use in your applications. 
@@ -19,10 +17,10 @@ For more information how to use Microsoft ClearScript please read their FAQtoria
 
 DataSet, IncidentData, ResponseData, and TimingData all expose special properties for accessing specific entries within their Data dictionaries as follows:
 
-### DataSet
+#### DataSet
 Id - String
 
-### IncidentData
+#### IncidentData
 Id - String  
 Time - DateTime  
 Location - String  
@@ -30,12 +28,12 @@ Latitude - Double
 Longitude - Double  
 Responses - DataSet<ResponseData>
 
-### ResponseData
+#### ResponseData
 Parent - IncidentData  
 Id - String  
 TimingData - DataSet<TimingData>  
 
-### TimingData
+#### TimingData
 Parent - ResponseData  
 Name - String  
 Value - Double  
@@ -47,7 +45,7 @@ Post-Processing Host Objects
 ----------------------------
 The following host objects are available in post-processing scripts:
 
-## Post-Loading Script
+### Post-Loading Script
 
 **Incidents**: DataSet of IncidentData objects created by the MapLoader  
 **XHost**: Microsoft ClearScript Extended Host Functions  
@@ -57,7 +55,7 @@ The following host objects are available in post-processing scripts:
 **MapLoader**: The DataBridge MapLoader class  
 **ProgressInfo**: Helper class for tracking processing progress  
 
-## Per Incident Script
+### Per Incident Script
 
 **Incidents**: DataSet of IncidentData objects created by the MapLoader  
 **Incident**: The current IncidentData object being processed  
@@ -106,11 +104,11 @@ var MapLoaderError = new MapLoaderError(MapLoaderErrorType.BadValue, "I found a 
 Helper Object Functions
 -------------------------------------
 
-## XHost
+### XHost
 
 See Microsoft's reference at https://microsoft.github.io/ClearScript/Reference/html/T_Microsoft_ClearScript_ExtendedHostFunctions.htm
 
-## Tools
+### Tools
 
 Functions used for manipulating AnnotatedData without making a large number of context switches
 
@@ -122,7 +120,7 @@ Example
 Tools.MergeDateTime(Incident, "Time", "IncidentDate", "IncidentTime")
 ```
 
-## Debug
+### Debug
 
 Functions used for outputting information to the DataBridge JavaScript debug window
 
@@ -141,7 +139,7 @@ cow["says"] = "Mooooooooooooo";
 Debug.WriteObject(cow);
 ```
 
-## Logger
+### Logger
 
 See the NLog documentation at https://github.com/NLog/NLog/wiki/Tutorial for information on the Logger object
 
@@ -154,7 +152,7 @@ Logger.Info("This is informative?");
 Logger.Debug("No bugs allowed!");
 ```
 
-## MapLoader
+### MapLoader
 
 Allows for direct access to the underlying MapLoader class
 
