@@ -65,7 +65,11 @@
                 <Separator/>
                 <MenuItem x:Name="EditCauseTreeMenuItem" Header="Edit Cause _Tree..." Click="EditCauseTree_Click" IsEnabled="False"/>
                 <Separator/>
-                <MenuItem x:Name="EditPostProcessingScript" Header="Edit PostProcessing _Script..." Click="EditPostProcessingScript_Click" IsEnabled="False"/>
+                <MenuItem x:Name="EditPostProcessingScript" Header="Post-Processing _Scripts" IsEnabled="False">
+                    <MenuItem x:Name="EditPhaseOneScript" Header="Phase _1: Post-Loading Script" Click="EditPhaseOneScript_Click" ToolTip="Use to generate statistics"/>
+                    <MenuItem x:Name="EditPhaseTwoScript" Header="Phase _2: Per Incident Script" Click="EditPhaseTwoScript_Click" ToolTip="Good for modifying individual incidents"/>
+                    <MenuItem x:Name="EditPhaseThreeScript" Header="Phase _3: Final Processing Script" Click="EditPhaseThreeScript_Click" ToolTip="Use info from other phases to modify data"/>
+                </MenuItem>
             </MenuItem>
             <MenuItem Name="HelpMenu" Header="_Help" IsTabStop="False">
                 <MenuItem x:Name="ShowJSDebugMenuItem" Header="Show _JavaScript Debug Window..." Click="ShowJSDebugMenuItem_Click"/>
@@ -86,19 +90,19 @@
                         <Image Source="/DataBridge;component/Resources/SaveIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
                 </Button>
                 <Separator/>
-                <Button x:Name="CreateJsonButton" Margin="0,0,0,-1" Click="CreateJson_Click">
+                <Button x:Name="CreateJsonButton" Margin="0,0,0,-1" Click="CreateJson_Click" ToolTip="Create JSON from DataMap">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/DataBridge;component/Resources/JsonIcon.png" Width="24" Height="24" Margin="0,0,0,0" Style="{StaticResource DynamicImageOpacity}"/>
                         <Label Height="28">Create JSON...</Label>
                     </StackPanel>
                 </Button>
-                <Button x:Name="CreateCsvButton" Margin="0,0,0,-1" Click="CreateCsv_Click">
+                <Button x:Name="CreateCsvButton" Margin="0,0,0,-1" Click="CreateCsv_Click" ToolTip="Create CSVs from DataMap">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/DataBridge;component/Resources/CsvIcon.png" Width="24" Height="24" Margin="0,0,0,0"  Style="{StaticResource DynamicImageOpacity}"/>
                         <Label Height="28">Create CSVs...</Label>
                     </StackPanel>
                 </Button>
-                <Button x:Name="StopButton" IsEnabled="False" Click="StopButton_Click">
+                <Button x:Name="StopButton" IsEnabled="False" Click="StopButton_Click" ToolTip="Stop Processing">
                     <Image Source="/DataBridge;component/Resources/StopIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
                 </Button>
             </ToolBar>
@@ -112,7 +116,7 @@
                 <ToggleButton x:Name="InvertLatitudeButton" Margin="0,0,0,-1" Click="ToggleInvertLatitude_Click" ToolTip="Toggle Invert Latitude">
                     <Image x:Name="InvertLatitudeButtonIcon" Source="/DataBridge;component/Resources/YIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
                 </ToggleButton>
-                <Button x:Name="EditProjectionButton" Margin="0,0,0,-1" Click="EditProjection_Click" ToolTip="Edit Projection...">
+                <Button x:Name="EditProjectionButton" Margin="0,0,0,-1" Click="EditProjection_Click" ToolTip="Edit Projection">
                     <StackPanel Orientation="Horizontal">
                         <Image x:Name="EditProjectionButtonIcon" Source="/DataBridge;component/Resources/GlobeIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
                         <Label Height="28">Edit Projection...</Label>
@@ -126,10 +130,10 @@
                     </StackPanel>
                 </Button>
                 <Separator/>
-                <Button x:Name="EditPostProcessingButton" Margin="0,0,0,-1" Click="EditPostProcessingScript_Click" ToolTip="Edit PostProcessing Script">
+                <Button x:Name="EditPostProcessingButton" Margin="0,0,0,-1" Click="EditPhaseTwoScript_Click" ToolTip="Edit Per Incident Post-Processing Script">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="/DataBridge;component/Resources/CodeIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
-                        <Label Height="28">PostProcessing Script...</Label>
+                        <Label Height="28">Per Incident Script...</Label>
                     </StackPanel>
                 </Button>
                 <Button x:Name="ShowJSDebugWindowButton" Margin="0,0,0,-1" Click="ShowJSDebugWindowButton_Click" ToolTip="Toggle Script Debug Window">

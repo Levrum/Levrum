@@ -21,8 +21,7 @@ using Levrum.Data.Classes;
 using Levrum.Data.Map;
 using Levrum.UI.WPF;
 using Levrum.Utils;
-
-using CsvHelper;
+using Levrum.Utils.Data;
 
 namespace Levrum.DataBridge
 {
@@ -398,127 +397,6 @@ namespace Levrum.DataBridge
             }
         }
 
-        private void convertJsonToCsv(DataSet<IncidentData> incidents, string incidentFile, string responseFile, BackgroundWorker worker = null)
-        {
-            try
-            {
-                HashSet<string> incidentDataFields = new HashSet<string>();
-                HashSet<string> responseDataFields = new HashSet<string>();
-                HashSet<string> benchmarkNames = new HashSet<string>();
-                foreach (IncidentData incident in incidents)
-                {
-                    foreach (string key in incident.Data.Keys)
-                    {
-                        incidentDataFields.Add(key);
-                    }
-                    foreach (ResponseData response in incident.Responses)
-                    {
-                        foreach (string key in response.Data.Keys)
-                        {
-                            responseDataFields.Add(key);
-                        }
-                        foreach (BenchmarkData benchmark in response.Benchmarks)
-                        {
-                            benchmarkNames.Add(benchmark.Name);
-                        }
-                    }
-                }
-
-                List<dynamic> incidentRecords = new List<dynamic>();
-                List<dynamic> responseRecords = new List<dynamic>();
-                foreach (IncidentData incident in incidents)
-                {
-                    if (worker != null && worker.CancellationPending)
-                    {
-                        return;
-                    }
-                    dynamic incidentRecord = new ExpandoObject();
-                    incidentRecord.Id = incident.Id;
-                    incidentRecord.Time = incident.Time;
-                    incidentRecord.Location = incident.Location;
-                    incidentRecord.Latitude = incident.Latitude;
-                    incidentRecord.Longitude = incident.Longitude;
-                    foreach (string field in incidentDataFields)
-                    {
-                        if (incident.Data.ContainsKey(field))
-                        {
-                            ((IDictionary<string, object>)incidentRecord).Add(field, incident.Data[field]);
-                        }
-                        else
-                        {
-                            ((IDictionary<string, object>)incidentRecord).Add(field, string.Empty);
-                        }
-                    }
-
-                    foreach (ResponseData response in incident.Responses)
-                    {
-                        dynamic responseRecord = new ExpandoObject();
-                        responseRecord.Id = incident.Id;
-                        foreach (string field in responseDataFields)
-                        {
-                            if (response.Data.ContainsKey(field))
-                            {
-                                ((IDictionary<string, object>)responseRecord).Add(field, response.Data[field]);
-                            }
-                            else
-                            {
-                                ((IDictionary<string, object>)responseRecord).Add(field, string.Empty);
-                            }
-                        }
-
-                        foreach (string benchmarkName in benchmarkNames)
-                        {
-                            BenchmarkData benchmark = (from bmk in response.Benchmarks
-                                                       where bmk.Name == benchmarkName
-                                                       select bmk).FirstOrDefault();
-
-                            if (benchmark != null)
-                            {
-                                object value;
-                                if (benchmark.Data.ContainsKey("DateTime"))
-                                {
-                                    value = benchmark.Data["DateTime"];
-                                }
-                                else
-                                {
-                                    value = benchmark.Value;
-                                }
-                                ((IDictionary<string, object>)responseRecord).Add(benchmarkName, value);
-                            }
-                            else
-                            {
-                                ((IDictionary<string, object>)responseRecord).Add(benchmarkName, string.Empty);
-                            }
-                        }
-                        responseRecords.Add(responseRecord);
-                    }
-                    incidentRecords.Add(incidentRecord);
-                }
-
-                using (StringWriter writer = new StringWriter())
-                {
-                    using (CsvWriter csv = new CsvWriter(writer))
-                    {
-                        csv.WriteRecords(incidentRecords);
-                    }
-                    File.WriteAllText(incidentFile, writer.ToString());
-                }
-
-                using (StringWriter writer = new StringWriter())
-                {
-                    using (CsvWriter csv = new CsvWriter(writer))
-                    {
-                        csv.WriteRecords(responseRecords);
-                    }
-                    File.WriteAllText(responseFile, writer.ToString());
-                }
-            }
-            catch (Exception ex)
-            {
-                logException(this, "Error converting JSON to CSV", ex);
-            }
-        }
-
         public DataMapDocument GetDocumentForMap(DataMap map)
         {
             return (from DataMapDocument d in openDocuments
@@ -614,7 +492,7 @@ namespace Levrum.DataBridge
                         string incidentJson = File.ReadAllText(ofd.FileName);
                         DataSet<IncidentData> incidents = JsonConvert.DeserializeObject<DataSet<IncidentData>>(incidentJson);
 
-                        convertJsonToCsv(incidents, incidentCsvFileName, responseCsvFileName, Worker);
+                        IncidentDataTools.CreateCsvs(incidents, incidentCsvFileName, responseCsvFileName);
 
                         MessageBox.Show(string.Format("Incidents saved as CSV files '{0}' and '{1}'", incidentCsvFileName, responseCsvFileName));
                     }
@@ -962,7 +840,7 @@ namespace Levrum.DataBridge
 
                         GC.Collect();
                         onLoaderProgress(this, "Generating and saving CSVs", 0);
-                        convertJsonToCsv(loader.Incidents, incidentCsvFileName, responseCsvFileName);
+                        IncidentDataTools.CreateCsvs(loader.Incidents, incidentCsvFileName, responseCsvFileName);
                         MessageBox.Show(string.Format("Incidents saved as CSV files '{0}' and '{1}'", incidentCsvFileName, responseCsvFileName));
                     }
                     catch (Exception ex)
@@ -1144,31 +1022,6 @@ namespace Levrum.DataBridge
             }
         }
 
-        private void EditPostProcessingScript_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                string script = null;
-                if (!string.IsNullOrWhiteSpace(DataSources.Map.PostProcessingScript))
-                {
-                    script = DataSources.Map.PostProcessingScript;
-                }
-                EditScriptDialog dialog = new EditScriptDialog(null, null, script);
-                dialog.Owner = this;
-                dialog.ShowDialog();
-
-                if (dialog.DialogResult == true)
-                {
-                    DataSources.Map.PostProcessingScript = dialog.Result;
-                    SetChangesMade(DataSources.Map, true);
-                }
-            }
-            catch (Exception ex)
-            {
-                logException(sender, "Unable to edit PostProcessing Script", ex);
-            }
-        }
-
         private void ShowJSDebugWindowButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -1226,6 +1079,81 @@ namespace Levrum.DataBridge
             }
 
             Worker.CancelAsync();
+        }
+
+        private void EditPhaseOneScript_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string script = null;
+                if (!string.IsNullOrWhiteSpace(DataSources.Map.PostProcessingScript))
+                {
+                    script = DataSources.Map.PostProcessingScript;
+                }
+                EditScriptDialog dialog = new EditScriptDialog(null, null, script);
+                dialog.Owner = this;
+                dialog.ShowDialog();
+
+                if (dialog.DialogResult == true)
+                {
+                    DataSources.Map.PostProcessingScript = dialog.Result;
+                    SetChangesMade(DataSources.Map, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                logException(sender, "Unable to edit post-loading script", ex);
+            }
+        }
+
+        private void EditPhaseTwoScript_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string script = null;
+                if (!string.IsNullOrWhiteSpace(DataSources.Map.PerIncidentScript))
+                {
+                    script = DataSources.Map.PerIncidentScript;
+                }
+                EditScriptDialog dialog = new EditScriptDialog(null, null, script);
+                dialog.Owner = this;
+                dialog.ShowDialog();
+
+                if (dialog.DialogResult == true)
+                {
+                    DataSources.Map.PerIncidentScript = dialog.Result;
+                    SetChangesMade(DataSources.Map, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                logException(sender, "Unable to edit per incident script", ex);
+            }
+        }
+
+        private void EditPhaseThreeScript_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                string script = null;
+                if (!string.IsNullOrWhiteSpace(DataSources.Map.FinalProcessingScript))
+                {
+                    script = DataSources.Map.FinalProcessingScript;
+                }
+                EditScriptDialog dialog = new EditScriptDialog(null, null, script);
+                dialog.Owner = this;
+                dialog.ShowDialog();
+
+                if (dialog.DialogResult == true)
+                {
+                    DataSources.Map.FinalProcessingScript = dialog.Result;
+                    SetChangesMade(DataSources.Map, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                logException(sender, "Unable to edit final processing script", ex);
+            }
         }
     }
 
