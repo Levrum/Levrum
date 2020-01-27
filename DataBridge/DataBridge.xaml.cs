@@ -488,6 +488,7 @@ namespace Levrum.DataBridge
                 {
                     try
                     {
+                        LogHelper.LogMessage(LogLevel.Info, string.Format("Converting JSON {0} to CSVs {1} and {2}", ofd.FileName, incidentCsvFileName, responseCsvFileName));
                         DisableControls();
                         string incidentJson = File.ReadAllText(ofd.FileName);
                         DataSet<IncidentData> incidents = JsonConvert.DeserializeObject<DataSet<IncidentData>>(incidentJson);
@@ -506,6 +507,7 @@ namespace Levrum.DataBridge
                     try
                     {
                         EnableControls();
+                        LogHelper.LogMessage(LogLevel.Info, "Finished converting JSON to CSVs");
                         StatusBarProgress.Value = 0;
                         StatusBarText.Text = "Ready";
                     }
@@ -649,9 +651,10 @@ namespace Levrum.DataBridge
             try
             {
                 SaveFileDialog sfd = new SaveFileDialog();
+                FileInfo file;
                 if (DataSources.Map.Data.ContainsKey("LastJsonExport"))
                 {
-                    FileInfo file = new FileInfo(DataSources.Map.Data["LastJsonExport"] as string);
+                    file = new FileInfo(DataSources.Map.Data["LastJsonExport"] as string);
                     if (file.Exists)
                     {
                         sfd.InitialDirectory = file.DirectoryName;
@@ -669,6 +672,7 @@ namespace Levrum.DataBridge
                 {
                     return;
                 }
+                file = new FileInfo(sfd.FileName);
                 Cursor = Cursors.Wait;
                 if (!DataSources.Map.Data.ContainsKey("LastJsonExport") || DataSources.Map.Data["LastJsonExport"] as string != sfd.FileName)
                 {
@@ -676,6 +680,7 @@ namespace Levrum.DataBridge
 
                     SetChangesMade(DataSources.Map, true);
                 }
+                LogHelper.LogMessage(LogLevel.Info, string.Format("Creating JSON {0} from DataMap {1}", sfd.FileName, DataSources.Map.Name));
 
                 MapLoader loader = new MapLoader();
                 loader.OnProgressUpdate += onLoaderProgress;
@@ -706,10 +711,10 @@ namespace Levrum.DataBridge
                         GC.Collect();
                         if (Worker.CancellationPending)
                         {
+                            LogHelper.LogMessage(LogLevel.Info, string.Format("Cancelled JSON creation at user request"));
                             return;
                         }
                         onLoaderProgress(this, "Generating and saving JSON", 0);
-                        FileInfo file = new FileInfo(sfd.FileName);
                         JsonSerializerSettings settings = new JsonSerializerSettings();
                         settings.TypeNameHandling = TypeNameHandling.All;
                         settings.Formatting = Formatting.Indented;
@@ -734,7 +739,7 @@ namespace Levrum.DataBridge
                         loader.DebugHost.OnDebugMessage -= JSDebugWindow.OnMessageReceived;
                         loader.Incidents.Clear();
                         loader.IncidentsById.Clear();
-
+                        LogHelper.LogMessage(LogLevel.Info, "Finished creating JSON");
                         GC.Collect();
                         EnableControls();
                         StatusBarProgress.Value = 0;
@@ -813,6 +818,8 @@ namespace Levrum.DataBridge
                     SetChangesMade(DataSources.Map, true);
                 }
 
+                LogHelper.LogMessage(LogLevel.Info, string.Format("Creating CSVs {0} and {1} from DataMap {2}", incidentCsvFileName, responseCsvFileName, DataSources.Map.Name));
+
                 MapLoader loader = new MapLoader();
                 loader.OnProgressUpdate += onLoaderProgress;
                 loader.DebugHost.OnDebugMessage += JSDebugWindow.OnMessageReceived;
@@ -838,6 +845,12 @@ namespace Levrum.DataBridge
                             }
                         }
 
+                        if (Worker.CancellationPending)
+                        {
+                            LogHelper.LogMessage(LogLevel.Info, string.Format("Cancelled CSV creation at user request"));
+                            return;
+                        }
+
                         GC.Collect();
                         onLoaderProgress(this, "Generating and saving CSVs", 0);
                         IncidentDataTools.CreateCsvs(loader.Incidents, incidentCsvFileName, responseCsvFileName);
@@ -855,7 +868,7 @@ namespace Levrum.DataBridge
                         loader.DebugHost.OnDebugMessage -= JSDebugWindow.OnMessageReceived;
                         loader.Incidents.Clear();
                         loader.IncidentsById.Clear();
-
+                        LogHelper.LogMessage(LogLevel.Info, string.Format("Finished creating CSVs"));
                         GC.Collect();
                         EnableControls();
                         StatusBarProgress.Value = 0;
