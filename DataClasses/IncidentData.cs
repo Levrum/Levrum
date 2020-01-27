@@ -124,11 +124,23 @@ namespace Levrum.Data.Classes
             }
         }
 
-        public DataSet<ResponseData> Responses { get; set; }
+        [JsonIgnore]
+        public DataSet<ResponseData> Responses { 
+            get
+            {
+                DataSet<ResponseData> output = new DataSet<ResponseData>(this);
+                if (!Data.ContainsKey("Responses") || !(Data["Responses"] is DataSet<ResponseData>))
+                {
+                    Data["Responses"] = output;
+                    return output;
+                }
 
-        public IncidentData()
-        {
-            Responses = new DataSet<ResponseData>(this);
+                return Data["Responses"] as DataSet<ResponseData>;
+            }
+            set
+            {
+                Data["Responses"] = value;
+            }
         }
 
         // 20190629 CDN - modified parameter defaults to compile in VS2017.   DateTime

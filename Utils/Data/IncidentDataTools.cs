@@ -32,7 +32,7 @@ namespace Levrum.Utils.Data
                         {
                             responseDataFields.Add(key);
                         }
-                        foreach (BenchmarkData benchmark in response.Benchmarks)
+                        foreach (TimingData benchmark in response.TimingData)
                         {
                             benchmarkNames.Add(benchmark.Name);
                         }
@@ -79,7 +79,7 @@ namespace Levrum.Utils.Data
 
                         foreach (string benchmarkName in benchmarkNames)
                         {
-                            BenchmarkData benchmark = (from bmk in response.Benchmarks
+                            TimingData benchmark = (from bmk in response.TimingData
                                                        where bmk.Name == benchmarkName
                                                        select bmk).FirstOrDefault();
 

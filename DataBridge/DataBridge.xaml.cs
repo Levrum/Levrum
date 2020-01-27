@@ -701,7 +701,7 @@ namespace Levrum.DataBridge
                             foreach (ResponseData response in incident.Responses)
                             {
                                 response.Intern();
-                                foreach (BenchmarkData benchmark in response.Benchmarks)
+                                foreach (TimingData benchmark in response.TimingData)
                                 {
                                     response.Intern();
                                 }
@@ -838,7 +838,7 @@ namespace Levrum.DataBridge
                             foreach (ResponseData response in incident.Responses)
                             {
                                 response.Intern();
-                                foreach (BenchmarkData benchmark in response.Benchmarks)
+                                foreach (TimingData benchmark in response.TimingData)
                                 {
                                     response.Intern();
                                 }

@@ -6,6 +6,8 @@ namespace Levrum.Data.Classes
 {
     public abstract class AnnotatedData
     {
+        public AnnotatedData Parent { get; set; } = null;
+
         private InternedDictionary<string, object> m_data = null;
 
         public InternedDictionary<string, object> Data
@@ -24,6 +26,13 @@ namespace Levrum.Data.Classes
             }
         }
 
+        public void RemoveDataValue(string key)
+        {
+            if (Data.ContainsKey(key))
+            {
+                Data.Remove(key);
+            }
+        }
 
         public object GetDataValue(string key)
         {
@@ -44,6 +53,13 @@ namespace Levrum.Data.Classes
                 // Event logging goes here
                 return (false);
             }
+        }
+
+        public void SetDataDateTime(string key, int year = 1901, int month = 1, int day = 1, int hour = 0, int minute = 0, int second = 0, int millisecond = 0)
+        {
+            DateTime value = new DateTime(year, month, day, hour, minute, second, millisecond);
+            if (!Data.ContainsKey(key)) { Data.Add(key, value); }
+            else { Data[key] = value; }
         }
 
         public void Intern()

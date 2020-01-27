@@ -18,7 +18,6 @@ namespace Levrum.Utils
         public void WriteObject(object obj)
         {
             string json = JsonConvert.SerializeObject(obj);
-            throw new Exception();
             WriteLine(json);
         }
 

@@ -2,41 +2,63 @@
 using System.Collections.Generic;
 using System.Text;
 
+using Newtonsoft.Json;
+
 namespace Levrum.Data.Classes
 {
     public class ResponseData : AnnotatedData
     {
-        public IncidentData Parent { get; set; } = null;
-
-        private char[] m_id;
-
+        [JsonIgnore]
         public string Id
         {
             get
             {
-                return new string(m_id);
+                if (Data.ContainsKey("Id"))
+                {
+                    return Data["Id"] as string;
+                }
+                else
+                {
+                    return string.Empty;
+                }
             }
             set
             {
-                m_id = value.ToCharArray();
+                Data["Id"] = value;
             }
         }
 
-        public DataSet<BenchmarkData> Benchmarks { get; set; }
+        [JsonIgnore]
+        public DataSet<TimingData> Benchmarks { get { return TimingData; } set { TimingData = value; } }
 
-        public ResponseData()
+        [JsonIgnore]
+        public DataSet<TimingData> TimingData
         {
-            Benchmarks = new DataSet<BenchmarkData>(this);
+            get
+            {
+                DataSet<TimingData> output = new DataSet<TimingData>(this);
+                if (!Data.ContainsKey("Benchmarks") || !(Data["Benchmarks"] is DataSet<TimingData>))
+                {
+                    Data["Benchmarks"] = output;
+                    return output;
+                }
+
+                return Data["Benchmarks"] as DataSet<TimingData>;
+            }
+            set
+            {
+                Data["Benchmarks"] = value;
+            }
         }
 
-        public ResponseData(string id = "", BenchmarkData[] benchmarks = null)
+        public ResponseData(string id = "", TimingData[] benchmarks = null)
         {
             Id = id;
-            Benchmarks = new DataSet<BenchmarkData>(this);
+            TimingData = new DataSet<TimingData>(this);
 
             if (benchmarks != null)
             {
-                Benchmarks.AddRange(benchmarks);
+                TimingData.AddRange(benchmarks);
             }
         }
     }

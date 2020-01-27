@@ -25,18 +25,6 @@ namespace Levrum.DataBridge
     /// </summary>
     public partial class EditScriptDialog : Window
     {
-        public string Caption
-        {
-            get
-            {
-                return Label.Content as string;
-            }
-            set
-            {
-                Label.Content = value;
-            }
-        }
-
         public string InitialText { get; set; } = null;
 
         public string Text
@@ -69,11 +57,6 @@ namespace Levrum.DataBridge
             if (!string.IsNullOrEmpty(_title))
             {
                 Title = _title;
-            }
-
-            if (!string.IsNullOrEmpty(_caption))
-            {
-                Caption = _caption;
             }
 
             if (!string.IsNullOrEmpty(_text))

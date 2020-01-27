@@ -6,12 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
+using Microsoft.ClearScript;
 using Microsoft.ClearScript.V8;
 
 using Levrum.Data.Sources;
 using Levrum.Data.Classes;
 
 using Levrum.Utils;
+using Levrum.Utils.Data;
 using Levrum.Utils.Geography;
 
 using NLog;
@@ -649,22 +651,17 @@ namespace Levrum.Data.Map
 
                         object parsedValue = getParsedValue(stringValue);
 
-                        BenchmarkData benchmark = new BenchmarkData();
+                        TimingData benchmark = new TimingData();
                         benchmark.Name = mapping.Field;
                         if (parsedValue is double)
                         {
                             benchmark.Value = (double)parsedValue;
-                            if ((benchmark.Value < 0) || (benchmark.Value > 300) || (double.IsNaN(benchmark.Value)))
-                            {
-                                DebugHost.WriteLine("Uh-oh:  funky benchmark!");    // great place for a breakpoint...
-                            }
-                        }
-                        if (parsedValue is DateTime)
+                        } else if (parsedValue is DateTime)
                         {
-                            benchmark.SetDataValue("DateTime", parsedValue);    // This ensures data will be written as absolute timestamps in the output CSV files
+                            benchmark.Data["DateTime"] = parsedValue; // This ensures data will be written as absolute timestamps in the output CSV files
                         }
                         benchmark.Data["RawData"] = parsedValue;
-                        response.Benchmarks.Add(benchmark);
+                        response.TimingData.Add(benchmark);
                     }
                 }
             }
@@ -799,7 +796,7 @@ namespace Levrum.Data.Map
 
                 foreach (ResponseData response in incident.Responses)
                 {
-                    BenchmarkData assigned = (from b in response.Benchmarks
+                    TimingData assigned = (from b in response.TimingData
                                               where b.Name == "Assigned"
                                               select b).FirstOrDefault();
 
@@ -825,7 +822,7 @@ namespace Levrum.Data.Map
                         assigned.Data["DateTime"] = assignedTime;
                     }
 
-                    BenchmarkData responding = (from b in response.Benchmarks
+                    TimingData responding = (from b in response.TimingData
                                                 where b.Name == "Responding"
                                                 select b).FirstOrDefault();
 
@@ -851,16 +848,16 @@ namespace Levrum.Data.Map
                         responding.Data["DateTime"] = respondingTime;
                     }
 
-                    BenchmarkData turnout = (from b in response.Benchmarks
+                    TimingData turnout = (from b in response.TimingData
                                              where b.Name == "TurnoutTime"
                                              select b).FirstOrDefault();
                     if (turnout == null)
                     {
-                        turnout = new BenchmarkData("TurnoutTime", Math.Max(0, (respondingTime - assignedTime).TotalMinutes));
-                        response.Benchmarks.Add(turnout);
+                        turnout = new TimingData("TurnoutTime", Math.Max(0, (respondingTime - assignedTime).TotalMinutes));
+                        response.TimingData.Add(turnout);
                     }
 
-                    BenchmarkData onScene = (from b in response.Benchmarks
+                    TimingData onScene = (from b in response.TimingData
                                              where b.Name == "OnScene"
                                              select b).FirstOrDefault();
 
@@ -886,16 +883,16 @@ namespace Levrum.Data.Map
                         onScene.Data["DateTime"] = onSceneTime;
                     }
 
-                    BenchmarkData travel = (from b in response.Benchmarks
+                    TimingData travel = (from b in response.TimingData
                                             where b.Name == "TravelTime"
                                             select b).FirstOrDefault();
                     if (travel == null)
                     {
-                        travel = new BenchmarkData("TravelTime", Math.Max(0, (onSceneTime - respondingTime).TotalMinutes));
-                        response.Benchmarks.Add(travel);
+                        travel = new TimingData("TravelTime", Math.Max(0, (onSceneTime - respondingTime).TotalMinutes));
+                        response.TimingData.Add(travel);
                     }
 
-                    BenchmarkData clearScene = (from b in response.Benchmarks
+                    TimingData clearScene = (from b in response.TimingData
                                                 where b.Name == "ClearScene"
                                                 select b).FirstOrDefault();
 
@@ -921,7 +918,7 @@ namespace Levrum.Data.Map
                         clearScene.Data["DateTime"] = clearSceneTime;
                     }
 
-                    BenchmarkData inService = (from b in response.Benchmarks
+                    TimingData inService = (from b in response.TimingData
                                                where b.Name == "InService"
                                                select b).FirstOrDefault();
 
@@ -952,27 +949,27 @@ namespace Levrum.Data.Map
                         clearSceneTime = inServiceTime;
                     }
 
-                    BenchmarkData committed = (from b in response.Benchmarks
+                    TimingData committed = (from b in response.TimingData
                                                where b.Name == "CommittedHours"
                                                select b).FirstOrDefault();
 
                     if (committed == null)
                     {
-                        committed = new BenchmarkData("CommittedHours", Math.Max(0, (clearSceneTime - assignedTime).TotalMinutes));
-                        response.Benchmarks.Add(committed);
+                        committed = new TimingData("CommittedHours", Math.Max(0, (clearSceneTime - assignedTime).TotalMinutes));
+                        response.TimingData.Add(committed);
                     }
 
-                    BenchmarkData sceneTime = (from b in response.Benchmarks
+                    TimingData sceneTime = (from b in response.TimingData
                                                where b.Name == "SceneTime"
                                                select b).FirstOrDefault();
 
                     if (sceneTime == null && onSceneTime != DateTime.MinValue)
                     {
-                        sceneTime = new BenchmarkData("SceneTime", (clearSceneTime - onSceneTime).TotalMinutes);
-                        response.Benchmarks.Add(sceneTime);
+                        sceneTime = new TimingData("SceneTime", (clearSceneTime - onSceneTime).TotalMinutes);
+                        response.TimingData.Add(sceneTime);
                     }
 
-                    BenchmarkData inQuarters = (from b in response.Benchmarks
+                    TimingData inQuarters = (from b in response.TimingData
                                                 where b.Name == "InQuarters"
                                                 select b).FirstOrDefault();
 
@@ -1074,7 +1071,7 @@ namespace Levrum.Data.Map
                                 response.Data[attr.Key] = attr.Value;
                             }
 
-                            foreach (BenchmarkData bmk in response.Benchmarks)
+                            foreach (TimingData bmk in response.TimingData)
                             {
                                 foreach (var attr in bmkAttributes)
                                 {
@@ -1266,7 +1263,7 @@ namespace Levrum.Data.Map
                 double firstResponding = double.MaxValue;
                 foreach (ResponseData response in incident.Responses)
                 {
-                    double onScene = (from BenchmarkData bmk in response.Benchmarks
+                    double onScene = (from TimingData bmk in response.TimingData
                                       where bmk.Name == "OnScene"
                                       select bmk.Value).FirstOrDefault();
 
@@ -1282,7 +1279,7 @@ namespace Levrum.Data.Map
                         firstOnScene = onScene;
                     }
 
-                    double responding = (from BenchmarkData bmk in response.Benchmarks
+                    double responding = (from TimingData bmk in response.TimingData
                                          where bmk.Name == "Responding"
                                          select bmk.Value).FirstOrDefault();
 
@@ -1294,11 +1291,11 @@ namespace Levrum.Data.Map
                 }
 
                 if (firstArrival != null)
-                    firstArrival.Benchmarks.Add(new BenchmarkData("FirstArrival", firstOnScene));
+                    firstArrival.TimingData.Add(new TimingData("FirstArrival", firstOnScene));
                 if (lastArrival != null)
-                    lastArrival.Benchmarks.Add(new BenchmarkData("FullComplement", lastOnScene));
+                    lastArrival.TimingData.Add(new TimingData("FullComplement", lastOnScene));
                 if (firstResponse != null)
-                    firstResponse.Benchmarks.Add(new BenchmarkData("FirstResponding", firstResponding));
+                    firstResponse.TimingData.Add(new TimingData("FirstResponding", firstResponding));
             }
         }
 
@@ -1330,6 +1327,31 @@ namespace Levrum.Data.Map
             }
         }
 
+        private void setupScriptEngine(V8ScriptEngine engine)
+        {
+            engine.AddHostObject("XHost", new ExtendedHostFunctions());
+            engine.AddHostObject("Tools", new AnnotatedDataTools());
+            engine.AddHostObject("Incidents", Incidents);
+            engine.AddHostObject("Debug", DebugHost);
+            engine.AddHostObject("Logger", Logger);
+            engine.AddHostObject("MapLoader", this);
+            engine.AddHostType("bool", typeof(bool));
+            engine.AddHostType("double", typeof(double));
+            engine.AddHostType("int", typeof(int));
+            engine.AddHostType("string", typeof(string));
+            engine.AddHostType("DateTime", typeof(DateTime));
+            engine.AddHostType("TimeSpan", typeof(TimeSpan));
+            engine.AddHostType("LogLevel", typeof(NLogLevel));
+            engine.AddHostType("IncidentData", typeof(IncidentData));
+            engine.AddHostType("IncidentDataSet", typeof(DataSet<IncidentData>));
+            engine.AddHostType("ResponseData", typeof(ResponseData));
+            engine.AddHostType("ResponseDataSet", typeof(DataSet<ResponseData>));
+            engine.AddHostType("TimingData", typeof(TimingData));
+            engine.AddHostType("TimingDataSet", typeof(DataSet<TimingData>));
+            engine.AddHostType("MapLoaderErrorType", typeof(MapLoaderErrorType));
+            engine.AddHostType("MapLoaderError", typeof(MapLoaderError));
+        }
+
         private void executePostProcessing()
         {
             if (!string.IsNullOrWhiteSpace(Map.PostProcessingScript))
@@ -1344,21 +1366,8 @@ namespace Levrum.Data.Map
                         pInfo.Count = Incidents.Count;
                         pInfo.Number = 0;
 
-                        v8.AddHostObject("Incidents", Incidents);
-                        v8.AddHostObject("Debug", DebugHost);
-                        v8.AddHostObject("Logger", Logger);
-                        v8.AddHostObject("MapLoader", this);
+                        setupScriptEngine(v8);
                         v8.AddHostObject("ProgressInfo", pInfo);
-                        v8.AddHostType("LogLevel", typeof(NLogLevel));
-                        v8.AddHostType("IncidentData", typeof(IncidentData));
-                        v8.AddHostType("ResponseData", typeof(ResponseData));
-                        v8.AddHostType("BenchmarkData", typeof(BenchmarkData));
-                        v8.AddHostType("bool", typeof(bool));
-                        v8.AddHostType("double", typeof(double));
-                        v8.AddHostType("int", typeof(int));
-                        v8.AddHostType("string", typeof(string));
-                        v8.AddHostType("DateTime", typeof(DateTime));
-                        v8.AddHostType("TimeSpan", typeof(TimeSpan));
                         v8.Execute(Map.PostProcessingScript);
                     }
                 }
@@ -1376,27 +1385,16 @@ namespace Levrum.Data.Map
             if (!string.IsNullOrWhiteSpace(Map.PerIncidentScript))
             {
                 updateProgress(9, string.Format("Executing per incident script"), 0, true);
-                using (V8ScriptEngine v8 = new V8ScriptEngine())
+                V8ScriptEngine v8 = null;
+                try
                 {
+                    v8 = new V8ScriptEngine();
                     ProgressInfo pInfo = new ProgressInfo();
                     pInfo.Count = Incidents.Count;
                     pInfo.Number = 0;
 
-                    v8.AddHostObject("Incidents", Incidents);
-                    v8.AddHostObject("Debug", DebugHost);
-                    v8.AddHostObject("Logger", Logger);
-                    v8.AddHostObject("MapLoader", this);
+                    setupScriptEngine(v8);
                     v8.AddHostObject("ProgressInfo", pInfo);
-                    v8.AddHostType("LogLevel", typeof(NLogLevel));
-                    v8.AddHostType("IncidentData", typeof(IncidentData));
-                    v8.AddHostType("ResponseData", typeof(ResponseData));
-                    v8.AddHostType("BenchmarkData", typeof(BenchmarkData));
-                    v8.AddHostType("bool", typeof(bool));
-                    v8.AddHostType("double", typeof(double));
-                    v8.AddHostType("int", typeof(int));
-                    v8.AddHostType("string", typeof(string));
-                    v8.AddHostType("DateTime", typeof(DateTime));
-                    v8.AddHostType("TimeSpan", typeof(TimeSpan));
 
                     foreach (IncidentData incident in Incidents)
                     {
@@ -1406,6 +1404,16 @@ namespace Levrum.Data.Map
                         }
 
                         pInfo.Number++;
+
+                        // The script engine starts to really lag after a few hundred thousand incidents, this helps avoid that somewhat
+                        if (pInfo.Number % 50000 == 0)
+                        {
+                            v8.Dispose();
+                            v8 = new V8ScriptEngine();
+                            setupScriptEngine(v8);
+                            v8.AddHostObject("ProgressInfo", pInfo);
+                        }
+
                         updateProgress(9, string.Format("Executing per incident script for incident {0} of {1}", pInfo.Number, pInfo.Count), pInfo.Progress, pInfo.Number >= pInfo.Count - 20);
                         v8.AddHostObject("Incident", incident);
                         try
@@ -1416,6 +1424,12 @@ namespace Levrum.Data.Map
                         {
                             LogHelper.LogMessage(Utils.LogLevel.Warn, string.Format("Exception running per incident script for incident {0}", incident.Id), ex);
                         }
+                    }
+                } finally
+                {
+                    if (v8 != null)
+                    {
+                        v8.Dispose();
                     }
                 }
             }
@@ -1437,21 +1451,8 @@ namespace Levrum.Data.Map
                         pInfo.Count = Incidents.Count;
                         pInfo.Number = 0;
 
-                        v8.AddHostObject("Incidents", Incidents);
-                        v8.AddHostObject("Debug", DebugHost);
-                        v8.AddHostObject("Logger", Logger);
-                        v8.AddHostObject("MapLoader", this);
+                        setupScriptEngine(v8);
                         v8.AddHostObject("ProgressInfo", pInfo);
-                        v8.AddHostType("LogLevel", typeof(NLogLevel));
-                        v8.AddHostType("IncidentData", typeof(IncidentData));
-                        v8.AddHostType("ResponseData", typeof(ResponseData));
-                        v8.AddHostType("BenchmarkData", typeof(BenchmarkData));
-                        v8.AddHostType("bool", typeof(bool));
-                        v8.AddHostType("double", typeof(double));
-                        v8.AddHostType("int", typeof(int));
-                        v8.AddHostType("string", typeof(string));
-                        v8.AddHostType("DateTime", typeof(DateTime));
-                        v8.AddHostType("TimeSpan", typeof(TimeSpan));
                         v8.Execute(Map.FinalProcessingScript);
                     }
                 }
@@ -1481,6 +1482,15 @@ namespace Levrum.Data.Map
             DataSource = dataSource;
             Mapping = mapping;
             Record = record;
+            if (!string.IsNullOrEmpty(details))
+            {
+                Details = details;
+            }
+        }
+
+        public MapLoaderError(MapLoaderErrorType type, string details = "")
+        {
+            ErrorType = type;
             if (!string.IsNullOrEmpty(details))
             {
                 Details = details;
