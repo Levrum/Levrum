@@ -3,21 +3,28 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
+using Newtonsoft.Json;
+
 namespace Levrum.Data.Classes
 {
     public class IncidentData : AnnotatedData
     {
-        private char[] m_id;
-        private long m_time;
-        private char[] m_location;
-
+        [JsonIgnore]
         public string Id
         {
             get
             {
                 if (Data.ContainsKey("Id"))
                 {
-                    return Data["Id"] as string;
+                    object id = Data["Id"];
+                    if (id is char[])
+                    {
+                        return new string(Data["Id"] as char[]);
+                    }
+                    else
+                    {
+                        return Data["Id"] as string;
+                    }
                 } else
                 {
                     return string.Empty;
@@ -25,10 +32,11 @@ namespace Levrum.Data.Classes
             }
             set
             {
-                Data["Id"] = value;
+                Data["Id"] = value.ToCharArray();
             }
         }
 
+        [JsonIgnore]
         public DateTime Time
         {
             get
@@ -36,7 +44,10 @@ namespace Levrum.Data.Classes
                 DateTime output  = DateTime.MinValue;
                 if (Data.ContainsKey("Time"))
                 {
-                    if (Data["Time"] is string)
+                    if (Data["Time"] is long)
+                    {
+                        output = new DateTime((long)Data["Time"]);
+                    } else if (Data["Time"] is string)
                     {
                         DateTime.TryParse((string)Data["Time"], out output);
                     }
@@ -49,26 +60,36 @@ namespace Levrum.Data.Classes
             }
             set
             {
-                Data["Time"] = value;
+                Data["Time"] = value.Ticks;
             }
         }
 
+        [JsonIgnore]
         public string Location
         {
             get
             {
                 if (Data.ContainsKey("Location"))
                 {
-                    return Data["Location"] as string;
+                    object loc = Data["Location"];
+                    if (loc is char[])
+                    {
+                        return new string(loc as char[]);
+                    }
+                    else
+                    {
+                        return Data["Location"] as string;
+                    }
                 }
                 return string.Empty;
             }
             set
             {
-                Data["Location"] = value;
+                Data["Location"] = value.ToCharArray();
             }
         }
 
+        [JsonIgnore]
         public double Longitude
         {
             get
@@ -93,6 +114,7 @@ namespace Levrum.Data.Classes
             }
         }
 
+        [JsonIgnore]
         public double Latitude
         {
             get
