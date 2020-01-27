@@ -26,8 +26,9 @@ namespace Levrum.Data.Map
     public class MapLoader
     {
         public DataSet<IncidentData> Incidents { get; protected set; } = new DataSet<IncidentData>();
-
         public Dictionary<string, IncidentData> IncidentsById { get; protected set; } = new Dictionary<string, IncidentData>();
+
+        private ConcurrentBag<IncidentData> IncidentQueue { get; set; } = new ConcurrentBag<IncidentData>();
 
         public List<MapLoaderError> ErrorRecords = new List<MapLoaderError>(); // Dictionary<IDataSource, List<Tuple<DataMapping, Record>>> ErrorRecords = new Dictionary<IDataSource, List<Tuple<DataMapping, Record>>>();
 
@@ -59,23 +60,18 @@ namespace Levrum.Data.Map
                     dataSource.Connect();
                 }
 
-                //processIncidentMappings(map);
-                
-                //if (Cancelling())
-                //    return false;
+                processIncidentDataMappings();
 
-                processIncidentDataMappings(map);
-                
                 if (Cancelling())
                     return false;
 
-                processResponseDataMappings(map);
-                
+                processResponseDataMappings();
+
                 if (Cancelling())
                     return false;
 
-                processBenchmarkMappings(map);
-                
+                processBenchmarkMappings();
+
                 if (Cancelling())
                     return false;
 
@@ -86,32 +82,32 @@ namespace Levrum.Data.Map
                 }
                 CauseData = flattenCauseData(causeTree);
 
-                cleanupIncidentData(map);
-                
-                if (Cancelling())
-                    return false;
-
-                cleanupResponseData(map);
-                
-                if (Cancelling())
-                    return false;
-
-                cleanupBenchmarks(map);
+                cleanupIncidentData();
 
                 if (Cancelling())
                     return false;
 
-                processGeoSources(map);
+                cleanupResponseData();
 
                 if (Cancelling())
                     return false;
 
-                calculateDerivedBenchmarks(map);
+                cleanupBenchmarks();
 
                 if (Cancelling())
                     return false;
 
-                executePostProcessing(map);
+                processGeoSources();
+
+                if (Cancelling())
+                    return false;
+
+                calculateDerivedBenchmarks();
+
+                if (Cancelling())
+                    return false;
+
+                executePostProcessing();
             }
             finally
             {
@@ -136,7 +132,8 @@ namespace Levrum.Data.Map
             if (Worker == null)
             {
                 return false;
-            } else
+            }
+            else
             {
                 return Worker.CancellationPending;
             }
@@ -226,19 +223,19 @@ namespace Levrum.Data.Map
             ErrorRecords.Add(new MapLoaderError(type, dataSource, mapping, record, details));
         }
 
-        private void processIncidentMappings(DataMap map)
+        private void processIncidentMappings()
         {
-            HashSet<IDataSource> dataSources = (from mapping in map.IncidentMappings
+            HashSet<IDataSource> dataSources = (from mapping in Map.IncidentMappings
                                                 select mapping?.Column?.DataSource).ToHashSet();
-            
+
             updateProgress(1, string.Format("Loading incident records from {0} data sources", dataSources.Count), 0, true);
 
             int numSources = dataSources.Count;
             int completedSources = 0;
             foreach (IDataSource dataSource in dataSources)
             {
-                List<DataMapping> mappingsForSource = (from mapping in map.IncidentMappings
-                                                       where (null!=mapping) && (mapping.Column.DataSource == dataSource)
+                List<DataMapping> mappingsForSource = (from mapping in Map.IncidentMappings
+                                                       where (null != mapping) && (mapping.Column.DataSource == dataSource)
                                                        select mapping).ToList();
 
                 if (mappingsForSource.Count == 0)
@@ -249,7 +246,7 @@ namespace Levrum.Data.Map
                 double progressPerSource = 100 / numSources;
                 double progress = completedSources * progressPerSource;
                 updateProgress(1, string.Format("Getting incident records from data source {0}", dataSource.Name), progress);
-                
+
                 List<Record> recordsFromSource = dataSource.GetRecords();
                 int recordNumber = 0;
                 foreach (Record record in recordsFromSource)
@@ -264,7 +261,7 @@ namespace Levrum.Data.Map
                     IncidentData incident;
                     object idValue = record.GetValue(dataSource.IDColumn);
                     string recordIncidentId = "";
-                    if (idValue != null) 
+                    if (idValue != null)
                     {
                         recordIncidentId = idValue.ToString();
                     }
@@ -363,9 +360,9 @@ namespace Levrum.Data.Map
             }
         }
 
-        private void processIncidentDataMappings(DataMap map)
+        private void processIncidentDataMappings()
         {
-            HashSet<IDataSource> dataSources = (from mapping in map.IncidentDataMappings
+            HashSet<IDataSource> dataSources = (from mapping in Map.IncidentDataMappings
                                                 select mapping.Column.DataSource).ToHashSet();
 
             updateProgress(1, string.Format("Loading incident data records from {0} data sources", dataSources.Count), 0, true);
@@ -374,7 +371,7 @@ namespace Levrum.Data.Map
             int completedSources = 0;
             foreach (IDataSource dataSource in dataSources)
             {
-                List<DataMapping> mappingsForSource = (from mapping in map.IncidentDataMappings
+                List<DataMapping> mappingsForSource = (from mapping in Map.IncidentDataMappings
                                                        where mapping.Column.DataSource == dataSource
                                                        select mapping).ToList();
 
@@ -400,7 +397,8 @@ namespace Levrum.Data.Map
                     IncidentData incident;
                     object value = record.GetValue(dataSource.IDColumn);
                     string recordIncidentId = null;
-                    if (value != null) {
+                    if (value != null)
+                    {
                         recordIncidentId = value.ToString();
                     }
 
@@ -435,9 +433,9 @@ namespace Levrum.Data.Map
             }
         }
 
-        private void processResponseDataMappings(DataMap map)
+        private void processResponseDataMappings()
         {
-            HashSet<IDataSource> dataSources = (from mapping in map.ResponseDataMappings
+            HashSet<IDataSource> dataSources = (from mapping in Map.ResponseDataMappings
                                                 select mapping.Column.DataSource).ToHashSet();
 
             updateProgress(2, string.Format("Loading response data records from {0} data sources", dataSources.Count), 0, true);
@@ -446,7 +444,7 @@ namespace Levrum.Data.Map
             int completedSources = 0;
             foreach (IDataSource dataSource in dataSources)
             {
-                List<DataMapping> mappingsForSource = (from mapping in map.ResponseDataMappings
+                List<DataMapping> mappingsForSource = (from mapping in Map.ResponseDataMappings
                                                        where mapping.Column.DataSource == dataSource
                                                        select mapping).ToList();
 
@@ -504,12 +502,13 @@ namespace Levrum.Data.Map
                     if (recordResponseIdValue != null)
                     {
                         recordResponseId = recordResponseIdValue.ToString();
-                    } else
+                    }
+                    else
                     {
                         AddErrorRecord(MapLoaderErrorType.NullResponseId, dataSource, null, record);
                         continue;
                     }
-                    
+
                     ResponseData response = (from r in incident.Responses
                                              where r.Data.ContainsKey("ResponseID") && recordResponseId == r.Data["ResponseID"] as string
                                              select r).FirstOrDefault();
@@ -539,9 +538,9 @@ namespace Levrum.Data.Map
             }
         }
 
-        private void processBenchmarkMappings(DataMap map)
+        private void processBenchmarkMappings()
         {
-            HashSet<IDataSource> dataSources = (from mapping in map.BenchmarkMappings
+            HashSet<IDataSource> dataSources = (from mapping in Map.BenchmarkMappings
                                                 select mapping.Column.DataSource).ToHashSet();
 
             updateProgress(3, string.Format("Loading response timing records from {0} data sources", dataSources.Count), 0, true);
@@ -550,7 +549,7 @@ namespace Levrum.Data.Map
             int completedSources = 0;
             foreach (IDataSource dataSource in dataSources)
             {
-                List<DataMapping> mappingsForSource = (from mapping in map.BenchmarkMappings
+                List<DataMapping> mappingsForSource = (from mapping in Map.BenchmarkMappings
                                                        where mapping.Column.DataSource == dataSource
                                                        select mapping).ToList();
 
@@ -655,7 +654,7 @@ namespace Levrum.Data.Map
                         if (parsedValue is double)
                         {
                             benchmark.Value = (double)parsedValue;
-                            if ((benchmark.Value<0)||(benchmark.Value>300)||(double.IsNaN(benchmark.Value)))
+                            if ((benchmark.Value < 0) || (benchmark.Value > 300) || (double.IsNaN(benchmark.Value)))
                             {
                                 DebugHost.WriteLine("Uh-oh:  funky benchmark!");    // great place for a breakpoint...
                             }
@@ -698,13 +697,13 @@ namespace Levrum.Data.Map
             return parsedValue;
         }
 
-        private void cleanupIncidentData(DataMap map)
+        private void cleanupIncidentData()
         {
             CoordinateConverter converter = null;
-            bool convertCoordinates = map.EnableCoordinateConversion;
+            bool convertCoordinates = Map.EnableCoordinateConversion;
             try
             {
-                converter = new CoordinateConverter(map.Projection);
+                converter = new CoordinateConverter(Map.Projection);
             }
             catch (Exception ex)
             {
@@ -729,12 +728,12 @@ namespace Levrum.Data.Map
                     incident.Longitude = latLon.Longitude;
                 }
 
-                if (map.InvertLatitude)
+                if (Map.InvertLatitude)
                 {
                     incident.Latitude = incident.Latitude * -1.0;
                 }
 
-                if (map.InvertLongitude)
+                if (Map.InvertLongitude)
                 {
                     incident.Longitude = incident.Longitude * -1.0;
                 }
@@ -757,12 +756,12 @@ namespace Levrum.Data.Map
             }
         }
 
-        private void cleanupResponseData(DataMap map)
+        private void cleanupResponseData()
         {
             updateProgress(5, string.Format("Processing response data for {0} incidents", Incidents.Count), 0, true);
         }
 
-        private void cleanupBenchmarks(DataMap map)
+        private void cleanupBenchmarks()
         {
             updateProgress(6, string.Format("Processing response timings for {0} incidents", Incidents.Count), 0, true);
             int incidentNum = 0;
@@ -1002,13 +1001,12 @@ namespace Levrum.Data.Map
             }
         }
 
-        private ConcurrentBag<IncidentData> m_incidentQueue = new ConcurrentBag<IncidentData>();
         private HashSet<IDataSource> m_geoSources = new HashSet<IDataSource>();
 
         private void geoSourceThread()
         {
             IncidentData incident;
-            while (m_incidentQueue.TryTake(out incident))
+            while (IncidentQueue.TryTake(out incident))
             {
                 try
                 {
@@ -1016,7 +1014,7 @@ namespace Levrum.Data.Map
                         return;
 
                     double incidentCount = Incidents.Count;
-                    double incidentNum = incidentCount - (double)m_incidentQueue.Count;
+                    double incidentNum = incidentCount - (double)IncidentQueue.Count;
                     double progress = (incidentNum / incidentCount) * 100;
                     updateProgress(7, string.Format("Processing geographic data for incident {0} of {1}", incidentNum, incidentCount), progress, incidentNum == Incidents.Count);
                     foreach (IDataSource dataSource in m_geoSources)
@@ -1085,26 +1083,27 @@ namespace Levrum.Data.Map
                             }
                         }
                     }
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     LogHelper.LogMessage(Utils.LogLevel.Warn, string.Format("Exception processing geographic data for incident {0}", incident.Id), ex);
                 }
             }
         }
 
-        private void processGeoSources(DataMap map)
+        private void processGeoSources()
         {
             try
             {
-                HashSet<IDataSource> incidentGeoSources = (from mapping in map.IncidentDataMappings
+                HashSet<IDataSource> incidentGeoSources = (from mapping in Map.IncidentDataMappings
                                                            where mapping.Column?.DataSource is GeoSource
                                                            select mapping.Column.DataSource).ToHashSet();
 
-                HashSet<IDataSource> responseGeoSources = (from mapping in map.ResponseDataMappings
+                HashSet<IDataSource> responseGeoSources = (from mapping in Map.ResponseDataMappings
                                                            where mapping.Column?.DataSource is GeoSource
                                                            select mapping.Column.DataSource).ToHashSet();
 
-                HashSet<IDataSource> benchmarkGeoSources = (from mapping in map.IncidentDataMappings
+                HashSet<IDataSource> benchmarkGeoSources = (from mapping in Map.IncidentDataMappings
                                                             where mapping.Column?.DataSource is GeoSource
                                                             select mapping.Column.DataSource).ToHashSet();
 
@@ -1137,7 +1136,7 @@ namespace Levrum.Data.Map
 
                 foreach (IncidentData incident in Incidents)
                 {
-                    m_incidentQueue.Add(incident);
+                    IncidentQueue.Add(incident);
                 }
 
                 int threadCount = Environment.ProcessorCount - 1;
@@ -1164,7 +1163,6 @@ namespace Levrum.Data.Map
                     Thread.Sleep(1000);
                 }
 
-                running = false;
                 /*
                 foreach (IncidentData incident in Incidents) { 
                     if (Cancelling())
@@ -1241,13 +1239,14 @@ namespace Levrum.Data.Map
                     }
                 }
                 */
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 LogHelper.LogException(ex, "Exception processing geographic data", true);
             }
         }
 
-        private void calculateDerivedBenchmarks(DataMap map)
+        private void calculateDerivedBenchmarks()
         {
             updateProgress(8, string.Format("Calculating derived response timings for {0} incidents", Incidents.Count), 0);
             int incidentNum = 0;
@@ -1319,7 +1318,9 @@ namespace Levrum.Data.Map
         {
             public int Number { get; set; } = 0;
             public int Count { get; set; } = 0;
-            public double Progress { get
+            public double Progress
+            {
+                get
                 {
                     if (Count == 0)
                         return 100.0;
@@ -1329,15 +1330,52 @@ namespace Levrum.Data.Map
             }
         }
 
-        private void executePostProcessing(DataMap map)
+        private void executePostProcessing()
         {
-            if (map.PostProcessingScript == string.Empty)
+            if (!string.IsNullOrWhiteSpace(Map.PostProcessingScript))
             {
-                return;
+
+                updateProgress(9, string.Format("Executing post-loading script"), 0, true);
+                try
+                {
+                    using (V8ScriptEngine v8 = new V8ScriptEngine())
+                    {
+                        ProgressInfo pInfo = new ProgressInfo();
+                        pInfo.Count = Incidents.Count;
+                        pInfo.Number = 0;
+
+                        v8.AddHostObject("Incidents", Incidents);
+                        v8.AddHostObject("Debug", DebugHost);
+                        v8.AddHostObject("Logger", Logger);
+                        v8.AddHostObject("MapLoader", this);
+                        v8.AddHostObject("ProgressInfo", pInfo);
+                        v8.AddHostType("LogLevel", typeof(NLogLevel));
+                        v8.AddHostType("IncidentData", typeof(IncidentData));
+                        v8.AddHostType("ResponseData", typeof(ResponseData));
+                        v8.AddHostType("BenchmarkData", typeof(BenchmarkData));
+                        v8.AddHostType("bool", typeof(bool));
+                        v8.AddHostType("double", typeof(double));
+                        v8.AddHostType("int", typeof(int));
+                        v8.AddHostType("string", typeof(string));
+                        v8.AddHostType("DateTime", typeof(DateTime));
+                        v8.AddHostType("TimeSpan", typeof(TimeSpan));
+                        v8.Execute(Map.PostProcessingScript);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.LogMessage(Utils.LogLevel.Warn, string.Format("Exception running post-loading script"), ex);
+                    DebugHost.WriteLine(ex.Message);
+                    DebugHost.WriteLine(ex.StackTrace);
+                }
             }
-            updateProgress(9, string.Format("Executing post processing script"), 0, true);
-            try
+
+            if (Cancelling())
+                return;
+
+            if (!string.IsNullOrWhiteSpace(Map.PerIncidentScript))
             {
+                updateProgress(9, string.Format("Executing per incident script"), 0, true);
                 using (V8ScriptEngine v8 = new V8ScriptEngine())
                 {
                     ProgressInfo pInfo = new ProgressInfo();
@@ -1359,28 +1397,70 @@ namespace Levrum.Data.Map
                     v8.AddHostType("string", typeof(string));
                     v8.AddHostType("DateTime", typeof(DateTime));
                     v8.AddHostType("TimeSpan", typeof(TimeSpan));
-                    v8.Execute(map.PostProcessingScript);
 
-                    /*
                     foreach (IncidentData incident in Incidents)
                     {
+                        if (Cancelling())
+                        {
+                            return;
+                        }
+
                         pInfo.Number++;
-                        updateProgress(10, string.Format("Executing PostProcessing script for incident {0} of {1}", pInfo.Number, pInfo.Count), pInfo.Progress, pInfo.Number == pInfo.Count);
+                        updateProgress(9, string.Format("Executing per incident script for incident {0} of {1}", pInfo.Number, pInfo.Count), pInfo.Progress, pInfo.Number >= pInfo.Count - 20);
                         v8.AddHostObject("Incident", incident);
                         try
                         {
-                            
-                        } catch (Exception ex)
+                            v8.Execute(Map.PerIncidentScript);
+                        }
+                        catch (Exception ex)
                         {
-                            LogHelper.LogMessage(Utils.LogLevel.Warn, string.Format("Exception running PostProcessing script for incident {0}", incident.Id), ex);
+                            LogHelper.LogMessage(Utils.LogLevel.Warn, string.Format("Exception running per incident script for incident {0}", incident.Id), ex);
                         }
                     }
-                    */
                 }
-            } catch (Exception ex)
+            }
+
+            if (Cancelling())
             {
-                DebugHost.WriteLine(ex.Message);
-                DebugHost.WriteLine(ex.StackTrace);
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(Map.FinalProcessingScript))
+            {
+                updateProgress(9, string.Format("Executing final processing script"), 0, true);
+
+                try
+                {
+                    using (V8ScriptEngine v8 = new V8ScriptEngine())
+                    {
+                        ProgressInfo pInfo = new ProgressInfo();
+                        pInfo.Count = Incidents.Count;
+                        pInfo.Number = 0;
+
+                        v8.AddHostObject("Incidents", Incidents);
+                        v8.AddHostObject("Debug", DebugHost);
+                        v8.AddHostObject("Logger", Logger);
+                        v8.AddHostObject("MapLoader", this);
+                        v8.AddHostObject("ProgressInfo", pInfo);
+                        v8.AddHostType("LogLevel", typeof(NLogLevel));
+                        v8.AddHostType("IncidentData", typeof(IncidentData));
+                        v8.AddHostType("ResponseData", typeof(ResponseData));
+                        v8.AddHostType("BenchmarkData", typeof(BenchmarkData));
+                        v8.AddHostType("bool", typeof(bool));
+                        v8.AddHostType("double", typeof(double));
+                        v8.AddHostType("int", typeof(int));
+                        v8.AddHostType("string", typeof(string));
+                        v8.AddHostType("DateTime", typeof(DateTime));
+                        v8.AddHostType("TimeSpan", typeof(TimeSpan));
+                        v8.Execute(Map.FinalProcessingScript);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.LogMessage(Utils.LogLevel.Warn, string.Format("Exception running final processing script"), ex);
+                    DebugHost.WriteLine(ex.Message);
+                    DebugHost.WriteLine(ex.StackTrace);
+                }
             }
         }
     }
