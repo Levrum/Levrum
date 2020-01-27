@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -69,6 +70,36 @@ namespace Levrum.DataBridge
                 IDataSource newSource = editor.DataSource;
                 if (newSource != null)
                 {
+                    if (string.IsNullOrWhiteSpace(newSource.Name))
+                    {
+                        string baseName = "Other Source";
+                        if (newSource is CsvSource)
+                        {
+                            baseName = "CSV Source";
+                        } else if (newSource is SqlSource)
+                        {
+                            baseName = "SQL Source";
+                        } else if (newSource is GeoSource)
+                        {
+                            baseName = "Geo Source";
+                        }
+
+                        int i = 1;
+                        bool nameFound = false;
+                        while (!nameFound)
+                        {
+                            string newName = string.Format("{0} #{1}", baseName, i);
+                            IDataSource existingSource = (from IDataSource s in DataSources
+                                                          where s.Name == newName
+                                                          select s).FirstOrDefault();
+
+                            if (existingSource == null)
+                            {
+                                newSource.Name = newName;
+                                nameFound = true;
+                            }
+                        }
+                    }
                     DataSources.Add(newSource);
                     if (Window != null)
                     {
@@ -92,6 +123,38 @@ namespace Levrum.DataBridge
                 int index = DataSources.IndexOf(currentSource);
                 DataSources.RemoveAt(index);
                 IDataSource newSource = editor.DataSource;
+                if (string.IsNullOrWhiteSpace(newSource.Name))
+                {
+                    string baseName = "Other Source";
+                    if (newSource is CsvSource)
+                    {
+                        baseName = "CSV Source";
+                    }
+                    else if (newSource is SqlSource)
+                    {
+                        baseName = "SQL Source";
+                    }
+                    else if (newSource is GeoSource)
+                    {
+                        baseName = "Geo Source";
+                    }
+
+                    int i = 1;
+                    bool nameFound = false;
+                    while (!nameFound)
+                    {
+                        string newName = string.Format("{0} #{1}", baseName, i);
+                        IDataSource existingSource = (from IDataSource s in DataSources
+                                                      where s.Name == newName
+                                                      select s).FirstOrDefault();
+
+                        if (existingSource == null)
+                        {
+                            newSource.Name = newName;
+                            nameFound = true;
+                        }
+                    }
+                }
                 updateDataSource(currentSource, newSource);
 
                 currentSource = editor.DataSource;
