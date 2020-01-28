@@ -6,8 +6,6 @@ namespace Levrum.Data.Classes
 {
     public abstract class AnnotatedData
     {
-        public AnnotatedData Parent { get; set; } = null;
-
         private InternedDictionary<string, object> m_data = null;
 
         public InternedDictionary<string, object> Data
