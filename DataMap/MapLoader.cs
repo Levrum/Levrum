@@ -955,7 +955,7 @@ namespace Levrum.Data.Map
 
                     if (committed == null)
                     {
-                        committed = new TimingData("CommittedHours", Math.Max(0, (clearSceneTime - assignedTime).TotalMinutes));
+                        committed = new TimingData("CommittedHours", Math.Max(0, (clearSceneTime - assignedTime).TotalMinutes) / 60);
                         response.TimingData.Add(committed);
                     }
 
