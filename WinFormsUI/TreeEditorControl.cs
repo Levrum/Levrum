@@ -270,7 +270,7 @@ namespace Levrum.UI.WinForms
             LoadTree(categoryData, m_flpOrganizedData);
         }
 
-        private FlowLayoutPanel AddSubPanel(FlowLayoutPanel parentPanel, ICategoryData panelCatData)
+        private FlowLayoutPanel AddSubPanel(FlowLayoutPanel parentPanel, ICategoryData panelCatData, bool existingChild = false)
         {
             string panelName = panelCatData.Name;
 
@@ -319,14 +319,14 @@ namespace Levrum.UI.WinForms
             // Add children
             foreach (ICategoryData categoryData in panelCatData.Children)
             {
-                AddSubPanel(newPanel, categoryData);
+                AddSubPanel(newPanel, categoryData, true);
             }
 
             newPanel.Controls.Add(GenerateSubcategoryButton());
 
             parentPanel.Controls.Add(newPanel);
 
-            if (parentPanel.Tag is ICategoryData)
+            if (!existingChild && parentPanel.Tag is ICategoryData)
             {
                 ICategoryData data = parentPanel.Tag as ICategoryData;
                 data.Children.Add(panelCatData);
