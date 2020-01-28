@@ -124,6 +124,11 @@ namespace Levrum.Data.Classes
             }
         }
 
+        public TimingData()
+        {
+
+        }
+
         public TimingData(string name = "", double value = Double.NaN, string details = "")
         {
             Name = name;

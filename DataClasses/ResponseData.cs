@@ -51,6 +51,11 @@ namespace Levrum.Data.Classes
             }
         }
 
+        public ResponseData()
+        {
+
+        }
+
         public ResponseData(string id = "", TimingData[] benchmarks = null)
         {
             Id = id;

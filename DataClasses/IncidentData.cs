@@ -143,6 +143,11 @@ namespace Levrum.Data.Classes
             }
         }
 
+        public IncidentData()
+        {
+
+        }
+
         // 20190629 CDN - modified parameter defaults to compile in VS2017.   DateTime
         // default is a hack suggested by https://stackoverflow.com/questions/3031110/set-default-value-for-datetime-in-optional-parameter
         public IncidentData(string id = "", DateTime? time = null, string location = "", double longitude = 0.0, double latitude = 0.0, 

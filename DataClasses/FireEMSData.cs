@@ -104,6 +104,8 @@ namespace Levrum.Data.Classes
 
     public class FireEMSResponse : ResponseData
     {
+        public FireEMSIncident Parent { get; set; } = null;
+
         [JsonIgnore]
         public string Unit
         {
