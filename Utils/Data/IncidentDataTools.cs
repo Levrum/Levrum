@@ -129,5 +129,22 @@ namespace Levrum.Utils.Data
                 LogHelper.LogException(ex, "Error converting Incident Data to CSVs", true);
             }
         }
+
+        public static HashSet<string> GetUnitsFromIncidents(List<IncidentData> incidents)
+        {
+            HashSet<string> units = new HashSet<string>();
+
+            foreach (IncidentData incident in incidents)
+            {
+                foreach (ResponseData response in incident.Responses)
+                {
+                    if (response.Data.ContainsKey("Unit")) {
+                        units.Add(response.Data["Unit"] as string);
+                    }
+                }
+            }
+
+            return units;
+        }
     }
 }
