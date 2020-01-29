@@ -721,7 +721,8 @@ namespace Levrum.DataBridge
                         using (TextWriter writer = File.CreateText(sfd.FileName)) {
                             var serializer = new JsonSerializer();
                             serializer.Formatting = Formatting.Indented;
-                            serializer.TypeNameHandling = TypeNameHandling.All;
+                            serializer.TypeNameHandling = TypeNameHandling.Auto;
+                            serializer.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
                             serializer.Serialize(writer, loader.Incidents);
                         }
 
