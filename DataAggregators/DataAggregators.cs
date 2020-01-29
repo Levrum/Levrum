@@ -138,9 +138,9 @@ namespace Levrum.Data.Aggregators
             Categories = _categories;
         }
 
-        public virtual AnnotatedDictionary<object, List<T>> GetData(List<T> data)
+        public virtual Dictionary<object, List<T>> GetData(List<T> data)
         {
-            AnnotatedDictionary<object, List<T>> output = new AnnotatedDictionary<object, List<T>>();
+            Dictionary<object, List<T>> output = new Dictionary<object, List<T>>();
             output["All"] = data;
 
             return output;
@@ -277,7 +277,7 @@ namespace Levrum.Data.Aggregators
             return null;
         }
 
-        protected AnnotatedDictionary<object, List<T>> sortByNumericKey(AnnotatedDictionary<object, List<T>> output)
+        protected Dictionary<object, List<T>> sortByNumericKey(Dictionary<object, List<T>> output)
         {
             List<KeyValuePair<object, List<T>>> unsortedOutput = output.ToList();
             unsortedOutput.Sort(
@@ -297,7 +297,7 @@ namespace Levrum.Data.Aggregators
             return output;
         }
 
-        protected AnnotatedDictionary<object, object> sortByAlphaKey(AnnotatedDictionary<object, object> output)
+        protected Dictionary<object, object> sortByAlphaKey(Dictionary<object, object> output)
         {
             List<KeyValuePair<object, object>> unsortedOutput = output.ToList();
             unsortedOutput.Sort(
@@ -329,9 +329,9 @@ namespace Levrum.Data.Aggregators
     {
         public override Type MemberType { get; protected set; } = typeof(DateTime);
 
-        public override AnnotatedDictionary<object, List<T>> GetData(List<T> data)
+        public override Dictionary<object, List<T>> GetData(List<T> data)
         {
-            AnnotatedDictionary<object, List<T>> output = new AnnotatedDictionary<object, List<T>>();
+            Dictionary<object, List<T>> output = new Dictionary<object, List<T>>();
             if (Member == null)
                 throw new MemberAccessException("HourOfDayAggregator created with null Member. Member must contain a MemberInfo object describing a DateTime.");
 
@@ -377,9 +377,9 @@ namespace Levrum.Data.Aggregators
 
         public override List<object> SortedKeys { get { return DayOfWeekKeys; } }
 
-        public override AnnotatedDictionary<object, List<T>> GetData(List<T> data)
+        public override Dictionary<object, List<T>> GetData(List<T> data)
         {
-            AnnotatedDictionary<object, List<T>> output = new AnnotatedDictionary<object, List<T>>();
+            Dictionary<object, List<T>> output = new Dictionary<object, List<T>>();
             if (Member == null)
                 throw new MemberAccessException("DayOfWeekAggregator created with null Member. Member must contain a MemberInfo object describing a DateTime.");
 
@@ -433,9 +433,9 @@ namespace Levrum.Data.Aggregators
 
         public override List<object> SortedKeys { get { return MonthOfYearKeys; } }
 
-        public override AnnotatedDictionary<object, List<T>> GetData(List<T> data)
+        public override Dictionary<object, List<T>> GetData(List<T> data)
         {
-            AnnotatedDictionary<object, List<T>> output = new AnnotatedDictionary<object, List<T>>();
+            Dictionary<object, List<T>> output = new Dictionary<object, List<T>>();
             if (Member == null)
                 throw new MemberAccessException("MonthOfYearAggregator created with null Member. Member must contain a MemberInfo object describing a DateTime.");
 
@@ -476,9 +476,9 @@ namespace Levrum.Data.Aggregators
     {
         public override Type MemberType { get; protected set; } = typeof(DateTime);
 
-        public override AnnotatedDictionary<object, List<T>> GetData(List<T> data)
+        public override Dictionary<object, List<T>> GetData(List<T> data)
         {
-            AnnotatedDictionary<object, List<T>> output = new AnnotatedDictionary<object, List<T>>();
+            Dictionary<object, List<T>> output = new Dictionary<object, List<T>>();
             if (Member == null)
                 throw new MemberAccessException("DayAggregator created with null Member. Member must contain a MemberInfo object describing a DateTime.");
 
@@ -520,9 +520,9 @@ namespace Levrum.Data.Aggregators
     {
         public override Type MemberType { get; protected set; } = typeof(DateTime);
 
-        public override AnnotatedDictionary<object, List<T>> GetData(List<T> data)
+        public override Dictionary<object, List<T>> GetData(List<T> data)
         {
-            AnnotatedDictionary<object, List<T>> output = new AnnotatedDictionary<object, List<T>>();
+            Dictionary<object, List<T>> output = new Dictionary<object, List<T>>();
             if (Member == null)
                 throw new MemberAccessException("MonthAggregator created with null Member. Member must contain a MemberInfo object describing a DateTime.");
 
@@ -559,9 +559,9 @@ namespace Levrum.Data.Aggregators
     {
         public override Type MemberType { get; protected set; } = typeof(DateTime);
 
-        public override AnnotatedDictionary<object, List<T>> GetData(List<T> data)
+        public override Dictionary<object, List<T>> GetData(List<T> data)
         {
-            AnnotatedDictionary<object, List<T>> output = new AnnotatedDictionary<object, List<T>>();
+            Dictionary<object, List<T>> output = new Dictionary<object, List<T>>();
             if (Member == null)
                 throw new MemberAccessException("YearAggregator created with null Member. Member must contain a MemberInfo object describing a DateTime.");
 
@@ -585,9 +585,9 @@ namespace Levrum.Data.Aggregators
     [DataAggregator(Name = "Category")]
     public class CategoryAggregator<T> : DataAggregator<T>
     {
-        public override AnnotatedDictionary<object, List<T>> GetData(List<T> data)
+        public override Dictionary<object, List<T>> GetData(List<T> data)
         {
-            AnnotatedDictionary<object, List<T>> output = new AnnotatedDictionary<object, List<T>>();
+            Dictionary<object, List<T>> output = new Dictionary<object, List<T>>();
             if (Member == null)
                 throw new MemberAccessException("CategoryAggregator created with null Member. Member must contain a MemberInfo object for the field on which to aggregate.");
 
@@ -616,9 +616,9 @@ namespace Levrum.Data.Aggregators
     {
         public DataAggregatorValueDelegate ValueDelegate { get; set; }
 
-        public override AnnotatedDictionary<object, List<T>> GetData(List<T> data)
+        public override Dictionary<object, List<T>> GetData(List<T> data)
         {
-            AnnotatedDictionary<object, List<T>> output = new AnnotatedDictionary<object, List<T>>();
+            Dictionary<object, List<T>> output = new Dictionary<object, List<T>>();
             if (ValueDelegate == null)
                 throw new MemberAccessException("ValueDelegateAggregator created with null ValueDelegate. ValueDelegate must contain a DataAggregatorValueDelegate that obtains a value on which to aggregate.");
 
