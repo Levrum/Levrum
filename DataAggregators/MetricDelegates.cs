@@ -7,6 +7,9 @@ using System.Text;
 
 using Levrum.Data.Classes;
 
+using Levrum.Utils.Data;
+using Levrum.Utils.Date;
+
 namespace Levrum.Data.Aggregators
 {
     public static class MetricDelegates
@@ -89,7 +92,7 @@ namespace Levrum.Data.Aggregators
 
         protected virtual bool hasRequiredParameters()
         {
-            foreach(string str in RequiredParameters)
+            foreach (string str in RequiredParameters)
             {
                 if (!Parameters.ContainsKey(str))
                     return false;
@@ -99,7 +102,7 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name="Incident Time")]
+    [MetricDelegate(Name = "Incident Time")]
     public class IncidentTimeMetric : MetricDelegate
     {
         public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
@@ -129,7 +132,7 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name="Dispatch Time")]
+    [MetricDelegate(Name = "Dispatch Time")]
     public class DispatchTimeMetric : MetricDelegate
     {
         public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
@@ -158,7 +161,8 @@ namespace Levrum.Data.Aggregators
                 if (calculation == null)
                 {
                     output[kvp.Key] = dispatchTimes;
-                } else
+                }
+                else
                 {
                     output[kvp.Key] = calculation.Calculate(dispatchTimes);
                 }
@@ -168,7 +172,7 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name="Turnout Time")]
+    [MetricDelegate(Name = "Turnout Time")]
     public class TurnoutTimeMetric : MetricDelegate
     {
         public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
@@ -208,7 +212,7 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name="Travel Time")]
+    [MetricDelegate(Name = "Travel Time")]
     public class TravelTimeMetric : MetricDelegate
     {
         public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
@@ -253,7 +257,7 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name="Initial Response")]
+    [MetricDelegate(Name = "Initial Response")]
     public class InitialResponseTimeMetric : MetricDelegate
     {
         public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
@@ -312,7 +316,7 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name="Full Complement")]
+    [MetricDelegate(Name = "Full Complement")]
     public class FullComplementTimeMetric : MetricDelegate
     {
         public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
@@ -329,8 +333,8 @@ namespace Levrum.Data.Aggregators
                     foreach (ResponseData response in incident.Responses)
                     {
                         double fullComplementBmk = (from TimingData bmk in response.TimingData
-                                                  where bmk.Name == "FullComplement"
-                                                  select bmk.Value).FirstOrDefault();
+                                                    where bmk.Name == "FullComplement"
+                                                    select bmk.Value).FirstOrDefault();
 
                         if (fullComplementBmk != default)
                         {
@@ -371,7 +375,7 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name="Scene Time")]
+    [MetricDelegate(Name = "Scene Time")]
     public class SceneTimeMetric : MetricDelegate
     {
         public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
@@ -418,7 +422,7 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name="Committed Time")]
+    [MetricDelegate(Name = "Committed Time")]
     public class CommittedTimeMetric : MetricDelegate
     {
         public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
@@ -478,10 +482,216 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name="Utilization")]
+    [MetricDelegate(Name = "Utilization")]
     public class UtilizationMetric : MetricDelegate
     {
         public override string[] RequiredParameters { get; protected set; } = { "Start Date", "End Date" };
+
+        public string getAggregationFromData(Dictionary<object, List<IncidentData>> data)
+        {
+            List<object> keys = data.Keys.ToList();
+            if (keys.Count == 0)
+            {
+                return string.Empty;
+            }
+            else if (keys[0] is string)
+            {
+                bool isDoW = true;
+                bool isMoY = true;
+                // Check for Day of Week and Month of Year
+                foreach (object key in keys)
+                {
+                    if (!DayOfWeekAggregator<IncidentData>.DayOfWeekKeys.Contains(key))
+                    {
+                        isDoW = false;
+                    }
+
+                    if (!MonthOfYearAggregator<IncidentData>.MonthOfYearKeys.Contains(key))
+                    {
+                        isMoY = false;
+                    }
+                }
+
+                if (isDoW)
+                {
+                    return "DayOfWeek";
+                }
+                else if (isMoY)
+                {
+                    return "MonthOfYear";
+                }
+
+                // Check for Unit
+                List<IncidentData> incidents = new List<IncidentData>();
+                foreach (List<IncidentData> list in data.Values)
+                {
+                    incidents.AddRange(list);
+                }
+
+                HashSet<string> stringKeys = new HashSet<string>();
+                foreach (object key in keys)
+                {
+                    stringKeys.Add(key as string);
+                }
+
+                HashSet<string> unitNames = IncidentDataTools.GetUnitsFromIncidents(incidents);
+                bool isUnit = true;
+                foreach (string unitName in unitNames)
+                {
+                    if (!stringKeys.Contains(unitName))
+                    {
+                        isUnit = false;
+                    }
+                }
+                if (isUnit)
+                {
+                    return "Unit";
+                }
+            }
+            else if (keys[0] is int)
+            {
+                // Check for Hour of Day
+                if (keys.Count == 24)
+                {
+                    bool isHoD = true;
+                    try
+                    {
+                        for (int i = 0; i < 24; i++)
+                        {
+                            isHoD = (int)keys[i] == i;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        isHoD = false;
+                    }
+
+                    if (isHoD)
+                    {
+                        return "HourOfDay";
+                    }
+                }
+
+                // Check for Year
+                bool isYear = true;
+                try
+                {
+                    foreach (object key in keys)
+                    {
+                        int value = (int)key;
+                        if (value < 1950 || value > 2050) // If you are using this after 2050 I question the nature of all of reality
+                        {
+                            isYear = false;
+                            break;
+                        }
+                    }
+
+                    if (isYear)
+                    {
+                        return "Year";
+                    }
+                }
+                catch (Exception ex)
+                {
+
+                }
+
+                // Check for Month
+                try
+                {
+                    bool isMonth = true;
+                    foreach (object key in keys)
+                    {
+                        int value = (int)key;
+                        int year, month;
+                        year = DateTimeUtils.GetYearFromYMKey(value);
+                        month = DateTimeUtils.GetMonthFromYMKey(value);
+                        if (year < 1950 || year > 2050 || month <= 0 || month > 12)
+                        {
+                            isMonth = false;
+                            break;
+                        }
+                    }
+
+                    if (isMonth)
+                    {
+                        return "Month";
+                    }
+                } catch (Exception ex)
+                {
+
+                }
+
+                // Check for Day
+                try
+                {
+                    bool isDay = true;
+                    foreach (object key in keys)
+                    {
+                        int value = (int)key;
+                        int year, month, day;
+                        year = DateTimeUtils.GetYearFromYMDKey(value);
+                        month = DateTimeUtils.GetMonthFromYMDKey(value);
+                        day = DateTimeUtils.GetDayFromYMDKey(value);
+                        if (year < 1950 || year > 2050 || month <= 0 || month > 12 || day <= 0 || day > 31)
+                        {
+                            isDay = false;
+                            break;
+                        }
+                    }
+
+                    if (isDay)
+                    {
+                        return "Day";
+                    }
+                } catch (Exception ex)
+                {
+
+                }
+            }
+
+            return "Unknown";
+        }
+
+        public Periods GetAggregationPeriod(string aggregation)
+        {
+            switch (aggregation)
+            {
+                case "Day":
+                    return Periods.Day;
+                case "Month":
+                    return Periods.Month;
+                case "Year":
+                    return Periods.Year;
+                case "DayOfWeek":
+                    return Periods.DayOfWeek;
+                case "HourOfDay":
+                    return Periods.HourOfDay;
+                case "MonthOfYear":
+                    return Periods.MonthOfYear;
+                default:
+                    return Periods.TimeSpan;
+            }
+        }
+
+        public int GetPeriodIntValue(string aggregation, object key)
+        {
+            if (key is int)
+            {
+                return (int)key;
+            } else
+            {
+                switch(aggregation)
+                {
+                    case "DayOfWeek":
+                        return DayOfWeekAggregator<IncidentData>.DayOfWeekKeys.IndexOf(key);
+                    case "MonthOfYear":
+                        return MonthOfYearAggregator<IncidentData>.MonthOfYearKeys.IndexOf(key);
+                    default:
+                        return 0;
+                }
+            }
+        }
 
         public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
         {
@@ -494,7 +704,8 @@ namespace Levrum.Data.Aggregators
             if (Parameters["End Date"] is DateTime)
             {
                 endDate = (DateTime)Parameters["End Date"];
-            } else if (!DateTime.TryParse(Parameters["End Date"].ToString(), out endDate))
+            }
+            else if (!DateTime.TryParse(Parameters["End Date"].ToString(), out endDate))
             {
                 return output;
             }
@@ -502,16 +713,19 @@ namespace Levrum.Data.Aggregators
             if (Parameters["Start Date"] is DateTime)
             {
                 startDate = (DateTime)Parameters["Start Date"];
-            } else if (!DateTime.TryParse(Parameters["Start Date"].ToString(), out startDate))
+            }
+            else if (!DateTime.TryParse(Parameters["Start Date"].ToString(), out startDate))
             {
                 return output;
             }
 
-            double timespanMinutes = (endDate - startDate).TotalMinutes;
+            string aggregation = getAggregationFromData(data);
+            Periods period = GetAggregationPeriod(aggregation);
             foreach (KeyValuePair<object, List<IncidentData>> datum in data)
             {
-                Dictionary<string, double> utilizationByUnit = new Dictionary<string, double>();
+                double timespanMinutes = DateTimeUtils.GetPeriodMinutes(period, startDate, endDate, GetPeriodIntValue(aggregation, datum.Key));
 
+                Dictionary<string, double> utilizationByUnit = new Dictionary<string, double>();
                 foreach (IncidentData incident in datum.Value)
                 {
                     foreach (ResponseData response in incident.Responses)
@@ -563,19 +777,25 @@ namespace Levrum.Data.Aggregators
                     }
                 }
 
-                if (utilizationByUnit.ContainsKey(datum.Key.ToString()))
-                {
-                    output[datum.Key] = (utilizationByUnit[datum.Key.ToString()] / timespanMinutes) * 100.0;
-                }
-                else
+                if (period == Periods.TimeSpan)
                 {
                     double timespanMinutesByNumUnits = utilizationByUnit.Keys.Count * timespanMinutes;
                     double totalCommittedTime = utilizationByUnit.Values.Sum();
 
                     output[datum.Key] = (totalCommittedTime / timespanMinutesByNumUnits) * 100.0;
+                } else
+                {
+                    output[datum.Key] = (utilizationByUnit[datum.Key.ToString()] / timespanMinutes) * 100.0;
                 }
             }
 
+            output = sortOutput(output);
+
+            return output;
+        }
+
+        private Dictionary<object, object> sortOutput(Dictionary<object, object> output)
+        {
             List<KeyValuePair<object, object>> unsortedOutput = output.ToList();
 
             unsortedOutput.Sort(
