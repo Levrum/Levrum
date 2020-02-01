@@ -13,15 +13,36 @@ namespace Levrum.Utils.MathAndStats
     /// </summary>
     class Util
     {
-        public static bool HandleAppErr(object obj, string str1, string str2)
+        public static bool HandleAppErr(object oSrc, string sContext, string sMsg)
         {
-            return true;
+            LogHelper.LogMessage(LogLevel.Error,"Source: " + oSrc.ToString() + ";  Context: " + sContext + ";  Message: " + sMsg);
+            return (false);
         }
 
         public static bool HandleExc(Object obj, string str, Exception ex)
         {
-            return true;
+            LogHelper.LogException(ex, "Context: " + obj?.ToString() + "; " + str, true);
+            return (false);
         }
+
+
+        /// <summary>
+        /// Is this type a scalar?
+        /// </summary>
+        /// <param name="oType"></param>
+        /// <returns></returns>
+        public static bool IsScalarType(Type oType)
+        {
+            if (null == oType) { return (false); }
+            if (typeof(int).IsAssignableFrom(oType)) { return (true); }
+            if (typeof(double).IsAssignableFrom(oType)) { return (true); }
+            if (typeof(Decimal).IsAssignableFrom(oType)) { return (true); }
+            if (typeof(String).IsAssignableFrom(oType)) { return (true); }
+            if (typeof(Enum).IsAssignableFrom(oType)) { return (true); }
+            if (typeof(DateTime).IsAssignableFrom(oType)) { return (true); }
+            return (false);
+        }
+
     }
 
     /// <summary>

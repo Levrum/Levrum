@@ -44,24 +44,34 @@ namespace Levrum.DataBridge
 
         public void SetOutputText(object sender, string outputText)
         {
-            if (!Dispatcher.CheckAccess())
+            const string fn = "JavascriptDebugWindow.SetOutputText()";
+            try
             {
-                Dispatcher.Invoke(new Action(() => { SetOutputText(sender, outputText); }));
-                return;
-            }
 
-            int caretPosition = DebugOutputTextBox.CaretOffset;
-            bool resetCaret = false;
-            if (caretPosition >= (DebugOutputTextBox.Text.Length - 1))
-            {
-                resetCaret = true;
-            }
 
-            DebugOutputTextBox.Text = outputText;
-            if (resetCaret)
+                //if (!Dispatcher.CheckAccess())
+                //{
+                //    Dispatcher.Invoke(new Action(() => { SetOutputText(sender, outputText); }));
+                //    return;
+                //}
+
+                //int caretPosition = DebugOutputTextBox.CaretOffset;
+                //bool resetCaret = false;
+                //if (caretPosition >= (DebugOutputTextBox.Text.Length - 1))
+                //{
+                //    resetCaret = true;
+                //}
+
+                //DebugOutputTextBox.Text = outputText;
+                //if (resetCaret)
+                //{
+                //    DebugOutputTextBox.CaretOffset = outputText.Length - 1;
+                //    DebugOutputTextBox.ScrollToEnd();
+                //}
+            }
+            catch(Exception exc)
             {
-                DebugOutputTextBox.CaretOffset = outputText.Length - 1;
-                DebugOutputTextBox.ScrollToEnd();
+                LogHelper.LogException(exc);
             }
         }
 
@@ -87,7 +97,7 @@ namespace Levrum.DataBridge
             {
                 // should do this with a right click menu item, but need time to figure out how to do that in WPF
                 DebugOutput.Clear();
-                DebugOutputTextBox.Text = DebugOutput.ToString();  
+                DebugOutputTextBox.Text = DebugOutput.ToString();
             }
             catch(Exception ex)
             {
