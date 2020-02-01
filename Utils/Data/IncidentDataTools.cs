@@ -8,6 +8,7 @@ using System.Text;
 using CsvHelper;
 
 using Levrum.Data.Classes;
+using Levrum.Utils.MathAndStats;
 
 namespace Levrum.Utils.Data
 {
@@ -15,6 +16,8 @@ namespace Levrum.Utils.Data
     {
         public static void CreateCsvs(DataSet<IncidentData> incidents, string incidentFile, string responseFile)
         {
+            const string fn = "IncidentDataTools.CreateCsvs()";
+            Type dtype = typeof(IncidentDataTools);
             try
             {
                 HashSet<string> incidentDataFields = new HashSet<string>();
@@ -39,8 +42,8 @@ namespace Levrum.Utils.Data
                     }
                 }
 
-                List<dynamic> incidentRecords = new List<dynamic>();
-                List<dynamic> responseRecords = new List<dynamic>();
+                List<ExpandoObject> incidentRecords = new List<ExpandoObject>();
+                List<ExpandoObject> responseRecords = new List<ExpandoObject>();
                 foreach (IncidentData incident in incidents)
                 {
                     dynamic incidentRecord = new ExpandoObject();
@@ -51,13 +54,18 @@ namespace Levrum.Utils.Data
                     incidentRecord.Longitude = incident.Longitude;
                     foreach (string field in incidentDataFields)
                     {
-                        if (incident.Data.ContainsKey(field))
+                        IDictionary<string, object> inc_dict = incidentRecord as IDictionary<string, object>;
+                        if (inc_dict.ContainsKey(field))
                         {
-                            ((IDictionary<string, object>)incidentRecord).Add(field, incident.Data[field]);
+                            LogHelper.LogErrOnce(fn, "Fieldname '" + field + "' is apparently duplicated in the incident data map");
+                        }
+                        else if (incident.Data.ContainsKey(field))
+                        {
+                            inc_dict.Add(field, incident.Data[field]);
                         }
                         else
                         {
-                            ((IDictionary<string, object>)incidentRecord).Add(field, string.Empty);
+                            inc_dict.Add(field, string.Empty);
                         }
                     }
 
@@ -65,15 +73,20 @@ namespace Levrum.Utils.Data
                     {
                         dynamic responseRecord = new ExpandoObject();
                         responseRecord.Id = incident.Id;
+                        IDictionary<string, object> rsp_dict = responseRecord as IDictionary<string, object>;
                         foreach (string field in responseDataFields)
                         {
-                            if (response.Data.ContainsKey(field))
+                            if (rsp_dict.ContainsKey(field))
                             {
-                                ((IDictionary<string, object>)responseRecord).Add(field, response.Data[field]);
+                                LogHelper.LogErrOnce(fn, "Fieldname '" + field + "' is apparently duplicated in the response data map");
+                            }
+                            else if (response.Data.ContainsKey(field))
+                            {
+                                rsp_dict.Add(field, response.Data[field]);
                             }
                             else
                             {
-                                ((IDictionary<string, object>)responseRecord).Add(field, string.Empty);
+                                rsp_dict.Add(field, string.Empty);
                             }
                         }
 
@@ -82,8 +95,11 @@ namespace Levrum.Utils.Data
                             TimingData benchmark = (from bmk in response.TimingData
                                                        where bmk.Name == benchmarkName
                                                        select bmk).FirstOrDefault();
-
-                            if (benchmark != null)
+                            if (rsp_dict.ContainsKey(benchmarkName)) 
+                            {
+                                LogHelper.LogErrOnce(fn, "Benchmark '" + benchmarkName + "' is apparently duplicated in the benchmark data map");
+                            }
+                            else if (benchmark != null)
                             {
                                 object value;
                                 if (benchmark.Data.ContainsKey("DateTime"))
@@ -94,11 +110,11 @@ namespace Levrum.Utils.Data
                                 {
                                     value = benchmark.Value;
                                 }
-                                ((IDictionary<string, object>)responseRecord).Add(benchmarkName, value);
+                                rsp_dict.Add(benchmarkName, value);
                             }
                             else
                             {
-                                ((IDictionary<string, object>)responseRecord).Add(benchmarkName, string.Empty);
+                                rsp_dict.Add(benchmarkName, string.Empty);
                             }
                         }
                         responseRecords.Add(responseRecord);
@@ -106,23 +122,36 @@ namespace Levrum.Utils.Data
                     incidentRecords.Add(incidentRecord);
                 }
 
-                using (StringWriter writer = new StringWriter())
-                {
-                    using (CsvWriter csv = new CsvWriter(writer))
-                    {
-                        csv.WriteRecords(incidentRecords);
-                    }
-                    File.WriteAllText(incidentFile, writer.ToString());
-                }
 
-                using (StringWriter writer = new StringWriter())
+                if (!CsvAnalyzer.SaveExpandosAsCsv(incidentFile, incidentRecords, false))
                 {
-                    using (CsvWriter csv = new CsvWriter(writer))
-                    {
-                        csv.WriteRecords(responseRecords);
-                    }
-                    File.WriteAllText(responseFile, writer.ToString());
+                    Util.HandleAppErr(dtype, fn, "Error saving incident data to " + incidentFile);
                 }
+                //using (StringWriter writer = new StringWriter())
+                //{
+                //    using (CsvWriter csv = new CsvWriter(writer))
+                //    {
+                //        foreach (ExpandoObject irec in incidentRecords)
+                //        {
+                //            csv.WriteRecord<ExpandoObject>(irec);
+                //        }
+                //        //csv.WriteRecords(incidentRecords);
+                //    }
+                //    File.WriteAllText(incidentFile, writer.ToString());
+                //}
+
+                if (!CsvAnalyzer.SaveExpandosAsCsv(responseFile, responseRecords,false))
+                {
+                    Util.HandleAppErr(dtype, fn, "Error saving response data to " + responseFile);
+                }
+                //using (StringWriter writer = new StringWriter())
+                //{
+                //    using (CsvWriter csv = new CsvWriter(writer))
+                //    {
+                //        csv.WriteRecords(responseRecords);
+                //    }
+                //    File.WriteAllText(responseFile, writer.ToString());
+                //}
             }
             catch (Exception ex)
             {

@@ -76,6 +76,23 @@ namespace Levrum.Utils
             }
         }
 
+        public  static void LogErrOnce(string context, string message)
+        {
+            string smsg_hash = context + "|" + message;
+            if (!m_oMessageTab.ContainsKey(smsg_hash))
+            {
+                m_oMessageTab.Add(smsg_hash, 1);
+                LogMessage(LogLevel.Error, smsg_hash);
+                return;
+            }
+            else
+            {
+                m_oMessageTab[smsg_hash]++;
+            }
+        }
+
+        private static Dictionary<string, int> m_oMessageTab = new Dictionary<string, int>();
+
         public static void LogMessage(NLogLevel level, string message)
         {
             LogMessage(level, message, null);
