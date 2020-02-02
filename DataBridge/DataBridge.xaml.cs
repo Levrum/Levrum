@@ -646,6 +646,14 @@ namespace Levrum.DataBridge
             }
         }
 
+
+
+        private void HandleShowLog(object oSrc, RoutedEventArgs oArgs)
+        {
+            string slog = LogHelper.PrettyprintLogEntries(30);
+            MessageBox.Show(slog);
+        }
+
         private void CreateJson_Click(object sender, RoutedEventArgs e)
         {
             try
