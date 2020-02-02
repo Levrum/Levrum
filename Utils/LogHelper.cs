@@ -159,5 +159,20 @@ namespace Levrum.Utils
         }
 
         public delegate void OnLogMessageDelegate(string time, string level, string message, string exception);
+
+        #region Legacy Helper Functions
+        public static bool HandleAppErr(object oSrc, string sContext, string sMsg)
+        {
+            LogMessage(LogLevel.Error, "Source: " + oSrc.ToString() + ";  Context: " + sContext + ";  Message: " + sMsg);
+            return (false);
+        }
+
+        public static bool HandleExc(Object obj, string str, Exception ex)
+        {
+            LogException(ex, "Context: " + obj?.ToString() + "; " + str, true);
+            return (false);
+        }
+        #endregion
     }
+
 }
