@@ -49,25 +49,25 @@ namespace Levrum.DataBridge
             {
 
 
-                //if (!Dispatcher.CheckAccess())
-                //{
-                //    Dispatcher.Invoke(new Action(() => { SetOutputText(sender, outputText); }));
-                //    return;
-                //}
+                if (!Dispatcher.CheckAccess())
+                {
+                    Dispatcher.Invoke(new Action(() => { SetOutputText(sender, outputText); }));
+                    return;
+                }
 
-                //int caretPosition = DebugOutputTextBox.CaretOffset;
-                //bool resetCaret = false;
-                //if (caretPosition >= (DebugOutputTextBox.Text.Length - 1))
-                //{
-                //    resetCaret = true;
-                //}
+                int caretPosition = DebugOutputTextBox.CaretOffset;
+                bool resetCaret = false;
+                if (caretPosition >= (DebugOutputTextBox.Text.Length - 1))
+                {
+                    resetCaret = true;
+                }
 
-                //DebugOutputTextBox.Text = outputText;
-                //if (resetCaret)
-                //{
-                //    DebugOutputTextBox.CaretOffset = outputText.Length - 1;
-                //    DebugOutputTextBox.ScrollToEnd();
-                //}
+                DebugOutputTextBox.Text = outputText;
+                if (resetCaret)
+                {
+                    DebugOutputTextBox.CaretOffset = outputText.Length - 1;
+                    DebugOutputTextBox.ScrollToEnd();
+                }
             }
             catch(Exception exc)
             {
@@ -83,6 +83,7 @@ namespace Levrum.DataBridge
                 return;
             }
 
+            Console.WriteLine("JSDBG: " + message);
             DebugOutput.Append(message);
             if (!UpdateWorker.IsBusy)
             {
