@@ -21,14 +21,56 @@ namespace Levrum.Utils
 
         public static event LogHelperMessageBoxDelegate OnMessageBox;
         public static event LogHelperFatalErrorDelegate OnFatalError;
+        public static List<LogEntry> LogEntries = new List<LogEntry>();
+
 
         static LogHelper()
         {
             Logger = LogManager.GetCurrentClassLogger();
         }
 
+        public static string PrettyprintLogEntries(int nMax)
+        {
+            const string fn = "LogHelper.PrettyprintLogEnries()";
+            try
+            {
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; (i < LogEntries.Count) && (i < (nMax - 1)); i++)
+                {
+                    LogEntry entry = LogEntries[i];
+
+                    sb.Append(i.ToString().PadLeft(3, ' ') + ".) ");
+                    sb.Append(entry.Timestamp.ToLongTimeString() + " ");
+                    sb.Append(entry.Level.ToString() + ": ");
+                    sb.Append(entry.Message + "  ");
+                    if (null!=entry.Exc)
+                    {
+                        sb.Append(" EXCEPTION: " + entry.Exc.Message);
+                    }
+                    sb.AppendLine();
+                }
+                return (sb.ToString());
+
+            }
+            catch (Exception exc)
+            {
+                LogHelper.LogException(exc);  // hopefully this doesn't cause infinite recursion
+                return ("Error retrieving log entries ... please see event log");
+            }
+        }
+
         public static void LogMessage(LogLevel level, string message = "", Exception ex = null)
         {
+
+            LogEntry entry = new LogEntry();
+            entry.Message = message;
+            entry.Level = level;
+            entry.Exc = ex;
+            lock (LogEntries)
+            {
+                LogEntries.Add(entry);
+            }
+
             if (ex != null && level == LogLevel.Error)
             {
                 LogException(ex, message, true);
@@ -102,6 +144,8 @@ namespace Levrum.Utils
         {
             try
             {
+
+
                 if (level == NLogLevel.Fatal)
                 {
                     Logger.Fatal(ex, message);
@@ -128,6 +172,8 @@ namespace Levrum.Utils
                 {
                     Logger.Info(ex, message);
                 }
+
+                
             }
             catch (Exception loggingException)
             {
@@ -159,5 +205,26 @@ namespace Levrum.Utils
         }
 
         public delegate void OnLogMessageDelegate(string time, string level, string message, string exception);
+
+        public static void DisplayMessageIfPossible(string sMsg)
+        {
+            try
+            {
+                if (null != OnMessageBox) { OnMessageBox(sMsg, ""); }
+            }
+            catch(Exception exc)
+            {
+                LogException(exc, "Error attempting in message box handler");
+            }
+        }
+    } // end class{}
+
+    public class LogEntry
+    {
+        public DateTime Timestamp = DateTime.Now;
+        public LogLevel Level = LogLevel.Info;
+        public Exception Exc = null;
+        public string Message = "";
     }
+
 }
