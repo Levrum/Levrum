@@ -8,7 +8,6 @@ namespace Levrum.Data.Classes
 {
     public class ResponseData : AnnotatedData
     {
-        [JsonIgnore]
         public string Id
         {
             get
@@ -28,7 +27,6 @@ namespace Levrum.Data.Classes
             }
         }
 
-        [JsonIgnore]
         public DataSet<TimingData> Benchmarks { get { return TimingData; } set { TimingData = value; } }
 
         [JsonIgnore]
