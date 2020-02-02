@@ -9,6 +9,20 @@ namespace Levrum.Data.Classes
 {
     public class IncidentData : AnnotatedData
     {
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append(Id + " ");
+            sb.Append(Time.ToShortDateString() + " " + Time.ToLongTimeString() + "  ");
+            object code = GetDataValue("Code");
+            if (null==code) { code = GetDataValue("NatureCode"); }
+            if (null!=code) { sb.Append(code.ToString() + "  "); }
+            sb.Append(Location);
+            return (sb.ToString());
+
+        }
+
         [JsonIgnore]
         public string Id
         {

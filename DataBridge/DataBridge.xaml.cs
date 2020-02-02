@@ -654,6 +654,11 @@ namespace Levrum.DataBridge
             MessageBox.Show(slog);
         }
 
+        private void HandleClearLog(object oSrc, RoutedEventArgs oArgs)
+        {
+            LogHelper.ClearLogEntries();
+        }
+
         private void CreateJson_Click(object sender, RoutedEventArgs e)
         {
             try
