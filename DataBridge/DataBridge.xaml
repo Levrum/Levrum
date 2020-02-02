@@ -57,6 +57,7 @@
                 <Separator/>
                 <MenuItem x:Name="JsonViewerMenuItem" Header="Open _JSON Viewer..." Click="JsonViewerMenuItem_Click" IsEnabled="True"/>
                 <MenuItem x:Name="ToolsShowLogMenuItem" Header="Show _Log..."  Click="HandleShowLog" IsEnabled="True" />
+                <MenuItem x:Name="ToolsClearLogMenuItem" Header="_Clear Log " Click="HandleClearLog" IsEnabled="True" />
             </MenuItem>
             <MenuItem Name="PropertiesMenu" Header="_Properties" IsTabStop="False">
                 <MenuItem x:Name="CoordinateConversionMenuItem" Header="Enable _Coordinate Conversion" Click="ToggleConvertCoordinate_Click" IsEnabled="False"/>

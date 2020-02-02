@@ -217,6 +217,17 @@ namespace Levrum.Utils
                 LogException(exc, "Error attempting in message box handler");
             }
         }
+
+        public static void ClearLogEntries()
+        {
+            if (null == LogEntries)
+            {
+                LogEntries = new List<LogEntry>();
+                return;
+            }
+            LogEntries.Clear();
+            return;
+        }
     } // end class{}
 
     public class LogEntry
