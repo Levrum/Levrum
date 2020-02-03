@@ -35,9 +35,10 @@ namespace Levrum.Utils
             try
             {
                 StringBuilder sb = new StringBuilder();
-                int lastIndex = LogEntries.Count - 1;
-                int firstIndex = nMax == -1 ? 0 : LogEntries.Count - nMax;
-                for (int i = firstIndex; i < LogEntries.Count; i++)
+                //int lastIndex = LogEntries.Count - 1;
+                //int firstIndex = nMax == -1 ? 0 : LogEntries.Count - nMax;
+                int ndone = 0;
+                for (int i = LogEntries.Count-1; i>=0; i--)  // display in reverse order
                 {
                     LogEntry entry = LogEntries[i];
 
@@ -49,6 +50,8 @@ namespace Levrum.Utils
                     {
                         sb.AppendLine(string.Format("{0}.) {1} {2}: {3} EXCEPTION: {4}", i.ToString().PadLeft(3, ' '), entry.Timestamp.ToLongTimeString(), entry.Level.ToString(), entry.Message, entry.Exception.Message));
                     }
+                    ndone++;
+                    if ((nMax>0)&&(ndone>=nMax)) { break;  }
                 }
                 return sb.ToString();
             }
