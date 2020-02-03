@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 using CsvHelper;
@@ -92,8 +95,8 @@ namespace Levrum.Utils.Data
                     summaryBuilder.AppendFormat("\nTotal Records: {0}\n\n", recordCount);
                 }
 
-                
-                foreach(ColumnInfo field in fieldInfo)
+
+                foreach (ColumnInfo field in fieldInfo)
                 {
                     summaryBuilder.AppendFormat(field.GetSummaryHeader());
                     if (field.Summary != null)
@@ -101,7 +104,8 @@ namespace Levrum.Utils.Data
                         summaryBuilder.AppendFormat(field.Summary.Summarize());
                     }
                 }
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
 
             }
@@ -183,13 +187,16 @@ namespace Levrum.Utils.Data
                 {
                     field.Type = ColumnType.doubleField;
                     field.Summary = new NumericSummary();
-                } else
+                }
+                else
                 {
                     field.Summary = new StringSummary();
                 }
             }
 
             return fieldInfo;
-        }
+        } // end method()
+
     }
-}
+
+} // end namespace{}

@@ -22,6 +22,7 @@ namespace Levrum.DataBridge
     {
         DataMapping m_result;
         bool m_saving = false;
+        bool m_closing = false;
 
         public DataMapping Result 
         { 
@@ -32,7 +33,7 @@ namespace Levrum.DataBridge
             set 
             {
                 m_result = value;
-                if (m_saving)
+                if (!m_closing)
                 {
                     FieldNameComboBox.Text = value.Field;
                     FieldSourceComboBox.SelectedItem = value.Column.DataSource;
@@ -46,17 +47,17 @@ namespace Levrum.DataBridge
         public ColumnSelectionDialog(List<IDataSource> _dataSources, DataMapping _mapping)
         {
             InitializeComponent();
-            FieldNameComboBox.ItemsSource = DefaultFieldNames;
-
-            FieldSourceComboBox.ItemsSource = _dataSources;
-            FieldSourceComboBox.DisplayMemberPath = "Name";
-
             DataMapping copy = new DataMapping();
             copy.Column = new ColumnMapping();
             copy.Column.ColumnName = _mapping.Column.ColumnName;
             copy.Column.DataSource = _mapping.Column.DataSource;
             copy.Field = _mapping.Field;
 
+            FieldNameComboBox.ItemsSource = DefaultFieldNames;
+            
+            FieldSourceComboBox.ItemsSource = _dataSources;
+            FieldSourceComboBox.DisplayMemberPath = "Name";
+            
             Result = copy;
         }
 
@@ -104,6 +105,8 @@ namespace Levrum.DataBridge
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            m_closing = true;
+
             if (!m_saving)
             {
                 Result = null;

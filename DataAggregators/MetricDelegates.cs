@@ -6,12 +6,15 @@ using System.Reflection;
 using System.Text;
 
 using Levrum.Data.Classes;
+using Levrum.Data.Classes.Tools;
 
 using Levrum.Utils.Data;
-using Levrum.Utils.Date;
+using Levrum.Utils.Time;
 
 namespace Levrum.Data.Aggregators
 {
+    public enum MetricType { IncidentData, ResponseData, TimingData }
+
     public static class MetricDelegates
     {
         static MetricDelegates()
@@ -78,6 +81,8 @@ namespace Levrum.Data.Aggregators
     public class MetricDelegateAttribute : Attribute
     {
         public string Name { get; set; }
+        public MetricType Type { get; set; }
+        public TimeMeasureType Measurement { get; set; }
     }
 
     public abstract class MetricDelegate
@@ -85,7 +90,7 @@ namespace Levrum.Data.Aggregators
         public virtual Dictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
         public virtual string[] RequiredParameters { get; protected set; } = new string[0];
 
-        public virtual object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
+        public virtual object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null, string category = "", object categoryValue = null)
         {
             return data;
         }
@@ -102,10 +107,10 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name = "Incident Time")]
+    [MetricDelegate(Name = "Incident Time", Type = MetricType.IncidentData, Measurement = TimeMeasureType.Instant)]
     public class IncidentTimeMetric : MetricDelegate
     {
-        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
+        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null, string category = "", object categoryValue = null)
         {
             Dictionary<object, object> output = new Dictionary<object, object>();
 
@@ -132,10 +137,10 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name = "Dispatch Time")]
+    [MetricDelegate(Name = "Dispatch Time", Type = MetricType.TimingData, Measurement = TimeMeasureType.Instant)]
     public class DispatchTimeMetric : MetricDelegate
     {
-        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
+        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null, string category = "", object categoryValue = null)
         {
             Dictionary<object, object> output = new Dictionary<object, object>();
 
@@ -172,10 +177,10 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name = "Turnout Time")]
+    [MetricDelegate(Name = "Turnout Time", Type = MetricType.TimingData, Measurement = TimeMeasureType.Instant)]
     public class TurnoutTimeMetric : MetricDelegate
     {
-        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
+        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null, string category = "", object categoryValue = null)
         {
             Dictionary<object, object> output = new Dictionary<object, object>();
 
@@ -212,10 +217,10 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name = "Travel Time")]
+    [MetricDelegate(Name = "Travel Time", Type = MetricType.TimingData, Measurement = TimeMeasureType.Duration)]
     public class TravelTimeMetric : MetricDelegate
     {
-        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
+        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null, string category = "", object categoryValue = null)
         {
             Dictionary<object, object> output = new Dictionary<object, object>();
 
@@ -257,10 +262,10 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name = "Initial Response")]
+    [MetricDelegate(Name = "Initial Response", Type = MetricType.TimingData, Measurement = TimeMeasureType.Instant)]
     public class InitialResponseTimeMetric : MetricDelegate
     {
-        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
+        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null, string category = "", object categoryValue = null)
         {
             Dictionary<object, object> output = new Dictionary<object, object>();
 
@@ -316,10 +321,10 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name = "Full Complement")]
+    [MetricDelegate(Name = "Full Complement", Type = MetricType.TimingData, Measurement = TimeMeasureType.Instant)]
     public class FullComplementTimeMetric : MetricDelegate
     {
-        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
+        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null, string category = "", object categoryValue = null)
         {
             Dictionary<object, object> output = new Dictionary<object, object>();
 
@@ -375,10 +380,10 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name = "Scene Time")]
+    [MetricDelegate(Name = "Scene Time", Type = MetricType.TimingData, Measurement = TimeMeasureType.Duration)]
     public class SceneTimeMetric : MetricDelegate
     {
-        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
+        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null, string category = "", object categoryValue = null)
         {
             Dictionary<object, object> output = new Dictionary<object, object>();
 
@@ -422,10 +427,10 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name = "Committed Time")]
+    [MetricDelegate(Name = "Committed Time", Type = MetricType.TimingData, Measurement = TimeMeasureType.Duration)]
     public class CommittedTimeMetric : MetricDelegate
     {
-        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
+        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null, string category = "", object categoryValue = null)
         {
             Dictionary<object, object> output = new Dictionary<object, object>();
 
@@ -482,7 +487,7 @@ namespace Levrum.Data.Aggregators
         }
     }
 
-    [MetricDelegate(Name = "Utilization")]
+    [MetricDelegate(Name = "Utilization", Type = MetricType.TimingData, Measurement = TimeMeasureType.Duration)]
     public class UtilizationMetric : MetricDelegate
     {
         public override string[] RequiredParameters { get; protected set; } = { "Start Date", "End Date" };
@@ -655,19 +660,19 @@ namespace Levrum.Data.Aggregators
 
         public Periods GetAggregationPeriod(string aggregation)
         {
-            switch (aggregation)
+            switch (aggregation.Replace(" ", string.Empty).ToLower())
             {
-                case "Day":
+                case "day":
                     return Periods.Day;
-                case "Month":
+                case "month":
                     return Periods.Month;
-                case "Year":
+                case "year":
                     return Periods.Year;
-                case "DayOfWeek":
+                case "dayofweek":
                     return Periods.DayOfWeek;
-                case "HourOfDay":
+                case "hourofday":
                     return Periods.HourOfDay;
-                case "MonthOfYear":
+                case "monthofyear":
                     return Periods.MonthOfYear;
                 default:
                     return Periods.TimeSpan;
@@ -681,19 +686,19 @@ namespace Levrum.Data.Aggregators
                 return (int)key;
             } else
             {
-                switch(aggregation)
+                switch(aggregation.Replace(" ", string.Empty).ToLower())
                 {
-                    case "DayOfWeek":
+                    case "dayofweek":
                         return DayOfWeekAggregator<IncidentData>.DayOfWeekKeys.IndexOf(key);
-                    case "MonthOfYear":
-                        return MonthOfYearAggregator<IncidentData>.MonthOfYearKeys.IndexOf(key);
+                    case "monthofyear":
+                        return MonthOfYearAggregator<IncidentData>.MonthOfYearKeys.IndexOf(key) + 1;
                     default:
                         return 0;
                 }
             }
         }
 
-        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null)
+        public override object Calculate(Dictionary<object, List<IncidentData>> data, CalculationDelegate calculation = null, string category = "", object categoryValue = null)
         {
             Dictionary<object, object> output = new Dictionary<object, object>();
             if (!hasRequiredParameters())
@@ -720,10 +725,16 @@ namespace Levrum.Data.Aggregators
             }
 
             string aggregation = getAggregationFromData(data);
-            Periods period = GetAggregationPeriod(aggregation);
+            Periods aggregationPeriod = GetAggregationPeriod(aggregation);
+            Periods categoryPeriod = GetAggregationPeriod(category);
+
             foreach (KeyValuePair<object, List<IncidentData>> datum in data)
             {
-                double timespanMinutes = DateTimeUtils.GetPeriodMinutes(period, startDate, endDate, GetPeriodIntValue(aggregation, datum.Key));
+                int aggregationPeriodInt = GetPeriodIntValue(aggregation, datum.Key);
+                double aggregationMinutes = DateTimeUtils.GetPeriodMinutes(aggregationPeriod, startDate, endDate, aggregationPeriodInt);
+                int categoryPeriodInt = GetPeriodIntValue(category, categoryValue);
+                double categoryMinutes = DateTimeUtils.GetPeriodMinutes(categoryPeriod, startDate, endDate, categoryPeriodInt);
+                
 
                 Dictionary<string, double> utilizationByUnit = new Dictionary<string, double>();
                 foreach (IncidentData incident in datum.Value)
@@ -736,35 +747,20 @@ namespace Levrum.Data.Aggregators
                         }
 
                         string unit = response.Data["Unit"].ToString();
-
-                        double committedTime = 0.0;
-
-                        double committedHours = (from TimingData bmk in response.TimingData
-                                                 where bmk.Name == "CommittedHours"
-                                                 select bmk.Value).FirstOrDefault();
-
-                        if (committedHours != default)
+                        if (unit == "LHSQ1")
                         {
-                            committedTime = committedHours * 60.0;
+                            string moo = "moo";
                         }
-                        else
+
+                        Periods period = categoryPeriod;
+                        int periodInt = categoryPeriodInt;
+                        if (categoryPeriod == Periods.TimeSpan)
                         {
-                            double dispatched = (from TimingData bmk in response.TimingData
-                                                 where bmk.Name == "Assigned"
-                                                 select bmk.Value).FirstOrDefault();
-
-                            if (dispatched == default)
-                                continue;
-
-                            double clearScene = (from TimingData bmk in response.TimingData
-                                                 where bmk.Name == "ClearScene"
-                                                 select bmk.Value).FirstOrDefault();
-
-                            if (clearScene == default)
-                                continue;
-
-                            committedTime = clearScene - dispatched;
+                            period = aggregationPeriod;
+                            periodInt = aggregationPeriodInt;
                         }
+
+                        double committedTime = getCommittedTimeFromResponse(response, incident.Time, period, periodInt);
 
                         if (!utilizationByUnit.Keys.Contains(unit))
                         {
@@ -777,21 +773,87 @@ namespace Levrum.Data.Aggregators
                     }
                 }
 
-                if (period == Periods.TimeSpan)
+                if (aggregation == "Unit" || category == "Unit") {
+                    double periodMinutes = categoryPeriod == Periods.TimeSpan ? aggregationMinutes : categoryMinutes;
+                    if (utilizationByUnit.ContainsKey(datum.Key.ToString()))
+                    {
+                        output[datum.Key] = (utilizationByUnit[datum.Key.ToString()] / periodMinutes) * 100.0;
+                    } else if (utilizationByUnit.ContainsKey(categoryValue as string))
+                    {
+                        output[datum.Key] = (utilizationByUnit[categoryValue as string] / periodMinutes) * 100.0;
+                    }
+                    else
+                    {
+                        output[datum.Key] = 0.0;
+                    }
+                }
+                else if (aggregationPeriod == Periods.TimeSpan)
                 {
-                    double timespanMinutesByNumUnits = utilizationByUnit.Keys.Count * timespanMinutes;
+                    double timespanMinutesByNumUnits = utilizationByUnit.Keys.Count * aggregationMinutes;
                     double totalCommittedTime = utilizationByUnit.Values.Sum();
 
                     output[datum.Key] = (totalCommittedTime / timespanMinutesByNumUnits) * 100.0;
-                } else
-                {
-                    output[datum.Key] = (utilizationByUnit[datum.Key.ToString()] / timespanMinutes) * 100.0;
                 }
             }
 
-            output = sortOutput(output);
-
+            if (aggregation == "Unknown" || string.IsNullOrEmpty(category))
+            {
+                output = sortOutput(output);
+            }
             return output;
+        }
+
+        private double getCommittedTimeFromResponse(ResponseData response, DateTime time, Periods period, int value)
+        {
+            double committedTime = 0.0;
+            double dispatched = (from TimingData bmk in response.TimingData
+                                 where bmk.Name == "Assigned"
+                                 select bmk.Value).FirstOrDefault();
+
+            double clearScene = (from TimingData bmk in response.TimingData
+                                 where bmk.Name == "ClearScene"
+                                 select bmk.Value).FirstOrDefault();
+
+            double committedHours = (from TimingData bmk in response.TimingData
+                                     where bmk.Name == "CommittedHours"
+                                     select bmk.Value).FirstOrDefault();
+
+            if (period == Periods.TimeSpan)
+            {
+                if (committedHours != default)
+                {
+                    committedTime = committedHours * 60.0;
+                }
+                else if (dispatched != default && clearScene != default)
+                {
+                    committedTime = clearScene - dispatched;
+                }
+            }
+            else
+            {
+                DateTime assignedTime;
+                if (dispatched != default)
+                {
+                    assignedTime = time.AddMinutes(dispatched);
+                } else
+                {
+                    assignedTime = time;
+                }
+                  
+                DateTime clearTime;
+                if (clearScene == default)
+                {
+                    clearTime = time.AddHours(committedHours);
+                } else
+                {
+                    clearTime = time.AddMinutes(clearScene);
+                }
+                    
+
+                return DateTimeUtils.GetTimeSpentInPeriod(period, assignedTime, clearTime, value);
+            }
+
+            return committedTime;
         }
 
         private Dictionary<object, object> sortOutput(Dictionary<object, object> output)

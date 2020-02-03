@@ -155,18 +155,17 @@ namespace Levrum.Data.Sources
         {
             Dictionary<string, object> output = new Dictionary<string, object>();
 
-            List<ComplexPolygon> cPolys = GetComplexPolysFromFile();
+            List<AnnotatedObject<ComplexPolygon>> cPolys = GetComplexPolysFromFile();
             double[] xyPoint = Converter.ConvertLatLonToXY(latLon);
             ComplexPolygon lastContainingPoly = null;
-            foreach (ComplexPolygon cPoly in cPolys)
+            foreach (AnnotatedObject<ComplexPolygon> cPoly in cPolys)
             {
-                if (cPoly.Contains(xyPoint[0], xyPoint[1]))
+                if (cPoly.Object.Contains(xyPoint[0], xyPoint[1]))
                 {
                     foreach (KeyValuePair<string, object> kvp in cPoly.Data)
                     {
                         if (output.ContainsKey(kvp.Key))
                         {
-                            bool test = lastContainingPoly.Contains(xyPoint[0], xyPoint[1]);
                             LogHelper.LogMessage(LogLevel.Warn, string.Format("Discarding data {0}={1} at coordinates {2},{3}", kvp.Key, output[kvp.Key], latLon.Latitude, latLon.Longitude));
                         }
                         else
@@ -174,7 +173,7 @@ namespace Levrum.Data.Sources
                             output[kvp.Key] = kvp.Value;
                         }
                     }
-                    lastContainingPoly = cPoly;
+                    lastContainingPoly = cPoly.Object;
                 }
             }
 
@@ -349,26 +348,39 @@ namespace Levrum.Data.Sources
             return true;
         }
 
-        List<ComplexPolygon> m_complexPolygons = null;
-        ComplexPolygonAreaComparer m_comparer = new ComplexPolygonAreaComparer();
+        List<AnnotatedObject<ComplexPolygon>> m_complexPolygons = null;
+        AnnotatedComplexPolygonComparer m_comparer = new AnnotatedComplexPolygonComparer();
 
-        public List<ComplexPolygon> GetComplexPolysFromFile()
+        private class AnnotatedComplexPolygonComparer : IComparer<AnnotatedObject<ComplexPolygon>>
+        {
+            public int Compare(AnnotatedObject<ComplexPolygon> p1, AnnotatedObject<ComplexPolygon> p2)
+            {
+                if (p1.Object.Area == p2.Object.Area)
+                    return 0;
+                if (p1.Object.Area < p2.Object.Area)
+                    return -1;
+
+                return 1;
+            }
+        }
+
+        public List<AnnotatedObject<ComplexPolygon>> GetComplexPolysFromFile()
         {
             if (m_complexPolygons != null)
             {
                 return m_complexPolygons;
             }
-            List<ComplexPolygon> output = new List<ComplexPolygon>();
+            List<AnnotatedObject<ComplexPolygon>> output = new List<AnnotatedObject<ComplexPolygon>>();
             
             List<AnnotatedObject<Geometry>> geoms = GetGeomsFromFile();
             foreach (AnnotatedObject<Geometry> geom in geoms)
             {
-                ComplexPolygon poly = GetComplexPolygonFromGeometry(geom.Object);
+                AnnotatedObject<ComplexPolygon> poly = new AnnotatedObject<ComplexPolygon>(GetComplexPolygonFromGeometry(geom.Object));
                 foreach(KeyValuePair<string, object> kvp in geom.Data)
                 {
                     poly.Data.Add(kvp.Key, kvp.Value);
                 }
-                poly.ComputeArea();
+                poly.Object.ComputeArea();
                 output.Add(poly);
             }
 

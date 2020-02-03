@@ -21,7 +21,6 @@ namespace Levrum.Data.Classes
 
     public class TimingData : AnnotatedData
     {
-        [JsonIgnore]
         public string Name
         {
             get
@@ -41,7 +40,6 @@ namespace Levrum.Data.Classes
             }
         }
 
-        [JsonIgnore]
         public double Value
         {
             get
@@ -61,7 +59,6 @@ namespace Levrum.Data.Classes
             }
         }
 
-        [JsonIgnore]
         public string Details
         {
             get

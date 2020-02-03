@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Text;
 using System.Windows;
 
@@ -21,18 +22,57 @@ namespace Levrum.Utils
 
         public static event LogHelperMessageBoxDelegate OnMessageBox;
         public static event LogHelperFatalErrorDelegate OnFatalError;
+        public static List<LogEntry> LogEntries = new List<LogEntry>();
+
 
         static LogHelper()
         {
             Logger = LogManager.GetCurrentClassLogger();
         }
 
+        public static string PrettyprintLogEntries(int nMax = -1)
+        {
+            try
+            {
+                StringBuilder sb = new StringBuilder();
+                int lastIndex = LogEntries.Count - 1;
+                int firstIndex = nMax == -1 ? 0 : LogEntries.Count - nMax;
+                for (int i = firstIndex; i < LogEntries.Count; i++)
+                {
+                    LogEntry entry = LogEntries[i];
+
+                    if (entry.Exception == null)
+                    {
+                        sb.AppendLine(string.Format("{0}.) {1} {2}: {3}", i.ToString().PadLeft(3, ' '), entry.Timestamp.ToLongTimeString(), entry.Level.ToString(), entry.Message));
+                    }
+                    else
+                    {
+                        sb.AppendLine(string.Format("{0}.) {1} {2}: {3} EXCEPTION: {4}", i.ToString().PadLeft(3, ' '), entry.Timestamp.ToLongTimeString(), entry.Level.ToString(), entry.Message, entry.Exception.Message));
+                    }
+                }
+                return sb.ToString();
+            }
+            catch (Exception exc)
+            {
+                LogException(exc);  // hopefully this doesn't cause infinite recursion
+                return "Error retrieving log entries ... please see event log";
+            }
+        }
+
         public static void LogMessage(LogLevel level, string message = "", Exception ex = null)
         {
+            LogEntry entry = new LogEntry(default, level, message, ex);
+            lock (LogEntries)
+            {
+                LogEntries.Add(entry);
+            }
+
             if (ex != null && level == LogLevel.Error)
             {
                 LogException(ex, message, true);
-            } else {
+            }
+            else
+            {
                 LogMessage(GetNLogLevel(level), message, ex);
             }
         }
@@ -76,6 +116,23 @@ namespace Levrum.Utils
             }
         }
 
+        public static void LogErrOnce(string context, string message)
+        {
+            string smsg_hash = context + "|" + message;
+            if (!m_oMessageTab.ContainsKey(smsg_hash))
+            {
+                m_oMessageTab.Add(smsg_hash, 1);
+                LogMessage(LogLevel.Error, smsg_hash);
+                return;
+            }
+            else
+            {
+                m_oMessageTab[smsg_hash]++;
+            }
+        }
+
+        private static Dictionary<string, int> m_oMessageTab = new Dictionary<string, int>();
+
         public static void LogMessage(NLogLevel level, string message)
         {
             LogMessage(level, message, null);
@@ -85,6 +142,8 @@ namespace Levrum.Utils
         {
             try
             {
+
+
                 if (level == NLogLevel.Fatal)
                 {
                     Logger.Fatal(ex, message);
@@ -111,6 +170,8 @@ namespace Levrum.Utils
                 {
                     Logger.Info(ex, message);
                 }
+
+
             }
             catch (Exception loggingException)
             {
@@ -142,5 +203,53 @@ namespace Levrum.Utils
         }
 
         public delegate void OnLogMessageDelegate(string time, string level, string message, string exception);
+
+        #region Legacy Helper Functions
+        public static bool HandleAppErr(object oSrc, string sContext, string sMsg)
+        {
+            LogMessage(LogLevel.Error, "Source: " + oSrc.ToString() + ";  Context: " + sContext + ";  Message: " + sMsg);
+            return (false);
+        }
+
+        public static bool HandleExc(Object obj, string str, Exception ex)
+        {
+            LogException(ex, "Context: " + obj?.ToString() + "; " + str, true);
+            return (false);
+        }
+        #endregion
+
+        public static void DisplayMessageIfPossible(string sMsg)
+        {
+            try
+            {
+                if (null != OnMessageBox) { OnMessageBox(sMsg, ""); }
+            }
+            catch (Exception exc)
+            {
+                LogException(exc, "Error attempting in message box handler");
+            }
+        }
+    } // end class{}
+
+    public class LogEntry
+    {
+        public DateTime Timestamp { get; set; } = DateTime.Now;
+        public LogLevel Level { get; set; } = LogLevel.Info;
+        public Exception Exception { get; set; } = null;
+        public string Message { get; set; } = string.Empty;
+
+        public LogEntry()
+        {
+
+        }
+
+        public LogEntry(DateTime timeStamp = default, LogLevel level = LogLevel.Info, string message = "", Exception exception = null)
+        {
+            Timestamp = timeStamp == default ? DateTime.Now : timeStamp;
+            Level = level;
+            Exception = exception;
+            Message = message;
+        }
     }
+
 }

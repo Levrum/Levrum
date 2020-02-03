@@ -11,6 +11,7 @@ using Microsoft.ClearScript.V8;
 
 using Levrum.Data.Sources;
 using Levrum.Data.Classes;
+using Levrum.Data.Classes.Tools;
 
 using Levrum.Utils;
 using Levrum.Utils.Data;
@@ -1396,6 +1397,7 @@ namespace Levrum.Data.Map
                     setupScriptEngine(v8);
                     v8.AddHostObject("ProgressInfo", pInfo);
 
+                    int n_pperrs = 0;
                     foreach (IncidentData incident in Incidents)
                     {
                         if (Cancelling())
@@ -1423,8 +1425,15 @@ namespace Levrum.Data.Map
                         catch (Exception ex)
                         {
                             LogHelper.LogMessage(Utils.LogLevel.Warn, string.Format("Exception running per incident script for incident {0}", incident.Id), ex);
+                            n_pperrs++;
                         }
-                    }
+                    } // end foreach(incident)
+
+                    if (n_pperrs>0)
+                    {
+                        //LogHelper.LogMessage(Utils.LogLevel.Error, "The post-processing script generated " + n_pperrs + " errors.  Please see the event log, which is in some cryptic place that will be difficult to find.");
+                        LogHelper.DisplayMessageIfPossible("The post-processing script generated " + n_pperrs + " errors.  Please see the event log.");                    }
+
                 } finally
                 {
                     if (v8 != null)
