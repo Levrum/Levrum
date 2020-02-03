@@ -11,6 +11,7 @@ using Microsoft.ClearScript.V8;
 
 using Levrum.Data.Sources;
 using Levrum.Data.Classes;
+using Levrum.Data.Classes.Tools;
 
 using Levrum.Utils;
 using Levrum.Utils.Data;

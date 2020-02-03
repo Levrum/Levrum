@@ -11,27 +11,14 @@ namespace Levrum.Utils.MathAndStats
     /// <summary>
     /// Placeholder class
     /// </summary>
-    class Util
+    public static class TypeExtensionMethods
     {
-        public static bool HandleAppErr(object oSrc, string sContext, string sMsg)
-        {
-            LogHelper.LogMessage(LogLevel.Error,"Source: " + oSrc.ToString() + ";  Context: " + sContext + ";  Message: " + sMsg);
-            return (false);
-        }
-
-        public static bool HandleExc(Object obj, string str, Exception ex)
-        {
-            LogHelper.LogException(ex, "Context: " + obj?.ToString() + "; " + str, true);
-            return (false);
-        }
-
-
         /// <summary>
         /// Is this type a scalar?
         /// </summary>
         /// <param name="oType"></param>
         /// <returns></returns>
-        public static bool IsScalarType(Type oType)
+        public static bool IsScalarType(this Type oType)
         {
             if (null == oType) { return (false); }
             if (typeof(int).IsAssignableFrom(oType)) { return (true); }
@@ -109,7 +96,7 @@ namespace Levrum.Utils.MathAndStats
 
             catch (Exception exc)
             {
-                Util.HandleExc(typeof(Stats), fn, exc);
+                LogHelper.HandleExc(typeof(Stats), fn, exc);
                 return (-1.0);
             }
         }
@@ -136,17 +123,17 @@ namespace Levrum.Utils.MathAndStats
             {
                 if (dR > 1.0)
                 {
-                    Util.HandleAppErr(typeof(Stats), fn, "Hit ratio > 1.0: " + dR);
+                    LogHelper.HandleAppErr(typeof(Stats), fn, "Hit ratio > 1.0: " + dR);
                     return (-2.0);
                 }
                 if (dR < 0.0)
                 {
-                    Util.HandleAppErr(typeof(Stats), fn, "Hit ratio < 0.0: " + dR);
+                    LogHelper.HandleAppErr(typeof(Stats), fn, "Hit ratio < 0.0: " + dR);
                     return (-3.0);
                 }
                 if (iN > iS)
                 {
-                    Util.HandleAppErr(typeof(Stats), fn, "Hit count greater than sample size: " + iN + ", " + iS);
+                    LogHelper.HandleAppErr(typeof(Stats), fn, "Hit count greater than sample size: " + iN + ", " + iS);
                     return (-4.0);
                 }
 
@@ -161,7 +148,7 @@ namespace Levrum.Utils.MathAndStats
 
             catch (Exception exc)
             {
-                Util.HandleExc(typeof(Stats), fn, exc);
+                LogHelper.HandleExc(typeof(Stats), fn, exc);
                 return (-1.0);
             }
         }  // end ProbNPositives
@@ -187,17 +174,17 @@ namespace Levrum.Utils.MathAndStats
             {
                 if (dR > 1.0)
                 {
-                    Util.HandleAppErr(typeof(Stats), fn, "Hit ratio > 1.0: " + dR);
+                    LogHelper.HandleAppErr(typeof(Stats), fn, "Hit ratio > 1.0: " + dR);
                     return (-2.0);
                 }
                 if (dR < 0.0)
                 {
-                    Util.HandleAppErr(typeof(Stats), fn, "Hit ratio < 0.0: " + dR);
+                    LogHelper.HandleAppErr(typeof(Stats), fn, "Hit ratio < 0.0: " + dR);
                     return (-3.0);
                 }
                 if (iN > iS)
                 {
-                    Util.HandleAppErr(typeof(Stats), fn, "Hit count greater than sample size: " + iN + ", " + iS);
+                    LogHelper.HandleAppErr(typeof(Stats), fn, "Hit count greater than sample size: " + iN + ", " + iS);
                     return (-4.0);
                 }
 
@@ -214,7 +201,7 @@ namespace Levrum.Utils.MathAndStats
 
             catch (Exception exc)
             {
-                Util.HandleExc(typeof(Stats), fn, exc);
+                LogHelper.HandleExc(typeof(Stats), fn, exc);
                 return (-1.0);
             }
         }
@@ -250,7 +237,7 @@ namespace Levrum.Utils.MathAndStats
             }
             catch (Exception exc)
             {
-                Util.HandleExc(typeof(Stats), fn, exc);
+                LogHelper.HandleExc(typeof(Stats), fn, exc);
                 return (-1.0);
             }
         }
@@ -326,7 +313,7 @@ namespace Levrum.Utils.MathAndStats
             }
             catch (Exception exc)
             {
-                Util.HandleExc(this, fn, exc);
+                LogHelper.HandleExc(this, fn, exc);
                 return (0.0);
             }
         }
@@ -426,14 +413,14 @@ namespace Levrum.Utils.MathAndStats
                 else
                 {
                     string fn = MethodBase.GetCurrentMethod().Name;
-                    Util.HandleAppErr(this, fn, "Stats class does not support statistic: " + qStatistic.ToString());
+                    LogHelper.HandleAppErr(this, fn, "Stats class does not support statistic: " + qStatistic.ToString());
                     return (0);
                 }
             }
             catch (Exception exc)
             {
                 string fn = MethodBase.GetCurrentMethod().Name;
-                Util.HandleExc(this, fn, exc);
+                LogHelper.HandleExc(this, fn, exc);
                 return (0);
             }
         }
@@ -502,7 +489,7 @@ namespace Levrum.Utils.MathAndStats
             catch (Exception exc)
             {
                 string fn = MethodBase.GetCurrentMethod().Name;
-                Util.HandleExc(this, fn, exc);
+                LogHelper.HandleExc(this, fn, exc);
                 return (0.0);
             }
 
@@ -535,7 +522,7 @@ namespace Levrum.Utils.MathAndStats
                 if (null == os)
                 {
                     string fn = MethodBase.GetCurrentMethod().Name;
-                    Util.HandleAppErr(this, fn, "Attempting to add non-OrderedStats");
+                    LogHelper.HandleAppErr(this, fn, "Attempting to add non-OrderedStats");
                 }
 
                 foreach (double dval in os.m_oFrequencies.Values)
@@ -548,7 +535,7 @@ namespace Levrum.Utils.MathAndStats
             catch (Exception exc)
             {
                 string fn = MethodBase.GetCurrentMethod().Name;
-                Util.HandleExc(this, fn, exc);
+                LogHelper.HandleExc(this, fn, exc);
                 return (false);
             }
 
@@ -566,14 +553,14 @@ namespace Levrum.Utils.MathAndStats
                 base.RemoveObs(dObs);
                 if (!m_oFrequencies.ContainsKey(dObs))
                 {
-                    Util.HandleAppErr(this, fn, "Observation " + dObs + " cannot be removed, because it is not present");
+                    LogHelper.HandleAppErr(this, fn, "Observation " + dObs + " cannot be removed, because it is not present");
                     return;
                 }
                 m_oFrequencies[dObs]--;
             }
             catch (Exception exc)
             {
-                Util.HandleExc(this, fn, exc);
+                LogHelper.HandleExc(this, fn, exc);
             }
 
         }
@@ -592,7 +579,7 @@ namespace Levrum.Utils.MathAndStats
             }
             catch (Exception exc)
             {
-                Util.HandleExc(this, fn, exc);
+                LogHelper.HandleExc(this, fn, exc);
             }
         }
 
@@ -612,7 +599,7 @@ namespace Levrum.Utils.MathAndStats
             catch (Exception exc)
             {
                 string fn = MethodBase.GetCurrentMethod().Name;
-                Util.HandleExc(this, fn, exc);
+                LogHelper.HandleExc(this, fn, exc);
             }
         }
 
