@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using Levrum.Utils;
+
 namespace Levrum.Data.Classes
 {
     public abstract class AnnotatedData
@@ -37,9 +39,20 @@ namespace Levrum.Data.Classes
             return Data.GetValue(key);
         }
 
+        public object[] GetDataValues(string[] keys)
+        {
+            object[] output = new object[keys.Length];
+            for (int i = 0; i < keys.Length; i++)
+            {
+                object value;
+                output[i] = Data.TryGetValue(keys[i], out value) ? value : null;
+            }
+
+            return output;
+        }
+
         public bool SetDataValue(string key, object value)
         {
-            const string fn = "AnnotatedData.SetDataValue()";
             try
             {
                 if (!Data.ContainsKey(key)) { Data.Add(key, value); }
@@ -48,8 +61,42 @@ namespace Levrum.Data.Classes
             }
             catch (Exception exc)
             {
-                // Event logging goes here
+                LogHelper.LogException(exc, "Exception setting data value", false);
                 return (false);
+            }
+        }
+
+        public bool SetDataValues(string[] keys, object[] values)
+        {
+            try
+            {
+                for (int i = 0; i < keys.Length; i++)
+                {
+                    object value = null;
+                    if (i < values.Length)
+                    {
+                        value = values[i];
+                    }
+                    if (!Data.ContainsKey(keys[i]) && value != null) { Data.Add(keys[i], value); }
+                    else if (Data.ContainsKey(keys[i]))
+                    {
+                        if (value != null)
+                        {
+                            Data[keys[i]] = value;
+                        }
+                        else
+                        {
+                            Data.Remove(keys[i]);
+                        }
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "Exception setting data values", false);
+                return false;
             }
         }
 

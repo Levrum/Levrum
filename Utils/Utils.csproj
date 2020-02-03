@@ -33,8 +33,4 @@
     <PackageReference Include="RabbitMQ.Client" Version="5.1.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\DataClasses\DataClasses.csproj" />
-  </ItemGroup>
-
 </Project>

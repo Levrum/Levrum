@@ -8,7 +8,7 @@ using System.Reflection;
 
 using Levrum.Data.Classes;
 
-using Levrum.Utils.Date;
+using Levrum.Utils.Time;
 
 namespace Levrum.Data.Aggregators
 {

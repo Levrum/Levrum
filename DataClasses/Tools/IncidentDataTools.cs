@@ -5,16 +5,23 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-using CsvHelper;
+// using CsvHelper;
 
-using Levrum.Data.Classes;
+using Levrum.Utils;
+using Levrum.Utils.Data;
+using Levrum.Utils.MathAndStats;
 
-namespace Levrum.Utils.Data
+namespace Levrum.Data.Classes.Tools
 {
     public static class IncidentDataTools
     {
+        public static string[] s_ignoredIncidentDataFields = new string[] { "Responses" };
+        public static string[] s_ignoredResponseDataFields = new string[] { "TimingData" };
+
         public static void CreateCsvs(DataSet<IncidentData> incidents, string incidentFile, string responseFile)
         {
+            const string fn = "IncidentDataTools.CreateCsvs()";
+            Type dtype = typeof(IncidentDataTools);
             try
             {
                 HashSet<string> incidentDataFields = new HashSet<string>();
@@ -24,13 +31,19 @@ namespace Levrum.Utils.Data
                 {
                     foreach (string key in incident.Data.Keys)
                     {
-                        incidentDataFields.Add(key);
+                        if (!s_ignoredIncidentDataFields.Contains(key))
+                        {
+                            incidentDataFields.Add(key);
+                        }
                     }
                     foreach (ResponseData response in incident.Responses)
                     {
                         foreach (string key in response.Data.Keys)
                         {
-                            responseDataFields.Add(key);
+                            if (!s_ignoredResponseDataFields.Contains(key))
+                            {
+                                responseDataFields.Add(key);
+                            }
                         }
                         foreach (TimingData benchmark in response.TimingData)
                         {
@@ -51,13 +64,18 @@ namespace Levrum.Utils.Data
                     incidentRecord.Longitude = incident.Longitude;
                     foreach (string field in incidentDataFields)
                     {
-                        if (incident.Data.ContainsKey(field))
+                        IDictionary<string, object> inc_dict = incidentRecord as IDictionary<string, object>;
+                        if (inc_dict.ContainsKey(field))
                         {
-                            ((IDictionary<string, object>)incidentRecord).Add(field, incident.Data[field]);
+                            LogHelper.LogErrOnce(fn, "Fieldname '" + field + "' is apparently duplicated in the incident data map");
+                        }
+                        else if (incident.Data.ContainsKey(field))
+                        {
+                            inc_dict.Add(field, incident.Data[field]);
                         }
                         else
                         {
-                            ((IDictionary<string, object>)incidentRecord).Add(field, string.Empty);
+                            inc_dict.Add(field, string.Empty);
                         }
                     }
 
@@ -65,25 +83,33 @@ namespace Levrum.Utils.Data
                     {
                         dynamic responseRecord = new ExpandoObject();
                         responseRecord.Id = incident.Id;
+                        IDictionary<string, object> rsp_dict = responseRecord as IDictionary<string, object>;
                         foreach (string field in responseDataFields)
                         {
-                            if (response.Data.ContainsKey(field))
+                            if (rsp_dict.ContainsKey(field))
                             {
-                                ((IDictionary<string, object>)responseRecord).Add(field, response.Data[field]);
+                                LogHelper.LogErrOnce(fn, "Fieldname '" + field + "' is apparently duplicated in the response data map");
+                            }
+                            else if (response.Data.ContainsKey(field))
+                            {
+                                rsp_dict.Add(field, response.Data[field]);
                             }
                             else
                             {
-                                ((IDictionary<string, object>)responseRecord).Add(field, string.Empty);
+                                rsp_dict.Add(field, string.Empty);
                             }
                         }
 
                         foreach (string benchmarkName in benchmarkNames)
                         {
                             TimingData benchmark = (from bmk in response.TimingData
-                                                       where bmk.Name == benchmarkName
-                                                       select bmk).FirstOrDefault();
-
-                            if (benchmark != null)
+                                                    where bmk.Name == benchmarkName
+                                                    select bmk).FirstOrDefault();
+                            if (rsp_dict.ContainsKey(benchmarkName))
+                            {
+                                LogHelper.LogErrOnce(fn, "Benchmark '" + benchmarkName + "' is apparently duplicated in the benchmark data map");
+                            }
+                            else if (benchmark != null)
                             {
                                 object value;
                                 if (benchmark.Data.ContainsKey("DateTime"))
@@ -94,11 +120,11 @@ namespace Levrum.Utils.Data
                                 {
                                     value = benchmark.Value;
                                 }
-                                ((IDictionary<string, object>)responseRecord).Add(benchmarkName, value);
+                                rsp_dict.Add(benchmarkName, value);
                             }
                             else
                             {
-                                ((IDictionary<string, object>)responseRecord).Add(benchmarkName, string.Empty);
+                                rsp_dict.Add(benchmarkName, string.Empty);
                             }
                         }
                         responseRecords.Add(responseRecord);
@@ -106,18 +132,31 @@ namespace Levrum.Utils.Data
                     incidentRecords.Add(incidentRecord);
                 }
 
+
+                //if (!CsvSerializer.SaveExpandosAsCsv(incidentFile, incidentRecords, false))
+                //{
+                //    LogHelper.HandleAppErr(dtype, fn, "Error saving incident data to " + incidentFile);
+                //}
                 using (StringWriter writer = new StringWriter())
                 {
-                    using (CsvWriter csv = new CsvWriter(writer))
+                    using (CsvHelper.CsvWriter csv = new CsvHelper.CsvWriter(writer))
                     {
+                        //foreach (ExpandoObject irec in incidentRecords)
+                        //{
+                        //    csv.WriteRecord<ExpandoObject>(irec);
+                        //}
                         csv.WriteRecords(incidentRecords);
                     }
                     File.WriteAllText(incidentFile, writer.ToString());
                 }
 
+                //if (!CsvSerializer.SaveExpandosAsCsv(responseFile, responseRecords,false))
+                //{
+                //    LogHelper.HandleAppErr(dtype, fn, "Error saving response data to " + responseFile);
+                //   }
                 using (StringWriter writer = new StringWriter())
                 {
-                    using (CsvWriter csv = new CsvWriter(writer))
+                    using (CsvHelper.CsvWriter csv = new CsvHelper.CsvWriter(writer))
                     {
                         csv.WriteRecords(responseRecords);
                     }
@@ -138,7 +177,8 @@ namespace Levrum.Utils.Data
             {
                 foreach (ResponseData response in incident.Responses)
                 {
-                    if (response.Data.ContainsKey("Unit")) {
+                    if (response.Data.ContainsKey("Unit"))
+                    {
                         units.Add(response.Data["Unit"] as string);
                     }
                 }

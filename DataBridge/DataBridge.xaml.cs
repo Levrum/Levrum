@@ -18,8 +18,11 @@ using Xceed.Wpf.AvalonDock.Layout;
 using Newtonsoft.Json;
 
 using Levrum.Data.Classes;
+using Levrum.Data.Classes.Tools;
 using Levrum.Data.Map;
+
 using Levrum.UI.WPF;
+
 using Levrum.Utils;
 using Levrum.Utils.Data;
 
@@ -201,10 +204,20 @@ namespace Levrum.DataBridge
 
                 if (forceSaveAs || string.IsNullOrEmpty(map.Path))
                 {
-                    DirectoryInfo di = new DirectoryInfo(string.Format("{0}\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Levrum\\Data Maps"));
-                    di.Create();
-
+                    DirectoryInfo di;
                     SaveFileDialog sfd = new SaveFileDialog();
+
+                    if (string.IsNullOrEmpty(map.Path))
+                    {
+                        di = new DirectoryInfo(string.Format("{0}\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Levrum\\Data Maps"));
+                        di.Create();
+                    } else
+                    {
+                        FileInfo lastFile = new FileInfo(map.Path);
+                        di = lastFile.Directory;
+                        sfd.FileName = lastFile.Name;
+                    }
+                    
                     sfd.InitialDirectory = di.FullName;
                     sfd.DefaultExt = "dmap";
                     sfd.Filter = "Levrum DataMap files (*.dmap)|*.dmap|All files (*.*)|*.*";
@@ -562,7 +575,9 @@ namespace Levrum.DataBridge
             }
             finally
             {
-                Application.Current.Shutdown();
+                if (e.Cancel == false) { 
+                    Application.Current.Shutdown();
+                }
             }
         }
 
@@ -646,6 +661,14 @@ namespace Levrum.DataBridge
             }
         }
 
+
+
+        private void HandleShowLog(object oSrc, RoutedEventArgs oArgs)
+        {
+            string slog = LogHelper.PrettyprintLogEntries(30);
+            MessageBox.Show(slog);
+        }
+
         private void CreateJson_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -658,7 +681,7 @@ namespace Levrum.DataBridge
                     if (file.Exists)
                     {
                         sfd.InitialDirectory = file.DirectoryName;
-                        sfd.FileName = DataSources.Map.Data["LastJsonExport"] as string;
+                        sfd.FileName = file.Name;
                     }
                 }
                 else
@@ -771,7 +794,7 @@ namespace Levrum.DataBridge
                     if (file.Exists)
                     {
                         sfd.InitialDirectory = file.DirectoryName;
-                        sfd.FileName = DataSources.Map.Data["LastCsvIncidentExport"] as string;
+                        sfd.FileName = file.Name;
                     }
                 }
                 else
