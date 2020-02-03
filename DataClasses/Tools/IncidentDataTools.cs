@@ -5,12 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-using CsvHelper;
+// using CsvHelper;
 
-using Levrum.Data.Classes;
+using Levrum.Utils;
+using Levrum.Utils.Data;
 using Levrum.Utils.MathAndStats;
 
-namespace Levrum.Utils.Data
+namespace Levrum.Data.Classes.Tools
 {
     public static class IncidentDataTools
     {
@@ -123,9 +124,9 @@ namespace Levrum.Utils.Data
                 }
 
 
-                if (!CsvAnalyzer.SaveExpandosAsCsv(incidentFile, incidentRecords, false))
+                if (!CsvSerializer.SaveExpandosAsCsv(incidentFile, incidentRecords, false))
                 {
-                    Util.HandleAppErr(dtype, fn, "Error saving incident data to " + incidentFile);
+                    LogHelper.HandleAppErr(dtype, fn, "Error saving incident data to " + incidentFile);
                 }
                 //using (StringWriter writer = new StringWriter())
                 //{
@@ -140,9 +141,9 @@ namespace Levrum.Utils.Data
                 //    File.WriteAllText(incidentFile, writer.ToString());
                 //}
 
-                if (!CsvAnalyzer.SaveExpandosAsCsv(responseFile, responseRecords,false))
+                if (!CsvSerializer.SaveExpandosAsCsv(responseFile, responseRecords,false))
                 {
-                    Util.HandleAppErr(dtype, fn, "Error saving response data to " + responseFile);
+                    LogHelper.HandleAppErr(dtype, fn, "Error saving response data to " + responseFile);
                 }
                 //using (StringWriter writer = new StringWriter())
                 //{

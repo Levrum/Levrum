@@ -4,7 +4,7 @@ using System.Text;
 
 using ClipperLib;
 
-using Levrum.Data.Classes;
+// using Levrum.Data.Classes;
 
 
 namespace Levrum.Utils.Geometry
@@ -12,7 +12,7 @@ namespace Levrum.Utils.Geometry
     using Path = List<IntPoint>;
     using Paths = List<List<IntPoint>>;
 
-    public class ComplexPolygon : AnnotatedData
+    public class ComplexPolygon
     {
         public Polygon Polygon = new Polygon();
 
@@ -128,7 +128,6 @@ namespace Levrum.Utils.Geometry
             Point2 p2 = new Point2(dX, dY);
             if (null == this.Polygon) { return (false); }
 
-            var moo = Data;
             bool containsPoint = Polygon.Contains(p2);
             foreach (Polygon subPoly in SubPolygons)
                 containsPoint = containsPoint ^ subPoly.Contains(p2); // If an odd number of polygons contains the location, it's good, so use XOR.

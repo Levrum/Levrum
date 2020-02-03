@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-using Levrum.Data.Classes;
-
-namespace Levrum.Utils.Data
+namespace Levrum.Data.Classes.Tools
 {
     public class AnnotatedDataTools
     {

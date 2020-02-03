@@ -42,7 +42,6 @@ namespace Levrum.Data.Classes
             }
         }
 
-        [JsonIgnore]
         public DateTime Time
         {
             get
@@ -70,7 +69,6 @@ namespace Levrum.Data.Classes
             }
         }
 
-        [JsonIgnore]
         public string Location
         {
             get
@@ -87,7 +85,6 @@ namespace Levrum.Data.Classes
             }
         }
 
-        [JsonIgnore]
         public double Longitude
         {
             get
@@ -112,7 +109,6 @@ namespace Levrum.Data.Classes
             }
         }
 
-        [JsonIgnore]
         public double Latitude
         {
             get
@@ -138,7 +134,6 @@ namespace Levrum.Data.Classes
             }
         }
 
-        [JsonIgnore]
         public DataSet<ResponseData> Responses { 
             get
             {
