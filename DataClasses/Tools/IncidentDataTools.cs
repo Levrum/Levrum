@@ -57,11 +57,6 @@ namespace Levrum.Data.Classes.Tools
                 foreach (IncidentData incident in incidents)
                 {
                     dynamic incidentRecord = new ExpandoObject();
-                    incidentRecord.Id = incident.Id;
-                    incidentRecord.Time = incident.Time;
-                    incidentRecord.Location = incident.Location;
-                    incidentRecord.Latitude = incident.Latitude;
-                    incidentRecord.Longitude = incident.Longitude;
                     foreach (string field in incidentDataFields)
                     {
                         IDictionary<string, object> inc_dict = incidentRecord as IDictionary<string, object>;
@@ -132,28 +127,15 @@ namespace Levrum.Data.Classes.Tools
                     incidentRecords.Add(incidentRecord);
                 }
 
-
-                //if (!CsvSerializer.SaveExpandosAsCsv(incidentFile, incidentRecords, false))
-                //{
-                //    LogHelper.HandleAppErr(dtype, fn, "Error saving incident data to " + incidentFile);
-                //}
                 using (StringWriter writer = new StringWriter())
                 {
                     using (CsvHelper.CsvWriter csv = new CsvHelper.CsvWriter(writer))
                     {
-                        //foreach (ExpandoObject irec in incidentRecords)
-                        //{
-                        //    csv.WriteRecord<ExpandoObject>(irec);
-                        //}
                         csv.WriteRecords(incidentRecords);
                     }
                     File.WriteAllText(incidentFile, writer.ToString());
                 }
 
-                //if (!CsvSerializer.SaveExpandosAsCsv(responseFile, responseRecords,false))
-                //{
-                //    LogHelper.HandleAppErr(dtype, fn, "Error saving response data to " + responseFile);
-                //   }
                 using (StringWriter writer = new StringWriter())
                 {
                     using (CsvHelper.CsvWriter csv = new CsvHelper.CsvWriter(writer))
