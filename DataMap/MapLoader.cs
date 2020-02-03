@@ -23,6 +23,8 @@ using NLog.Config;
 using NLog.Targets;
 
 using Newtonsoft.Json;
+using System.Diagnostics;
+using Levrum.Utils.MathAndStats;
 
 namespace Levrum.Data.Map
 {
@@ -1397,6 +1399,8 @@ namespace Levrum.Data.Map
                     setupScriptEngine(v8);
                     v8.AddHostObject("ProgressInfo", pInfo);
 
+                    Stats stats = new Stats();
+                    Stopwatch stwatch = new Stopwatch();
                     int n_pperrs = 0;
                     foreach (IncidentData incident in Incidents)
                     {
@@ -1420,7 +1424,11 @@ namespace Levrum.Data.Map
                         v8.AddHostObject("Incident", incident);
                         try
                         {
+                            stwatch.Start();
                             v8.Execute(Map.PerIncidentScript);
+                            stats.AddObs(stwatch.Elapsed.TotalMilliseconds);
+                            stwatch.Stop();
+                            stwatch.Reset();
                         }
                         catch (Exception ex)
                         {
@@ -1432,16 +1440,29 @@ namespace Levrum.Data.Map
                     if (n_pperrs>0)
                     {
                         //LogHelper.LogMessage(Utils.LogLevel.Error, "The post-processing script generated " + n_pperrs + " errors.  Please see the event log, which is in some cryptic place that will be difficult to find.");
-                        LogHelper.DisplayMessageIfPossible("The post-processing script generated " + n_pperrs + " errors.  Please see the event log.");                    }
+                        LogHelper.DisplayMessageIfPossible("The post-processing script generated " + n_pperrs + " errors.  Please see the event log.");                    
+                    }
 
-                } finally
+                    if (stats.Count>0)
+                    {
+                        LogHelper.LogMessage(Utils.LogLevel.Info, "Script timing: " + Math.Round(stats.Mean * 1000, 3) + " +/- " +
+                                             Math.Round(stats.StdDev * 1000, 3) + " usec");
+                    }
+                
+                } // end try{ enclosing incident loop }
+                catch (Exception exc)
+                {
+                    LogHelper.LogException(exc, "Exception in post-processing loop");
+                    LogHelper.DisplayMessageIfPossible("Exception in post-processing; please see event log");
+                } // end catch{}
+                finally
                 {
                     if (v8 != null)
                     {
                         v8.Dispose();
                     }
-                }
-            }
+                } // end finally{}
+            } // endif(per-incident script defined)
 
             if (Cancelling())
             {
