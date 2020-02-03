@@ -15,6 +15,9 @@ namespace Levrum.Data.Classes.Tools
 {
     public static class IncidentDataTools
     {
+        public static string[] s_ignoredIncidentDataFields = new string[] { "Responses" };
+        public static string[] s_ignoredResponseDataFields = new string[] { "TimingData" };
+
         public static void CreateCsvs(DataSet<IncidentData> incidents, string incidentFile, string responseFile)
         {
             const string fn = "IncidentDataTools.CreateCsvs()";
@@ -28,13 +31,19 @@ namespace Levrum.Data.Classes.Tools
                 {
                     foreach (string key in incident.Data.Keys)
                     {
-                        incidentDataFields.Add(key);
+                        if (!s_ignoredIncidentDataFields.Contains(key))
+                        {
+                            incidentDataFields.Add(key);
+                        }
                     }
                     foreach (ResponseData response in incident.Responses)
                     {
                         foreach (string key in response.Data.Keys)
                         {
-                            responseDataFields.Add(key);
+                            if (!s_ignoredResponseDataFields.Contains(key))
+                            {
+                                responseDataFields.Add(key);
+                            }
                         }
                         foreach (TimingData benchmark in response.TimingData)
                         {
@@ -43,16 +52,11 @@ namespace Levrum.Data.Classes.Tools
                     }
                 }
 
-                List<ExpandoObject> incidentRecords = new List<ExpandoObject>();
-                List<ExpandoObject> responseRecords = new List<ExpandoObject>();
+                List<dynamic> incidentRecords = new List<dynamic>();
+                List<dynamic> responseRecords = new List<dynamic>();
                 foreach (IncidentData incident in incidents)
                 {
                     dynamic incidentRecord = new ExpandoObject();
-                    incidentRecord.Id = incident.Id;
-                    incidentRecord.Time = incident.Time;
-                    incidentRecord.Location = incident.Location;
-                    incidentRecord.Latitude = incident.Latitude;
-                    incidentRecord.Longitude = incident.Longitude;
                     foreach (string field in incidentDataFields)
                     {
                         IDictionary<string, object> inc_dict = incidentRecord as IDictionary<string, object>;
@@ -94,9 +98,9 @@ namespace Levrum.Data.Classes.Tools
                         foreach (string benchmarkName in benchmarkNames)
                         {
                             TimingData benchmark = (from bmk in response.TimingData
-                                                       where bmk.Name == benchmarkName
-                                                       select bmk).FirstOrDefault();
-                            if (rsp_dict.ContainsKey(benchmarkName)) 
+                                                    where bmk.Name == benchmarkName
+                                                    select bmk).FirstOrDefault();
+                            if (rsp_dict.ContainsKey(benchmarkName))
                             {
                                 LogHelper.LogErrOnce(fn, "Benchmark '" + benchmarkName + "' is apparently duplicated in the benchmark data map");
                             }
@@ -123,36 +127,23 @@ namespace Levrum.Data.Classes.Tools
                     incidentRecords.Add(incidentRecord);
                 }
 
-
-                if (!CsvSerializer.SaveExpandosAsCsv(incidentFile, incidentRecords, false))
+                using (StringWriter writer = new StringWriter())
                 {
-                    LogHelper.HandleAppErr(dtype, fn, "Error saving incident data to " + incidentFile);
+                    using (CsvHelper.CsvWriter csv = new CsvHelper.CsvWriter(writer))
+                    {
+                        csv.WriteRecords(incidentRecords);
+                    }
+                    File.WriteAllText(incidentFile, writer.ToString());
                 }
-                //using (StringWriter writer = new StringWriter())
-                //{
-                //    using (CsvWriter csv = new CsvWriter(writer))
-                //    {
-                //        foreach (ExpandoObject irec in incidentRecords)
-                //        {
-                //            csv.WriteRecord<ExpandoObject>(irec);
-                //        }
-                //        //csv.WriteRecords(incidentRecords);
-                //    }
-                //    File.WriteAllText(incidentFile, writer.ToString());
-                //}
 
-                if (!CsvSerializer.SaveExpandosAsCsv(responseFile, responseRecords,false))
+                using (StringWriter writer = new StringWriter())
                 {
-                    LogHelper.HandleAppErr(dtype, fn, "Error saving response data to " + responseFile);
+                    using (CsvHelper.CsvWriter csv = new CsvHelper.CsvWriter(writer))
+                    {
+                        csv.WriteRecords(responseRecords);
+                    }
+                    File.WriteAllText(responseFile, writer.ToString());
                 }
-                //using (StringWriter writer = new StringWriter())
-                //{
-                //    using (CsvWriter csv = new CsvWriter(writer))
-                //    {
-                //        csv.WriteRecords(responseRecords);
-                //    }
-                //    File.WriteAllText(responseFile, writer.ToString());
-                //}
             }
             catch (Exception ex)
             {
@@ -168,7 +159,8 @@ namespace Levrum.Data.Classes.Tools
             {
                 foreach (ResponseData response in incident.Responses)
                 {
-                    if (response.Data.ContainsKey("Unit")) {
+                    if (response.Data.ContainsKey("Unit"))
+                    {
                         units.Add(response.Data["Unit"] as string);
                     }
                 }

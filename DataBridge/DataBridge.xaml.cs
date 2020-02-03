@@ -575,7 +575,9 @@ namespace Levrum.DataBridge
             }
             finally
             {
-                Application.Current.Shutdown();
+                if (e.Cancel == false) { 
+                    Application.Current.Shutdown();
+                }
             }
         }
 
