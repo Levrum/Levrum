@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -80,6 +82,7 @@ namespace Levrum.DataBridge
                     ViewLogsMenuItem.Visibility = Visibility.Visible;
                 }
             }
+            checkForUpdates();
             updateToolbarsAndMenus();
         }
 
@@ -98,6 +101,42 @@ namespace Levrum.DataBridge
         private void logException(object sender, string message, Exception ex)
         {
             LogHelper.LogMessage(LogLevel.Error, message, ex);
+        }
+
+        private void checkForUpdates()
+        {
+            try
+            {
+                WebClient client = new WebClient();
+                string url = string.Format("http://updates.levrum.com/api/update?app={0}&version={1}", "databridge", Assembly.GetEntryAssembly().GetName().Version);
+
+                string updates = client.DownloadString(url);
+                UpdateInfo info = JsonConvert.DeserializeObject<UpdateInfo>(updates);
+
+                if (!string.IsNullOrWhiteSpace(info.URL))
+                {
+                    MessageBoxResult result = MessageBox.Show(string.Format("An update to version {0} is available. Update now? The application will restart.", info.Version), "Update Available", MessageBoxButton.YesNo);
+                    if (result == MessageBoxResult.No)
+                    {
+                        return;
+                    }
+
+                    Cursor = Cursors.Wait;
+                    long time = DateTime.Now.Ticks;
+                    DirectoryInfo tempDir = new DirectoryInfo(string.Format("Levrum\\Temp\\{0}", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)));
+                    if (!tempDir.Exists)
+                    {
+                        tempDir.Create();
+                    }
+                    FileInfo file = new FileInfo(tempDir.FullName + "\\" + info.FileName);
+                    client.DownloadFileAsync(new Uri(info.URL), file.FullName);
+                    Process.Start(file.FullName);
+                    Application.Current.Shutdown();
+                }
+            } catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "Exception while checking for updates", false);
+            }
         }
 
         public DataMapDocument OpenDataMap(string fileName)
