@@ -108,7 +108,12 @@ namespace Levrum.DataBridge
             try
             {
                 WebClient client = new WebClient();
-                string url = string.Format("http://updates.levrum.com/api/update?app={0}&version={1}", "databridge", Assembly.GetEntryAssembly().GetName().Version);
+                string updateServer = "http://updates.levrum.com/";
+#if DEBUG
+                updateServer = "http://localhost:5000/";
+#endif
+
+                string url = string.Format("{0}api/update?app={1}&version={2}", updateServer, "databridge", Assembly.GetEntryAssembly().GetName().Version);
 
                 string updates = client.DownloadString(url);
                 UpdateInfo info = JsonConvert.DeserializeObject<UpdateInfo>(updates);
@@ -123,19 +128,22 @@ namespace Levrum.DataBridge
 
                     Cursor = Cursors.Wait;
                     long time = DateTime.Now.Ticks;
-                    DirectoryInfo tempDir = new DirectoryInfo(string.Format("Levrum\\Temp\\{0}", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)));
+                    DirectoryInfo tempDir = new DirectoryInfo(string.Format("{0}\\Levrum\\Temp\\", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)));
                     if (!tempDir.Exists)
                     {
                         tempDir.Create();
                     }
                     FileInfo file = new FileInfo(tempDir.FullName + "\\" + info.FileName);
-                    client.DownloadFileAsync(new Uri(info.URL), file.FullName);
+                    client.DownloadFile(new Uri(info.URL), file.FullName);
                     Process.Start(file.FullName);
                     Application.Current.Shutdown();
                 }
             } catch (Exception ex)
             {
                 LogHelper.LogException(ex, "Exception while checking for updates", false);
+            } finally
+            {
+                Cursor = Cursors.Arrow;
             }
         }
 
