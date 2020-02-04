@@ -1410,6 +1410,7 @@ namespace Levrum.Data.Map
                     {
                         setupScriptEngine(v8);
                         v8.AddHostObject("ProgressInfo", pInfo);
+                        V8Script script = v8.Compile(Map.PerIncidentScript);
                         foreach (IncidentData incident in chunk)
                         {
                             if (Cancelling())
@@ -1422,7 +1423,7 @@ namespace Levrum.Data.Map
                             v8.AddHostObject("Incident", incident);
                             try
                             {
-                                v8.Execute(Map.PerIncidentScript);
+                                v8.Execute(script);
                                 v8.CollectGarbage(true);
                             }
                             catch (Exception ex)
