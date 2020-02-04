@@ -16,7 +16,7 @@ namespace Levrum.Data.Classes.Tools
     public static class IncidentDataTools
     {
         public static string[] s_ignoredIncidentDataFields = new string[] { "Responses" };
-        public static string[] s_ignoredResponseDataFields = new string[] { "TimingData" };
+        public static string[] s_ignoredResponseDataFields = new string[] { "TimingData", "Benchmarks" };
 
         public static void CreateCsvs(DataSet<IncidentData> incidents, string incidentFile, string responseFile)
         {
