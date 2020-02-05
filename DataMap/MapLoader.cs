@@ -657,7 +657,8 @@ namespace Levrum.Data.Map
                         if (parsedValue is double)
                         {
                             benchmark.Value = (double)parsedValue;
-                        } else if (parsedValue is DateTime)
+                        }
+                        else if (parsedValue is DateTime)
                         {
                             benchmark.Data["DateTime"] = parsedValue; // This ensures data will be written as absolute timestamps in the output CSV files
                         }
@@ -798,8 +799,8 @@ namespace Levrum.Data.Map
                 foreach (ResponseData response in incident.Responses)
                 {
                     TimingData assigned = (from b in response.TimingData
-                                              where b.Name == "Assigned"
-                                              select b).FirstOrDefault();
+                                           where b.Name == "Assigned"
+                                           select b).FirstOrDefault();
 
                     DateTime assignedTime = DateTime.MinValue;
                     if (assigned != null)
@@ -824,8 +825,8 @@ namespace Levrum.Data.Map
                     }
 
                     TimingData responding = (from b in response.TimingData
-                                                where b.Name == "Responding"
-                                                select b).FirstOrDefault();
+                                             where b.Name == "Responding"
+                                             select b).FirstOrDefault();
 
                     DateTime respondingTime = DateTime.MinValue;
                     if (responding != null)
@@ -850,8 +851,8 @@ namespace Levrum.Data.Map
                     }
 
                     TimingData turnout = (from b in response.TimingData
-                                             where b.Name == "TurnoutTime"
-                                             select b).FirstOrDefault();
+                                          where b.Name == "TurnoutTime"
+                                          select b).FirstOrDefault();
                     if (turnout == null)
                     {
                         turnout = new TimingData("TurnoutTime", Math.Max(0, (respondingTime - assignedTime).TotalMinutes));
@@ -859,8 +860,8 @@ namespace Levrum.Data.Map
                     }
 
                     TimingData onScene = (from b in response.TimingData
-                                             where b.Name == "OnScene"
-                                             select b).FirstOrDefault();
+                                          where b.Name == "OnScene"
+                                          select b).FirstOrDefault();
 
                     DateTime onSceneTime = DateTime.MinValue;
                     if (onScene != null)
@@ -885,8 +886,8 @@ namespace Levrum.Data.Map
                     }
 
                     TimingData travel = (from b in response.TimingData
-                                            where b.Name == "TravelTime"
-                                            select b).FirstOrDefault();
+                                         where b.Name == "TravelTime"
+                                         select b).FirstOrDefault();
                     if (travel == null)
                     {
                         travel = new TimingData("TravelTime", Math.Max(0, (onSceneTime - respondingTime).TotalMinutes));
@@ -894,8 +895,8 @@ namespace Levrum.Data.Map
                     }
 
                     TimingData clearScene = (from b in response.TimingData
-                                                where b.Name == "ClearScene"
-                                                select b).FirstOrDefault();
+                                             where b.Name == "ClearScene"
+                                             select b).FirstOrDefault();
 
                     DateTime clearSceneTime = DateTime.MinValue;
                     if (clearScene != null)
@@ -920,8 +921,8 @@ namespace Levrum.Data.Map
                     }
 
                     TimingData inService = (from b in response.TimingData
-                                               where b.Name == "InService"
-                                               select b).FirstOrDefault();
+                                            where b.Name == "InService"
+                                            select b).FirstOrDefault();
 
                     DateTime inServiceTime = DateTime.MinValue;
                     if (inService != null)
@@ -951,8 +952,8 @@ namespace Levrum.Data.Map
                     }
 
                     TimingData committed = (from b in response.TimingData
-                                               where b.Name == "CommittedHours"
-                                               select b).FirstOrDefault();
+                                            where b.Name == "CommittedHours"
+                                            select b).FirstOrDefault();
 
                     if (committed == null)
                     {
@@ -961,8 +962,8 @@ namespace Levrum.Data.Map
                     }
 
                     TimingData sceneTime = (from b in response.TimingData
-                                               where b.Name == "SceneTime"
-                                               select b).FirstOrDefault();
+                                            where b.Name == "SceneTime"
+                                            select b).FirstOrDefault();
 
                     if (sceneTime == null && onSceneTime != DateTime.MinValue)
                     {
@@ -971,8 +972,8 @@ namespace Levrum.Data.Map
                     }
 
                     TimingData inQuarters = (from b in response.TimingData
-                                                where b.Name == "InQuarters"
-                                                select b).FirstOrDefault();
+                                             where b.Name == "InQuarters"
+                                             select b).FirstOrDefault();
 
                     DateTime inQuartersTime = DateTime.MinValue;
                     if (inQuarters != null)
@@ -1386,60 +1387,60 @@ namespace Levrum.Data.Map
             if (!string.IsNullOrWhiteSpace(Map.PerIncidentScript))
             {
                 updateProgress(9, string.Format("Executing per incident script"), 0, true);
-                V8ScriptEngine v8 = null;
-                try
+                List<List<IncidentData>> chunks = new List<List<IncidentData>>();
+                List<IncidentData> newChunk = new List<IncidentData>();
+                chunks.Add(newChunk);
+                foreach (IncidentData incident in Incidents)
                 {
-                    v8 = new V8ScriptEngine();
-                    ProgressInfo pInfo = new ProgressInfo();
-                    pInfo.Count = Incidents.Count;
-                    pInfo.Number = 0;
-
-                    setupScriptEngine(v8);
-                    v8.AddHostObject("ProgressInfo", pInfo);
-
-                    int n_pperrs = 0;
-                    foreach (IncidentData incident in Incidents)
+                    if (newChunk.Count >= 10000)
                     {
-                        if (Cancelling())
-                        {
-                            return;
-                        }
-
-                        pInfo.Number++;
-
-                        // The script engine starts to really lag after a few hundred thousand incidents, this helps avoid that somewhat
-                        if (pInfo.Number % 50000 == 0)
-                        {
-                            v8.Dispose();
-                            v8 = new V8ScriptEngine();
-                            setupScriptEngine(v8);
-                            v8.AddHostObject("ProgressInfo", pInfo);
-                        }
-
-                        updateProgress(9, string.Format("Executing per incident script for incident {0} of {1}", pInfo.Number, pInfo.Count), pInfo.Progress, pInfo.Number >= pInfo.Count - 20);
-                        v8.AddHostObject("Incident", incident);
-                        try
-                        {
-                            v8.Execute(Map.PerIncidentScript);
-                        }
-                        catch (Exception ex)
-                        {
-                            LogHelper.LogMessage(Utils.LogLevel.Warn, string.Format("Exception running per incident script for incident {0}", incident.Id), ex);
-                            n_pperrs++;
-                        }
-                    } // end foreach(incident)
-
-                    if (n_pperrs>0)
-                    {
-                        //LogHelper.LogMessage(Utils.LogLevel.Error, "The post-processing script generated " + n_pperrs + " errors.  Please see the event log, which is in some cryptic place that will be difficult to find.");
-                        LogHelper.DisplayMessageIfPossible("The post-processing script generated " + n_pperrs + " errors.  Please see the event log.");                    }
-
-                } finally
-                {
-                    if (v8 != null)
-                    {
-                        v8.Dispose();
+                        newChunk = new List<IncidentData>();
+                        chunks.Add(newChunk);
                     }
+                    newChunk.Add(incident);
+                }
+                ProgressInfo pInfo = new ProgressInfo();
+                pInfo.Count = Incidents.Count;
+                pInfo.Number = 0;
+                int n_pperrs = 0;
+
+                foreach (List<IncidentData> chunk in chunks)
+                {
+                    using (V8ScriptEngine v8 = new V8ScriptEngine())
+                    {
+                        setupScriptEngine(v8);
+                        v8.AddHostObject("ProgressInfo", pInfo);
+                        V8Script script = v8.Compile(Map.PerIncidentScript);
+                        foreach (IncidentData incident in chunk)
+                        {
+                            if (Cancelling())
+                            {
+                                return;
+                            }
+                            pInfo.Number++;
+
+                            updateProgress(9, string.Format("Executing per incident script for incident {0} of {1}", pInfo.Number, pInfo.Count), pInfo.Progress, pInfo.Number >= pInfo.Count - 20);
+                            v8.AddHostObject("Incident", incident);
+                            try
+                            {
+                                v8.Execute(script);
+                                v8.CollectGarbage(true);
+                            }
+                            catch (Exception ex)
+                            {
+                                LogHelper.LogMessage(Utils.LogLevel.Warn, string.Format("Exception running per incident script for incident {0}", incident.Id), ex);
+                                n_pperrs++;
+                            }
+                        }
+                    }
+                }
+
+
+
+                if (n_pperrs > 0)
+                {
+                    //LogHelper.LogMessage(Utils.LogLevel.Error, "The post-processing script generated " + n_pperrs + " errors.  Please see the event log, which is in some cryptic place that will be difficult to find.");
+                    LogHelper.DisplayMessageIfPossible("The post-processing script generated " + n_pperrs + " errors.  Please see the event log.");
                 }
             }
 
