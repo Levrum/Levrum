@@ -41,11 +41,24 @@ namespace Levrum.DataBridge
         public IDataSource DataSource { get; set; } = null;
         private IDataSource OriginalDataSource { get; set; } = null;
 
-        List<DataSourceTypeInfo> DataSourceTypes { get; } = new List<DataSourceTypeInfo>(new DataSourceTypeInfo[] { "CSV File", "SQL Server", "GeoData" });
+        public static List<DataSourceTypeInfo> DataSourceTypes { get; } = new List<DataSourceTypeInfo>(new DataSourceTypeInfo[] { DataSourceTypeInfo.CsvSource, DataSourceTypeInfo.SqlSource, DataSourceTypeInfo.GeoSource });
 
-        List<DataSourceTypeInfo> SqlSourceTypes { get; } = new List<DataSourceTypeInfo>(new DataSourceTypeInfo[] { "Table", "Query" });
+        public static Dictionary<string, DataSourceTypeInfo> SourceTypesByExtension = new Dictionary<string, DataSourceTypeInfo>()
+        {
+            { ".csv", DataSourceTypeInfo.CsvSource },
+            { ".sql", DataSourceTypeInfo.SqlSource },
+            { ".shp", DataSourceTypeInfo.GeoSource },
+            { ".zip", DataSourceTypeInfo.GeoSource },
+            { ".geojson", DataSourceTypeInfo.GeoSource }
+        };
 
-        ObservableCollection<DataSourceTypeInfo> Projections { get; } = new ObservableCollection<DataSourceTypeInfo>();
+        public static List<DataSourceTypeInfo> SqlSourceTypes { get; } = new List<DataSourceTypeInfo>(new DataSourceTypeInfo[] { "Table", "Query" });
+
+        public static ObservableCollection<DataSourceTypeInfo> Projections { get; } = new ObservableCollection<DataSourceTypeInfo>()
+        {
+            new DataSourceTypeInfo("EPSG:3857 Pseudo-Mercator", CoordinateConverter.WebMercator.WKT),
+            new DataSourceTypeInfo("EPSG:4326 Lat-Long", CoordinateConverter.WGS84.WKT)
+        };
 
         bool ChangesMade { get; set; } = false;
         private bool Loading { get; set; } = true;
@@ -58,8 +71,6 @@ namespace Levrum.DataBridge
             SqlDataTypeComboBox.ItemsSource = SqlSourceTypes;
             SqlDataTypeComboBox.DisplayMemberPath = "Name";
 
-            Projections.Add(new DataSourceTypeInfo("EPSG:3857 Pseudo-Mercator", CoordinateConverter.WebMercator.WKT));
-            Projections.Add(new DataSourceTypeInfo("EPSG:4326 Lat-Long", CoordinateConverter.WGS84.WKT));
             ProjectionColumnComboBox.ItemsSource = Projections;
             ProjectionColumnComboBox.DisplayMemberPath = "Name";
 
@@ -67,100 +78,7 @@ namespace Levrum.DataBridge
             {
                 OriginalDataSource = _dataSource.Clone() as IDataSource;
                 DataSource = _dataSource;
-                NameTextBox.Text = _dataSource.Name;
-                if (DataSource.Type == DataSourceType.CsvSource)
-                {
-                    DataSourceTypeComboBox.SelectedItem = DataSourceTypes[0];
-                    updateDataSourceOptionsDisplay();
-                    if (_dataSource.Parameters.ContainsKey("File")) {
-                        CsvFileNameTextBox.Text = _dataSource.Parameters["File"];
-                    }
-                    CsvSource csvSource = _dataSource as CsvSource;
-                    if (csvSource == null)
-                    {
-                        return;
-                    }
-                    if (_dataSource.Parameters.ContainsKey("EmbedCSV"))
-                    {
-                        bool embedCsv = false;
-                        if (bool.TryParse(_dataSource.Parameters["EmbedCSV"], out embedCsv))
-                        {
-                            EmbedCsvCheckBox.IsChecked = true;
-                        }
-                    }
-
-                    List<string> columns = csvSource.GetColumns();
-                    IdColumnComboBox.ItemsSource = columns;
-                    IdColumnComboBox.SelectedItem = _dataSource.IDColumn;
-                    ResponseIdColumnComboBox.ItemsSource = columns;
-                    ResponseIdColumnComboBox.SelectedItem = _dataSource.ResponseIDColumn;
-                }
-                else if (DataSource.Type == DataSourceType.SqlSource)
-                {
-                    DataSourceTypeComboBox.SelectedItem = DataSourceTypes[1];
-                    updateDataSourceOptionsDisplay();
-                    SqlServerAddress.Text = DataSource.Parameters["Server"];
-                    SqlServerPort.Text = DataSource.Parameters["Port"];
-                    SqlServerUser.Text = DataSource.Parameters["User"];
-                    SqlServerPassword.Password = DataSource.Parameters["Password"];
-                    SqlServerDatabase.Text = DataSource.Parameters["Database"];
-                    connectToSqlSource();
-                    if (DataSource.Parameters["Query"] != null)
-                    {
-                        SqlDataTypeComboBox.SelectedItem = SqlSourceTypes[1];
-                        SqlQueryTextBox.Text = DataSource.Parameters["Query"];
-                    }
-                    else
-                    {
-                        SqlTableComboBox.SelectedItem = DataSource.Parameters["Table"];
-                    }
-
-                    SqlIdColumnComboBox.SelectedItem = DataSource.IDColumn;
-                    SqlResponseIdColumnComboBox.SelectedItem = DataSource.ResponseIDColumn;
-                }
-                else if (DataSource.Type == DataSourceType.GeoSource)
-                {
-                    DataSourceTypeComboBox.SelectedItem = DataSourceTypes[2];
-                    updateDataSourceOptionsDisplay();
-                    if (_dataSource.Parameters.ContainsKey("File"))
-                    {
-                        try
-                        {
-                            summarizeGeoFile(_dataSource.Parameters["File"]);
-                        } catch (Exception ex)
-                        {
-                            LogHelper.LogMessage(LogLevel.Error, string.Format("Unable to load GeoSource from file '{0}'", _dataSource.Parameters["File"]), ex);
-                        }
-
-                        GeoFileNameTextBox.Text = _dataSource.Parameters["File"];
-                    }
-                    GeoSource geoSource = _dataSource as GeoSource;
-                    if (geoSource == null)
-                    {
-                        return;
-                    }
-
-                    if (_dataSource.Parameters.ContainsKey("ProjectionName"))
-                    {
-                        string projectionName = _dataSource.Parameters["ProjectionName"];
-                        var proj = (from p in Projections
-                                    where p.Name == projectionName
-                                    select p).FirstOrDefault();
-                        if (proj != null)
-                        {
-                            ProjectionColumnComboBox.SelectedItem = proj;
-                        } else
-                        {
-                            DataSourceTypeInfo info = new DataSourceTypeInfo(projectionName);
-                            if (_dataSource.Parameters.ContainsKey("Projection"))
-                            {
-                                info.Data = _dataSource.Parameters["Projection"];
-                            }
-                            Projections.Add(info);
-                            ProjectionColumnComboBox.SelectedItem = info;
-                        }
-                    }
-                }
+                updateDisplayForDataSource();
                 ChangesMade = false;
             }
             else
@@ -171,6 +89,107 @@ namespace Levrum.DataBridge
                 ChangesMade = false;
             }
             Loading = false;
+        }
+
+        private void updateDisplayForDataSource()
+        {
+            NameTextBox.Text = DataSource.Name;
+            if (DataSource.Type == DataSourceType.CsvSource)
+            {
+                DataSourceTypeComboBox.SelectedItem = DataSourceTypes[0];
+                updateDisplayOptions();
+                if (DataSource.Parameters.ContainsKey("File"))
+                {
+                    CsvFileNameTextBox.Text = DataSource.Parameters["File"];
+                }
+                CsvSource csvSource = DataSource as CsvSource;
+                if (csvSource == null)
+                {
+                    return;
+                }
+                if (DataSource.Parameters.ContainsKey("EmbedCSV"))
+                {
+                    bool embedCsv = false;
+                    if (bool.TryParse(DataSource.Parameters["EmbedCSV"], out embedCsv))
+                    {
+                        EmbedCsvCheckBox.IsChecked = true;
+                    }
+                }
+
+                List<string> columns = csvSource.GetColumns();
+                IdColumnComboBox.ItemsSource = columns;
+                IdColumnComboBox.SelectedItem = DataSource.IDColumn;
+                ResponseIdColumnComboBox.ItemsSource = columns;
+                ResponseIdColumnComboBox.SelectedItem = DataSource.ResponseIDColumn;
+            }
+            else if (DataSource.Type == DataSourceType.SqlSource)
+            {
+                DataSourceTypeComboBox.SelectedItem = DataSourceTypes[1];
+                updateDisplayOptions();
+                SqlServerAddress.Text = DataSource.Parameters["Server"];
+                SqlServerPort.Text = DataSource.Parameters["Port"];
+                SqlServerUser.Text = DataSource.Parameters["User"];
+                SqlServerPassword.Password = DataSource.Parameters["Password"];
+                SqlServerDatabase.Text = DataSource.Parameters["Database"];
+                connectToSqlSource();
+                if (DataSource.Parameters["Query"] != null)
+                {
+                    SqlDataTypeComboBox.SelectedItem = SqlSourceTypes[1];
+                    SqlQueryTextBox.Text = DataSource.Parameters["Query"];
+                }
+                else
+                {
+                    SqlTableComboBox.SelectedItem = DataSource.Parameters["Table"];
+                }
+
+                SqlIdColumnComboBox.SelectedItem = DataSource.IDColumn;
+                SqlResponseIdColumnComboBox.SelectedItem = DataSource.ResponseIDColumn;
+            }
+            else if (DataSource.Type == DataSourceType.GeoSource)
+            {
+                DataSourceTypeComboBox.SelectedItem = DataSourceTypes[2];
+                updateDisplayOptions();
+                if (DataSource.Parameters.ContainsKey("File"))
+                {
+                    try
+                    {
+                        summarizeGeoFile(DataSource.Parameters["File"]);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogHelper.LogMessage(LogLevel.Error, string.Format("Unable to load GeoSource from file '{0}'", DataSource.Parameters["File"]), ex);
+                    }
+
+                    GeoFileNameTextBox.Text = DataSource.Parameters["File"];
+                }
+                GeoSource geoSource = DataSource as GeoSource;
+                if (geoSource == null)
+                {
+                    return;
+                }
+
+                if (DataSource.Parameters.ContainsKey("ProjectionName"))
+                {
+                    string projectionName = DataSource.Parameters["ProjectionName"];
+                    var proj = (from p in Projections
+                                where p.Name == projectionName
+                                select p).FirstOrDefault();
+                    if (proj != null)
+                    {
+                        ProjectionColumnComboBox.SelectedItem = proj;
+                    }
+                    else
+                    {
+                        DataSourceTypeInfo info = new DataSourceTypeInfo(projectionName);
+                        if (DataSource.Parameters.ContainsKey("Projection"))
+                        {
+                            info.Data = DataSource.Parameters["Projection"];
+                        }
+                        Projections.Add(info);
+                        ProjectionColumnComboBox.SelectedItem = info;
+                    }
+                }
+            }
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -270,27 +289,27 @@ namespace Levrum.DataBridge
                 DataSource.Disconnect();
             }
 
-            if (DataSourceTypeComboBox.SelectedItem.ToString() == "CSV File")
+            if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.CsvSource)
             {
                 DataSource = new CsvSource();
                 ChangesMade = true;
             }
-            else if (DataSourceTypeComboBox.SelectedItem.ToString() == "SQL Server")
+            else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.SqlSource)
             {
                 DataSource = new SqlSource();
                 ChangesMade = true;
             }
-            else if (DataSourceTypeComboBox.SelectedItem.ToString() == "GeoData")
+            else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.GeoSource)
             {
                 DataSource = new GeoSource();
                 ChangesMade = true;
             }
-            updateDataSourceOptionsDisplay();
+            updateDisplayOptions();
         }
 
-        private void updateDataSourceOptionsDisplay()
+        private void updateDisplayOptions()
         {
-            if (DataSourceTypeComboBox.SelectedItem.ToString() == "CSV File")
+            if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.CsvSource)
             {
                 CsvOptionsGrid.Visibility = Visibility.Visible;
                 CsvOptionsButtons.Visibility = Visibility.Visible;
@@ -299,7 +318,7 @@ namespace Levrum.DataBridge
                 GeoOptionsGrid.Visibility = Visibility.Hidden;
                 GeoOptionsPanel.Visibility = Visibility.Hidden;
             }
-            else if (DataSourceTypeComboBox.SelectedItem.ToString() == "SQL Server")
+            else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.SqlSource)
             {
                 CsvOptionsGrid.Visibility = Visibility.Hidden;
                 CsvOptionsButtons.Visibility = Visibility.Hidden;
@@ -308,7 +327,7 @@ namespace Levrum.DataBridge
                 GeoOptionsGrid.Visibility = Visibility.Hidden;
                 GeoOptionsPanel.Visibility = Visibility.Hidden;
             }
-            else if (DataSourceTypeComboBox.SelectedItem.ToString() == "GeoData")
+            else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.GeoSource)
             {
                 CsvOptionsGrid.Visibility = Visibility.Hidden;
                 CsvOptionsButtons.Visibility = Visibility.Hidden;
@@ -553,7 +572,8 @@ namespace Levrum.DataBridge
                     newProjection.Data = projection;
                     Projections.Add(newProjection);
                     ProjectionColumnComboBox.SelectedItem = newProjection;
-                } else
+                }
+                else
                 {
                     ProjectionColumnComboBox.SelectedItem = existingProjection;
                 }
@@ -613,15 +633,109 @@ namespace Levrum.DataBridge
             {
                 CsvSource source = DataSource as CsvSource;
                 source.Parameters["EmbedCSV"] = (bool)EmbedCsvCheckBox.IsChecked ? "true" : "false";
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 LogHelper.LogException(ex, "Unable to toggle Embed CSV", true);
             }
+        }
+
+        public static IDataSource CreateDataSourceFromFile(string fileName)
+        {
+            FileInfo info = new FileInfo(fileName);
+            string nameWithoutExtension = info.Name.Substring(0, info.Name.Length - info.Extension.Length);
+            DataSourceTypeInfo type;
+            IDataSource output = null;
+            if (SourceTypesByExtension.TryGetValue(info.Extension, out type))
+            {
+                if (type == DataSourceTypeInfo.CsvSource)
+                {
+                    output = new CsvSource(info);
+                }
+                else if (type == DataSourceTypeInfo.GeoSource)
+                {
+                    GeoSource source = new GeoSource();
+                    source.GeoFile = info;
+
+                    string projectionName, projection;
+                    if (GeoSource.GetProjectionFromFile(info.FullName, out projectionName, out projection))
+                    {
+                        source.Parameters["ProjectionName"] = projectionName;
+                        source.Parameters["Projection"] = projection;
+                    }
+                    output = source;
+                }
+                else if (type == DataSourceTypeInfo.SqlSource)
+                {
+                    string query = File.ReadAllText(info.FullName);
+                    output = new SqlSource();
+                    output.Parameters["Server"] = string.Empty;
+                    output.Parameters["Port"] = string.Empty;
+                    output.Parameters["User"] = string.Empty;
+                    output.Parameters["Password"] = string.Empty;
+                    output.Parameters["Database"] = string.Empty;
+                    output.Parameters["Query"] = query;
+                }
+            }
+
+            return output;
+        }
+
+        private void DataSourceEditorGrid_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                var fileNames = e.Data.GetData(DataFormats.FileDrop) as string[];
+                if (fileNames.Length == 1)
+                {
+                    FileInfo info = new FileInfo(fileNames[0]);
+                    string nameWithoutExtension = info.Name.Substring(0, info.Name.Length - info.Extension.Length);
+                    DataSourceTypeInfo type;
+                    if (SourceTypesByExtension.TryGetValue(info.Extension, out type))
+                    {
+                        IDataSource newSource = CreateDataSourceFromFile(fileNames[0]);
+                        DataSource = newSource;
+                        updateDisplayForDataSource();
+                    }
+                }
+            }
+        }
+
+        private void DataSourceEditorGrid_DragOver(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                var fileNames = e.Data.GetData(DataFormats.FileDrop) as string[];
+                bool dragAllowed = fileNames.Length == 1;
+
+                if (dragAllowed)
+                {    
+                    foreach (string fileName in fileNames)
+                    {
+                        FileInfo info = new FileInfo(fileName);
+                        if (!SourceTypesByExtension.ContainsKey(info.Extension))
+                        {
+                            dragAllowed = false;
+                        }
+                    }
+                }
+                if (dragAllowed)
+                {
+                    e.Effects = DragDropEffects.Copy;
+                    return;
+                }
+            }
+
+            e.Effects = DragDropEffects.None;
         }
     }
 
     public class DataSourceTypeInfo
     {
+        public static DataSourceTypeInfo CsvSource = new DataSourceTypeInfo("CSV File");
+        public static DataSourceTypeInfo SqlSource = new DataSourceTypeInfo("SQL Server");
+        public static DataSourceTypeInfo GeoSource = new DataSourceTypeInfo("Geographical Data");
+
         public string Name { get; set; } = string.Empty;
         public string Data { get; set; } = string.Empty;
 
@@ -639,11 +753,6 @@ namespace Levrum.DataBridge
         public static implicit operator DataSourceTypeInfo(string _name)
         {
             return new DataSourceTypeInfo(_name);
-        }
-
-        public static implicit operator string(DataSourceTypeInfo _info)
-        {
-            return _info.Name;
         }
     }
 }
