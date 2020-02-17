@@ -347,7 +347,35 @@ namespace Levrum.Utils.Osm
 
         public void CreateOsrmFiles(string profilePath = "")
         {
-            FileInfo osmFile = OsmFile;
+            FileInfo osmFile = null;
+            bool deleteBaseFile = false;
+            if (!Zipped)
+            {
+                osmFile = OsmFile;
+            }
+            else
+            {
+                try
+                {
+                    ZipArchive archive = ZipFile.OpenRead(OsmFile.FullName);
+                    ZipArchiveEntry entry = archive.Entries[0];
+
+                    DirectoryInfo osmFileDir = new DirectoryInfo(OsmFile.DirectoryName);
+                    string fileName = string.Format("{0}\\{1}", osmFileDir.FullName, entry.FullName);
+                    entry.ExtractToFile(fileName);
+                    FileInfo unzippedFile = new FileInfo(fileName);
+                    if (unzippedFile.Exists)
+                    {
+                        osmFile = unzippedFile;
+                        deleteBaseFile = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.LogException(ex);
+                    return;
+                }
+            }
 
             // osrm can't handle spaces in osm filenames
             string lastName = osmFile.Name;
@@ -419,6 +447,11 @@ namespace Levrum.Utils.Osm
                 {
                     File.Delete(osmFile.DirectoryName + "\\" + safeName);
                 }
+            }
+
+            if (deleteBaseFile)
+            {
+                File.Delete(osmFile.FullName);
             }
         }
     }
