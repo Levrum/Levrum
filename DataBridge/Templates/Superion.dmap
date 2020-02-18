@@ -1,42 +1,49 @@
 {
   "$id": "1",
-  "Name": "Superion DataMap.dmap",
+  "$type": "Levrum.Data.Map.DataMap, Levrum.Data.Map",
+  "Name": "Superion.dmap",
   "EnableCoordinateConversion": true,
   "IncidentMappings": {
     "$id": "2",
+    "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Levrum.Data.Map.DataMapping, Levrum.Data.Map]], System.ObjectModel",
     "$values": [
       {
         "$id": "3",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
         "Field": "Time",
         "ColumnType": 1,
         "Column": {
           "$id": "4",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
           "ColumnName": "CallReceived",
           "DataSource": {
             "$id": "5",
+            "$type": "Levrum.Data.Sources.SqlSource, Levrum.Data.Sources",
             "Name": "Superion CAD",
             "Type": 1,
-            "Info": "Superion CAD",
             "IDColumn": "UniqueID",
             "ResponseIDColumn": "Unit",
             "Parameters": {
               "$id": "6",
+              "$type": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib],[System.String, System.Private.CoreLib]], System.Private.CoreLib",
               "Server": "",
-              "Port": "",
+              "Port": "1433",
               "User": "",
               "Password": "",
               "Database": "",
-              "Query": "WITH IncidentsWithResponses AS (\r\n                        SELECT\r\n                          I.inci_id AS 'UniqueID',\r\n                          I.calltime AS 'CallReceived',\r\n                          I.nature as 'Nature',\r\n                          I.citydesc as 'City',\r\n                          REPLACE(\r\n                          REPLACE(\r\n                          REPLACE(\r\n                          REPLACE(\r\n                          REPLACE(I.priority,'P','3')\r\n                         ,'2','1')\r\n                         ,'4','1')\r\n                         ,'7','1')\r\n                         ,' ','1') AS 'Priority',\r\n                          I.cancelled as 'Cancelled',\r\n                          I.street as 'Address',\r\n                          I.geox as 'X',\r\n                          I.geoy as 'Y',\r\n                          I.district as 'District',\r\n                          RTRIM(D.unitcode) AS 'Unit',\r\n                          I.firstdtm AS 'FirstEffAction',\r\n                          I.firstenr AS 'FirstResponding',\r\n                          I.firstarrv AS 'FirstArrival',\r\n                          REPLACE(\r\n                          REPLACE(\r\n                          REPLACE(\r\n                          REPLACE(D.transtype,'D','Dispatched')\r\n                         ,'R','Responding')\r\n                         ,'A','OnScene')\r\n                         ,'C','ClearScene') as 'BenchmarkType',\r\n                          D.timestamp as 'Timestamp'  \r\n                        FROM  dbo.inmain I\r\n                          INNER JOIN dbo.incilog D ON ((D.inci_id=I.inci_id) AND (D.transtype in ('D', 'E', 'A', 'C')))\r\n                        WHERE (I.service = 'FIRE') AND (D.unitcode IS NOT NULL)\r\n                        )\r\n                        SELECT *\r\n                        FROM\r\n                           IncidentsWithResponses\r\n                           PIVOT (MAX(Timestamp) FOR BenchmarkType IN (Dispatched, Enroute, OnScene, ClearScene))\r\n                        AS p\r\n                        ORDER BY UniqueID"
+              "Query": "WITH IncidentsWithResponses AS (\r\n                        SELECT\r\n                          I.inci_id AS 'UniqueID',\r\n                          I.case_id AS 'CaseID',\r\n                          I.ra AS 'ResponseArea',\r\n                          I.calltime AS 'CallReceived',\r\n                          I.nature as 'Nature',\r\n                          I.citydesc as 'City',\r\n                          I.zip as 'Zip',\r\n                          REPLACE(\r\n                          REPLACE(\r\n                          REPLACE(\r\n                          REPLACE(\r\n                          REPLACE(I.priority,'P','3')\r\n                         ,'2','1')\r\n                         ,'4','1')\r\n                         ,'7','1')\r\n                         ,' ','1') AS 'Priority',\r\n                          I.cancelled as 'Cancelled',\r\n                          I.street as 'Address',\r\n                          I.geox as 'X',\r\n                          I.geoy as 'Y',\r\n                          I.district as 'District',\r\n                          RTRIM(D.unitcode) AS 'Unit',\r\n                          I.firstdtm AS 'FirstEffAction',\r\n                          I.firstenr AS 'FirstResponding',\r\n                          I.firstarrv AS 'FirstArrival',\r\n                          REPLACE(\r\n                          REPLACE(\r\n                          REPLACE(\r\n\t\t\t\t\t\t  REPLACE(\r\n\t\t\t\t\t\t  REPLACE(\r\n                          REPLACE(D.transtype,'D','Dispatched')\r\n                         ,'E','Enroute')\r\n                         ,'A','OnScene')\r\n                         ,'C','ClearScene')\r\n                         ,'T','Transport')\r\n                         ,'H','Hospital') as 'BenchmarkType',\r\n                          D.timestamp as 'Timestamp'  \r\n                        FROM  dbo.inmain I\r\n                          INNER JOIN dbo.incilog D ON ((D.inci_id=I.inci_id) AND (D.transtype in ('D', 'E', 'A', 'C', 'T', 'H')))\r\n                        WHERE (I.service = 'FIRE') AND (D.unitcode IS NOT NULL)\r\n                        )\r\n                        SELECT *\r\n                        FROM\r\n                           IncidentsWithResponses\r\n                           PIVOT (MAX(Timestamp) FOR BenchmarkType IN (Dispatched, Enroute, OnScene, ClearScene, Transport, Hospital))\r\n                        AS p\r\n                        ORDER BY UniqueID"
             }
           }
         }
       },
       {
         "$id": "7",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
         "Field": "Latitude",
         "ColumnType": 1,
         "Column": {
           "$id": "8",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
           "ColumnName": "Y",
           "DataSource": {
             "$ref": "5"
@@ -45,10 +52,12 @@
       },
       {
         "$id": "9",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
         "Field": "Longitude",
         "ColumnType": 1,
         "Column": {
           "$id": "10",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
           "ColumnName": "X",
           "DataSource": {
             "$ref": "5"
@@ -57,10 +66,12 @@
       },
       {
         "$id": "11",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
         "Field": "Location",
         "ColumnType": 1,
         "Column": {
           "$id": "12",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
           "ColumnName": "Address",
           "DataSource": {
             "$ref": "5"
@@ -71,13 +82,16 @@
   },
   "IncidentDataMappings": {
     "$id": "13",
+    "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Levrum.Data.Map.DataMapping, Levrum.Data.Map]], System.ObjectModel",
     "$values": [
       {
         "$id": "14",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
         "Field": "Priority",
         "ColumnType": 1,
         "Column": {
           "$id": "15",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
           "ColumnName": "Priority",
           "DataSource": {
             "$ref": "5"
@@ -86,10 +100,12 @@
       },
       {
         "$id": "16",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
         "Field": "Cancelled",
         "ColumnType": 1,
         "Column": {
           "$id": "17",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
           "ColumnName": "Cancelled",
           "DataSource": {
             "$ref": "5"
@@ -98,10 +114,12 @@
       },
       {
         "$id": "18",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
         "Field": "District",
         "ColumnType": 1,
         "Column": {
           "$id": "19",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
           "ColumnName": "District",
           "DataSource": {
             "$ref": "5"
@@ -110,11 +128,69 @@
       },
       {
         "$id": "20",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
         "Field": "Code",
         "ColumnType": 1,
         "Column": {
           "$id": "21",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
           "ColumnName": "Nature",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "22",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Time",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "23",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "CallReceived",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "24",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Latitude",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "25",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "X",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "26",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Longitude",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "27",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Y",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "28",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Location",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "29",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Address",
           "DataSource": {
             "$ref": "5"
           }
@@ -123,14 +199,17 @@
     ]
   },
   "ResponseDataMappings": {
-    "$id": "22",
+    "$id": "30",
+    "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Levrum.Data.Map.DataMapping, Levrum.Data.Map]], System.ObjectModel",
     "$values": [
       {
-        "$id": "23",
+        "$id": "31",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
         "Field": "Unit",
         "ColumnType": 1,
         "Column": {
-          "$id": "24",
+          "$id": "32",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
           "ColumnName": "Unit",
           "DataSource": {
             "$ref": "5"
@@ -140,14 +219,17 @@
     ]
   },
   "BenchmarkMappings": {
-    "$id": "25",
+    "$id": "33",
+    "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Levrum.Data.Map.DataMapping, Levrum.Data.Map]], System.ObjectModel",
     "$values": [
       {
-        "$id": "26",
+        "$id": "34",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
         "Field": "Assigned",
         "ColumnType": 1,
         "Column": {
-          "$id": "27",
+          "$id": "35",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
           "ColumnName": "Dispatched",
           "DataSource": {
             "$ref": "5"
@@ -155,11 +237,13 @@
         }
       },
       {
-        "$id": "28",
+        "$id": "36",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
         "Field": "Responding",
         "ColumnType": 1,
         "Column": {
-          "$id": "29",
+          "$id": "37",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
           "ColumnName": "Enroute",
           "DataSource": {
             "$ref": "5"
@@ -167,11 +251,13 @@
         }
       },
       {
-        "$id": "30",
+        "$id": "38",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
         "Field": "OnScene",
         "ColumnType": 1,
         "Column": {
-          "$id": "31",
+          "$id": "39",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
           "ColumnName": "OnScene",
           "DataSource": {
             "$ref": "5"
@@ -179,12 +265,42 @@
         }
       },
       {
-        "$id": "32",
+        "$id": "40",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
         "Field": "ClearScene",
         "ColumnType": 1,
         "Column": {
-          "$id": "33",
+          "$id": "41",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
           "ColumnName": "ClearScene",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "42",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Transport",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "43",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Transport",
+          "DataSource": {
+            "$ref": "5"
+          }
+        }
+      },
+      {
+        "$id": "44",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Hospital",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "45",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Hospital",
           "DataSource": {
             "$ref": "5"
           }
@@ -193,7 +309,8 @@
     ]
   },
   "DataSources": {
-    "$id": "34",
+    "$id": "46",
+    "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Levrum.Data.Sources.IDataSource, Levrum.Data.Sources]], System.ObjectModel",
     "$values": [
       {
         "$ref": "5"
@@ -202,8 +319,18 @@
   },
   "ResponseIdColumn": "",
   "Projection": "",
+  "InvertLongitude": false,
+  "InvertLatitude": false,
   "CauseTree": {
-    "$id": "35",
+    "$id": "47",
+    "$type": "System.Collections.Generic.List`1[[Levrum.Data.Classes.CauseData, Levrum.Data.Classes]], System.Private.CoreLib",
     "$values": []
+  },
+  "PostProcessingScript": "",
+  "PerIncidentScript": "",
+  "FinalProcessingScript": "",
+  "Data": {
+    "$type": "Levrum.Data.Classes.InternedDictionary`2[[System.String, System.Private.CoreLib],[System.Object, System.Private.CoreLib]], Levrum.Data.Classes",
+    "LastJsonExport": "C:\\Users\\Kevin\\Documents\\Levrum\\superion.json"
   }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -125,35 +126,7 @@ namespace Levrum.DataBridge
                 IDataSource newSource = editor.DataSource;
                 if (string.IsNullOrWhiteSpace(newSource.Name))
                 {
-                    string baseName = "Other Source";
-                    if (newSource is CsvSource)
-                    {
-                        baseName = "CSV Source";
-                    }
-                    else if (newSource is SqlSource)
-                    {
-                        baseName = "SQL Source";
-                    }
-                    else if (newSource is GeoSource)
-                    {
-                        baseName = "Geo Source";
-                    }
-
-                    int i = 1;
-                    bool nameFound = false;
-                    while (!nameFound)
-                    {
-                        string newName = string.Format("{0} #{1}", baseName, i);
-                        IDataSource existingSource = (from IDataSource s in DataSources
-                                                      where s.Name == newName
-                                                      select s).FirstOrDefault();
-
-                        if (existingSource == null)
-                        {
-                            newSource.Name = newName;
-                            nameFound = true;
-                        }
-                    }
+                    getUnusedDataSourceName(newSource);
                 }
                 updateDataSource(currentSource, newSource);
 
@@ -298,6 +271,118 @@ namespace Levrum.DataBridge
         {
             EditButton.IsEnabled = DataSourcesListBox.SelectedIndex != -1;
             DeleteButton.IsEnabled = DataSourcesListBox.SelectedIndex != -1;
+        }
+
+        private void getUnusedDataSourceName(IDataSource newSource, string baseName = "")
+        {
+            if (string.IsNullOrWhiteSpace(baseName))
+            {
+                if (newSource is CsvSource)
+                {
+                    baseName = "CSV Source";
+                }
+                else if (newSource is SqlSource)
+                {
+                    baseName = "SQL Source";
+                }
+                else if (newSource is GeoSource)
+                {
+                    baseName = "Geo Source";
+                }
+            } else
+            {
+                IDataSource existingSource = (from IDataSource s in DataSources
+                                              where s.Name == baseName
+                                              select s).FirstOrDefault();
+
+                if (existingSource == null)
+                {
+                    newSource.Name = baseName;
+                    return;
+                }
+            }
+
+            int i = 1;
+            bool nameFound = false;
+            while (!nameFound)
+            {
+                string newName = string.Format("{0} #{1}", baseName, i);
+                IDataSource existingSource = (from IDataSource s in DataSources
+                                              where s.Name == newName
+                                              select s).FirstOrDefault();
+
+                if (existingSource == null)
+                {
+                    newSource.Name = newName;
+                    nameFound = true;
+                }
+                i++;
+            }
+        }
+
+        private void DataSourcesListGrid_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                var fileNames = e.Data.GetData(DataFormats.FileDrop) as string[];
+                foreach (string fileName in fileNames)
+                {
+                    FileInfo info = new FileInfo(fileName);
+                    string nameWithoutExtension = info.Name.Substring(0, info.Name.Length - info.Extension.Length);
+                    DataSourceTypeInfo type;
+                    if (DataSourceEditor.SourceTypesByExtension.TryGetValue(info.Extension, out type))
+                    {
+                        if (type == DataSourceTypeInfo.CsvSource || type == DataSourceTypeInfo.GeoSource)
+                        {
+                            IDataSource existingSource = (from s in Map.DataSources
+                                                          where s.Parameters.ContainsKey("File") && s.Parameters["File"] == info.FullName
+                                                          select s).FirstOrDefault();
+
+                            if (existingSource != null)
+                            {
+                                continue;
+                            }
+                        }
+
+                        IDataSource newSource = DataSourceEditor.CreateDataSourceFromFile(fileName);
+                        getUnusedDataSourceName(newSource, nameWithoutExtension);
+                        Map.DataSources.Add(newSource);
+                    }
+                }
+            }
+        }
+
+        private void DataSourcesListGrid_DragOver(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                var fileNames = e.Data.GetData(DataFormats.FileDrop) as string[];
+                bool dragAllowed = true;
+                foreach (string fileName in fileNames)
+                {
+                    FileInfo info = new FileInfo(fileName);
+                    if (!DataSourceEditor.SourceTypesByExtension.ContainsKey(info.Extension))
+                    {
+                        dragAllowed = false;
+                    }
+                }
+                if (dragAllowed)
+                {
+                    e.Effects = DragDropEffects.Copy;
+                    return;
+                }
+            }
+        
+            e.Effects = DragDropEffects.None;
+        }
+
+        private void DataSourcesListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            IDataSource source = DataSourcesListBox.SelectedItem as IDataSource;
+            if (source != null)
+            {
+                EditButton_Click(sender, e);
+            }
         }
     }
 }

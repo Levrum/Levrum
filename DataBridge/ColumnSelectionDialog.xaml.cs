@@ -42,7 +42,7 @@ namespace Levrum.DataBridge
             } 
         }
 
-        public List<string> DefaultFieldNames = new List<string>(new string[] { "Time", "Latitude", "Longitude", "Location", "Code", "Category", "Type", "Jurisdiction", "District", "Priority", "CallProcessed", "Cancelled", "Unit", "UnitType", "Shift", "Assigned", "Responding", "OnScene", "ClearScene", "InService", "InQuarters" });
+        public List<string> DefaultFieldNames = new List<string>(new string[] { "Time", "Latitude", "Longitude", "Location", "Code", "Category", "Type", "Jurisdiction", "District", "Priority", "CallProcessed", "Cancelled", "Unit", "UnitType", "Shift", "Assigned", "Responding", "OnScene", "ClearScene", "Transport", "Hospital", "InService", "InQuarters" });
 
         public ColumnSelectionDialog(List<IDataSource> _dataSources, DataMapping _mapping)
         {
