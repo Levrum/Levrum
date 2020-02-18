@@ -7,7 +7,7 @@
     <RootNamespace>Levrum.Data.Sources</RootNamespace>
     <Authors>Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
-    <Version>0.0.3</Version>
+    <Version>0.0.4</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>(c) 2019 Levrum Data Technologies</Copyright>
   </PropertyGroup>

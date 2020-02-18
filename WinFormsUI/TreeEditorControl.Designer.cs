@@ -36,7 +36,6 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.m_flpUnorganizedData = new System.Windows.Forms.FlowLayoutPanel();
             this.m_btnUndoDelete = new System.Windows.Forms.Button();
-            this.m_btnLoadTree = new System.Windows.Forms.Button();
             this.m_btnSaveTree = new System.Windows.Forms.Button();
             this.m_btnLoadIncidents = new System.Windows.Forms.Button();
             this.m_cbDefaultTree = new System.Windows.Forms.ComboBox();
@@ -170,18 +169,6 @@
             this.m_btnUndoDelete.Visible = false;
             this.m_btnUndoDelete.Click += new System.EventHandler(this.m_btnUndoDelete_Click);
             // 
-            // m_btnLoadTree
-            // 
-            this.m_btnLoadTree.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_btnLoadTree.AutoSize = true;
-            this.m_btnLoadTree.Location = new System.Drawing.Point(730, 487);
-            this.m_btnLoadTree.Name = "m_btnLoadTree";
-            this.m_btnLoadTree.Size = new System.Drawing.Size(99, 23);
-            this.m_btnLoadTree.TabIndex = 1;
-            this.m_btnLoadTree.Text = "&Load Tree";
-            this.m_btnLoadTree.UseVisualStyleBackColor = true;
-            this.m_btnLoadTree.Click += new System.EventHandler(this.m_btnLoadTree_Click);
-            // 
             // m_btnSaveTree
             // 
             this.m_btnSaveTree.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -198,7 +185,7 @@
             // 
             this.m_btnLoadIncidents.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.m_btnLoadIncidents.AutoSize = true;
-            this.m_btnLoadIncidents.Location = new System.Drawing.Point(616, 487);
+            this.m_btnLoadIncidents.Location = new System.Drawing.Point(719, 487);
             this.m_btnLoadIncidents.Name = "m_btnLoadIncidents";
             this.m_btnLoadIncidents.Size = new System.Drawing.Size(108, 23);
             this.m_btnLoadIncidents.TabIndex = 3;
@@ -217,7 +204,7 @@
             this.m_cbDefaultTree.Name = "m_cbDefaultTree";
             this.m_cbDefaultTree.Size = new System.Drawing.Size(121, 21);
             this.m_cbDefaultTree.TabIndex = 4;
-            this.m_cbDefaultTree.Text = "Use Default Tree";
+            this.m_cbDefaultTree.Text = "Load Existing Tree";
             this.m_cbDefaultTree.SelectedIndexChanged += new System.EventHandler(this.m_cbDefaultTree_SelectedIndexChanged);
             // 
             // m_bgwLoadIncidentData
@@ -237,7 +224,6 @@
             this.Controls.Add(this.m_cbDefaultTree);
             this.Controls.Add(this.m_btnLoadIncidents);
             this.Controls.Add(this.m_btnSaveTree);
-            this.Controls.Add(this.m_btnLoadTree);
             this.Controls.Add(this.m_scMain);
             this.Name = "TreeEditorControl";
             this.Size = new System.Drawing.Size(847, 521);
@@ -260,7 +246,6 @@
         private System.Windows.Forms.SplitContainer m_scMain;
         private System.Windows.Forms.FlowLayoutPanel m_flpOrganizedData;
         private System.Windows.Forms.FlowLayoutPanel m_flpUnorganizedData;
-        private System.Windows.Forms.Button m_btnLoadTree;
         private System.Windows.Forms.Button m_btnSaveTree;
         private System.Windows.Forms.Button m_btnLoadIncidents;
         private System.Windows.Forms.Button m_btnAddOrganizedCategory;

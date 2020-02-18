@@ -48,6 +48,7 @@ namespace Levrum.UI.WinForms
         public TreeEditorControl()
         {
             InitializeComponent();
+            m_cbDefaultTree.Items.Add("Browse..");
             m_btnLoadIncidents.Visible = LoadIncidentsButton;
             MoveCursor = new Cursor(Properties.Resources.move_button.Handle);
         }
@@ -1349,6 +1350,9 @@ namespace Levrum.UI.WinForms
                 case "Charlotte (root cause)":
                     tree = CreateDefaultTree_CharlotteRootCause();
                     break;
+                case "Browse..":
+                    LoadTreeFromFile();
+                    break;
             }
             if (tree != null)
             {
@@ -1357,6 +1361,32 @@ namespace Levrum.UI.WinForms
                 MarkAllBlocksInTreeAsAdded(tree);
                 Cursor.Current = Cursors.Default;
             }
+        }
+
+        private void LoadTreeFromFile()
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
+            if (ofd.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
+            string fileName = ofd.FileName;
+
+            List<ICategoryData> tree = null;
+            try
+            {
+                tree = JsonConvert.DeserializeObject<List<ICategoryData>>(File.ReadAllText(fileName), new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All });
+
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogException(ex);
+                return;
+            }
+            LoadTree(tree, m_flpOrganizedData);
+            MarkAllBlocksInTreeAsAdded(tree);
         }
 
         private void SubPanel_Paint(object sender, PaintEventArgs e)
@@ -1444,6 +1474,10 @@ namespace Levrum.UI.WinForms
                     }
                 }
                 LoadValueBlocks(m_flpUnorganizedData, dataFieldValues);
+                if (Tree != null)
+                {
+                    MarkAllBlocksInTreeAsAdded(Tree);
+                }
                 m_btnLoadIncidents.Enabled = true;
             };
             listBox.Location = new Point(m_btnLoadIncidents.Location.X, m_btnLoadIncidents.Location.Y - (m_btnLoadIncidents.Height + listBox.Height - listBox.Margin.Top - header.Margin.Bottom));
