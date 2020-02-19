@@ -39,8 +39,16 @@ namespace Levrum.Utils.Osm
                     return null;
                 }
 
+                string osrmFileName;
                 DirectoryInfo directory = OsmFile.Directory;
-                string osrmFileName = OsmFile.Name.Substring(0, OsmFile.Name.Length - OsmFile.Extension.Length).Replace(" ", "_");
+                if (OsmFile.FullName.ToLowerInvariant().EndsWith(".osm.zip"))
+                {
+                    osrmFileName = OsmFile.Name.Substring(0, OsmFile.Name.Length - ".osm.zip".Length).Replace(" ", "_");
+                }
+                else
+                {
+                    osrmFileName = OsmFile.Name.Substring(0, OsmFile.Name.Length - OsmFile.Extension.Length).Replace(" ", "_");
+                }
                 FileInfo output = new FileInfo(string.Format("{0}\\{1}.osrm", directory.FullName, osrmFileName));
                 return output.Exists ? output : null;
             }
@@ -85,179 +93,222 @@ namespace Levrum.Utils.Osm
 
         public Stream OpenRead()
         {
-            if (!OsmFile.Exists)
+            try
             {
-                throw new FileNotFoundException(m_fileInfo.Name);
-            }
-
-            if (Zipped == true)
-            {
-                if (ZipArchive != null)
+                if (!OsmFile.Exists)
                 {
-                    ZipArchive.Dispose();
-                    ZipArchive = null;
+                    throw new FileNotFoundException(m_fileInfo.Name);
                 }
 
-                ZipArchive = ZipFile.Open(OsmFile.FullName, ZipArchiveMode.Read);
-                ZipArchiveEntry entry = ZipArchive.GetEntry(OsmFile.Name.Substring(0, OsmFile.Name.Length - OsmFile.Extension.Length));
-                return entry.Open();
-            }
-            else
+                if (Zipped == true)
+                {
+                    if (ZipArchive != null)
+                    {
+                        ZipArchive.Dispose();
+                        ZipArchive = null;
+                    }
+
+                    ZipArchive = ZipFile.Open(OsmFile.FullName, ZipArchiveMode.Read);
+                    ZipArchiveEntry entry = ZipArchive.GetEntry(OsmFile.Name.Substring(0, OsmFile.Name.Length - OsmFile.Extension.Length));
+                    return entry.Open();
+                }
+                else
+                {
+                    return OsmFile.OpenRead();
+                }
+            } catch (Exception ex)
             {
-                return OsmFile.OpenRead();
+                LogHelper.LogException(ex);
+                return null;
             }
         }
 
         public Stream OpenWrite()
         {
-            if (OsmFile.FullName == string.Empty)
+            try
             {
-                throw new ArgumentException("File name is null");
-            }
-            else if (!OsmFile.Exists)
-            {
-                OsmFile.Create();
-            }
-
-            if (Zipped == true)
-            {
-                if (ZipArchive != null)
+                if (OsmFile.FullName == string.Empty)
                 {
-                    ZipArchive.Dispose();
-                    ZipArchive = null;
+                    throw new ArgumentException("File name is null");
+                }
+                else if (!OsmFile.Exists)
+                {
+                    OsmFile.Create();
                 }
 
-                ZipArchive = new ZipArchive(OsmFile.OpenRead(), ZipArchiveMode.Update);
-                ZipArchiveEntry osmFileEntry = ZipArchive.CreateEntry(string.Format("{0}.osm", OsmFile.Name.Substring(0, OsmFile.Name.Length - OsmFile.Extension.Length)));
-                return osmFileEntry.Open();
-            }
-            else
+                if (Zipped == true)
+                {
+                    if (ZipArchive != null)
+                    {
+                        ZipArchive.Dispose();
+                        ZipArchive = null;
+                    }
+
+                    ZipArchive = new ZipArchive(OsmFile.OpenRead(), ZipArchiveMode.Update);
+                    ZipArchiveEntry osmFileEntry = ZipArchive.CreateEntry(string.Format("{0}.osm", OsmFile.Name.Substring(0, OsmFile.Name.Length - OsmFile.Extension.Length)));
+                    return osmFileEntry.Open();
+                }
+                else
+                {
+                    return OsmFile.OpenWrite();
+                }
+            } catch (Exception ex)
             {
-                return OsmFile.OpenWrite();
+                LogHelper.LogException(ex);
+                return null;
             }
         }
 
         public byte[] ReadAllBytes()
         {
-            if (!OsmFile.Exists)
+            try
             {
-                throw new FileNotFoundException(OsmFile.FullName);
-            }
-            else if (Zipped == true)
-            {
-                if (ZipArchive != null)
+                if (!OsmFile.Exists)
                 {
-                    ZipArchive.Dispose();
-                    ZipArchive = null;
+                    throw new FileNotFoundException(OsmFile.FullName);
                 }
-
-                ZipArchive = new ZipArchive(OsmFile.OpenRead(), ZipArchiveMode.Update);
-                ZipArchiveEntry osmFileEntry = ZipArchive.CreateEntry(string.Format("{0}.osm", OsmFile.Name.Substring(0, OsmFile.Name.Length - OsmFile.Extension.Length)));
-                
-                using (Stream stream = osmFileEntry.Open())
+                else if (Zipped == true)
                 {
-                    using (MemoryStream memStream = new MemoryStream())
+                    if (ZipArchive != null)
                     {
-                        byte[] buffer = new byte[16 * 1024];
-                        int read;
-                        while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                        ZipArchive.Dispose();
+                        ZipArchive = null;
+                    }
+
+                    ZipArchive = new ZipArchive(OsmFile.OpenRead(), ZipArchiveMode.Update);
+                    ZipArchiveEntry osmFileEntry = ZipArchive.CreateEntry(string.Format("{0}.osm", OsmFile.Name.Substring(0, OsmFile.Name.Length - OsmFile.Extension.Length)));
+
+                    using (Stream stream = osmFileEntry.Open())
+                    {
+                        using (MemoryStream memStream = new MemoryStream())
                         {
-                            memStream.Write(buffer, 0, read);
+                            byte[] buffer = new byte[16 * 1024];
+                            int read;
+                            while ((read = stream.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                memStream.Write(buffer, 0, read);
+                            }
+                            return memStream.ToArray();
                         }
-                        return memStream.ToArray();
                     }
                 }
-            }
-            else
+                else
+                {
+                    return File.ReadAllBytes(OsmFile.FullName);
+                }
+            } catch (Exception ex)
             {
-                return File.ReadAllBytes(OsmFile.FullName);
+                LogHelper.LogException(ex);
+                return null;
             }
         }
 
         public string ReadAllText()
         {
-            if (!OsmFile.Exists)
+            try
             {
-                throw new FileNotFoundException(OsmFile.FullName);
-            }
-            else if (Zipped == true)
-            {
-                if (ZipArchive != null)
+                if (!OsmFile.Exists)
                 {
-                    ZipArchive.Dispose();
-                    ZipArchive = null;
+                    throw new FileNotFoundException(OsmFile.FullName);
                 }
-
-                ZipArchive = new ZipArchive(OsmFile.OpenRead(), ZipArchiveMode.Update);
-                ZipArchiveEntry osmFileEntry = ZipArchive.CreateEntry(string.Format("{0}.osm", OsmFile.Name.Substring(0, OsmFile.Name.Length - OsmFile.Extension.Length)));
-
-                using (Stream stream = osmFileEntry.Open())
+                else if (Zipped == true)
                 {
-                    using (StreamReader sr = new StreamReader(stream))
+                    if (ZipArchive != null)
                     {
-                        return sr.ReadToEnd();
+                        ZipArchive.Dispose();
+                        ZipArchive = null;
+                    }
+
+                    ZipArchive = new ZipArchive(OsmFile.OpenRead(), ZipArchiveMode.Update);
+                    ZipArchiveEntry osmFileEntry = ZipArchive.CreateEntry(string.Format("{0}.osm", OsmFile.Name.Substring(0, OsmFile.Name.Length - OsmFile.Extension.Length)));
+
+                    using (Stream stream = osmFileEntry.Open())
+                    {
+                        using (StreamReader sr = new StreamReader(stream))
+                        {
+                            return sr.ReadToEnd();
+                        }
                     }
                 }
-            }
-            else
+                else
+                {
+                    return File.ReadAllText(OsmFile.FullName);
+                }
+            } catch (Exception ex)
             {
-                return File.ReadAllText(OsmFile.FullName);
+                LogHelper.LogException(ex);
+                return "";
             }
         }
 
         public void WriteAllText(string input)
         {
-            if (OsmFile.FullName == string.Empty)
+            try
             {
-                throw new ArgumentException("File name is null");
-            }
-            else if (Zipped == true)
-            {
-                if (ZipArchive != null)
+                if (OsmFile.FullName == string.Empty)
                 {
-                    ZipArchive.Dispose();
-                    ZipArchive = null;
+                    throw new ArgumentException("File name is null");
                 }
-
-                ZipArchive = new ZipArchive(OsmFile.OpenRead(), ZipArchiveMode.Update);
-                ZipArchiveEntry osmFileEntry = null;
-                string entryName = string.Format("{0}.osm", OsmFile.Name.Substring(0, OsmFile.Name.Length - OsmFile.Extension.Length));
-                try
+                else if (Zipped == true)
                 {
-                    osmFileEntry = ZipArchive.GetEntry(entryName);
-                } catch (Exception ex)
-                {
-                    
-                }
-                if (osmFileEntry == null)
-                {
-                    osmFileEntry = ZipArchive.CreateEntry(entryName);
-                }
-
-                using (Stream stream = osmFileEntry.Open())
-                {
-                    using (StreamWriter sw = new StreamWriter(stream))
+                    if (ZipArchive != null)
                     {
-                        sw.Write(input);
+                        ZipArchive.Dispose();
+                        ZipArchive = null;
                     }
-                }
 
-            }
-            else
+                    ZipArchive = new ZipArchive(OsmFile.OpenRead(), ZipArchiveMode.Update);
+                    ZipArchiveEntry osmFileEntry = null;
+                    string entryName = string.Format("{0}.osm", OsmFile.Name.Substring(0, OsmFile.Name.Length - OsmFile.Extension.Length));
+                    try
+                    {
+                        osmFileEntry = ZipArchive.GetEntry(entryName);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                    if (osmFileEntry == null)
+                    {
+                        osmFileEntry = ZipArchive.CreateEntry(entryName);
+                    }
+
+                    using (Stream stream = osmFileEntry.Open())
+                    {
+                        using (StreamWriter sw = new StreamWriter(stream))
+                        {
+                            sw.Write(input);
+                        }
+                    }
+
+                }
+                else
+                {
+                    File.WriteAllText(OsmFile.FullName, input);
+                }
+            } catch (Exception ex)
             {
-                File.WriteAllText(OsmFile.FullName, input);
+                LogHelper.LogException(ex);
             }
         }
 
         public void UpdateZip(FileInfo file)
         {
-            if (Zipped == false)
+            try
             {
-                return;
-            }
+                if (Zipped == false)
+                {
+                    return;
+                }
 
-            string text = File.ReadAllText(file.FullName);
-            WriteAllText(text);
+                string text = File.ReadAllText(file.FullName);
+                WriteAllText(text);
+                OsmFile.LastWriteTimeUtc = file.LastWriteTimeUtc;
+                OsmFile.CreationTimeUtc = file.CreationTimeUtc;
+            } catch (Exception ex)
+            {
+                LogHelper.LogException(ex);
+            }
         }
 
         public void Compress()
@@ -292,13 +343,16 @@ namespace Levrum.Utils.Osm
                 FileInfo zipFile = new FileInfo(zipName);
                 if (zipFile.Exists)
                 {
-                    OsmFile.Delete();
+                    zipFile.LastWriteTimeUtc = OsmFile.LastWriteTimeUtc;
+                    zipFile.CreationTimeUtc = OsmFile.CreationTimeUtc;
+                    File.Delete(OsmFile.FullName);
                     OsmFile = zipFile;
                 }
                 else
                 {
                     throw new Exception("Unable to compress OSM file, zipFile does not exist.");
                 }
+                Zipped = true;
             }
             catch (Exception ex)
             {
@@ -331,8 +385,11 @@ namespace Levrum.Utils.Osm
                 FileInfo unzippedFile = new FileInfo(fileName);
                 if (unzippedFile.Exists)
                 {
+                    archive.Dispose();
+                    archive = null;
                     OsmFile.Delete();
                     OsmFile = unzippedFile;
+                    Zipped = false;
                 }
                 else
                 {
@@ -405,6 +462,24 @@ namespace Levrum.Utils.Osm
                 if (string.IsNullOrEmpty(profilePath))
                 {
                     profilePath = AppDomain.CurrentDomain.BaseDirectory + "osrm\\car.lua";
+                }
+
+                if (profilePath.Contains(" "))
+                {
+                    string safeProfilePath = string.Format("{0}\\Levrum\\Temp\\car.lua", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+                    FileInfo safeProfile = new FileInfo(safeProfilePath);
+                    DirectoryInfo libDi = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory + "osrm\\lib");
+
+                    DirectoryInfo newLibDi = new DirectoryInfo(safeProfile.DirectoryName + "\\lib");
+
+                    newLibDi.Create();
+                    foreach (FileInfo fileInfo in libDi.GetFiles())
+                    {
+                        fileInfo.CopyTo(newLibDi.FullName + "\\" + fileInfo.Name, true);
+                    }
+                    
+                    File.Copy(profilePath, safeProfilePath, true);
+                    profilePath = safeProfilePath;
                 }
 
                 ProcessStartInfo info = new ProcessStartInfo();

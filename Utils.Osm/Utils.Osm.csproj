@@ -7,9 +7,10 @@
     <RootNamespace>Levrum.Utils.Osm</RootNamespace>
     <Authors>Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
-    <Version>0.1.3</Version>
+    <Version>0.1.8</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>(c) 2020 Levrum Data Technologies</Copyright>
+    <AssemblyVersion>0.1.8.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
