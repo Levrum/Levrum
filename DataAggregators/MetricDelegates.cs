@@ -674,6 +674,10 @@ namespace Levrum.Data.Aggregators
                     return Periods.HourOfDay;
                 case "monthofyear":
                     return Periods.MonthOfYear;
+                //case "code":
+                //case "type":
+                //case "category":
+                //    return Periods.PercentageOfTotal;
                 default:
                     return Periods.TimeSpan;
             }
@@ -728,15 +732,17 @@ namespace Levrum.Data.Aggregators
             Periods aggregationPeriod = GetAggregationPeriod(aggregation);
             Periods categoryPeriod = GetAggregationPeriod(category);
 
+            Dictionary<string, double> totalUnitUtilization = new Dictionary<string, double>();
+            Dictionary<object, Dictionary<string, double>> utilizations = new Dictionary<object, Dictionary<string, double>>();
             foreach (KeyValuePair<object, List<IncidentData>> datum in data)
             {
                 int aggregationPeriodInt = GetPeriodIntValue(aggregation, datum.Key);
                 double aggregationMinutes = DateTimeUtils.GetPeriodMinutes(aggregationPeriod, startDate, endDate, aggregationPeriodInt);
                 int categoryPeriodInt = GetPeriodIntValue(category, categoryValue);
                 double categoryMinutes = DateTimeUtils.GetPeriodMinutes(categoryPeriod, startDate, endDate, categoryPeriodInt);
-                
 
-                Dictionary<string, double> utilizationByUnit = new Dictionary<string, double>();
+
+                Dictionary<string, double> unitUtilizationForAggregation = utilizations[datum.Key] = new Dictionary<string, double>();
                 foreach (IncidentData incident in datum.Value)
                 {
                     foreach (ResponseData response in incident.Responses)
@@ -747,10 +753,6 @@ namespace Levrum.Data.Aggregators
                         }
 
                         string unit = response.Data["Unit"].ToString();
-                        if (unit == "LHSQ1")
-                        {
-                            string moo = "moo";
-                        }
 
                         Periods period = categoryPeriod;
                         int periodInt = categoryPeriodInt;
@@ -762,37 +764,54 @@ namespace Levrum.Data.Aggregators
 
                         double committedTime = getCommittedTimeFromResponse(response, incident.Time, period, periodInt);
 
-                        if (!utilizationByUnit.Keys.Contains(unit))
+                        if (!totalUnitUtilization.Keys.Contains(unit))
                         {
-                            utilizationByUnit.Add(unit, committedTime);
+                            totalUnitUtilization.Add(unit, committedTime);
+                        } else
+                        {
+                            totalUnitUtilization[unit] += committedTime;
+                        }
+
+                        if (!unitUtilizationForAggregation.Keys.Contains(unit))
+                        {
+                            unitUtilizationForAggregation.Add(unit, committedTime);
                         }
                         else
                         {
-                            utilizationByUnit[unit] += committedTime;
+                            unitUtilizationForAggregation[unit] += committedTime;
                         }
                     }
                 }
+            }
+
+            foreach (object key in data.Keys) {
+                int aggregationPeriodInt = GetPeriodIntValue(aggregation, key);
+                double aggregationMinutes = DateTimeUtils.GetPeriodMinutes(aggregationPeriod, startDate, endDate, aggregationPeriodInt);
+                int categoryPeriodInt = GetPeriodIntValue(category, categoryValue);
+                double categoryMinutes = DateTimeUtils.GetPeriodMinutes(categoryPeriod, startDate, endDate, categoryPeriodInt);
+
+                Dictionary<string, double> unitUtilizationForAggregation = utilizations[key];
 
                 if (aggregation == "Unit" || category == "Unit") {
                     double periodMinutes = categoryPeriod == Periods.TimeSpan ? aggregationMinutes : categoryMinutes;
-                    if (utilizationByUnit.ContainsKey(datum.Key.ToString()))
+                    if (unitUtilizationForAggregation.ContainsKey(key.ToString()))
                     {
-                        output[datum.Key] = (utilizationByUnit[datum.Key.ToString()] / periodMinutes) * 100.0;
-                    } else if (utilizationByUnit.ContainsKey(categoryValue as string))
+                        output[key] = (unitUtilizationForAggregation[key.ToString()] / periodMinutes) * 100.0;
+                    } else if (unitUtilizationForAggregation.ContainsKey(categoryValue as string))
                     {
-                        output[datum.Key] = (utilizationByUnit[categoryValue as string] / periodMinutes) * 100.0;
+                        output[key] = (unitUtilizationForAggregation[categoryValue as string] / periodMinutes) * 100.0;
                     }
                     else
                     {
-                        output[datum.Key] = 0.0;
+                        output[key] = 0.0;
                     }
                 }
                 else if (aggregationPeriod == Periods.TimeSpan)
                 {
-                    double timespanMinutesByNumUnits = utilizationByUnit.Keys.Count * aggregationMinutes;
-                    double totalCommittedTime = utilizationByUnit.Values.Sum();
+                    double timespanMinutesByNumUnits = unitUtilizationForAggregation.Keys.Count * aggregationMinutes;
+                    double totalCommittedTime = unitUtilizationForAggregation.Values.Sum();
 
-                    output[datum.Key] = (totalCommittedTime / timespanMinutesByNumUnits) * 100.0;
+                    output[key] = (totalCommittedTime / timespanMinutesByNumUnits) * 100.0;
                 }
             }
 
