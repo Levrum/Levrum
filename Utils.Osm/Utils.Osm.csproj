@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.1;net48</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AssemblyName>Levrum.Utils.Osm</AssemblyName>
+    <RootNamespace>Levrum.Utils.Osm</RootNamespace>
+    <Authors>Kevin M. Kelly</Authors>
+    <Company>Levrum Data Technologies</Company>
+    <Version>0.1.8</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>(c) 2020 Levrum Data Technologies</Copyright>
+    <AssemblyVersion>0.1.8.0</AssemblyVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="osrm.zip" />
+    <None Remove="tbb.dll" />
+    <None Remove="tbbmalloc.dll" />
+    <None Remove="tbbmalloc_proxy.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Utils\Utils.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="osrm.net">
+      <HintPath>..\Dependencies\osrmnet\osrm.net.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="osrm.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="tbb.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="tbbmalloc.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="tbbmalloc_proxy.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+</Project>

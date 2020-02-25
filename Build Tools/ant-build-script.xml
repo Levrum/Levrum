@@ -1,6 +1,6 @@
 <project>
 
-	<property name="DataBridge-version" value="0.0.3"/>
+	<property name="DataBridge-version" value="0.1.0"/>
 	<property environment="env"/>
     
 	<target name="backup-version-number">
