@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Levrum.Utils.Time
 {
-    public enum Periods { TimeSpan, HourOfDay, DayOfWeek, MonthOfYear, Day, Month, Year }
+    public enum Periods { TimeSpan, HourOfDay, DayOfWeek, MonthOfYear, Day, Month, Year, PercentageOfTotal }
 
     public class DateTimeUtils
     {
