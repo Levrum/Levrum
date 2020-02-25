@@ -41,6 +41,8 @@
             this.m_cbDefaultTree = new System.Windows.Forms.ComboBox();
             this.m_bgwLoadIncidentData = new System.ComponentModel.BackgroundWorker();
             this.m_undoDeleteTimer = new System.Windows.Forms.Timer(this.components);
+            this.m_lbDataFields = new System.Windows.Forms.ListBox();
+            this.m_labelDataFieldsHeader = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.m_scMain)).BeginInit();
             this.m_scMain.Panel1.SuspendLayout();
             this.m_scMain.Panel2.SuspendLayout();
@@ -217,11 +219,38 @@
             this.m_undoDeleteTimer.Interval = 5000;
             this.m_undoDeleteTimer.Tick += new System.EventHandler(this.m_undoDeleteTimer_Tick);
             // 
+            // m_lbDataFields
+            // 
+            this.m_lbDataFields.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_lbDataFields.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.m_lbDataFields.FormattingEnabled = true;
+            this.m_lbDataFields.ItemHeight = 15;
+            this.m_lbDataFields.Location = new System.Drawing.Point(629, 323);
+            this.m_lbDataFields.Name = "m_lbDataFields";
+            this.m_lbDataFields.Size = new System.Drawing.Size(210, 154);
+            this.m_lbDataFields.TabIndex = 5;
+            this.m_lbDataFields.Visible = false;
+            // 
+            // m_labelDataFieldsHeader
+            // 
+            this.m_labelDataFieldsHeader.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_labelDataFieldsHeader.BackColor = System.Drawing.Color.White;
+            this.m_labelDataFieldsHeader.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.m_labelDataFieldsHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.m_labelDataFieldsHeader.Location = new System.Drawing.Point(629, 302);
+            this.m_labelDataFieldsHeader.Name = "m_labelDataFieldsHeader";
+            this.m_labelDataFieldsHeader.Size = new System.Drawing.Size(210, 18);
+            this.m_labelDataFieldsHeader.TabIndex = 6;
+            this.m_labelDataFieldsHeader.Text = "Please choose a data field";
+            this.m_labelDataFieldsHeader.Visible = false;
+            // 
             // TreeEditorControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.m_cbDefaultTree);
+            this.Controls.Add(this.m_labelDataFieldsHeader);
+            this.Controls.Add(this.m_lbDataFields);
             this.Controls.Add(this.m_btnLoadIncidents);
             this.Controls.Add(this.m_btnSaveTree);
             this.Controls.Add(this.m_scMain);
@@ -258,5 +287,7 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button m_btnUndoDelete;
         private System.Windows.Forms.Timer m_undoDeleteTimer;
+        private System.Windows.Forms.ListBox m_lbDataFields;
+        private System.Windows.Forms.Label m_labelDataFieldsHeader;
     }
 }

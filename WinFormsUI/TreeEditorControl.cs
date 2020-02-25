@@ -1452,16 +1452,20 @@ namespace Levrum.UI.WinForms
             Cursor.Current = Cursors.Default;
 
             // Prompt user to select incident data field
-            string selectedField = null;
-            ListBox listBox = new ListBox();
-            Label header = new Label();
-            listBox.Items.AddRange(incidentDataFields.ToArray());
-            listBox.DoubleClick += (sdr, args) =>
+            string selectedField = null;            
+            m_lbDataFields.Items.AddRange(incidentDataFields.ToArray());
+            m_lbDataFields.DoubleClick += m_lbDataFields_DoubleClick;
+
+            m_lbDataFields.Visible = true;
+            m_labelDataFieldsHeader.Visible = true;
+
+            void m_lbDataFields_DoubleClick(object sender, EventArgs e)
             {
-                selectedField = listBox.SelectedItem.ToString();
-                listBox.Hide();
-                this.Controls.Remove(listBox);
-                this.Controls.Remove(header);
+                selectedField = m_lbDataFields.SelectedItem.ToString();
+                m_labelDataFieldsHeader.Visible = false;
+                m_lbDataFields.Visible = false;
+                m_lbDataFields.Items.Clear();
+                m_lbDataFields.DoubleClick -= m_lbDataFields_DoubleClick;
 
                 // Populate unorganized data with data field values
                 Cursor.Current = Cursors.WaitCursor;
@@ -1479,26 +1483,7 @@ namespace Levrum.UI.WinForms
                     MarkAllBlocksInTreeAsAdded(Tree);
                 }
                 m_btnLoadIncidents.Enabled = true;
-            };
-            listBox.Location = new Point(m_btnLoadIncidents.Location.X, m_btnLoadIncidents.Location.Y - (m_btnLoadIncidents.Height + listBox.Height - listBox.Margin.Top - header.Margin.Bottom));
-            listBox.Anchor = (AnchorStyles.Bottom | AnchorStyles.Right);
-            listBox.Font = new Font(listBox.Font.FontFamily, 9);
-
-            header.Text = "Please choose a data field";
-            header.Font = new Font(header.Font.FontFamily, 9, FontStyle.Bold);
-            header.Padding = new Padding(2);
-            header.BackColor = Color.White;
-            header.Location = new Point(listBox.Location.X, listBox.Location.Y - header.Height);
-            header.Anchor = (AnchorStyles.Bottom | AnchorStyles.Right);
-            header.AutoSize = true;
-            header.BorderStyle = BorderStyle.FixedSingle;
-            listBox.Width = TextRenderer.MeasureText(header.Text, header.Font).Width + header.Padding.Right * 2 + 1;
-            Cursor.Current = Cursors.Default;
-
-            this.Controls.Add(header);
-            this.Controls.Add(listBox);
-            header.BringToFront();
-            listBox.BringToFront();
+            }
         }
 
         private void m_undoDeleteTimer_Tick(object sender, EventArgs e)
