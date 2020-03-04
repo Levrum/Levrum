@@ -99,12 +99,13 @@
             this.m_btnAddOrganizedCategory.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.m_btnAddOrganizedCategory.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.m_btnAddOrganizedCategory.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            this.m_btnAddOrganizedCategory.FlatAppearance.BorderSize = 0;
             this.m_btnAddOrganizedCategory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.m_btnAddOrganizedCategory.Image = global::Levrum.UI.WinForms.Properties.Resources.add_subcategory;
             this.m_btnAddOrganizedCategory.Location = new System.Drawing.Point(10, 10);
             this.m_btnAddOrganizedCategory.Margin = new System.Windows.Forms.Padding(10);
             this.m_btnAddOrganizedCategory.Name = "m_btnAddOrganizedCategory";
-            this.m_btnAddOrganizedCategory.Size = new System.Drawing.Size(36, 36);
+            this.m_btnAddOrganizedCategory.Size = new System.Drawing.Size(34, 34);
             this.m_btnAddOrganizedCategory.TabIndex = 0;
             this.m_btnAddOrganizedCategory.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.m_btnAddOrganizedCategory.UseVisualStyleBackColor = false;
@@ -199,9 +200,6 @@
             // 
             this.m_cbDefaultTree.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.m_cbDefaultTree.FormattingEnabled = true;
-            this.m_cbDefaultTree.Items.AddRange(new object[] {
-            "Causes",
-            "NFIRS Causes"});
             this.m_cbDefaultTree.Location = new System.Drawing.Point(150, 487);
             this.m_cbDefaultTree.Name = "m_cbDefaultTree";
             this.m_cbDefaultTree.Size = new System.Drawing.Size(121, 21);
