@@ -242,38 +242,21 @@ namespace Levrum.UI.WinForms
             m_recyclingBin.Clear();
         }
 
-        private void m_btnLoadTree_Click(object sender, EventArgs e)
+        private void LoadTree(IEnumerable<ICategoryData> tree, FlowLayoutPanel parentPanel)
         {
-            try
-            {
-                OpenFileDialog ofd = new OpenFileDialog();
-                ofd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
-                if (ofd.ShowDialog() != DialogResult.OK)
-                {
-                    return;
-                }
+            MarkAllValueBlocksAsNotAdded();
 
-                string fileName = ofd.FileName;
-
-                List<ICategoryData> tree = JsonConvert.DeserializeObject<List<ICategoryData>>(File.ReadAllText(fileName), new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All });
-                LoadTree(tree, m_flpUnorganizedData);
-            } catch (Exception ex)
-            {
-                LogHelper.LogException(ex, "Exception loading tree", true);
-            }
-        }
-
-        private void LoadTree(IEnumerable<ICategoryData> categoryData, FlowLayoutPanel parentPanel)
-        {
             parentPanel.Controls.Clear();
             parentPanel.FlowDirection = FlowDirection.TopDown;
             parentPanel.SuspendLayout();
-            foreach (ICategoryData data in categoryData)
+            foreach (ICategoryData data in tree)
             {
                 FlowLayoutPanel newPanel = AddSubPanel(parentPanel, data);
             }
             parentPanel.Controls.Add(GenerateSubcategoryButton());
             parentPanel.ResumeLayout();
+
+            MarkBlocksInTreeAsAdded(tree.ToList());
         }
 
         public void LoadTree(IEnumerable<ICategoryData> categoryData)
@@ -984,17 +967,31 @@ namespace Levrum.UI.WinForms
             }
         }
 
-        private void MarkAllBlocksInTreeAsAdded(List<ICategoryData> tree)
+        private void MarkBlocksInTreeAsAdded(List<ICategoryData> tree)
         {
             if (tree == null || tree.Count <= 0)
             {
                 return;
             }
 
+            m_flpUnorganizedData.SuspendLayout();
+
             foreach (ICategoryData catData in tree)
             {
-                MarkAllBlocksInTreeAsAdded(catData.Children);
+                MarkBlocksInBranchAsAdded(catData);
+            }
 
+            m_flpUnorganizedData.ResumeLayout();
+
+            void MarkBlocksInBranchAsAdded(ICategoryData catData)
+            {
+                if (catData.Children != null)
+                {
+                    foreach (ICategoryData cd in catData.Children)
+                    {
+                        MarkBlocksInBranchAsAdded(cd);
+                    }
+                }
                 foreach (ICategorizedValue catValue in catData.Values)
                 {
                     MarkValueBlockAsAdded(catValue);
@@ -1015,6 +1012,22 @@ namespace Levrum.UI.WinForms
                     }
                 }
             }            
+        }
+
+        private void MarkAllValueBlocksAsNotAdded()
+        {
+            m_flpUnorganizedData.SuspendLayout();
+
+            foreach (Control control in m_flpUnorganizedData.Controls)
+            {
+                Button button = control as Button;
+                if (button == null)
+                    return;
+
+                MarkValueBlockAsNotAdded(button);
+            }
+
+            m_flpUnorganizedData.ResumeLayout();
         }
 
         private bool ValueBlockIsAdded(ICategorizedValue vbData, FlowLayoutPanel parentPanel)
@@ -1369,9 +1382,8 @@ namespace Levrum.UI.WinForms
             }
             if (tree != null)
             {
-                LoadTree(tree, m_flpOrganizedData);
                 Cursor.Current = Cursors.WaitCursor;
-                MarkAllBlocksInTreeAsAdded(tree);
+                LoadTree(tree, m_flpOrganizedData);                
                 Cursor.Current = Cursors.Default;
             }
         }
@@ -1401,7 +1413,6 @@ namespace Levrum.UI.WinForms
                 return;
             }
             LoadTree(tree, m_flpOrganizedData);
-            MarkAllBlocksInTreeAsAdded(tree);
         }
 
         private void SubPanel_Paint(object sender, PaintEventArgs e)
@@ -1462,6 +1473,7 @@ namespace Levrum.UI.WinForms
             if (incidentDataFields.Count < 1)
             {
                 MessageBox.Show("Could not find any data fields in incident data.");
+                m_btnLoadIncidents.Enabled = true;
                 return;
             }
             Cursor.Current = Cursors.Default;
@@ -1495,7 +1507,7 @@ namespace Levrum.UI.WinForms
                 LoadValueBlocks(m_flpUnorganizedData, dataFieldValues);
                 if (Tree != null)
                 {
-                    MarkAllBlocksInTreeAsAdded(Tree);
+                    MarkBlocksInTreeAsAdded(Tree);
                 }
                 m_btnLoadIncidents.Enabled = true;
             }
