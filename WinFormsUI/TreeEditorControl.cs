@@ -44,6 +44,7 @@ namespace Levrum.UI.WinForms
         List<FlowLayoutPanel> m_selectedPanels = new List<FlowLayoutPanel>();
         List<Button> m_selectedButtons = new List<Button>();
         List<DraggedData> m_recyclingBin = new List<DraggedData>();
+        Dictionary<string, string> m_existingTrees;
 
         public TreeEditorControl()
         {
@@ -51,6 +52,15 @@ namespace Levrum.UI.WinForms
             m_cbDefaultTree.Items.Add("Browse..");
             m_btnLoadIncidents.Visible = LoadIncidentsButton;
             MoveCursor = new Cursor(Properties.Resources.move_button.Handle);
+        }
+
+        public void AddExistingTrees(Dictionary<string, string> existingTrees)
+        {
+            m_existingTrees = existingTrees;
+
+            m_cbDefaultTree.Items.Clear();
+            m_cbDefaultTree.Items.AddRange(existingTrees?.Keys.ToArray());
+            m_cbDefaultTree.Items.Add("Browse..");
         }
 
         private void SetUndoDeleteTimer()
@@ -1353,6 +1363,9 @@ namespace Levrum.UI.WinForms
                 case "Browse..":
                     LoadTreeFromFile();
                     break;
+                default:
+                    LoadTreeFromFile(m_existingTrees[m_cbDefaultTree.SelectedItem.ToString()]);
+                    break;
             }
             if (tree != null)
             {
@@ -1372,8 +1385,10 @@ namespace Levrum.UI.WinForms
                 return;
             }
 
-            string fileName = ofd.FileName;
-
+            LoadTreeFromFile(ofd.FileName);          
+        }
+        private void LoadTreeFromFile(string fileName)
+        {
             List<ICategoryData> tree = null;
             try
             {
