@@ -1591,5 +1591,37 @@ namespace Levrum.UI.WinForms
             m_btnUndoDelete.Visible = false;
             m_undoDeleteTimer.Enabled = false;
         }
+
+        private void m_cbOnlyUnadded_Click(object sender, EventArgs e)
+        {
+            m_flpUnorganizedData.SuspendLayout();
+
+            if (m_cbOnlyUnadded.Checked)
+            {
+                foreach (Control control in m_flpUnorganizedData.Controls)
+                {
+                    Button button = control as Button;
+                    if (button == null)
+                        continue;
+
+                    if (button.Image != null)
+                    {
+                        button.Visible = false;
+                    }
+                }
+            }
+            else
+            {
+                foreach (Control control in m_flpUnorganizedData.Controls)
+                {
+                    if (!(control is Button))
+                        continue;
+
+                    control.Visible = true;
+                }
+            }
+
+            m_flpUnorganizedData.ResumeLayout();
+        }
     }
 }
