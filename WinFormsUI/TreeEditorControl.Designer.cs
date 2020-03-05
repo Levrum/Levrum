@@ -58,6 +58,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.m_scMain.BackColor = System.Drawing.Color.LightGray;
+            this.m_scMain.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
             this.m_scMain.Location = new System.Drawing.Point(0, 0);
             this.m_scMain.Name = "m_scMain";
             // 
@@ -71,7 +72,7 @@
             this.m_scMain.Panel2.Controls.Add(this.m_flpUnorganizedData);
             this.m_scMain.Panel2.Controls.Add(this.m_btnUndoDelete);
             this.m_scMain.Size = new System.Drawing.Size(847, 473);
-            this.m_scMain.SplitterDistance = 668;
+            this.m_scMain.SplitterDistance = 797;
             this.m_scMain.TabIndex = 0;
             // 
             // m_flpOrganizedData
@@ -87,7 +88,7 @@
             this.m_flpOrganizedData.ForeColor = System.Drawing.SystemColors.ControlText;
             this.m_flpOrganizedData.Location = new System.Drawing.Point(0, 0);
             this.m_flpOrganizedData.Name = "m_flpOrganizedData";
-            this.m_flpOrganizedData.Size = new System.Drawing.Size(668, 473);
+            this.m_flpOrganizedData.Size = new System.Drawing.Size(797, 473);
             this.m_flpOrganizedData.TabIndex = 0;
             this.m_flpOrganizedData.Click += new System.EventHandler(this.OrganizedData_Click);
             this.m_flpOrganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.OrganizedPanel_DragDrop);
@@ -119,7 +120,7 @@
             this.m_pDelete.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_pDelete.Location = new System.Drawing.Point(0, 0);
             this.m_pDelete.Name = "m_pDelete";
-            this.m_pDelete.Size = new System.Drawing.Size(175, 473);
+            this.m_pDelete.Size = new System.Drawing.Size(46, 473);
             this.m_pDelete.TabIndex = 1;
             this.m_pDelete.Visible = false;
             this.m_pDelete.DragDrop += new System.Windows.Forms.DragEventHandler(this.DeletePanel_DragDrop);
@@ -146,7 +147,7 @@
             this.m_flpUnorganizedData.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_flpUnorganizedData.Location = new System.Drawing.Point(0, 0);
             this.m_flpUnorganizedData.Name = "m_flpUnorganizedData";
-            this.m_flpUnorganizedData.Size = new System.Drawing.Size(175, 473);
+            this.m_flpUnorganizedData.Size = new System.Drawing.Size(46, 473);
             this.m_flpUnorganizedData.TabIndex = 1;
             this.m_flpUnorganizedData.Click += new System.EventHandler(this.UnorganizedData_Click);
             this.m_flpUnorganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.DeletePanel_DragDrop);
@@ -161,9 +162,9 @@
             this.m_btnUndoDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.m_btnUndoDelete.ForeColor = System.Drawing.Color.LightGray;
             this.m_btnUndoDelete.Image = global::Levrum.UI.WinForms.Properties.Resources.undo;
-            this.m_btnUndoDelete.Location = new System.Drawing.Point(0, 441);
+            this.m_btnUndoDelete.Location = new System.Drawing.Point(0, 601);
             this.m_btnUndoDelete.Name = "m_btnUndoDelete";
-            this.m_btnUndoDelete.Size = new System.Drawing.Size(175, 32);
+            this.m_btnUndoDelete.Size = new System.Drawing.Size(120, 32);
             this.m_btnUndoDelete.TabIndex = 3;
             this.m_btnUndoDelete.Text = "Undo Delete";
             this.m_btnUndoDelete.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -252,6 +253,7 @@
             this.Controls.Add(this.m_btnLoadIncidents);
             this.Controls.Add(this.m_btnSaveTree);
             this.Controls.Add(this.m_scMain);
+            this.MinimumSize = new System.Drawing.Size(493, 361);
             this.Name = "TreeEditorControl";
             this.Size = new System.Drawing.Size(847, 521);
             this.Click += new System.EventHandler(this.TreeEditorControl_Click);
