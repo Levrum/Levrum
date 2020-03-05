@@ -686,6 +686,7 @@ namespace Levrum.UI.WinForms
             Button newValueBlock = new Button
             {
                 Text = value.Value,
+                TextAlign = ContentAlignment.MiddleLeft,
                 Font = new Font(Font.FontFamily, 9),
                 AutoSize = true,
                 FlatStyle = FlatStyle.Flat,
@@ -804,6 +805,63 @@ namespace Levrum.UI.WinForms
             }
             m_flpUnorganizedData.Controls.Clear();
             m_flpUnorganizedData.Controls.AddRange(newBlocks);
+
+            AdjustValueBlockSize();
+        }
+
+        private void AdjustValueBlockSize()
+        {
+            Button widestBlock = GetWidestValueBlock(m_flpUnorganizedData);
+            if (widestBlock == null)
+                return;
+
+            int maxWidth = widestBlock.Width;
+            int blockMargin = widestBlock.Margin.Left + widestBlock.Margin.Right;
+            if (widestBlock.Image == null)
+            {
+                maxWidth += Properties.Resources.ok_icon.Width;
+            }            
+
+            m_flpUnorganizedData.SuspendLayout();
+            foreach (Control control in m_flpUnorganizedData.Controls)
+            {
+                if (control is Button)
+                {
+                    control.Width = maxWidth;
+                }                    
+            }
+            m_flpUnorganizedData.ResumeLayout();
+
+            AdjustSplitter();
+            m_scMain.SplitterIncrement = maxWidth + blockMargin;
+            
+        }
+
+        private Button GetWidestValueBlock(Control parent)
+        {
+            Button widestButton = new Button { Width = 0 };
+            foreach (Control control in parent.Controls)
+            {
+                Button curButton = control as Button;
+                if (curButton == null)
+                    continue;
+
+                widestButton = curButton.Width > widestButton.Width ? curButton : widestButton;
+            }
+
+            return widestButton;
+        }
+
+        private void AdjustSplitter()
+        {
+            Button widestBlock = GetWidestValueBlock(m_flpUnorganizedData);
+            if (widestBlock == null)
+                return;
+
+            int maxWidth = widestBlock.Width;
+            int blockMargin = widestBlock.Margin.Left + widestBlock.Margin.Right;
+            int maxSplitterDist = m_scMain.Width - 200;
+            m_scMain.SplitterDistance = m_scMain.Width - (maxWidth + m_flpUnorganizedData.Margin.Left + m_flpUnorganizedData.Margin.Right + m_flpUnorganizedData.Padding.Left + m_flpUnorganizedData.Padding.Right + blockMargin + SystemInformation.VerticalScrollBarWidth);
         }
 
         private void AddSubcategory_Click(object sender, EventArgs e)
