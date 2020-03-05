@@ -43,6 +43,7 @@
             this.m_undoDeleteTimer = new System.Windows.Forms.Timer(this.components);
             this.m_lbDataFields = new System.Windows.Forms.ListBox();
             this.m_labelDataFieldsHeader = new System.Windows.Forms.Label();
+            this.m_cbOnlyUnadded = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.m_scMain)).BeginInit();
             this.m_scMain.Panel1.SuspendLayout();
             this.m_scMain.Panel2.SuspendLayout();
@@ -68,11 +69,12 @@
             // 
             // m_scMain.Panel2
             // 
+            this.m_scMain.Panel2.Controls.Add(this.m_cbOnlyUnadded);
             this.m_scMain.Panel2.Controls.Add(this.m_pDelete);
             this.m_scMain.Panel2.Controls.Add(this.m_flpUnorganizedData);
             this.m_scMain.Panel2.Controls.Add(this.m_btnUndoDelete);
             this.m_scMain.Size = new System.Drawing.Size(847, 473);
-            this.m_scMain.SplitterDistance = 797;
+            this.m_scMain.SplitterDistance = 496;
             this.m_scMain.TabIndex = 0;
             // 
             // m_flpOrganizedData
@@ -88,7 +90,7 @@
             this.m_flpOrganizedData.ForeColor = System.Drawing.SystemColors.ControlText;
             this.m_flpOrganizedData.Location = new System.Drawing.Point(0, 0);
             this.m_flpOrganizedData.Name = "m_flpOrganizedData";
-            this.m_flpOrganizedData.Size = new System.Drawing.Size(797, 473);
+            this.m_flpOrganizedData.Size = new System.Drawing.Size(496, 473);
             this.m_flpOrganizedData.TabIndex = 0;
             this.m_flpOrganizedData.Click += new System.EventHandler(this.OrganizedData_Click);
             this.m_flpOrganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.OrganizedPanel_DragDrop);
@@ -120,7 +122,7 @@
             this.m_pDelete.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_pDelete.Location = new System.Drawing.Point(0, 0);
             this.m_pDelete.Name = "m_pDelete";
-            this.m_pDelete.Size = new System.Drawing.Size(46, 473);
+            this.m_pDelete.Size = new System.Drawing.Size(347, 473);
             this.m_pDelete.TabIndex = 1;
             this.m_pDelete.Visible = false;
             this.m_pDelete.DragDrop += new System.Windows.Forms.DragEventHandler(this.DeletePanel_DragDrop);
@@ -130,7 +132,7 @@
             // 
             this.pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.pictureBox1.Image = global::Levrum.UI.WinForms.Properties.Resources.delete;
-            this.pictureBox1.Location = new System.Drawing.Point(39, 182);
+            this.pictureBox1.Location = new System.Drawing.Point(189, 182);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(100, 99);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -140,14 +142,16 @@
             // m_flpUnorganizedData
             // 
             this.m_flpUnorganizedData.AllowDrop = true;
+            this.m_flpUnorganizedData.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.m_flpUnorganizedData.AutoScroll = true;
             this.m_flpUnorganizedData.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.m_flpUnorganizedData.BackColor = System.Drawing.Color.White;
             this.m_flpUnorganizedData.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.m_flpUnorganizedData.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.m_flpUnorganizedData.Location = new System.Drawing.Point(0, 0);
+            this.m_flpUnorganizedData.Location = new System.Drawing.Point(0, 27);
             this.m_flpUnorganizedData.Name = "m_flpUnorganizedData";
-            this.m_flpUnorganizedData.Size = new System.Drawing.Size(46, 473);
+            this.m_flpUnorganizedData.Size = new System.Drawing.Size(347, 446);
             this.m_flpUnorganizedData.TabIndex = 1;
             this.m_flpUnorganizedData.Click += new System.EventHandler(this.UnorganizedData_Click);
             this.m_flpUnorganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.DeletePanel_DragDrop);
@@ -164,7 +168,7 @@
             this.m_btnUndoDelete.Image = global::Levrum.UI.WinForms.Properties.Resources.undo;
             this.m_btnUndoDelete.Location = new System.Drawing.Point(0, 601);
             this.m_btnUndoDelete.Name = "m_btnUndoDelete";
-            this.m_btnUndoDelete.Size = new System.Drawing.Size(120, 32);
+            this.m_btnUndoDelete.Size = new System.Drawing.Size(421, 32);
             this.m_btnUndoDelete.TabIndex = 3;
             this.m_btnUndoDelete.Text = "Undo Delete";
             this.m_btnUndoDelete.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -243,6 +247,17 @@
             this.m_labelDataFieldsHeader.Text = "Please choose a data field";
             this.m_labelDataFieldsHeader.Visible = false;
             // 
+            // m_cbOnlyUnadded
+            // 
+            this.m_cbOnlyUnadded.AutoSize = true;
+            this.m_cbOnlyUnadded.Location = new System.Drawing.Point(5, 4);
+            this.m_cbOnlyUnadded.Name = "m_cbOnlyUnadded";
+            this.m_cbOnlyUnadded.Size = new System.Drawing.Size(77, 17);
+            this.m_cbOnlyUnadded.TabIndex = 1;
+            this.m_cbOnlyUnadded.Text = "Not Added";
+            this.m_cbOnlyUnadded.UseVisualStyleBackColor = true;
+            this.m_cbOnlyUnadded.Click += new System.EventHandler(this.m_cbOnlyUnadded_Click);
+            // 
             // TreeEditorControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -259,6 +274,7 @@
             this.Click += new System.EventHandler(this.TreeEditorControl_Click);
             this.m_scMain.Panel1.ResumeLayout(false);
             this.m_scMain.Panel2.ResumeLayout(false);
+            this.m_scMain.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_scMain)).EndInit();
             this.m_scMain.ResumeLayout(false);
             this.m_flpOrganizedData.ResumeLayout(false);
@@ -289,5 +305,6 @@
         private System.Windows.Forms.Timer m_undoDeleteTimer;
         private System.Windows.Forms.ListBox m_lbDataFields;
         private System.Windows.Forms.Label m_labelDataFieldsHeader;
+        private System.Windows.Forms.CheckBox m_cbOnlyUnadded;
     }
 }
