@@ -1450,6 +1450,7 @@ namespace Levrum.UI.WinForms
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
+            ofd.Title = "Select Tree";
             if (ofd.ShowDialog() != DialogResult.OK)
             {
                 return;
