@@ -1558,10 +1558,10 @@ namespace Levrum.UI.WinForms
                 HashSet<string> dataFieldValues = new HashSet<string>();
                 foreach (IncidentData incident in incidents)
                 {
-                    if (incident.Data.ContainsKey(selectedField) && !dataFieldValues.Contains(incident.Data[selectedField]))
-                    {
-                        dataFieldValues.Add(incident.Data[selectedField].ToString());
-                    }
+                    incident.Data.TryGetValue(selectedField, out object fieldValue);
+                    if (fieldValue == null)
+                        continue;
+                    dataFieldValues.Add(fieldValue.ToString());
                 }
                 LoadValueBlocks(m_flpUnorganizedData, dataFieldValues);
                 if (Tree != null)
