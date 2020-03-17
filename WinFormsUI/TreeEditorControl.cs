@@ -44,6 +44,7 @@ namespace Levrum.UI.WinForms
         List<FlowLayoutPanel> m_selectedPanels = new List<FlowLayoutPanel>();
         List<Button> m_selectedButtons = new List<Button>();
         List<DraggedData> m_recyclingBin = new List<DraggedData>();
+        Dictionary<string, string> m_existingTrees;
 
         public TreeEditorControl()
         {
@@ -51,6 +52,15 @@ namespace Levrum.UI.WinForms
             m_cbDefaultTree.Items.Add("Browse..");
             m_btnLoadIncidents.Visible = LoadIncidentsButton;
             MoveCursor = new Cursor(Properties.Resources.move_button.Handle);
+        }
+
+        public void AddExistingTrees(Dictionary<string, string> existingTrees)
+        {
+            m_existingTrees = existingTrees;
+
+            m_cbDefaultTree.Items.Clear();
+            m_cbDefaultTree.Items.AddRange(existingTrees?.Keys.ToArray());
+            m_cbDefaultTree.Items.Add("Browse..");
         }
 
         private void SetUndoDeleteTimer()
@@ -232,38 +242,21 @@ namespace Levrum.UI.WinForms
             m_recyclingBin.Clear();
         }
 
-        private void m_btnLoadTree_Click(object sender, EventArgs e)
+        private void LoadTree(IEnumerable<ICategoryData> tree, FlowLayoutPanel parentPanel)
         {
-            try
-            {
-                OpenFileDialog ofd = new OpenFileDialog();
-                ofd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
-                if (ofd.ShowDialog() != DialogResult.OK)
-                {
-                    return;
-                }
+            MarkAllValueBlocksAsNotAdded();
 
-                string fileName = ofd.FileName;
-
-                List<ICategoryData> tree = JsonConvert.DeserializeObject<List<ICategoryData>>(File.ReadAllText(fileName), new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All });
-                LoadTree(tree, m_flpUnorganizedData);
-            } catch (Exception ex)
-            {
-                LogHelper.LogException(ex, "Exception loading tree", true);
-            }
-        }
-
-        private void LoadTree(IEnumerable<ICategoryData> categoryData, FlowLayoutPanel parentPanel)
-        {
             parentPanel.Controls.Clear();
             parentPanel.FlowDirection = FlowDirection.TopDown;
             parentPanel.SuspendLayout();
-            foreach (ICategoryData data in categoryData)
+            foreach (ICategoryData data in tree)
             {
                 FlowLayoutPanel newPanel = AddSubPanel(parentPanel, data);
             }
             parentPanel.Controls.Add(GenerateSubcategoryButton());
             parentPanel.ResumeLayout();
+
+            MarkBlocksInTreeAsAdded(tree.ToList());
         }
 
         public void LoadTree(IEnumerable<ICategoryData> categoryData)
@@ -693,6 +686,7 @@ namespace Levrum.UI.WinForms
             Button newValueBlock = new Button
             {
                 Text = value.Value,
+                TextAlign = ContentAlignment.MiddleLeft,
                 Font = new Font(Font.FontFamily, 9),
                 AutoSize = true,
                 FlatStyle = FlatStyle.Flat,
@@ -811,6 +805,63 @@ namespace Levrum.UI.WinForms
             }
             m_flpUnorganizedData.Controls.Clear();
             m_flpUnorganizedData.Controls.AddRange(newBlocks);
+
+            AdjustValueBlockSize();
+        }
+
+        private void AdjustValueBlockSize()
+        {
+            Button widestBlock = GetWidestValueBlock(m_flpUnorganizedData);
+            if (widestBlock == null)
+                return;
+
+            int maxWidth = widestBlock.Width;
+            int blockMargin = widestBlock.Margin.Left + widestBlock.Margin.Right;
+            if (widestBlock.Image == null)
+            {
+                maxWidth += Properties.Resources.ok_icon.Width;
+            }            
+
+            m_flpUnorganizedData.SuspendLayout();
+            foreach (Control control in m_flpUnorganizedData.Controls)
+            {
+                if (control is Button)
+                {
+                    control.Width = maxWidth;
+                }                    
+            }
+            m_flpUnorganizedData.ResumeLayout();
+
+            AdjustSplitter();
+            m_scMain.SplitterIncrement = maxWidth + blockMargin;
+            
+        }
+
+        private Button GetWidestValueBlock(Control parent)
+        {
+            Button widestButton = new Button { Width = 0 };
+            foreach (Control control in parent.Controls)
+            {
+                Button curButton = control as Button;
+                if (curButton == null)
+                    continue;
+
+                widestButton = curButton.Width > widestButton.Width ? curButton : widestButton;
+            }
+
+            return widestButton;
+        }
+
+        private void AdjustSplitter()
+        {
+            Button widestBlock = GetWidestValueBlock(m_flpUnorganizedData);
+            if (widestBlock == null)
+                return;
+
+            int maxWidth = widestBlock.Width;
+            int blockMargin = widestBlock.Margin.Left + widestBlock.Margin.Right;
+            int maxSplitterDist = m_scMain.Width - 200;
+            m_scMain.SplitterDistance = m_scMain.Width - (maxWidth + m_flpUnorganizedData.Margin.Left + m_flpUnorganizedData.Margin.Right + m_flpUnorganizedData.Padding.Left + m_flpUnorganizedData.Padding.Right + blockMargin + SystemInformation.VerticalScrollBarWidth);
         }
 
         private void AddSubcategory_Click(object sender, EventArgs e)
@@ -974,17 +1025,31 @@ namespace Levrum.UI.WinForms
             }
         }
 
-        private void MarkAllBlocksInTreeAsAdded(List<ICategoryData> tree)
+        private void MarkBlocksInTreeAsAdded(List<ICategoryData> tree)
         {
             if (tree == null || tree.Count <= 0)
             {
                 return;
             }
 
+            m_flpUnorganizedData.SuspendLayout();
+
             foreach (ICategoryData catData in tree)
             {
-                MarkAllBlocksInTreeAsAdded(catData.Children);
+                MarkBlocksInBranchAsAdded(catData);
+            }
 
+            m_flpUnorganizedData.ResumeLayout();
+
+            void MarkBlocksInBranchAsAdded(ICategoryData catData)
+            {
+                if (catData.Children != null)
+                {
+                    foreach (ICategoryData cd in catData.Children)
+                    {
+                        MarkBlocksInBranchAsAdded(cd);
+                    }
+                }
                 foreach (ICategorizedValue catValue in catData.Values)
                 {
                     MarkValueBlockAsAdded(catValue);
@@ -1005,6 +1070,22 @@ namespace Levrum.UI.WinForms
                     }
                 }
             }            
+        }
+
+        private void MarkAllValueBlocksAsNotAdded()
+        {
+            m_flpUnorganizedData.SuspendLayout();
+
+            foreach (Control control in m_flpUnorganizedData.Controls)
+            {
+                Button button = control as Button;
+                if (button == null)
+                    return;
+
+                MarkValueBlockAsNotAdded(button);
+            }
+
+            m_flpUnorganizedData.ResumeLayout();
         }
 
         private bool ValueBlockIsAdded(ICategorizedValue vbData, FlowLayoutPanel parentPanel)
@@ -1353,12 +1434,14 @@ namespace Levrum.UI.WinForms
                 case "Browse..":
                     LoadTreeFromFile();
                     break;
+                default:
+                    LoadTreeFromFile(m_existingTrees[m_cbDefaultTree.SelectedItem.ToString()]);
+                    break;
             }
             if (tree != null)
             {
-                LoadTree(tree, m_flpOrganizedData);
                 Cursor.Current = Cursors.WaitCursor;
-                MarkAllBlocksInTreeAsAdded(tree);
+                LoadTree(tree, m_flpOrganizedData);                
                 Cursor.Current = Cursors.Default;
             }
         }
@@ -1367,13 +1450,16 @@ namespace Levrum.UI.WinForms
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
+            ofd.Title = "Select Tree";
             if (ofd.ShowDialog() != DialogResult.OK)
             {
                 return;
             }
 
-            string fileName = ofd.FileName;
-
+            LoadTreeFromFile(ofd.FileName);          
+        }
+        private void LoadTreeFromFile(string fileName)
+        {
             List<ICategoryData> tree = null;
             try
             {
@@ -1386,7 +1472,6 @@ namespace Levrum.UI.WinForms
                 return;
             }
             LoadTree(tree, m_flpOrganizedData);
-            MarkAllBlocksInTreeAsAdded(tree);
         }
 
         private void SubPanel_Paint(object sender, PaintEventArgs e)
@@ -1447,58 +1532,44 @@ namespace Levrum.UI.WinForms
             if (incidentDataFields.Count < 1)
             {
                 MessageBox.Show("Could not find any data fields in incident data.");
+                m_btnLoadIncidents.Enabled = true;
                 return;
             }
             Cursor.Current = Cursors.Default;
 
             // Prompt user to select incident data field
-            string selectedField = null;
-            ListBox listBox = new ListBox();
-            Label header = new Label();
-            listBox.Items.AddRange(incidentDataFields.ToArray());
-            listBox.DoubleClick += (sdr, args) =>
+            string selectedField = null;            
+            m_lbDataFields.Items.AddRange(incidentDataFields.ToArray());
+            m_lbDataFields.DoubleClick += m_lbDataFields_DoubleClick;
+
+            m_lbDataFields.Visible = true;
+            m_labelDataFieldsHeader.Visible = true;
+
+            void m_lbDataFields_DoubleClick(object sender, EventArgs e)
             {
-                selectedField = listBox.SelectedItem.ToString();
-                listBox.Hide();
-                this.Controls.Remove(listBox);
-                this.Controls.Remove(header);
+                selectedField = m_lbDataFields.SelectedItem.ToString();
+                m_labelDataFieldsHeader.Visible = false;
+                m_lbDataFields.Visible = false;
+                m_lbDataFields.Items.Clear();
+                m_lbDataFields.DoubleClick -= m_lbDataFields_DoubleClick;
 
                 // Populate unorganized data with data field values
                 Cursor.Current = Cursors.WaitCursor;
                 HashSet<string> dataFieldValues = new HashSet<string>();
                 foreach (IncidentData incident in incidents)
                 {
-                    if (incident.Data.ContainsKey(selectedField) && !dataFieldValues.Contains(incident.Data[selectedField]))
-                    {
-                        dataFieldValues.Add(incident.Data[selectedField].ToString());
-                    }
+                    incident.Data.TryGetValue(selectedField, out object fieldValue);
+                    if (fieldValue == null)
+                        continue;
+                    dataFieldValues.Add(fieldValue.ToString());
                 }
                 LoadValueBlocks(m_flpUnorganizedData, dataFieldValues);
                 if (Tree != null)
                 {
-                    MarkAllBlocksInTreeAsAdded(Tree);
+                    MarkBlocksInTreeAsAdded(Tree);
                 }
                 m_btnLoadIncidents.Enabled = true;
-            };
-            listBox.Location = new Point(m_btnLoadIncidents.Location.X, m_btnLoadIncidents.Location.Y - (m_btnLoadIncidents.Height + listBox.Height - listBox.Margin.Top - header.Margin.Bottom));
-            listBox.Anchor = (AnchorStyles.Bottom | AnchorStyles.Right);
-            listBox.Font = new Font(listBox.Font.FontFamily, 9);
-
-            header.Text = "Please choose a data field";
-            header.Font = new Font(header.Font.FontFamily, 9, FontStyle.Bold);
-            header.Padding = new Padding(2);
-            header.BackColor = Color.White;
-            header.Location = new Point(listBox.Location.X, listBox.Location.Y - header.Height);
-            header.Anchor = (AnchorStyles.Bottom | AnchorStyles.Right);
-            header.AutoSize = true;
-            header.BorderStyle = BorderStyle.FixedSingle;
-            listBox.Width = TextRenderer.MeasureText(header.Text, header.Font).Width + header.Padding.Right * 2 + 1;
-            Cursor.Current = Cursors.Default;
-
-            this.Controls.Add(header);
-            this.Controls.Add(listBox);
-            header.BringToFront();
-            listBox.BringToFront();
+            }
         }
 
         private void m_undoDeleteTimer_Tick(object sender, EventArgs e)
@@ -1519,6 +1590,38 @@ namespace Levrum.UI.WinForms
             m_recyclingBin.Clear();
             m_btnUndoDelete.Visible = false;
             m_undoDeleteTimer.Enabled = false;
+        }
+
+        private void m_cbOnlyUnadded_Click(object sender, EventArgs e)
+        {
+            m_flpUnorganizedData.SuspendLayout();
+
+            if (m_cbOnlyUnadded.Checked)
+            {
+                foreach (Control control in m_flpUnorganizedData.Controls)
+                {
+                    Button button = control as Button;
+                    if (button == null)
+                        continue;
+
+                    if (button.Image != null)
+                    {
+                        button.Visible = false;
+                    }
+                }
+            }
+            else
+            {
+                foreach (Control control in m_flpUnorganizedData.Controls)
+                {
+                    if (!(control is Button))
+                        continue;
+
+                    control.Visible = true;
+                }
+            }
+
+            m_flpUnorganizedData.ResumeLayout();
         }
     }
 }
