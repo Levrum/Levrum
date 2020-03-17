@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 
 using GeoJSON.Net.Geometry;
 using GeoJSONPolygon = GeoJSON.Net.Geometry.Polygon;
@@ -88,27 +90,26 @@ namespace Levrum.Utils.Geography
         private static void ExtractZipFiles()
         {
             string dir = Directory.GetCurrentDirectory();
-            FileInfo sridZip = new FileInfo(dir + @"\Geography\SRID.zip");
-            if (sridZip.Exists)
+            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Levrum.Utils.Geography.SRID.zip");
+
+            DirectoryInfo dirInfo = new DirectoryInfo(
+                string.Format("{0}\\Levrum\\Temp\\SRID", 
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData))
+                );
+
+            if (dirInfo.Exists)
             {
-                DirectoryInfo dirInfo = new DirectoryInfo(
-                    string.Format("{0}\\Levrum\\Temp\\SRID", 
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData))
-                    );
-
-                if (dirInfo.Exists)
-                {
-                    dirInfo.Delete(true);
-                }
-
-                dirInfo.Create();
-
-                ZipFile.ExtractToDirectory(sridZip.FullName, dirInfo.FullName);
+                dirInfo.Delete(true);
             }
-            else
+
+            dirInfo.Create();
+            FileInfo sridZip = new FileInfo(string.Format("{0}\\SRID.zip", dirInfo));
+            using (FileStream fs = File.OpenWrite(sridZip.FullName))
             {
-                throw new Exception("Moo");
+                stream.CopyTo(fs);
             }
+
+            ZipFile.ExtractToDirectory(sridZip.FullName, dirInfo.FullName);
         }
 
         private static void RemoveTempFiles()
