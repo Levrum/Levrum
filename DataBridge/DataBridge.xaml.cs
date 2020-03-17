@@ -108,7 +108,7 @@ namespace Levrum.DataBridge
             try
             {
                 WebClient client = new WebClient();
-                string updateServer = "http://updates.levrum.com/";
+                string updateServer = "https://updates.levrum.com/";
 #if DEBUG
                 updateServer = "http://localhost:5000/";
 #endif
