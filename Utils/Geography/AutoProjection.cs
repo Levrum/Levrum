@@ -16,12 +16,12 @@ namespace Levrum.Utils.Geography
 {
     public class AutoProjection
     {
-        public static string GetProjection(double lat, double lon, string unit = "US survey foot")
+        public static string GetProjection(double lat, double lon, string unit = null)
         {
             //supports US survey foot, metre, and foot. Not sure what the diffence between US survey foot and foot is...
             string projection = "";
 
-            if (!IsUnitSupported(unit))
+            if ((unit != null) && !IsUnitSupported(unit))
             {
                 return unit + " is not supported. Please try again with either US survey foot, metre, or foot(or nothing and it will default to US survey foot)";
             }
@@ -36,7 +36,8 @@ namespace Levrum.Utils.Geography
                     RemoveTempFiles();
                     return "Unable to find projection";
                 }
-                projection = FindMatchingProjection(projName, unit, projectionList);
+
+                projection = FindMatchingProjection(projName, unit, projectionList);                
                 RemoveTempFiles();
             }
             else
@@ -249,20 +250,81 @@ namespace Levrum.Utils.Geography
 
         private static string FindMatchingProjection(string projName, string unit, List<Projection> projectionList)
         {
-            unit = unit.ToLower();
-            foreach (Projection proj in projectionList)
-            {
-                if (proj.Unit.ToLower() != unit)
-                {
-                    continue;
-                }
+            Projection matchingProjection = null;
 
-                if (CultureInfo.CurrentCulture.CompareInfo.IndexOf(proj.RawProjectionString, projName, CompareOptions.IgnoreCase) >= 0)
+            // Get list of projections that match projName
+            List<Projection> matchingProjections = projectionList.Where(proj => CultureInfo.CurrentCulture.CompareInfo.IndexOf(proj.RawProjectionString, projName, CompareOptions.IgnoreCase) >= 0).ToList();
+            
+            if (unit != null)
+            {
+                unit = unit.ToLower();
+                matchingProjections = matchingProjections.Where(proj => proj.Unit.ToLower() == unit).ToList();
+                if (!matchingProjections.Any())
                 {
-                    return proj.RawProjectionString;
+                    return "Unable to find projection";
                 }
             }
-            return "Unable to find projection";
+
+            // Choose a NAD 83 projection if possible
+            List<Projection> matchingNAD83Projections = matchingProjections.Where(proj => CultureInfo.CurrentCulture.CompareInfo.IndexOf(proj.RawProjectionString, "NAD83") >= 0).ToList();
+            matchingProjections = matchingNAD83Projections.Any() ? matchingNAD83Projections : matchingProjections;
+
+            // If no unit specified, search for projection in order of USft, ft, metre and return the first found
+            matchingProjection = matchingProjections.Find(proj => proj.Unit == "US survey foot");
+            if (matchingProjection == null)
+            {
+                matchingProjection = matchingProjections.Find(proj => proj.Unit == "foot");
+                if (matchingProjection == null)
+                {
+                    matchingProjection = matchingProjections.Find(proj => proj.Unit == "metre");
+                    if (matchingProjection == null)
+                    {
+                        return "Unable to find projection";
+                    }
+                }
+            }
+
+            return matchingProjection.RawProjectionString;
+        }
+
+        /// <summary>
+        /// Finds the NAD 83 projection that matches the given projection name.
+        /// </summary>
+        /// <param name="projName"></param>
+        /// <param name="projectionList"></param>
+        /// <returns>
+        /// Returns the WKT of the NAD 83 projection matching the given projection name. The projection
+        /// unit is the first unit found in the given search order: US survey foot, foot, metre.
+        /// </returns>
+        private static string FindMatchingNAD83Projection(string projName, List<Projection> projectionList)
+        {
+            Projection matchingProjection = null;
+
+            List<Projection> matchingProjections = projectionList.Where(proj => CultureInfo.CurrentCulture.CompareInfo.IndexOf(proj.RawProjectionString, projName, CompareOptions.IgnoreCase) >= 0).ToList();
+            List<Projection> matchingNAD83Projections = matchingProjections.Where(proj => CultureInfo.CurrentCulture.CompareInfo.IndexOf(proj.RawProjectionString, "NAD83") >= 0).ToList();
+
+            if (matchingNAD83Projections.Count > 0)
+            {
+                matchingProjection = matchingNAD83Projections.Find(proj => proj.Unit == "US survey foot");
+                if (matchingProjection == null)
+                {
+                    matchingProjection = matchingNAD83Projections.Find(proj => proj.Unit == "foot");
+                    if (matchingProjection == null)
+                    {
+                        matchingProjection = matchingNAD83Projections.Find(proj => proj.Unit == "metre");
+                        if (matchingProjection == null)
+                        {
+                            return "Unable to find projection";
+                        }
+                    }
+                }
+            }
+            else
+            {
+                return "Unable to find projection";
+            }
+
+            return matchingProjection.RawProjectionString;
         }
 
         private static Projection ProcessSRID(string record)
