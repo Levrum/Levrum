@@ -36,6 +36,9 @@ namespace Levrum.UI.WinForms
             }
         }
 
+        public bool UnsavedWork { get; private set; } = false;
+        private string m_savePath;
+
         public bool SaveTreeToFile { get; set; } = true;
         public event SaveTreeDelegate OnSaveTree;
 
@@ -948,31 +951,59 @@ namespace Levrum.UI.WinForms
 
         private void m_btnSaveTree_Click(object sender, EventArgs e)
         {
-            SaveTree();
+            if (m_savePath != null)
+            {
+                SaveTree(m_savePath);
+            }
+            else
+            {
+                SaveTree();
+            }            
         }
 
-        private void SaveTree()
+        private void SaveTree(string filePath = null)
         {
+            if (!UnsavedWork && filePath != null)
+            {
+                return;
+            }
+
             List<ICategoryData> tree = ConvertToTree();
+            if (!tree?.Any() ?? true)
+            {
+                return;
+            }
+
             if (SaveTreeToFile)
             {
-                SaveFileDialog ofd = new SaveFileDialog();
-                ofd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
-                if (ofd.ShowDialog() == DialogResult.OK)
+                if (filePath == null)
                 {
-                    string fileName = ofd.FileName;
-                    try
+                    SaveFileDialog ofd = new SaveFileDialog();
+                    ofd.Filter = "JSON Files (*.json)|*.json|All files (*.*)|*.*";
+                    ofd.Title = "Save Tree";
+                    if (ofd.ShowDialog() == DialogResult.OK)
                     {
-                        string jsonTree = JsonConvert.SerializeObject(tree, new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All });
-                        File.WriteAllText(fileName, jsonTree);
+                        m_savePath = ofd.FileName;
+                        filePath = ofd.FileName;
                     }
-                    catch (Exception ex)
+                    else
                     {
-                        MessageBox.Show("Could not save tree.");
+                        return;
                     }
+                }                
 
-                    MessageBox.Show("Successfully Saved Tree!");
+                try
+                {
+                    string jsonTree = JsonConvert.SerializeObject(tree, new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All, TypeNameHandling = TypeNameHandling.All });
+                    File.WriteAllText(filePath, jsonTree);
+                    UnsavedWork = false;
                 }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Could not save tree.");
+                }
+
+                MessageBox.Show("Successfully Saved Tree!");
             }
             OnSaveTree?.Invoke(tree);
         }
@@ -1639,6 +1670,17 @@ namespace Levrum.UI.WinForms
             }
 
             m_flpUnorganizedData.ResumeLayout();
+        }
+
+        private void m_flpOrganizedData_ControlAdded(object sender, ControlEventArgs e)
+        {
+            m_btnSaveTree.Enabled = true;
+            m_btnSaveAs.Enabled = true;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            SaveTree();
         }
     }
 }
