@@ -1566,13 +1566,11 @@ namespace Levrum.UI.WinForms
             foreach (IncidentData incident in incidents)
             {
                 foreach (string key in incident.Data.Keys.ToList())
-                {
-                    if (!incidentDataFields.Contains(key))
-                    {
-                        incidentDataFields.Add(key);
-                    }
+                {                    
+                    incidentDataFields.Add(key);
                 }
             }
+
             if (incidentDataFields.Count < 1)
             {
                 MessageBox.Show("Could not find any data fields in incident data.");
@@ -1606,6 +1604,11 @@ namespace Levrum.UI.WinForms
                     if (fieldValue == null)
                         continue;
                     dataFieldValues.Add(fieldValue.ToString());
+                    if (dataFieldValues.Count > 300)
+                    {
+                        MessageBox.Show("This field exceeds the maximum number of values. Only showing 300 values.", "Too Many Values");
+                        break;
+                    }
                 }
                 LoadValueBlocks(m_flpUnorganizedData, dataFieldValues);
                 if (Tree != null)
