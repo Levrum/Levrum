@@ -576,7 +576,7 @@ namespace Levrum.UI.WinForms
                         draggedData.Control.Parent.Controls.Remove(draggedData.Control);
                     }
 
-                    receivingPanelData.Children.Add(droppedData);
+                    //receivingPanelData.Children.Add(droppedData);
                     AddSubPanel(receivingPanel, droppedData);
                 }
                 // Handle drop of value block
@@ -926,15 +926,24 @@ namespace Levrum.UI.WinForms
         private List<ICategoryData> ConvertToTree()
         {
             List<ICategoryData> tree = new List<ICategoryData>();
-            foreach (Control node in m_flpOrganizedData.Controls)
+            foreach (Control control in m_flpOrganizedData.Controls)
             {
-                if (node is FlowLayoutPanel && node.Visible != false)
+                FlowLayoutPanel branch = control as FlowLayoutPanel;
+                if (branch == null)
+                    continue;
+
+                if (control.Visible != false && IsTopLevelBranch(branch))
                 {
-                    tree.Add(node.Tag as ICategoryData);
+                    tree.Add(branch.Tag as ICategoryData);
                 }
             }
 
             return tree;
+        }
+
+        private bool IsTopLevelBranch(FlowLayoutPanel branch)
+        {
+            return ((branch.Tag is ICategoryData) && !(branch.Parent.Tag is ICategoryData));
         }
 
         private void m_btnSaveTree_Click(object sender, EventArgs e)
