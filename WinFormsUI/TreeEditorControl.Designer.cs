@@ -32,6 +32,7 @@
             this.m_scMain = new System.Windows.Forms.SplitContainer();
             this.m_flpOrganizedData = new System.Windows.Forms.FlowLayoutPanel();
             this.m_btnAddOrganizedCategory = new System.Windows.Forms.Button();
+            this.m_cbOnlyUnadded = new System.Windows.Forms.CheckBox();
             this.m_pDelete = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.m_flpUnorganizedData = new System.Windows.Forms.FlowLayoutPanel();
@@ -43,7 +44,6 @@
             this.m_undoDeleteTimer = new System.Windows.Forms.Timer(this.components);
             this.m_lbDataFields = new System.Windows.Forms.ListBox();
             this.m_labelDataFieldsHeader = new System.Windows.Forms.Label();
-            this.m_cbOnlyUnadded = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.m_scMain)).BeginInit();
             this.m_scMain.Panel1.SuspendLayout();
             this.m_scMain.Panel2.SuspendLayout();
@@ -114,6 +114,17 @@
             this.m_btnAddOrganizedCategory.UseVisualStyleBackColor = false;
             this.m_btnAddOrganizedCategory.Click += new System.EventHandler(this.AddSubcategory_Click);
             // 
+            // m_cbOnlyUnadded
+            // 
+            this.m_cbOnlyUnadded.AutoSize = true;
+            this.m_cbOnlyUnadded.Location = new System.Drawing.Point(5, 4);
+            this.m_cbOnlyUnadded.Name = "m_cbOnlyUnadded";
+            this.m_cbOnlyUnadded.Size = new System.Drawing.Size(77, 17);
+            this.m_cbOnlyUnadded.TabIndex = 1;
+            this.m_cbOnlyUnadded.Text = "Not Added";
+            this.m_cbOnlyUnadded.UseVisualStyleBackColor = true;
+            this.m_cbOnlyUnadded.Click += new System.EventHandler(this.m_cbOnlyUnadded_Click);
+            // 
             // m_pDelete
             // 
             this.m_pDelete.AllowDrop = true;
@@ -132,7 +143,7 @@
             // 
             this.pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.pictureBox1.Image = global::Levrum.UI.WinForms.Properties.Resources.delete;
-            this.pictureBox1.Location = new System.Drawing.Point(189, 182);
+            this.pictureBox1.Location = new System.Drawing.Point(123, 187);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(100, 99);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -246,17 +257,6 @@
             this.m_labelDataFieldsHeader.TabIndex = 6;
             this.m_labelDataFieldsHeader.Text = "Please choose a data field";
             this.m_labelDataFieldsHeader.Visible = false;
-            // 
-            // m_cbOnlyUnadded
-            // 
-            this.m_cbOnlyUnadded.AutoSize = true;
-            this.m_cbOnlyUnadded.Location = new System.Drawing.Point(5, 4);
-            this.m_cbOnlyUnadded.Name = "m_cbOnlyUnadded";
-            this.m_cbOnlyUnadded.Size = new System.Drawing.Size(77, 17);
-            this.m_cbOnlyUnadded.TabIndex = 1;
-            this.m_cbOnlyUnadded.Text = "Not Added";
-            this.m_cbOnlyUnadded.UseVisualStyleBackColor = true;
-            this.m_cbOnlyUnadded.Click += new System.EventHandler(this.m_cbOnlyUnadded_Click);
             // 
             // TreeEditorControl
             // 
