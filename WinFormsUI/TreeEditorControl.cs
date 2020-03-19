@@ -193,7 +193,11 @@ namespace Levrum.UI.WinForms
                 foreach (DraggedData draggedData in allDraggedData)
                 {
                     draggedData.Control.Visible = false;
-                    MarkValueBlockAsNotAdded(draggedData.Control as Button);
+
+                    if (draggedData.Control is Button)
+                    {
+                        MarkValueBlockAsNotAdded(draggedData.Control as Button);
+                    }                        
                 }
 
                 m_flpOrganizedData.ResumeLayout();
@@ -924,7 +928,7 @@ namespace Levrum.UI.WinForms
             List<ICategoryData> tree = new List<ICategoryData>();
             foreach (Control node in m_flpOrganizedData.Controls)
             {
-                if (node is FlowLayoutPanel)
+                if (node is FlowLayoutPanel && node.Visible != false)
                 {
                     tree.Add(node.Tag as ICategoryData);
                 }
@@ -1585,7 +1589,11 @@ namespace Levrum.UI.WinForms
             foreach (DraggedData draggedData in m_recyclingBin)
             {
                 draggedData.Control.Visible = true;
-                MarkValueBlockAsAdded(draggedData.Control as Button);
+                
+                if (draggedData.Control is Button)
+                {
+                    MarkValueBlockAsAdded(draggedData.Control as Button);
+                }                
             }
             m_recyclingBin.Clear();
             m_btnUndoDelete.Visible = false;

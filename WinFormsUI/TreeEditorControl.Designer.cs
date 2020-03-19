@@ -32,11 +32,11 @@
             this.m_scMain = new System.Windows.Forms.SplitContainer();
             this.m_flpOrganizedData = new System.Windows.Forms.FlowLayoutPanel();
             this.m_btnAddOrganizedCategory = new System.Windows.Forms.Button();
+            this.m_btnUndoDelete = new System.Windows.Forms.Button();
             this.m_cbOnlyUnadded = new System.Windows.Forms.CheckBox();
             this.m_pDelete = new System.Windows.Forms.Panel();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.m_flpUnorganizedData = new System.Windows.Forms.FlowLayoutPanel();
-            this.m_btnUndoDelete = new System.Windows.Forms.Button();
             this.m_btnSaveTree = new System.Windows.Forms.Button();
             this.m_btnLoadIncidents = new System.Windows.Forms.Button();
             this.m_cbDefaultTree = new System.Windows.Forms.ComboBox();
@@ -69,10 +69,10 @@
             // 
             // m_scMain.Panel2
             // 
+            this.m_scMain.Panel2.Controls.Add(this.m_btnUndoDelete);
             this.m_scMain.Panel2.Controls.Add(this.m_cbOnlyUnadded);
             this.m_scMain.Panel2.Controls.Add(this.m_pDelete);
             this.m_scMain.Panel2.Controls.Add(this.m_flpUnorganizedData);
-            this.m_scMain.Panel2.Controls.Add(this.m_btnUndoDelete);
             this.m_scMain.Size = new System.Drawing.Size(847, 473);
             this.m_scMain.SplitterDistance = 496;
             this.m_scMain.TabIndex = 0;
@@ -113,6 +113,26 @@
             this.m_btnAddOrganizedCategory.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.m_btnAddOrganizedCategory.UseVisualStyleBackColor = false;
             this.m_btnAddOrganizedCategory.Click += new System.EventHandler(this.AddSubcategory_Click);
+            // 
+            // m_btnUndoDelete
+            // 
+            this.m_btnUndoDelete.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_btnUndoDelete.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.m_btnUndoDelete.BackColor = System.Drawing.Color.Black;
+            this.m_btnUndoDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.m_btnUndoDelete.ForeColor = System.Drawing.Color.LightGray;
+            this.m_btnUndoDelete.Image = global::Levrum.UI.WinForms.Properties.Resources.undo;
+            this.m_btnUndoDelete.Location = new System.Drawing.Point(-3, 441);
+            this.m_btnUndoDelete.Name = "m_btnUndoDelete";
+            this.m_btnUndoDelete.Size = new System.Drawing.Size(347, 32);
+            this.m_btnUndoDelete.TabIndex = 4;
+            this.m_btnUndoDelete.Text = "Undo Delete";
+            this.m_btnUndoDelete.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.m_btnUndoDelete.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.m_btnUndoDelete.UseVisualStyleBackColor = false;
+            this.m_btnUndoDelete.Visible = false;
+            this.m_btnUndoDelete.Click += new System.EventHandler(this.m_btnUndoDelete_Click);
             // 
             // m_cbOnlyUnadded
             // 
@@ -167,26 +187,6 @@
             this.m_flpUnorganizedData.Click += new System.EventHandler(this.UnorganizedData_Click);
             this.m_flpUnorganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.DeletePanel_DragDrop);
             this.m_flpUnorganizedData.DragEnter += new System.Windows.Forms.DragEventHandler(this.DeletePanel_DragEnter);
-            // 
-            // m_btnUndoDelete
-            // 
-            this.m_btnUndoDelete.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_btnUndoDelete.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.m_btnUndoDelete.BackColor = System.Drawing.Color.Black;
-            this.m_btnUndoDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.m_btnUndoDelete.ForeColor = System.Drawing.Color.LightGray;
-            this.m_btnUndoDelete.Image = global::Levrum.UI.WinForms.Properties.Resources.undo;
-            this.m_btnUndoDelete.Location = new System.Drawing.Point(0, 601);
-            this.m_btnUndoDelete.Name = "m_btnUndoDelete";
-            this.m_btnUndoDelete.Size = new System.Drawing.Size(421, 32);
-            this.m_btnUndoDelete.TabIndex = 3;
-            this.m_btnUndoDelete.Text = "Undo Delete";
-            this.m_btnUndoDelete.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.m_btnUndoDelete.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.m_btnUndoDelete.UseVisualStyleBackColor = false;
-            this.m_btnUndoDelete.Visible = false;
-            this.m_btnUndoDelete.Click += new System.EventHandler(this.m_btnUndoDelete_Click);
             // 
             // m_btnSaveTree
             // 
@@ -301,10 +301,10 @@
         private System.ComponentModel.BackgroundWorker m_bgwLoadIncidentData;
         private System.Windows.Forms.Panel m_pDelete;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.Button m_btnUndoDelete;
         private System.Windows.Forms.Timer m_undoDeleteTimer;
         private System.Windows.Forms.ListBox m_lbDataFields;
         private System.Windows.Forms.Label m_labelDataFieldsHeader;
         private System.Windows.Forms.CheckBox m_cbOnlyUnadded;
+        private System.Windows.Forms.Button m_btnUndoDelete;
     }
 }
