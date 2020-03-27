@@ -5,7 +5,7 @@
     <AssemblyName>Levrum.Data.Map</AssemblyName>
     <RootNamespace>Levrum.Data.Map</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>0.0.5</Version>
+    <Version>0.0.6</Version>
     <Authors>Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
     <Copyright>(c) 2019, 2020 Levrum Data Technologies</Copyright>
