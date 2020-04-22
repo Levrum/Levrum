@@ -16,13 +16,19 @@ namespace Levrum.Data.Sources
             Data[column] = value;
         }
 
-        public object GetValue(string column)
+        public object GetValue(string ColumnName)
         {
-            if (Data.ContainsKey(column)) {
-                return Data[column];
+            if (Data.ContainsKey(ColumnName)) {
+                return Data[ColumnName];
             }
 
             return null;
+        }
+
+        public bool HasColumn(string columnName)
+        {
+            if (null==Data) { return (false); }
+            return (Data.ContainsKey(columnName));
         }
     }
 }
