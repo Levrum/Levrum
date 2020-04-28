@@ -23,6 +23,8 @@ using Levrum.Data.Classes;
 using Levrum.Data.Classes.Tools;
 using Levrum.Data.Map;
 
+using Levrum.Licensing.Client.WPF;
+
 using Levrum.UI.WPF;
 
 using Levrum.Utils;
@@ -47,6 +49,11 @@ namespace Levrum.DataBridge
         public MainDataBridgeWindow()
         {
             InitializeComponent();
+            
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            LicenseClient client = new LicenseClient(assembly, "databridge");
+            client.VerifyOrRequestLicense();
+
             DataSources.Window = this;
             App app = Application.Current as App;
             if (app != null)
@@ -1243,6 +1250,12 @@ namespace Levrum.DataBridge
             {
                 logException(sender, "Unable to edit final processing script", ex);
             }
+        }
+
+        private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            AboutWindow aboutWindow = new AboutWindow();
+            aboutWindow.ShowDialog();
         }
     }
 
