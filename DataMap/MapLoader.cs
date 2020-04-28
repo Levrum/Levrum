@@ -419,8 +419,14 @@ namespace Levrum.Data.Map
                         Incidents.Add(incident);
                     }
 
+                    int nmapping = 0;
                     foreach (DataMapping mapping in mappingsForSource)
                     {
+                        nmapping++;
+                        string scolname = mapping?.Column?.ColumnName;
+                        if (string.IsNullOrEmpty(scolname)) { throw (new Exception("Unable to identify column name in incident mapping #" + nmapping)); }
+                        if (!record.HasColumn(scolname)) { throw (new Exception("Incident record does not contain column '" + scolname + "' (#" + nmapping + ")"));  }
+
                         string stringValue = record.GetValue(mapping.Column.ColumnName).ToString();
                         if (string.IsNullOrEmpty(stringValue))
                         {
@@ -524,8 +530,14 @@ namespace Levrum.Data.Map
                         incident.Responses.Add(response);
                     }
 
+                    int nmapping = 0;
                     foreach (DataMapping mapping in mappingsForSource)
                     {
+                        nmapping++;
+                        string scolname = mapping?.Column?.ColumnName;
+                        if (string.IsNullOrEmpty(scolname)) { throw (new Exception("Unable to identify column name in response mapping #" + nmapping)); }
+                        if (!record.HasColumn(scolname)) { throw (new Exception("Response record does not contain column '" + scolname + "' (#" + nmapping + ")")); }
+
                         string stringValue = record.GetValue(mapping.Column.ColumnName).ToString();
                         if (string.IsNullOrEmpty(stringValue))
                         {
