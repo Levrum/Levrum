@@ -77,7 +77,7 @@
                 <MenuItem x:Name="ShowJSDebugMenuItem" Header="Show _JavaScript Debug Window..." Click="ShowJSDebugMenuItem_Click"/>
                 <MenuItem x:Name="ViewLogsMenuItem" Header="View _Logs..." Click="ViewLogsMenuItem_Click" Visibility="Collapsed"/>
                 <Separator/>
-                <MenuItem Header="_About"/>
+                <MenuItem Name="AboutMenuItem" Header="_About" Click="AboutMenuItem_Click"/>
             </MenuItem>
         </Menu>
         <ToolBarTray Grid.Row="1" Margin="0,-1,0,0">

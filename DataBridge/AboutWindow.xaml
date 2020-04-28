@@ -1,0 +1,28 @@
+﻿<Window x:Class="Levrum.DataBridge.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Levrum.DataBridge"
+        mc:Ignorable="d"
+        Title="About Levrum DataBridge" Height="500" Width="600" ResizeMode="NoResize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="96"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="300*"/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Stretch">
+            <Image Name="BurgerImage" Margin="82,8,0,0" Source="/databridge.png" Height="80" MouseUp="BurgerImage_MouseUp"/>
+                <TextBlock VerticalAlignment="Center" FontSize="36" Margin="16,0,0,0" FontWeight="DemiBold">Levrum DataBridge</TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Vertical" Grid.Row="1">
+            <TextBlock Name="VersionText" HorizontalAlignment="Stretch" TextAlignment="Center" FontWeight="DemiBold" FontSize="18">Version 0.1.0.88</TextBlock>
+        </StackPanel>
+        <TextBlock Grid.Row="2" Name="AboutDetailsText" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="16,8,8,0" TextWrapping="Wrap" FontFamily="Consolas"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="3" HorizontalAlignment="Right">
+            <Button Name="OkButton" Grid.Row="2" Height="24" Margin="0,0,8,0" Width="80" Click="OkButton_Click">OK</Button>
+        </StackPanel>
+    </Grid>
+</Window>

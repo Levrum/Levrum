@@ -194,7 +194,7 @@ namespace Levrum.DataBridge
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            if (ChangesMade)
+            if (ChangesMade && SaveButton.IsEnabled)
             {
                 MessageBoxResult result = MessageBox.Show("Save changes before closing?", "Save Changes?", MessageBoxButton.YesNoCancel);
                 if (result == MessageBoxResult.Cancel)
@@ -288,6 +288,8 @@ namespace Levrum.DataBridge
             {
                 DataSource.Disconnect();
             }
+
+            SaveButton.IsEnabled = false;
 
             if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.CsvSource)
             {
@@ -415,6 +417,7 @@ namespace Levrum.DataBridge
             if (comboBox != null)
             {
                 DataSource.IDColumn = comboBox.SelectedItem as string;
+                SaveButton.IsEnabled = true;
             }
         }
 
@@ -580,6 +583,7 @@ namespace Levrum.DataBridge
 
                 summarizeGeoFile(ofd.FileName);
                 GeoFileNameTextBox.Text = ofd.FileName;
+                SaveButton.IsEnabled = true;
             }
             catch (Exception ex)
             {

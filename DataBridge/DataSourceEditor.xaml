@@ -82,15 +82,15 @@
                     <ColumnDefinition Width="60*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Margin="8,0,0,0" VerticalAlignment="Center">Server:</TextBlock>
-                <TextBox x:Name="SqlServerAddress" Grid.Column="1" Height="24" Margin="8,0,8,0" HorizontalContentAlignment="Right"></TextBox>
+                <TextBox x:Name="SqlServerAddress" Grid.Column="1" Height="24" Margin="8,0,8,0" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"></TextBox>
                 <TextBlock Grid.Column="2" VerticalAlignment="Center">Port:</TextBlock>
-                <TextBox x:Name="SqlServerPort" Grid.Column="3" Margin="8,0,8,0" Height="24" HorizontalContentAlignment="Right"></TextBox>
+                <TextBox x:Name="SqlServerPort" Grid.Column="3" Margin="8,0,8,0" Height="24" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"></TextBox>
                 <TextBlock Grid.Column="4" VerticalAlignment="Center">User:</TextBlock>
-                <TextBox x:Name="SqlServerUser" Grid.Column="5" Margin="8,0,8,0" Height="24" HorizontalContentAlignment="Right"></TextBox>
+                <TextBox x:Name="SqlServerUser" Grid.Column="5" Margin="8,0,8,0" Height="24" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"></TextBox>
                 <TextBlock Grid.Column="6" VerticalAlignment="Center">Password:</TextBlock>
-                <PasswordBox x:Name="SqlServerPassword" Grid.Column="7" Margin="8,0,8,0" Height="24" HorizontalContentAlignment="Right"></PasswordBox>
+                <PasswordBox x:Name="SqlServerPassword" Grid.Column="7" Margin="8,0,8,0" Height="24" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"></PasswordBox>
                 <TextBlock Grid.Column="8" VerticalAlignment="Center">Database:</TextBlock>
-                <TextBox x:Name="SqlServerDatabase" Grid.Column="9" Margin="8,0,8,0" Height="24" HorizontalContentAlignment="Right"></TextBox>
+                <TextBox x:Name="SqlServerDatabase" Grid.Column="9" Margin="8,0,8,0" Height="24" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"></TextBox>
             </Grid>
             <Grid Grid.Row="1" Margin="0,8,0,8">
                 <Grid.ColumnDefinitions>
@@ -168,7 +168,7 @@
             
         </StackPanel>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button x:Name="SaveButton" Width="80" Margin="0,8,0,8" Click="SaveButton_Click">Save</Button>
+            <Button x:Name="SaveButton" Width="80" Margin="0,8,0,8" Click="SaveButton_Click" IsEnabled="False">Save</Button>
             <Button x:Name="CancelButton" Width="80" Margin="8,8,8,8" Click="CancelButton_Click">Cancel</Button>
         </StackPanel>
     </Grid>

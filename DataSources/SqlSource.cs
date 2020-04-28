@@ -203,7 +203,7 @@ namespace Levrum.Data.Sources
                     return output;
                 }
 
-                SqlCommand cmd = new SqlCommand(string.Format("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name LIKE '%{0}%'", Parameters["Table"]), m_connection);
+                SqlCommand cmd = new SqlCommand(string.Format("SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name LIKE '{0}'", Parameters["Table"]), m_connection);
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
                     while (dr.Read())

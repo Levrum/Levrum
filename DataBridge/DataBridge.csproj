@@ -10,7 +10,7 @@
     <Authors>Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
     <PackageId>Levrum.DataBridge</PackageId>
-    <Copyright>(c) 2019 Levrum Data Technologies</Copyright>
+    <Copyright>Copyright © 2020 Levrum Data Technologies</Copyright>
     <ApplicationIcon>databridge.ico</ApplicationIcon>
   </PropertyGroup>
 
@@ -25,6 +25,7 @@
     <None Remove="CoordinateIcon.png" />
     <None Remove="CsvIcon.png" />
     <None Remove="databridge.ico" />
+    <None Remove="databridge.png" />
     <None Remove="datamap.ico" />
     <None Remove="GlobeIcon.png" />
     <None Remove="JsonIcon.png" />
@@ -33,6 +34,8 @@
     <None Remove="OpenIcon.png" />
     <None Remove="Resources\BugIcon.png" />
     <None Remove="Resources\CloseIcon.png" />
+    <None Remove="Resources\databridge.png" />
+    <None Remove="Resources\hamburger.png" />
     <None Remove="Resources\RightArrowIcon.png" />
     <None Remove="Resources\StopIcon.png" />
     <None Remove="SaveIcon.png" />
@@ -65,6 +68,7 @@
     <PackageReference Include="Dirkster.AvalonDock" Version="3.6.2" />
     <PackageReference Include="Dirkster.AvalonDock.Themes.VS2013" Version="3.6.2" />
     <PackageReference Include="DotNetProjects.Extended.Wpf.Toolkit" Version="4.6.78" />
+    <PackageReference Include="Levrum.Licensing.Client.WPF" Version="0.1.2" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NLog" Version="4.6.8" />
   </ItemGroup>
@@ -78,6 +82,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="databridge.png" />
     <Resource Include="Resources\BlankTemplate.png" />
     <Content Include="databridge.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -91,7 +96,13 @@
     <Resource Include="Resources\CodeIcon.png" />
     <Resource Include="Resources\CoordinateIcon.png" />
     <Resource Include="Resources\CsvIcon.png" />
+    <Resource Include="Resources\databridge.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\GlobeIcon.png" />
+    <Resource Include="Resources\hamburger.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\JsonIcon.png" />
     <Resource Include="Resources\NewIcon.png" />
     <Resource Include="Resources\OpenIcon.png" />
