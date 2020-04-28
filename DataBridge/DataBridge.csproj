@@ -6,7 +6,7 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>Levrum.DataBridge</RootNamespace>
-    <Version>0.0.4</Version>
+    <Version>0.1.0</Version>
     <Authors>Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
     <PackageId>Levrum.DataBridge</PackageId>
@@ -68,7 +68,7 @@
     <PackageReference Include="Dirkster.AvalonDock" Version="3.6.2" />
     <PackageReference Include="Dirkster.AvalonDock.Themes.VS2013" Version="3.6.2" />
     <PackageReference Include="DotNetProjects.Extended.Wpf.Toolkit" Version="4.6.78" />
-    <PackageReference Include="Levrum.Licensing.Client.WPF" Version="0.1.2.1" />
+    <PackageReference Include="Levrum.Licensing.Client.WPF" Version="0.1.2.3" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NLog" Version="4.6.8" />
   </ItemGroup>
