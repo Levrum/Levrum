@@ -111,9 +111,12 @@ namespace Levrum.Data.Classes.Tools
                                 {
                                     value = benchmark.Data["DateTime"];
                                 }
-                                else
+                                else if (!double.IsNaN(benchmark.Value))
                                 {
                                     value = benchmark.Value;
+                                } else
+                                {
+                                    value = "";
                                 }
                                 rsp_dict.Add(benchmarkName, value);
                             }

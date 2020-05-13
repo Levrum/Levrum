@@ -932,6 +932,46 @@ namespace Levrum.Data.Map
                         clearScene.Data["DateTime"] = clearSceneTime;
                     }
 
+                    TimingData transport = (from b in response.TimingData
+                                            where b.Name == "Transport"
+                                            select b).FirstOrDefault();
+
+                    DateTime transportTime = DateTime.MinValue;
+                    if (transport != null)
+                    {
+                        if (!double.IsNaN(transport.Value))
+                        {
+                            transportTime = baseTime.AddMinutes(transport.Value);
+                        }
+                        else if (transport.Data.ContainsKey("RawData"))
+                        {
+                            if (transport.Data["RawData"] is DateTime)
+                            {
+                                transportTime = (DateTime)transport.Data["RawData"];
+                                transport.Value = (transportTime - baseTime).TotalMinutes;
+                            }
+                            else if (DateTime.TryParse(transport.Data["RawData"] as string, out transportTime))
+                            {
+                                transport.Value = (transportTime - baseTime).TotalMinutes;
+                            }
+                        }
+                        if (transportTime != DateTime.MinValue)
+                        {
+                            transport.Data["DateTime"] = transportTime;
+                            if (Map.TransportAsClearScene == true)
+                            {
+                                if (clearScene != null)
+                                {
+                                    response.TimingData.Remove(clearScene);
+                                }
+                                clearScene = new TimingData("ClearScene", transport.Value);
+                                clearScene.Data["DateTime"] = transportTime;
+                                clearScene.Data["RawData"] = transport.Data["RawData"];
+                                response.TimingData.Add(clearScene);
+                            }
+                        }
+                    }
+
                     TimingData inService = (from b in response.TimingData
                                             where b.Name == "InService"
                                             select b).FirstOrDefault();

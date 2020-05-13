@@ -1,5 +1,5 @@
 #define ApplicationName 'Levrum DataBridge'
-#define ApplicationVersion GetFileVersion('..\DataBridge\bin\Release\DataBridge.exe')
+#define ApplicationVersion GetFileVersion('..\DataBridge\bin\Release\netcoreapp3.1\win-x64\publish\DataBridge.exe')
 
 [Setup]
 AppId=C5DCBCF2-D071-466E-B3AD-B0771A01C270
@@ -9,36 +9,37 @@ AppVerName={#ApplicationName} {#ApplicationVersion}
 AppPublisher=Levrum
 DefaultDirName={localappdata}\Levrum\{#ApplicationName}
 DefaultGroupName={#ApplicationName}
-UninstallDisplayIcon={app}\DataBridge.exe
+UninstallDisplayIcon={app}\databridge.ico
 Compression=lzma2
 SolidCompression=yes
 AllowNoIcons=yes
 WizardSmallImageFile="Small Install Image.bmp"
 WizardImageFile="Big Install Image.bmp"
 ChangesAssociations=yes
+PrivilegesRequired=lowest
 ;InfoBeforeFile="..\Dependencies\Changelog.txt"
 
 [Dirs]
 Name:"{app}\plugins"; Permissions:everyone-modify; Flags: uninsneveruninstall
 
 [Files]
-Source: "..\DataBridge\bin\Release\*"; DestDir: "{app}"; Flags: recursesubdirs overwritereadonly ignoreversion
+Source: "..\DataBridge\bin\Release\netcoreapp3.1\win-x64\publish\*"; DestDir: "{app}"; Flags: recursesubdirs overwritereadonly ignoreversion
 
-;Redistributables
-Source: "..\Dependencies\windowsdesktop-runtime-3.1.0-win-x64.exe"; DestDir: {tmp}; Flags: ignoreversion deleteafterinstall
-Source: "..\Dependencies\vc_redist.x64.exe"; DestDir: {tmp}; Flags: ignoreversion deleteafterinstall
+// ;Redistributables
+// Source: "..\Dependencies\windowsdesktop-runtime-3.1.0-win-x64.exe"; DestDir: {tmp}; Flags: ignoreversion deleteafterinstall
+// Source: "..\Dependencies\vc_redist.x64.exe"; DestDir: {tmp}; Flags: ignoreversion deleteafterinstall
 
 [Tasks]
 Name: desktopicon; Description: "Create a desktop icon"; GroupDescription: "Additional icons:"
 
 [Icons]
-Name: "{group}\{#ApplicationName}"; Filename: "{app}\netcoreapp3.1\DataBridge.exe"; IconFilename: "{app}\netcoreapp3.1\databridge.ico"
-Name: "{commondesktop}\{#ApplicationName}"; Filename: "{app}\netcoreapp3.1\DataBridge.exe"; IconFilename: "{app}\netcoreapp3.1\databridge.ico"; Tasks: desktopicon
+Name: "{group}\{#ApplicationName}"; Filename: "{app}\DataBridge.exe"; IconFilename: "{app}\databridge.ico"
+Name: "{userdesktop}\{#ApplicationName}"; Filename: "{app}\DataBridge.exe"; IconFilename: "{app}\databridge.ico"; Tasks: desktopicon
 
 [Run]
-Filename: {tmp}\windowsdesktop-runtime-3.1.0-win-x64.exe; StatusMsg: "Installing Microsoft .NET Core 3.1"; Description: Install Microsoft .NET Core 3.1; Parameters: /passive /noreboot; Flags: skipifdoesntexist; Check: ShouldInstalldotNETCore31
+// Filename: {tmp}\windowsdesktop-runtime-3.1.0-win-x64.exe; StatusMsg: "Installing Microsoft .NET Core 3.1"; Description: Install Microsoft .NET Core 3.1; Parameters: /passive /noreboot; Flags: skipifdoesntexist; Check: ShouldInstalldotNETCore31
 Filename: {tmp}\vc_redist.x64.exe; StatusMsg: "Installing Microsoft Visual C++ 2019 Redistributable"; Description: Install Visual C++ 2019 Redistributable; Parameters: /passive /noreboot; Flags: skipifdoesntexist; Check: ShouldInstallVCRedist
-Filename: {app}\netcoreapp3.1\DataBridge.exe; Description: {cm:LaunchProgram,{cm:AppName}}; Flags: nowait postinstall skipifsilent
+Filename: {app}\DataBridge.exe; Description: {cm:LaunchProgram,{cm:AppName}}; Flags: nowait postinstall skipifsilent
 
 [CustomMessages]
 AppName=Levrum DataBridge
@@ -46,10 +47,10 @@ LaunchProgram=Start Levrum DataBridge after finishing installation
 
 
 [Registry]
-Root: HKCR; Subkey: ".dmap"; ValueData: "{#ApplicationName}"; Flags: uninsdeletevalue; ValueType: string; ValueName: "";
-Root: HKCR; Subkey: "{#ApplicationName}"; ValueData: "Levrum DataMap";  Flags: uninsdeletekey; ValueType: string; ValueName: "";
-Root: HKCR; Subkey: "{#ApplicationName}\DefaultIcon"; ValueData: "{app}\netcoreapp3.1\datamap.ico"; ValueType: string; ValueName: "";
-Root: HKCR; Subkey: "{#ApplicationName}\shell\open\command"; ValueData: """{app}\netcoreapp3.1\DataBridge.exe"" ""%1"""; ValueType: string; ValueName: "";
+Root: HKCU; Subkey: "Software\Classes\.dmap"; ValueData: "{#ApplicationName}"; Flags: uninsdeletevalue; ValueType: string; ValueName: "";
+Root: HKCU; Subkey: "Software\Classes\{#ApplicationName}"; ValueData: "Levrum DataMap";  Flags: uninsdeletekey; ValueType: string; ValueName: "";
+Root: HKCU; Subkey: "Software\Classes\{#ApplicationName}\DefaultIcon"; ValueData: "{app}\datamap.ico"; ValueType: string; ValueName: "";
+Root: HKCU; Subkey: "Software\Classes\{#ApplicationName}\shell\open\command"; ValueData: """{app}\DataBridge.exe"" ""%1"""; ValueType: string; ValueName: "";
 
 [Code]
 /////////////////////////////////////////////////////////////////////
@@ -110,23 +111,24 @@ begin
   end;
 end;
 
+
 /////////////////////////////////////////////////////////////////////
-var dotNETCore31Missing: Boolean; // Is the .NET Core 3.1 missing entirely?
+// var dotNETCore31Missing: Boolean; // Is the .NET Core 3.1 missing entirely?
 var vc2019Missing: Boolean; // Is the VC++ 2019 Redistributable missing?
-var dotNETVersion: Cardinal;
+// var dotNETVersion: Cardinal;
 var vcVersion: String;
 
 function InitializeSetup(): Boolean;
 begin
     // Test the presence of .NET Core 3.1
-    if (RegKeyExists(HKLM, 'SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.NETCore.App') and RegQueryDWordValue(HKLM, 'SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.NETCore.App', '3.1.0', dotNETVersion)) then
-    begin
-        if (dotNETVersion >= 1) then
-          dotNETCore31Missing := False
-        else
-          dotNETCore31Missing := True;
-    end else
-      dotNETCore31Missing := True;
+//    if (RegKeyExists(HKLM, 'SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.NETCore.App') and RegQueryDWordValue(HKLM, 'SOFTWARE\WOW6432Node\dotnet\Setup\InstalledVersions\x64\sharedfx\Microsoft.NETCore.App', '3.1.0', dotNETVersion)) then
+//    begin
+//        if (dotNETVersion >= 1) then
+//          dotNETCore31Missing := False
+//        else
+//          dotNETCore31Missing := True;
+//    end else
+//      dotNETCore31Missing := True;
 
     if (not(RegValueExists(HKLM, 'SOFTWARE\WOW6432Node\Microsoft\VisualStudio\14.0\VC\Runtimes\x64', 'Version'))) then
         vc2019Missing := True
@@ -143,12 +145,12 @@ begin
     Result := True;
 end;
 
-function ShouldInstalldotNETCore31(): Boolean;
-begin
-    Result := dotNETCore31Missing;
-end;
+// function ShouldInstalldotNETCore31(): Boolean;
+// begin
+//    Result := dotNETCore31Missing;
+// end;
 
 function ShouldInstallVCRedist(): Boolean;
 begin
-    Result := vc2019Missing;
+  Result := vc2019Missing;
 end;
