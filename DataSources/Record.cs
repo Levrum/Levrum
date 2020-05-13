@@ -18,6 +18,8 @@ namespace Levrum.Data.Sources
 
         public object GetValue(string ColumnName)
         {
+            if (null==ColumnName) { return (null); }
+
             if (Data.ContainsKey(ColumnName)) {
                 return Data[ColumnName];
             }
