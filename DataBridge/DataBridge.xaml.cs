@@ -369,6 +369,7 @@ namespace Levrum.DataBridge
             ConvertCoordinateButton.IsEnabled = controlsEnabled;
             EditPostProcessingButton.IsEnabled = controlsEnabled;
             EditCauseTreeButton.IsEnabled = controlsEnabled;
+            ToggleTransportAsClearSceneButton.IsEnabled = controlsEnabled;
 
             StopButton.IsEnabled = runningOperation;
         }
@@ -404,6 +405,7 @@ namespace Levrum.DataBridge
                 EditProjectionMenuItem.IsEnabled = documentOpen;
                 ToggleInvertLatitudeMenuItem.IsEnabled = documentOpen;
                 ToggleInvertLongitudeMenuItem.IsEnabled = documentOpen;
+                ToggleTransportAsClearSceneMenuItem.IsEnabled = documentOpen;
 
                 EditCauseTreeMenuItem.IsEnabled = documentOpen;
                 EditPostProcessingScript.IsEnabled = documentOpen;
@@ -417,6 +419,7 @@ namespace Levrum.DataBridge
                 EditProjectionButton.IsEnabled = documentOpen;
                 EditCauseTreeButton.IsEnabled = documentOpen;
                 EditPostProcessingButton.IsEnabled = documentOpen;
+                ToggleTransportAsClearSceneButton.IsEnabled = documentOpen;
 
                 if (documentOpen)
                 {
@@ -1085,6 +1088,35 @@ namespace Levrum.DataBridge
                 ToggleInvertLongitudeMenuItem.Header = "Invert Lon_gitude Disabled";
                 ToggleInvertLongitudeMenuItem.IsChecked = false;
                 InvertLongitudeButton.IsChecked = false;
+            }
+        }
+
+        private void ToggleTransportAsClearScene_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                DataSources.Map.TransportAsClearScene = !DataSources.Map.TransportAsClearScene;
+                updateTransportAsClearScene();
+
+                SetChangesMade(DataSources.Map, true);
+            } catch (Exception ex)
+            {
+                logException(sender, "Unable to toggle transport as clearscene", ex);
+            }
+        }
+
+        private void updateTransportAsClearScene()
+        {
+            if (DataSources.Map.TransportAsClearScene)
+            {
+                ToggleTransportAsClearSceneMenuItem.Header = "_Transport As ClearScene Enabled";
+                ToggleTransportAsClearSceneMenuItem.IsChecked = true;
+                ToggleTransportAsClearSceneButton.IsChecked = true;
+            } else
+            {
+                ToggleTransportAsClearSceneMenuItem.Header = "_Transport As ClearScene Disabled";
+                ToggleTransportAsClearSceneMenuItem.IsChecked = false;
+                ToggleTransportAsClearSceneButton.IsChecked = false;
             }
         }
 

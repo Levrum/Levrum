@@ -64,6 +64,7 @@
                 <MenuItem x:Name="EditProjectionMenuItem" Header="Edit Conversion _Projection..." Click="EditProjection_Click" IsEnabled="False"/>
                 <MenuItem x:Name="ToggleInvertLongitudeMenuItem" Header="Enable Invert Lon_gitude" Click="ToggleInvertLongitude_Click" IsEnabled="False"/>
                 <MenuItem x:Name="ToggleInvertLatitudeMenuItem" Header="Enable Invert _Latitude" Click="ToggleInvertLatitude_Click" IsEnabled="False"/>
+                <MenuItem x:Name="ToggleTransportAsClearSceneMenuItem" Header="Enable _Transport As ClearScene" Click="ToggleTransportAsClearScene_Click" IsEnabled="False"/>
                 <Separator/>
                 <MenuItem x:Name="EditCauseTreeMenuItem" Header="Edit Cause _Tree..." Click="EditCauseTree_Click" IsEnabled="False"/>
                 <Separator/>
@@ -117,6 +118,9 @@
                 </ToggleButton>
                 <ToggleButton x:Name="InvertLatitudeButton" Margin="0,0,0,-1" Click="ToggleInvertLatitude_Click" ToolTip="Toggle Invert Latitude">
                     <Image x:Name="InvertLatitudeButtonIcon" Source="/DataBridge;component/Resources/YIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
+                </ToggleButton>
+                <ToggleButton x:Name="ToggleTransportAsClearSceneButton" Margin="0,0,0,-1" Click="ToggleTransportAsClearScene_Click" ToolTip="Toggle Transport As ClearScene">
+                    <Image x:Name="ToggleTransportAsClearSceneButtonIcon" Source="/DataBridge;component/Resources/Ambulance.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
                 </ToggleButton>
                 <Button x:Name="EditProjectionButton" Margin="0,0,0,-1" Click="EditProjection_Click" ToolTip="Edit Projection">
                     <StackPanel Orientation="Horizontal">
