@@ -42,9 +42,11 @@ namespace Levrum.DataBridge
             } 
         }
 
-        public List<string> DefaultFieldNames = new List<string>(new string[] { "Time", "Latitude", "Longitude", "Location", "Code", "Category", "Type", "Jurisdiction", "District", "Priority", "CallProcessed", "Cancelled", "Unit", "UnitType", "Shift", "Assigned", "Responding", "OnScene", "ClearScene", "Transport", "Hospital", "InService", "InQuarters" });
+        public List<string> DefaultIncidentDataFields = new List<string>(new string[] { "Time", "Latitude", "Longitude", "Location", "City", "State", "Code", "Category", "Type", "Jurisdiction", "District", "CallProcessed", "Cancelled", "FirstAction" });
+        public List<string> DefaultResponseDataFields = new List<string>(new string[] { "Unit", "UnitType", "Urgency", "Shift" });
+        public List<string> DefaultResponseTimingFields = new List<string>(new string[] { "Assigned", "Responding", "OnScene", "ClearScene", "Transport", "Hospital", "InService", "InQuarters" });
 
-        public ColumnSelectionDialog(List<IDataSource> _dataSources, DataMapping _mapping)
+        public ColumnSelectionDialog(List<IDataSource> _dataSources, DataMapping _mapping, DataMapEditor.DataMappingType mappingType)
         {
             InitializeComponent();
             DataMapping copy = new DataMapping();
@@ -53,7 +55,8 @@ namespace Levrum.DataBridge
             copy.Column.DataSource = _mapping.Column.DataSource;
             copy.Field = _mapping.Field;
 
-            FieldNameComboBox.ItemsSource = DefaultFieldNames;
+            getFieldNameSourceForMappingType(mappingType);
+            
             
             FieldSourceComboBox.ItemsSource = _dataSources;
             FieldSourceComboBox.DisplayMemberPath = "Name";
@@ -61,17 +64,34 @@ namespace Levrum.DataBridge
             Result = copy;
         }
 
-        public ColumnSelectionDialog(List<IDataSource> _dataSources, string _fieldName = null, bool fieldNameReadOnly = false)
+        public ColumnSelectionDialog(List<IDataSource> _dataSources, string _fieldName = null, bool fieldNameReadOnly = false, DataMapEditor.DataMappingType mappingType = DataMapEditor.DataMappingType.IncidentData)
         {
             InitializeComponent();
             Result = new DataMapping();
-            FieldNameComboBox.ItemsSource = DefaultFieldNames;
+            getFieldNameSourceForMappingType(mappingType);
+            
 
             FieldNameComboBox.Text = _fieldName;
             FieldNameComboBox.IsReadOnly = fieldNameReadOnly;
 
             FieldSourceComboBox.ItemsSource = _dataSources;
             FieldSourceComboBox.DisplayMemberPath = "Name";
+        }
+
+        private void getFieldNameSourceForMappingType(DataMapEditor.DataMappingType mappingType)
+        {
+            switch (mappingType)
+            {
+                case DataMapEditor.DataMappingType.IncidentData:
+                    FieldNameComboBox.ItemsSource = DefaultIncidentDataFields;
+                    break;
+                case DataMapEditor.DataMappingType.ResponseData:
+                    FieldNameComboBox.ItemsSource = DefaultResponseDataFields;
+                    break;
+                case DataMapEditor.DataMappingType.ResponseTiming:
+                    FieldNameComboBox.ItemsSource = DefaultResponseTimingFields;
+                    break;
+            }
         }
 
         private void ColumnComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)

@@ -56,8 +56,6 @@
                 <MenuItem x:Name="ConvertJsonToCsv" Header="_Convert Incident JSON to CSV..." Click="ConvertJsonToCsv_Click" IsEnabled="True"/>
                 <Separator/>
                 <MenuItem x:Name="JsonViewerMenuItem" Header="Open _JSON Viewer..." Click="JsonViewerMenuItem_Click" IsEnabled="True"/>
-                <MenuItem x:Name="ToolsShowLogMenuItem" Header="Show _Log..."  Click="HandleShowLog" IsEnabled="True" />
-                <MenuItem x:Name="ToolsClearLogMenuItem" Header="_Clear Log " Click="HandleClearLog" IsEnabled="True" />
             </MenuItem>
             <MenuItem Name="PropertiesMenu" Header="_Properties" IsTabStop="False">
                 <MenuItem x:Name="CoordinateConversionMenuItem" Header="Enable _Coordinate Conversion" Click="ToggleConvertCoordinate_Click" IsEnabled="False"/>
@@ -67,16 +65,21 @@
                 <MenuItem x:Name="ToggleTransportAsClearSceneMenuItem" Header="Enable _Transport As ClearScene" Click="ToggleTransportAsClearScene_Click" IsEnabled="False"/>
                 <Separator/>
                 <MenuItem x:Name="EditCauseTreeMenuItem" Header="Edit Cause _Tree..." Click="EditCauseTree_Click" IsEnabled="False"/>
+            </MenuItem>
+            <MenuItem x:Name="ScriptsMenu" Header="_Scripts" IsTabStop="False">
+                <MenuItem x:Name="EditPhaseOneScript" Header="Phase _1: Post-Loading Script" Click="EditPhaseOneScript_Click" ToolTip="Use to generate statistics"/>
+                <MenuItem x:Name="EditPhaseTwoScript" Header="Phase _2: Per Incident Script" Click="EditPhaseTwoScript_Click" ToolTip="Good for modifying individual incidents"/>
+                <MenuItem x:Name="EditPhaseThreeScript" Header="Phase _3: Final Processing Script" Click="EditPhaseThreeScript_Click" ToolTip="Use info from other phases to modify data"/>
                 <Separator/>
-                <MenuItem x:Name="EditPostProcessingScript" Header="Post-Processing _Scripts" IsEnabled="False">
-                    <MenuItem x:Name="EditPhaseOneScript" Header="Phase _1: Post-Loading Script" Click="EditPhaseOneScript_Click" ToolTip="Use to generate statistics"/>
-                    <MenuItem x:Name="EditPhaseTwoScript" Header="Phase _2: Per Incident Script" Click="EditPhaseTwoScript_Click" ToolTip="Good for modifying individual incidents"/>
-                    <MenuItem x:Name="EditPhaseThreeScript" Header="Phase _3: Final Processing Script" Click="EditPhaseThreeScript_Click" ToolTip="Use info from other phases to modify data"/>
-                </MenuItem>
+                <MenuItem x:Name="ShowJSDebugMenuItem" Header="Show _JavaScript Debug Window..." Click="ShowJSDebugMenuItem_Click"/>
             </MenuItem>
             <MenuItem Name="HelpMenu" Header="_Help" IsTabStop="False">
-                <MenuItem x:Name="ShowJSDebugMenuItem" Header="Show _JavaScript Debug Window..." Click="ShowJSDebugMenuItem_Click"/>
-                <MenuItem x:Name="ViewLogsMenuItem" Header="View _Logs..." Click="ViewLogsMenuItem_Click" Visibility="Collapsed"/>
+                <MenuItem x:Name="UserManualPDFMenuItem" Header="View User _Manual..." Click="UserManualPDFMenuItem_Click" Visibility="Visible"/>
+                <MenuItem x:Name="ScriptingPDFMenuItem" Header="View _Scripting Manual..." Click="ScriptingPDFMenuItem_Click" Visibility="Visible"/>
+                <Separator/>
+                <MenuItem x:Name="ViewLogsMenuItem" Header="View _All Logs..." Click="ViewLogsMenuItem_Click" Visibility="Collapsed"/>
+                <MenuItem x:Name="ToolsShowLogMenuItem" Header="Show Recent _Log..."  Click="HandleShowLog" IsEnabled="True" />
+                <MenuItem x:Name="ToolsClearLogMenuItem" Header="_Clear Recent Log" Click="HandleClearLog" IsEnabled="True" />
                 <Separator/>
                 <MenuItem Name="AboutMenuItem" Header="_About" Click="AboutMenuItem_Click"/>
             </MenuItem>

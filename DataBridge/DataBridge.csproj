@@ -35,8 +35,10 @@
     <None Remove="Resources\Ambulance.png" />
     <None Remove="Resources\BugIcon.png" />
     <None Remove="Resources\CloseIcon.png" />
+    <None Remove="Resources\DataBridge Manual.pdf" />
     <None Remove="Resources\databridge.png" />
     <None Remove="Resources\hamburger.png" />
+    <None Remove="Resources\PostProcessing Script Manual.pdf" />
     <None Remove="Resources\RightArrowIcon.png" />
     <None Remove="Resources\StopIcon.png" />
     <None Remove="SaveIcon.png" />
@@ -98,6 +100,9 @@
     <Resource Include="Resources\CodeIcon.png" />
     <Resource Include="Resources\CoordinateIcon.png" />
     <Resource Include="Resources\CsvIcon.png" />
+    <Content Include="Resources\DataBridge Manual.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Resources\databridge.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -108,6 +113,9 @@
     <Resource Include="Resources\JsonIcon.png" />
     <Resource Include="Resources\NewIcon.png" />
     <Resource Include="Resources\OpenIcon.png" />
+    <Content Include="Resources\PostProcessing Script Manual.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Resources\RightArrowIcon.png" />
     <Resource Include="Resources\SaveIcon.png" />
     <Resource Include="Resources\StopIcon.png" />

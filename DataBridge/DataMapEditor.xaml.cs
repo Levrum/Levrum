@@ -35,6 +35,8 @@ namespace Levrum.DataBridge
             //UpdateStaticMappingButtons();
         }
 
+        public enum DataMappingType { IncidentData, ResponseData, ResponseTiming };
+
         private void AddIncidentFieldButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -271,7 +273,7 @@ namespace Levrum.DataBridge
             try
             {
                 DataMapping selectedField = IncidentDataListBox.SelectedItem as DataMapping;
-                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), selectedField);
+                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), selectedField, DataMappingType.IncidentData);
                 dialog.Owner = Window;
                 dialog.ShowDialog();
                 if (dialog.Result != null)
@@ -296,7 +298,7 @@ namespace Levrum.DataBridge
             try
             {
                 DataMapping selectedField = ResponseDataListBox.SelectedItem as DataMapping;
-                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), selectedField);
+                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), selectedField, DataMappingType.ResponseData);
                 dialog.Owner = Window;
                 dialog.ShowDialog();
                 if (dialog.Result != null)
@@ -321,7 +323,7 @@ namespace Levrum.DataBridge
             try
             {
                 DataMapping selectedField = BenchmarkListBox.SelectedItem as DataMapping;
-                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), selectedField);
+                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), selectedField, DataMappingType.ResponseTiming);
                 dialog.Owner = Window;
                 dialog.ShowDialog();
                 if (dialog.Result != null)

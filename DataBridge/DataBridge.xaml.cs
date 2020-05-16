@@ -114,43 +114,11 @@ namespace Levrum.DataBridge
         {
             try
             {
-                WebClient client = new WebClient();
-                string updateServer = "https://updates.levrum.com/";
-#if DEBUG
-                updateServer = "http://localhost:5000/";
-#endif
-
-                string url = string.Format("{0}api/update?app={1}&version={2}", updateServer, "databridge", Assembly.GetEntryAssembly().GetName().Version);
-
-                string updates = client.DownloadString(url);
-                UpdateInfo info = JsonConvert.DeserializeObject<UpdateInfo>(updates);
-
-                if (!string.IsNullOrWhiteSpace(info.URL))
-                {
-                    MessageBoxResult result = MessageBox.Show(string.Format("An update to version {0} is available. Update now? The application will restart.", info.Version), "Update Available", MessageBoxButton.YesNo);
-                    if (result == MessageBoxResult.No)
-                    {
-                        return;
-                    }
-
-                    Cursor = Cursors.Wait;
-                    long time = DateTime.Now.Ticks;
-                    DirectoryInfo tempDir = new DirectoryInfo(string.Format("{0}\\Levrum\\Temp\\", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)));
-                    if (!tempDir.Exists)
-                    {
-                        tempDir.Create();
-                    }
-                    FileInfo file = new FileInfo(tempDir.FullName + "\\" + info.FileName);
-                    client.DownloadFile(new Uri(info.URL), file.FullName);
-                    Process.Start(file.FullName);
-                    Application.Current.Shutdown();
-                }
+                UpdateWindow updateWindow = new UpdateWindow("databridge", Assembly.GetEntryAssembly().GetName().Version);
+                updateWindow.ShowDialog();
             } catch (Exception ex)
             {
                 LogHelper.LogException(ex, "Exception while checking for updates", false);
-            } finally
-            {
-                Cursor = Cursors.Arrow;
             }
         }
 
@@ -408,7 +376,7 @@ namespace Levrum.DataBridge
                 ToggleTransportAsClearSceneMenuItem.IsEnabled = documentOpen;
 
                 EditCauseTreeMenuItem.IsEnabled = documentOpen;
-                EditPostProcessingScript.IsEnabled = documentOpen;
+                ScriptsMenu.IsEnabled = documentOpen;
 
                 SaveButton.IsEnabled = documentOpen;
                 CreateJsonButton.IsEnabled = documentOpen;
@@ -1288,6 +1256,36 @@ namespace Levrum.DataBridge
         {
             AboutWindow aboutWindow = new AboutWindow();
             aboutWindow.ShowDialog();
+        }
+
+        private void UserManualPDFMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            FileInfo assemblyInfo = new FileInfo(Assembly.GetExecutingAssembly().Location);
+            string fileName = string.Format("{0}\\Resources\\DataBridge Manual.pdf", assemblyInfo.DirectoryName);
+            FileInfo info = new FileInfo(fileName);
+            if (!info.Exists)
+            {
+                return;
+            }
+            Process p = new Process();
+            p.StartInfo = new ProcessStartInfo(fileName);
+            p.StartInfo.UseShellExecute = true;
+            p.Start();
+        }
+
+        private void ScriptingPDFMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            FileInfo assemblyInfo = new FileInfo(Assembly.GetExecutingAssembly().Location);
+            string fileName = string.Format("{0}\\Resources\\PostProcessing Script Manual.pdf", assemblyInfo.DirectoryName);
+            FileInfo info = new FileInfo(fileName);
+            if (!info.Exists)
+            {
+                return;
+            }
+            Process p = new Process();
+            p.StartInfo = new ProcessStartInfo(fileName);
+            p.StartInfo.UseShellExecute = true;
+            p.Start();
         }
     }
 
