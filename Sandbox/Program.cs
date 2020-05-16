@@ -12,6 +12,8 @@ using Levrum.Data.Map;
 using Levrum.Utils.Messaging;
 using Levrum.Utils.Geography;
 
+using Levrum.Utils.Osm;
+
 namespace Sandbox
 {
     public static class Program
@@ -183,7 +185,7 @@ namespace Sandbox.DefaultCommands
 
         public static string rmqsend(List<string> args)
         {
-            if (args.Count < 0)
+            if (args.Count == 0)
             {
                 return "rmqsend requires 1 argument";
             }
@@ -226,6 +228,96 @@ namespace Sandbox.DefaultCommands
             string projection = AutoProjection.GetProjection(authCode);
 
             return projection;
+        }
+
+        public static OsmFile OsmFile { get; set; } = null;
+        public static string loadosm(List<string> args)
+        {
+            if (args.Count == 0)
+                return "Usage: loadosm <filename>";
+
+            FileInfo file = new FileInfo(args[0]);
+            if (!file.Exists)
+                return string.Format("File {0} does not exist!", args[0]);
+
+            DateTime loadStart = DateTime.Now;
+            OsmFile = new OsmFile(file);
+            OsmFile.Load(true, true);
+            DateTime loadEnd = DateTime.Now;
+
+            return string.Format("Loaded {0} nodes, {1} ways, and {2} relations from {3} in {4} seconds.", OsmFile.Nodes.Count, OsmFile.Ways.Count, OsmFile.Relations.Count, file.Name, (loadEnd - loadStart).TotalSeconds);
+        }
+
+        public static string saveosm(List<string> args)
+        {
+            if (args.Count == 0)
+                return "Usage: saveosm <filename>";
+
+            if (OsmFile == null)
+                return "You must first load an OSM file with the loadosm command.";
+
+            DateTime saveStart = DateTime.Now;
+            OsmFile.Save(args[0]);
+            DateTime saveEnd = DateTime.Now;
+
+            return string.Format("Saved {0} nodes, {1} ways, and {2} relations to {3} in {4} seconds.", OsmFile.Nodes.Count, OsmFile.Ways.Count, OsmFile.Relations.Count, args[0], (saveEnd - saveStart).TotalSeconds);
+        }
+
+        public static string makeintersections(List<string> args)
+        {
+            if (OsmFile == null)
+                return "You must first load an osm file with the loadosm command.";
+
+            DateTime startTime = DateTime.Now;
+            OsmFile.GenerateIntersections();
+            DateTime endTime = DateTime.Now;
+
+            return string.Format("Generated {0} intersections in {1} seconds.", OsmFile.Intersections.Count, (endTime - startTime).TotalSeconds);
+        }
+
+        public static string saveintersections(List<string> args)
+        {
+            if (OsmFile == null)
+                return "You must first load an osm file with the loadosm command and run 'makeintersections'.";
+
+            if (OsmFile.IntersectionsGenerated == false)
+                return "You must first run 'makeintersections'.";
+
+            if (args.Count != 1)
+            {
+                return "Usage: saveintersections <filename>";
+            }
+
+            if (File.Exists(args[0]))
+            {
+                File.Delete(args[0]);
+            }
+
+            using (StreamWriter sw = new StreamWriter(File.OpenWrite(args[0])))
+            {
+                sw.WriteLine("IntersectionID,Latitude,Longitude,ConnectedIntersection_Distance");
+                foreach (var intersection in OsmFile.Intersections.Values)
+                {
+                    string lineToWrite = string.Format("{0},{1},{2},", intersection.ID, intersection.Latitude, intersection.Longitude);
+                    bool firstConnection = true;
+                    foreach (var connectedIntersection in intersection.ConnectedIntersectionDistances)
+                    {
+                        if (firstConnection)
+                        {
+                            firstConnection = false;
+                            lineToWrite = string.Format("{0}{1}_{2}", lineToWrite, connectedIntersection.Key, connectedIntersection.Value);
+                        } else
+                        {
+                            lineToWrite = string.Format("{0}#{1}_{2}", lineToWrite, connectedIntersection.Key, connectedIntersection.Value);
+                        }
+                    }
+                    sw.WriteLine(lineToWrite);
+                }
+                //JsonSerializer serializer = JsonSerializer.Create(new JsonSerializerSettings() { Formatting = Formatting.Indented });
+                //serializer.Serialize(sw, OsmFile.Intersections);   
+            }
+
+            return string.Format("Saved {0} intersections to {1} in CSV format.", OsmFile.Intersections.Count, args[0]);
         }
     }
 }

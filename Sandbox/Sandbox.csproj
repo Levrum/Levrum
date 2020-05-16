@@ -9,6 +9,7 @@
     <ProjectReference Include="..\DataClasses\DataClasses.csproj" />
     <ProjectReference Include="..\DataMap\DataMap.csproj" />
     <ProjectReference Include="..\DataSources\DataSources.csproj" />
+    <ProjectReference Include="..\Utils.Osm\Utils.Osm.csproj" />
     <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>
 
