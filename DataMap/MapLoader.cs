@@ -42,7 +42,9 @@ namespace Levrum.Data.Map
         public BackgroundWorker Worker { get; set; }
         public event MapLoaderProgressListener OnProgressUpdate;
 
-        private const int c_numSteps = 9;
+        private const int c_numSteps = 10;
+
+        public int JSProgressStep { get; set; } = -1;
 
         public Logger Logger { get; set; }
 
@@ -84,6 +86,8 @@ namespace Levrum.Data.Map
                     causeTree.Add(cause);
                 }
                 CauseData = flattenCauseData(causeTree);
+
+                executePostLoading();
 
                 cleanupIncidentData();
 
@@ -720,7 +724,7 @@ namespace Levrum.Data.Map
             {
                 convertCoordinates = false;
             }
-            updateProgress(4, string.Format("Processing incident data and nature codes for {0} incidents", Incidents.Count), 0, true);
+            updateProgress(5, string.Format("Processing incident data and nature codes for {0} incidents", Incidents.Count), 0, true);
 
             int incidentNum = 0;
             foreach (IncidentData incident in Incidents)
@@ -730,7 +734,7 @@ namespace Levrum.Data.Map
 
                 incidentNum++;
                 double progress = ((double)incidentNum / (double)Incidents.Count) * 100;
-                updateProgress(4, string.Format("Cleaning incident {0} of {1}", incidentNum, Incidents.Count), progress, incidentNum == Incidents.Count);
+                updateProgress(5, string.Format("Cleaning incident {0} of {1}", incidentNum, Incidents.Count), progress, incidentNum == Incidents.Count);
                 if (convertCoordinates)
                 {
                     double[] xyPoint = { incident.Longitude, incident.Latitude };
@@ -769,12 +773,12 @@ namespace Levrum.Data.Map
 
         private void cleanupResponseData()
         {
-            updateProgress(5, string.Format("Processing response data for {0} incidents", Incidents.Count), 0, true);
+            updateProgress(6, string.Format("Processing response data for {0} incidents", Incidents.Count), 0, true);
         }
 
         private void cleanupBenchmarks()
         {
-            updateProgress(6, string.Format("Processing response timings for {0} incidents", Incidents.Count), 0, true);
+            updateProgress(7, string.Format("Processing response timings for {0} incidents", Incidents.Count), 0, true);
             int incidentNum = 0;
             foreach (IncidentData incident in Incidents)
             {
@@ -791,9 +795,9 @@ namespace Levrum.Data.Map
                     continue;
                 }
 
-                if (incident.Data.ContainsKey("FirstEffAction"))
+                if (incident.Data.ContainsKey("FirstAction"))
                 {
-                    object firstEffAction = incident.Data["FirstEffAction"];
+                    object firstEffAction = incident.Data["FirstAction"];
                     if (firstEffAction is DateTime)
                     {
                         baseTime = (DateTime)firstEffAction;
@@ -1067,7 +1071,7 @@ namespace Levrum.Data.Map
                     double incidentCount = Incidents.Count;
                     double incidentNum = incidentCount - (double)IncidentQueue.Count;
                     double progress = (incidentNum / incidentCount) * 100;
-                    updateProgress(7, string.Format("Processing geographic data for incident {0} of {1}", incidentNum, incidentCount), progress, incidentNum == Incidents.Count);
+                    updateProgress(8, string.Format("Processing geographic data for incident {0} of {1}", incidentNum, incidentCount), progress, incidentNum == Incidents.Count);
                     foreach (IDataSource dataSource in m_geoSources)
                     {
                         GeoSource geoSource = (GeoSource)dataSource;
@@ -1183,7 +1187,7 @@ namespace Levrum.Data.Map
                     }
                 }
 
-                updateProgress(7, string.Format("Processing geographic data from {0} sources for {1} incidents", m_geoSources.Count, Incidents.Count), 0, true);
+                updateProgress(8, string.Format("Processing geographic data from {0} sources for {1} incidents", m_geoSources.Count, Incidents.Count), 0, true);
 
                 foreach (IncidentData incident in Incidents)
                 {
@@ -1299,7 +1303,7 @@ namespace Levrum.Data.Map
 
         private void calculateDerivedBenchmarks()
         {
-            updateProgress(8, string.Format("Calculating derived response timings for {0} incidents", Incidents.Count), 0);
+            updateProgress(9, string.Format("Calculating derived response timings for {0} incidents", Incidents.Count), 0);
             int incidentNum = 0;
             foreach (IncidentData incident in Incidents)
             {
@@ -1308,7 +1312,7 @@ namespace Levrum.Data.Map
 
                 incidentNum++;
                 double progress = ((double)incidentNum / (double)Incidents.Count) * 100;
-                updateProgress(8, string.Format("Calculating derived response timings for incident {0} of {1}", incidentNum, Incidents.Count), progress, incidentNum == Incidents.Count);
+                updateProgress(9, string.Format("Calculating derived response timings for incident {0} of {1}", incidentNum, Incidents.Count), progress, incidentNum == Incidents.Count);
                 ResponseData firstArrival = null;
                 ResponseData lastArrival = null;
                 ResponseData firstResponse = null;
@@ -1362,7 +1366,7 @@ namespace Levrum.Data.Map
 
         public void UpdateJSProgress(string message, double percentage)
         {
-            updateProgress(9, message, percentage);
+            updateProgress(JSProgressStep, message, percentage);
         }
 
         private class ProgressInfo
@@ -1406,12 +1410,15 @@ namespace Levrum.Data.Map
             engine.AddHostType("MapLoaderError", typeof(MapLoaderError));
         }
 
-        private void executePostProcessing()
+        private void executePostLoading()
         {
+            if (Cancelling())
+                return;
+
             if (!string.IsNullOrWhiteSpace(Map.PostProcessingScript))
             {
-
-                updateProgress(9, string.Format("Executing post-loading script"), 0, true);
+                JSProgressStep = 4;
+                updateProgress(JSProgressStep, string.Format("Executing post-loading script"), 0, true);
                 try
                 {
                     using (V8ScriptEngine v8 = new V8ScriptEngine())
@@ -1432,13 +1439,17 @@ namespace Levrum.Data.Map
                     DebugHost.WriteLine(ex.StackTrace);
                 }
             }
+        }
 
+        private void executePostProcessing()
+        {
             if (Cancelling())
                 return;
 
+            JSProgressStep = 10;
             if (!string.IsNullOrWhiteSpace(Map.PerIncidentScript))
             {
-                updateProgress(9, string.Format("Executing per incident script"), 0, true);
+                updateProgress(JSProgressStep, string.Format("Executing per incident script"), 0, true);
                 List<List<IncidentData>> chunks = new List<List<IncidentData>>();
                 List<IncidentData> newChunk = new List<IncidentData>();
                 chunks.Add(newChunk);
@@ -1471,7 +1482,7 @@ namespace Levrum.Data.Map
                             }
                             pInfo.Number++;
 
-                            updateProgress(9, string.Format("Executing per incident script for incident {0} of {1}", pInfo.Number, pInfo.Count), pInfo.Progress, pInfo.Number >= pInfo.Count - 20);
+                            updateProgress(JSProgressStep, string.Format("Executing per incident script for incident {0} of {1}", pInfo.Number, pInfo.Count), pInfo.Progress, pInfo.Number >= pInfo.Count - 20);
                             v8.AddHostObject("Incident", incident);
                             try
                             {
@@ -1503,7 +1514,7 @@ namespace Levrum.Data.Map
 
             if (!string.IsNullOrWhiteSpace(Map.FinalProcessingScript))
             {
-                updateProgress(9, string.Format("Executing final processing script"), 0, true);
+                updateProgress(JSProgressStep, string.Format("Executing final processing script"), 0, true);
 
                 try
                 {
