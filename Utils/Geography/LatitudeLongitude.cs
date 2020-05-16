@@ -45,6 +45,11 @@ namespace Levrum.Utils.Geography
             }
         }
 
+        public LatitudeLongitude()
+        {
+
+        }
+
         public LatitudeLongitude(double _latitude, double _longitude)
         {
             Latitude = _latitude;
@@ -79,6 +84,20 @@ namespace Levrum.Utils.Geography
         public static bool operator !=(LatitudeLongitude point1, LatitudeLongitude point2)
         {
             return !(point1 == point2);
+        }
+
+        public double DistanceFrom(LatitudeLongitude otherPoint)
+        {
+            double radiusInFeet = 20902464.0;
+            double pi180 = (Math.PI / 180);
+            double p1 = Latitude * pi180;
+            double p2 = otherPoint.Latitude * pi180;
+            double deltaP = (otherPoint.Latitude - Latitude) * pi180;
+            double deltaL = (otherPoint.Longitude - Longitude) * pi180;
+            double a = Math.Sin(deltaP / 2) * Math.Sin(deltaP / 2) + Math.Cos(p1) * Math.Cos(p2) * Math.Sin(deltaL / 2) * Math.Sin(deltaL / 2);
+            double distanceInRadians = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
+
+            return radiusInFeet * distanceInRadians;
         }
     }
 }
