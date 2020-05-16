@@ -5,7 +5,11 @@ Levrum DataBridge uses the Microsoft ClearScript engine to execute post-processi
 
 Levrum DataBridge connects to your Data Sources and combines them to create three different types of objects which are then combined to create JSON, CSV, and Microsoft Excel exports for use in your applications. 
 
-These objects are of type IncidentData, ResponseData, and TimingData, all of which are based on the AnnotatedData object. AnnotatedData objects store information in Dictionaries of type <string, object> named Data. 
+These objects are of type IncidentData, ResponseData, and TimingData, all of which are based on the AnnotatedData object. AnnotatedData objects store information in Dictionaries of type <string, object> named Data. These store the data from Field
+Mappings created with DataBridge. For example, in order to get the value of the Time Incident Data Mapping from the Incident object in a Per-Incident Script, you would use the JavaScript statement:
+```javascript
+var Time = Incident.GetDataValue("Time");
+```
 
 These dictionaries can be accessed in JavaScript in two different ways. AnnotatedData objects contain three functions for interacting with their Data dictionarys, SetDataValue, GetDataValue, and RemoveDataValue. 
 

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;net48</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net48</TargetFrameworks>
     <UseWPF>true</UseWPF>
     <AssemblyName>Levrum.UI.WPF</AssemblyName>
     <RootNamespace>Levrum.UI.WPF</RootNamespace>
@@ -12,6 +12,10 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Copyright>(c) 2019 Levrum Data Technologies</Copyright>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Utils\Utils.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <Compile Update="TextInputDialog.xaml.cs">
