@@ -398,6 +398,7 @@ namespace Levrum.DataBridge
                     updateCoordinateConversionControls();
                     updateInvertLatitude();
                     updateInvertLongitude();
+                    updateTransportAsClearScene();
                 }
                 else
                 {
