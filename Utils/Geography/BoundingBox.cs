@@ -37,10 +37,10 @@ namespace Levrum.Utils.Geography
 
         public void ExtendBounds(double lat, double lon)
         {
-            MinLat = Math.Min(MinLat, lat);
-            MinLon = Math.Min(MinLon, lon);
-            MaxLat = Math.Max(MaxLat, lat);
-            MaxLon = Math.Min(MaxLon, lon);
+            MinLat = MinLat == double.MaxValue ? lat : Math.Min(MinLat, lat);
+            MinLon = MinLon == double.MaxValue ? lon : Math.Min(MinLon, lon);
+            MaxLat = MaxLat == double.MinValue ? lat : Math.Max(MaxLat, lat);
+            MaxLon = MaxLon == double.MinValue ? lon : Math.Max(MaxLon, lon);
         }
 
         public bool Contains(LatitudeLongitude latLon)
