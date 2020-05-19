@@ -8,6 +8,7 @@ using System.Xml;
 using System.Xml.Linq;
 
 using Levrum.Utils.Geography;
+using Levrum.Utils.Geometry;
 
 namespace Levrum.Utils.Osm
 {
@@ -200,23 +201,7 @@ namespace Levrum.Utils.Osm
             {
                 foreach (OSMWay way in WaysById.Values) 
                 {
-                    OSMNode previousNode = null;
-                    double previousDistance = 0, newDistance = 0;
-                    foreach (string nodeRef in way.NodeReferences)
-                    {
-                        OSMNode currentNode;
-                        if (NodesById.TryGetValue(nodeRef, out currentNode))
-                        {
-                            if (previousNode != null)
-                            {
-                                double distance = previousNode.Location.DistanceFrom(currentNode.Location);
-                                newDistance = previousDistance + distance;
-                            }
-                            previousDistance = newDistance;
-                            previousNode = currentNode;
-                        }
-                        way.NodeDistances.Add(previousDistance);
-                    }
+                    calculateNodeDistancesForWay(way);
                 }
 
                 return DistancesCalculated = true;
@@ -228,20 +213,34 @@ namespace Levrum.Utils.Osm
             }
         }
 
+        private void calculateNodeDistancesForWay(OSMWay way)
+        {
+            OSMNode previousNode = null;
+            double previousDistance = 0, newDistance = 0;
+            foreach (string nodeRef in way.NodeReferences)
+            {
+                OSMNode currentNode;
+                if (NodesById.TryGetValue(nodeRef, out currentNode))
+                {
+                    if (previousNode != null)
+                    {
+                        double distance = previousNode.Location.DistanceFrom(currentNode.Location);
+                        newDistance = previousDistance + distance;
+                    }
+                    previousDistance = newDistance;
+                    previousNode = currentNode;
+                }
+                way.NodeDistances.Add(previousDistance);
+            }
+        }
+
         public bool CalculateWayBounds()
         {
             try
             {
                 foreach (OSMWay way in WaysById.Values)
                 {
-                    foreach (string nodeId in way.NodeReferences)
-                    {
-                        OSMNode node;
-                        if (NodesById.TryGetValue(nodeId, out node))
-                        {
-                            way.BoundingBox.ExtendBounds(node.Location);
-                        }
-                    }
+                    calculateBoundsForWay(way);
                 }
 
                 return BoundsCalculated = true;
@@ -250,6 +249,18 @@ namespace Levrum.Utils.Osm
             {
                 LogHelper.LogException(ex, "Error calculating way bounds", true);
                 return BoundsCalculated = false;
+            }
+        }
+
+        private void calculateBoundsForWay(OSMWay way)
+        {
+            foreach (string nodeId in way.NodeReferences)
+            {
+                OSMNode node;
+                if (NodesById.TryGetValue(nodeId, out node))
+                {
+                    way.BoundingBox.ExtendBounds(node.Location);
+                }
             }
         }
 
@@ -354,6 +365,192 @@ namespace Levrum.Utils.Osm
                 writer.WriteLine(string.Format(c_relationMemberFormat, member.Type, member.Ref, member.Role));
             }
             writer.WriteLine("  </relation>");
+        }
+
+        #endregion
+
+        #region Operations
+
+        public List<OSMWay> GetWaysIntersectingLine(LatitudeLongitude point1, LatitudeLongitude point2)
+        {
+            List<OSMWay> output = new List<OSMWay>();
+            try
+            {
+                foreach (OSMWay way in Ways)
+                {
+                    if (way.BoundingBox.IntersectsLine(point1, point2))
+                    {
+                        for (int i = 0; i < way.NodeReferences.Count - 1; i++)
+                        {
+                            OSMNode thisNode, thatNode;
+                            if (!NodesById.TryGetValue(way.NodeReferences[i], out thisNode) || !NodesById.TryGetValue(way.NodeReferences[i + 1], out thatNode))
+                            {
+                                continue;
+                            }
+
+                            Point2 intersectionPoint = LineSegment2.Intersection(point1, point2, thisNode.Location, thatNode.Location);
+                            if (intersectionPoint != null)
+                            {
+                                output.Add(way);
+                            }
+                        }
+                    }
+                }
+
+                return output;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "Error getting intersecting ways", true);
+            }
+            return output;
+        }
+
+        public bool SplitWaysByLine(LineSegment2 line)
+        {
+            return SplitWaysByLine(line.PointA, line.PointB);
+        }
+
+        public bool SplitWaysByLine(LatitudeLongitude point1, LatitudeLongitude point2)
+        {
+            try
+            {
+                List<OSMWay> originalWays = Ways;
+                foreach (OSMWay way in originalWays)
+                {
+                    if (way.Tags.ContainsKey("highway") && AcceptedRoadTypes.Contains(way.Tags["highway"]))
+                    {
+                        searchWayForIntersectionAndSplit(way, point1, point2);
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "Error getting intersecting ways", true);
+            }
+            return false;
+        }
+
+        private void searchWayForIntersectionAndSplit(OSMWay way, LatitudeLongitude point1, LatitudeLongitude point2)
+        {
+            if (way.BoundingBox.IntersectsLine(point1, point2))
+            {
+                for (int i = 0; i < way.NodeReferences.Count - 1; i++)
+                {
+                    OSMNode thisNode, thatNode;
+                    if (!NodesById.TryGetValue(way.NodeReferences[i], out thisNode) || !NodesById.TryGetValue(way.NodeReferences[i + 1], out thatNode))
+                    {
+                        continue;
+                    }
+
+                    Point2 intersectionPoint = LineSegment2.Intersection(point1, point2, thisNode.Location, thatNode.Location);
+                    if (intersectionPoint != null)
+                    {
+                        splitWayByLine(way, point1, point2, thisNode.Location, thatNode.Location, i, intersectionPoint);
+                    }
+                }
+            }
+        }
+
+        private void splitWayByLine(OSMWay way, LatitudeLongitude point1, LatitudeLongitude point2, LatitudeLongitude nodeLoc1, LatitudeLongitude nodeLoc2, int nodeIndex, Point2 intersectionPoint)
+        {
+            // Make new way
+            OSMWay newWay = new OSMWay();
+            newWay.ID = getValidOsmId();
+            newWay.Name = way.Name;
+            newWay.MaxSpeed = way.MaxSpeed;
+            newWay.Oneway = way.Oneway;
+            newWay.Version = "1";
+            newWay.Changeset = DateTime.Now.ToString("yyMMddHHmm");
+            foreach (KeyValuePair<string, string> kvp in way.Tags)
+            {
+                newWay.Tags[kvp.Key] = kvp.Value;
+            }
+            claimOsmObjectAsLevrums(newWay);
+            WaysById.Add(newWay.ID, newWay);
+
+            claimOsmObjectAsLevrums(way);
+
+            // Make new nodes
+            OSMNode oldWayTerminator = new OSMNode(), newWayTerminator = new OSMNode();
+
+            // Move the terminators towards their nodes slightly to prevent infinite recursion
+            double oldWayNodeLatHeight = nodeLoc1.Latitude - intersectionPoint.Y;
+            double oldWayNodeLngWidth = nodeLoc1.Longitude - intersectionPoint.X;
+            oldWayTerminator.Location = new LatitudeLongitude(intersectionPoint.Y + (Math.Sign(oldWayNodeLatHeight) * .00002), intersectionPoint.X + (Math.Sign(oldWayNodeLngWidth) * .00002));
+
+            double newWayNodeLatHeight = nodeLoc2.Latitude - intersectionPoint.Y;
+            double newWayNodeLngWidth = nodeLoc2.Longitude - intersectionPoint.X;
+            newWayTerminator.Location = new LatitudeLongitude(intersectionPoint.Y + (Math.Sign(newWayNodeLatHeight) * .00002), intersectionPoint.X + (Math.Sign(newWayNodeLngWidth) * .00002));
+                
+            newWayTerminator.EndNodeFlag = oldWayTerminator.EndNodeFlag = true;
+            
+            newWayTerminator.ID = getValidOsmId();
+            NodesById.Add(newWayTerminator.ID, newWayTerminator);
+
+            oldWayTerminator.ID = getValidOsmId();
+            NodesById.Add(oldWayTerminator.ID, oldWayTerminator);
+
+            newWayTerminator.Tags.Add("roadCut", oldWayTerminator.ID);
+            oldWayTerminator.Tags.Add("roadCut", newWayTerminator.ID);
+
+            claimOsmObjectAsLevrums(newWayTerminator);
+            claimOsmObjectAsLevrums(oldWayTerminator);
+            newWayTerminator.Version = "1";
+            oldWayTerminator.Version = "1";
+
+            // Not exactly true but this is somewhat hard to fake reasonably?
+            newWayTerminator.Changeset = newWay.Changeset;
+            oldWayTerminator.Changeset = newWay.Changeset;
+
+            // Cleanup node references
+            newWay.NodeReferences.Add(newWayTerminator.ID);
+            for (int j = nodeIndex + 1; j < way.NodeReferences.Count; j++)
+            {
+                newWay.NodeReferences.Add(way.NodeReferences[j]);
+            }
+
+            for (int j = way.NodeReferences.Count - 1; j > nodeIndex; j--) 
+            {
+                way.NodeReferences.RemoveAt(j);
+            }
+
+            way.NodeReferences.Add(oldWayTerminator.ID);
+            way.NodeDistances.Clear();
+            calculateNodeDistancesForWay(way);
+            calculateNodeDistancesForWay(newWay);
+
+            calculateBoundsForWay(newWay);
+            searchWayForIntersectionAndSplit(newWay, point1, point2);
+        }
+
+        Random m_rand = new Random((int)DateTime.Now.Ticks >> 10);
+
+        private string getValidOsmId()
+        {
+            // Gives a random number between 9 and 10 billion. At the time of writing (05-2020) there were only 6 billion OSM nodes. Should be safe for a year or two.
+            string output = string.Empty;
+            while (string.IsNullOrEmpty(output))
+            {   
+                double variance = m_rand.NextDouble() * Math.Pow(10, 9);
+                long nodeId = (long)Math.Floor((Math.Pow(10, 9) * 9) + variance);
+                output = nodeId.ToString();
+                if (NodesById.ContainsKey(output) || WaysById.ContainsKey(output))
+                    output = string.Empty;
+            }
+            
+            return output;
+        }
+
+        private void claimOsmObjectAsLevrums(OSMElement element)
+        {
+            element.User = "Levrum";
+            element.Timestamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
+            element.Uid = "11158813";
+            int version;
+            element.Version = int.TryParse(element.Version, out version) ? (version + 1).ToString() : element.Version;
         }
 
         #endregion
@@ -638,11 +835,7 @@ namespace Levrum.Utils.Osm
                     //Gotcha! megaWay was caught!
                     //megaWay's data was added to the POKEDEX
                     //Give a nickname to the captured megaWay?
-                    megaWay.User = "Levrum";
-                    megaWay.Timestamp = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ssZ");
-                    megaWay.Uid = "11158813";
-                    int version;
-                    megaWay.Version = int.TryParse(megaWay.Version, out version) ? (version + 1).ToString() : megaWay.Version;
+                    claimOsmObjectAsLevrums(megaWay);
                 }
             }
 
