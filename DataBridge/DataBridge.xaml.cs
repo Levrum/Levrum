@@ -52,6 +52,8 @@ namespace Levrum.DataBridge
             
             Assembly assembly = Assembly.GetExecutingAssembly();
             LicenseClient client = new LicenseClient(assembly, "databridge");
+            client.OnLogMessage += LicenseClient_OnLogMessage;
+            client.OnException += LicenseClient_OnException;
             client.VerifyOrRequestLicense();
 
             DataSources.Window = this;
@@ -91,6 +93,16 @@ namespace Levrum.DataBridge
             }
             checkForUpdates();
             updateToolbarsAndMenus();
+        }
+
+        private void LicenseClient_OnException(Exception ex)
+        {
+            LogHelper.LogException(ex, "Exception getting license", true);
+        }
+
+        private void LicenseClient_OnLogMessage(string message)
+        {
+            LogHelper.LogMessage(LogLevel.Warn, message, null);
         }
 
         private void onLoaderProgress(object sender, string message, double progress)
