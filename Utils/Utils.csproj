@@ -5,15 +5,15 @@
     <RootNamespace>Levrum.Utils</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Levrum.Utils</PackageId>
-    <Version>0.0.10.0</Version>
+    <Version>0.0.11.0</Version>
     <Authors>Carl Niedner, Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Product>Levrum.Utils</Product>
-    <Copyright>(c) 2019 Levrum Data Technologies</Copyright>
+    <Copyright>(c) 2019, 2020 Levrum Data Technologies</Copyright>
     <AssemblyName>Levrum.Utils</AssemblyName>
-    <AssemblyVersion>0.0.10.0</AssemblyVersion>
-    <FileVersion>0.0.10.0</FileVersion>
+    <AssemblyVersion>0.0.11.0</AssemblyVersion>
+    <FileVersion>0.0.11.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>

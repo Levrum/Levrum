@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Levrum.Utils.Geometry;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -98,6 +99,16 @@ namespace Levrum.Utils.Geography
             double distanceInRadians = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
 
             return radiusInFeet * distanceInRadians;
+        }
+
+        public static implicit operator Point2(LatitudeLongitude input)
+        {
+            return new Point2(input.Longitude, input.Latitude);
+        }
+
+        public static implicit operator LatitudeLongitude(Point2 input)
+        {
+            return new LatitudeLongitude(input.Y, input.X);
         }
     }
 }

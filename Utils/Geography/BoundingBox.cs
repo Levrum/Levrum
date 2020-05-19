@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+using Levrum.Utils.Geometry;
+
 namespace Levrum.Utils.Geography
 {
 
@@ -78,6 +80,24 @@ namespace Levrum.Utils.Geography
 
             BoundingBox output = new BoundingBox(input[0], input[1], input[2], input[3]);
             return output;
+        }
+
+        public bool IntersectsLine(LatitudeLongitude point1, LatitudeLongitude point2)
+        {
+            try
+            {
+                Point2 westIntersection = LineSegment2.Intersection(point1.Longitude, point1.Latitude, point2.Longitude, point2.Latitude, MinLon, MaxLat, MinLon, MinLat);
+                Point2 southIntersection = LineSegment2.Intersection(point1.Longitude, point1.Latitude, point2.Longitude, point2.Latitude, MinLon, MinLat, MaxLon, MinLat);
+                Point2 eastIntersection = LineSegment2.Intersection(point1.Longitude, point1.Latitude, point2.Longitude, point2.Latitude, MaxLon, MaxLat, MaxLon, MinLat);
+                Point2 northIntersection = LineSegment2.Intersection(point1.Longitude, point1.Latitude, point2.Longitude, point2.Latitude, MinLon, MaxLat, MaxLon, MaxLat);
+
+                return (westIntersection != null || southIntersection != null || eastIntersection != null || northIntersection != null);
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "Error testing line intersection", false);
+                return false;
+            }
         }
     }
 }
