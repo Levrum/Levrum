@@ -13,6 +13,7 @@ using Levrum.Utils.Messaging;
 using Levrum.Utils.Geography;
 
 using Levrum.Utils.Osm;
+using Levrum.Utils.Geometry;
 
 namespace Sandbox
 {
@@ -318,6 +319,28 @@ namespace Sandbox.DefaultCommands
             }
 
             return string.Format("Saved {0} intersections to {1} in CSV format.", OsmFile.Intersections.Count, args[0]);
+        }
+
+        public static string addroadcut(List<string> args)
+        {
+            if (OsmFile == null)
+                return "You must first load an osm file with the loadosm command.";
+
+            double x1, y1, x2, y2;
+            if (args.Count != 4 || !double.TryParse(args[0], out x1) || !double.TryParse(args[1], out y1) || !double.TryParse(args[2], out x2) || !double.TryParse(args[3], out y2))
+            {
+                return "Usage: addroadcut <x1> <y1> <x2> <y2>";
+            }
+
+            LatitudeLongitude a = new LatitudeLongitude(y1, x1);
+            LatitudeLongitude b = new LatitudeLongitude(y2, x2);
+
+            if (!OsmFile.SplitWaysByLine(a, b))
+            {
+                return "Unable to split way!";
+            }
+
+            return "Ways split successfully!";
         }
     }
 }

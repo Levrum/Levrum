@@ -362,7 +362,7 @@ namespace Levrum.Utils.Osm
             writer.WriteLine(string.Format(c_relationFormat, relation.ID, relation.Timestamp, relation.Uid, SecurityElement.Escape(relation.User), relation.Version, relation.Changeset, relation.Visible));
             foreach (OSMRelationMember member in relation.Members)
             {
-                writer.WriteLine(string.Format(c_relationMemberFormat, member.Type, member.Ref, member.Role));
+                writer.WriteLine(string.Format(c_relationMemberFormat, member.Type, member.Ref, SecurityElement.Escape(member.Role)));
             }
             writer.WriteLine("  </relation>");
         }
