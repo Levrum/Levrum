@@ -769,6 +769,10 @@ namespace Levrum.Data.Map
                 incident.Data["Category"] = natureCodeData[1].Trim();
                 incident.Data["Type"] = natureCodeData[2].Trim();
             }
+
+            var sortedIncidents = Incidents.OrderBy(i => i.Time).ToList();
+            Incidents.Clear();
+            Incidents.AddRange(sortedIncidents);
         }
 
         private void cleanupResponseData()

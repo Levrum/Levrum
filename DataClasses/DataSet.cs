@@ -61,6 +61,15 @@ namespace Levrum.Data.Classes
             Parent = _parent;
         }
 
+        public DataSet(List<T> _list = null, object _parent = null)
+        {
+            if (_list != null)
+            {
+                AddRange(_list);
+            }
+            Parent = _parent;
+        }
+
         public DataSet(string id = "", List<T> items = null, Dictionary<string, object> data = null, object _parent = null)
         {
             Id = id;
