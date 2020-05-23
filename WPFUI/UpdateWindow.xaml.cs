@@ -5,7 +5,7 @@ using System.IO;
 using System.Net;
 using System.Reflection;
 using System.Text;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using Newtonsoft.Json;
 
 using Levrum.Utils;
+using System.Threading;
 
 namespace Levrum.UI.WPF
 {
@@ -29,8 +30,11 @@ namespace Levrum.UI.WPF
         public string AppName { get; set; } = string.Empty;
         public Version Version { get; set; } = null;
         public UpdateInfo UpdateInfo { get; protected set; } = null;
-        public Thread UpdateThread { get; set; } = null;
+        public Task UpdateTask { get; set; } = null;
+        public CancellationTokenSource CancellationTokenSource { get; set; } = null;
+        public CancellationToken CancellationToken { get; set; }
         public bool WindowClosing { get; set; } = false;
+        public WebClient DownloadClient { get; set; } = null;
 
         public UpdateWindow(string appName, Version version)
         {
@@ -43,7 +47,10 @@ namespace Levrum.UI.WPF
         {
             if (Visibility == Visibility.Visible)
             {
-                checkForUpdate(AppName, Version);
+                CancellationTokenSource = new CancellationTokenSource();
+                CancellationToken = CancellationTokenSource.Token;
+                UpdateTask = new Task(() => { checkForUpdate(AppName, Version); }, CancellationToken);
+                UpdateTask.Start();
             }
         }
 
@@ -58,6 +65,7 @@ namespace Levrum.UI.WPF
 
                 string updates = client.DownloadString(url);
                 UpdateInfo = JsonConvert.DeserializeObject<UpdateInfo>(updates);
+                CancellationToken.ThrowIfCancellationRequested();
 
                 if (UpdateInfo != null && !string.IsNullOrWhiteSpace(UpdateInfo.URL))
                 {
@@ -68,48 +76,73 @@ namespace Levrum.UI.WPF
                     if (result == MessageBoxResult.No)
                     {
                         WindowClosing = true;
-                        Close();
+                        Dispatcher.Invoke(() => { Close(); });
                         return;
                     }
                 }
                 else
                 {
                     WindowClosing = true;
-                    Close();
+                    Dispatcher.Invoke(() => { Close(); });
                     return;
                 }
+                CancellationTokenSource.Dispose();
 
-                UpdateThread = new Thread(downloadUpdate);
-                UpdateThread.Start();
+                CancellationTokenSource = new CancellationTokenSource();
+                CancellationToken = CancellationTokenSource.Token;
+
+                UpdateTask = new Task(downloadUpdate, CancellationToken);
+                UpdateTask.Start();
             }
             catch (Exception ex)
             {
                 LogHelper.LogException(ex, "Exception while checking for updates", false);
+                WindowClosing = true;
+                Dispatcher.Invoke(() => { Close(); });
+                return;
             }
         }
 
         public void downloadUpdate()
         {
-            DirectoryInfo tempDir = new DirectoryInfo(string.Format("{0}\\Levrum\\Temp\\", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)));
-            if (!tempDir.Exists)
+            try
             {
-                tempDir.Create();
-            }
-            Title = "Downloading Update...";
-            StatusTextBlock.Text = "Beginning Download...";
+                DirectoryInfo tempDir = new DirectoryInfo(string.Format("{0}\\Levrum\\Temp\\", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)));
+                if (!tempDir.Exists)
+                {
+                    tempDir.Create();
+                }
+                Title = "Downloading Update...";
+                StatusTextBlock.Text = "Beginning Download...";
 
-            WebClient client = new WebClient();
-            FileInfo file = new FileInfo(tempDir.FullName + "\\" + UpdateInfo.FileName);
-            client.DownloadFile(new Uri(UpdateInfo.URL), file.FullName);
-            client.DownloadProgressChanged += Client_DownloadProgressChanged;
-            StatusTextBlock.Text = "Download Complete!";
-            StatusTextBlock.FontSize = 32;
-            Process.Start(file.FullName);
-            Application.Current.Shutdown();
+                DownloadClient = new WebClient();
+                FileInfo file = new FileInfo(tempDir.FullName + "\\" + UpdateInfo.FileName);
+                DownloadClient.DownloadFile(new Uri(UpdateInfo.URL), file.FullName);
+                DownloadClient.DownloadProgressChanged += Client_DownloadProgressChanged;
+                StatusTextBlock.Text = "Download Complete!";
+                StatusTextBlock.FontSize = 32;
+
+                CancellationToken.ThrowIfCancellationRequested();
+
+                Process.Start(file.FullName);
+                Application.Current.Shutdown();
+            } catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "Exception while downloading update", false);
+                WindowClosing = true;
+                Dispatcher.Invoke(() => { Close(); });
+                return;
+            }
         }
 
         private void Client_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
         {
+            if (CancellationToken.IsCancellationRequested)
+            {
+                DownloadClient.CancelAsync();
+                return;
+            }
+
             StatusTextBlock.FontSize = 24;
             double remainingMB = (e.TotalBytesToReceive - e.BytesReceived) / (1024 * 1024);
             StatusTextBlock.Text = string.Format("Downloaded {0}% ({1:F2}MB remaining)...", e.ProgressPercentage, remainingMB);
@@ -118,9 +151,9 @@ namespace Levrum.UI.WPF
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            if (UpdateThread != null)
+            if (CancellationTokenSource != null)
             {
-                UpdateThread.Abort();
+                CancellationTokenSource.Cancel();
             }
             WindowClosing = true;
             Close();
@@ -128,7 +161,7 @@ namespace Levrum.UI.WPF
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (UpdateThread != null && UpdateThread.IsAlive && !WindowClosing)
+            if (UpdateTask != null && UpdateTask.Status == TaskStatus.Running && !WindowClosing)
             {
                 MessageBoxResult result = MessageBox.Show("Closing the window will cancel your update. Would you like to cancel it?", "Cancel update?", MessageBoxButton.YesNo);
                 if (result == MessageBoxResult.No)
@@ -136,7 +169,8 @@ namespace Levrum.UI.WPF
                     e.Cancel = true;
                     return;
                 }
-                UpdateThread.Abort();
+                if (CancellationTokenSource != null) { CancellationTokenSource.Dispose(); }
+                Visibility = Visibility.Hidden;
             }
         }
     }
