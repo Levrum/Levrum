@@ -252,7 +252,8 @@ namespace Levrum.UI.WinForms
         private void LoadTree(IEnumerable<ICategoryData> tree, FlowLayoutPanel parentPanel)
         {
             MarkAllValueBlocksAsNotAdded();
-
+            
+            SuspendLayout();
             parentPanel.Controls.Clear();
             parentPanel.FlowDirection = FlowDirection.TopDown;
             parentPanel.SuspendLayout();
@@ -262,6 +263,7 @@ namespace Levrum.UI.WinForms
             }
             parentPanel.Controls.Add(GenerateSubcategoryButton());
             parentPanel.ResumeLayout();
+            ResumeLayout();
 
             MarkBlocksInTreeAsAdded(tree.ToList());
         }
