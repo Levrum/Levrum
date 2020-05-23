@@ -99,5 +99,22 @@ namespace Levrum.Utils.Geography
                 return false;
             }
         }
+
+        public LatitudeLongitude GetCenterPoint()
+        {
+            try
+            {
+                LatitudeLongitude output = new LatitudeLongitude();
+                output.Latitude = MinLat + (MaxLat - MinLat) / 2;
+                output.Longitude = MinLon + (MaxLon - MinLon) / 2;
+
+                return output;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "Error computing bounding box centroid", false);
+                return null;
+            }
+        }
     }
 }
