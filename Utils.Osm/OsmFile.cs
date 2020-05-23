@@ -447,14 +447,16 @@ namespace Levrum.Utils.Osm
             OSMNode oldWayTerminator = new OSMNode(), newWayTerminator = new OSMNode();
 
             // Move the terminators towards their nodes slightly to prevent infinite recursion
-            double oldWayNodeLatHeight = nodeLoc1.Latitude - intersectionPoint.Y;
-            double oldWayNodeLngWidth = nodeLoc1.Longitude - intersectionPoint.X;
-            oldWayTerminator.Location = new LatitudeLongitude(intersectionPoint.Y + (Math.Sign(oldWayNodeLatHeight) * .00002), intersectionPoint.X + (Math.Sign(oldWayNodeLngWidth) * .00002));
+            double oldWayDistance = Math.Sqrt(Math.Pow(nodeLoc1.Latitude - intersectionPoint.Y, 2) + Math.Pow(nodeLoc1.Longitude - intersectionPoint.X, 2));
+            double oldWayTerminatorDistance = oldWayDistance - .00002;
+            double ratio = oldWayTerminatorDistance / oldWayDistance;
+            oldWayTerminator.Location = new LatitudeLongitude(((1 - ratio) * nodeLoc1.Latitude) + (ratio * intersectionPoint.Y), ((1 - ratio) * nodeLoc1.Longitude) + (ratio * intersectionPoint.X));
 
-            double newWayNodeLatHeight = nodeLoc2.Latitude - intersectionPoint.Y;
-            double newWayNodeLngWidth = nodeLoc2.Longitude - intersectionPoint.X;
-            newWayTerminator.Location = new LatitudeLongitude(intersectionPoint.Y + (Math.Sign(newWayNodeLatHeight) * .00002), intersectionPoint.X + (Math.Sign(newWayNodeLngWidth) * .00002));
-                
+            double newWayDistance = Math.Sqrt(Math.Pow(nodeLoc2.Latitude - intersectionPoint.Y, 2) + Math.Pow(nodeLoc2.Longitude - intersectionPoint.X, 2));
+            double newWayTerminatorDistance = newWayDistance - .00002;
+            ratio = newWayTerminatorDistance / newWayDistance;
+            newWayTerminator.Location = new LatitudeLongitude(((1 - ratio) * nodeLoc2.Latitude) + (ratio * intersectionPoint.Y), ((1 - ratio) * nodeLoc2.Longitude) + (ratio * intersectionPoint.X));
+
             newWayTerminator.EndNodeFlag = oldWayTerminator.EndNodeFlag = true;
             
             newWayTerminator.ID = getValidOsmId();
