@@ -25,7 +25,7 @@ namespace Levrum.Utils.Geography
                     throw new ArgumentOutOfRangeException("Latitudes must be between -90.0 and 90.0 degrees");
                 }
 
-                m_latitude = Math.Round(value, 6); 
+                m_latitude = value;
             } 
         }
 
@@ -42,7 +42,7 @@ namespace Levrum.Utils.Geography
                     throw new ArgumentOutOfRangeException("Longitudes must be between -180.0 and 180.0 degrees");
                 }
 
-                m_longitude = Math.Round(value, 6);
+                m_longitude = value;
             }
         }
 

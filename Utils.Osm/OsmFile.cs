@@ -85,6 +85,15 @@ namespace Levrum.Utils.Osm
                 {
                     OSMNode node = new OSMNode();
                     node.GetElementDetailsFromXElement(nodeElement);
+                    if (double.TryParse(nodeElement.Attribute("lat").Value, out lat))
+                    {
+                        node.Latitude = lat;
+                    }
+
+                    if (double.TryParse(nodeElement.Attribute("lon").Value, out lon))
+                    {
+                        node.Longitude = lon;
+                    }
                     node.Latitude = double.TryParse(nodeElement.Attribute("lat").Value, out lat) ? lat : double.NaN;
                     node.Longitude = double.TryParse(nodeElement.Attribute("lon").Value, out lon) ? lon : double.NaN;
 
@@ -92,14 +101,6 @@ namespace Levrum.Utils.Osm
 
                     NodesById[node.ID] = node;
                     //WaysForNodes[node.ID] = new List<OSMNodeWayInfo>();
-
-                    List<XElement> tags = nodeElement.Descendants("tag").ToList();
-                    foreach (XElement tag in tags)
-                    {
-                        string key = tag.Attribute("k").Value;
-                        string value = tag.Attribute("v").Value;
-                        node.Tags[key] = value;
-                    }
                 }
 
                 foreach (XElement wayElement in wayElements)
@@ -134,23 +135,16 @@ namespace Levrum.Utils.Osm
                         }
                     }
 
-                    List<XElement> tags = wayElement.Descendants("tag").ToList();
-                    foreach (XElement tag in tags)
+                    XElement oneWayTag = wayElement.Descendants("tag").Where(t => t.Attribute("k").Value == "oneway").SingleOrDefault();
+                    if (oneWayTag != null && (oneWayTag.Attribute("v").Value == "yes" || oneWayTag.Attribute("v").Value == "true"))
                     {
-                        string key = tag.Attribute("k").Value;
-                        string value = tag.Attribute("v").Value;
+                        way.Oneway = true;
+                    }
 
-                        switch (key)
-                        {
-                            case "oneway":
-                                way.Oneway = (value == "yes" || value == "true");
-                                break;
-                            case "maxspeed":
-                                way.MaxSpeed = value;
-                                break;
-                        }
-
-                        way.Tags[key] = value;
+                    XElement maxSpeedTag = wayElement.Descendants("tag").Where(t => t.Attribute("k").Value == "maxspeed").SingleOrDefault();
+                    if (maxSpeedTag != null)
+                    {
+                        way.MaxSpeed = maxSpeedTag.Attribute("v").Value;
                     }
 
                     WaysById[way.ID] = way;
@@ -288,23 +282,33 @@ namespace Levrum.Utils.Osm
             {
                 using (StreamWriter writer = new StreamWriter(path))
                 {
-                    writer.WriteLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-                    writer.WriteLine("<osm version=\"0.6\" generator=\"Levrum\">");
+                    XElement osmElement = new XElement("osm");
+                    osmElement.SetAttributeValue("version", "0.6");
+                    osmElement.SetAttributeValue("encoding", "UTF-8");
+
                     UpdateBounds();
-                    writer.WriteLine(string.Format("  <bounds minlat=\"{0}\" minlon=\"{1}\" maxlat=\"{2}\" maxlon=\"{3}\" origin=\"Levrum OSM Writer\" />", Bounds.MinLat, Bounds.MinLon, Bounds.MaxLat, Bounds.MaxLon));
+                    XElement boundsElement = new XElement("bounds");
+                    boundsElement.SetAttributeValue("minlat", Bounds.MinLat);
+                    boundsElement.SetAttributeValue("minlon", Bounds.MinLon);
+                    boundsElement.SetAttributeValue("maxlat", Bounds.MaxLat);
+                    boundsElement.SetAttributeValue("maxlon", Bounds.MaxLon);
+                    boundsElement.SetAttributeValue("origin", "Levrum OSM Writer");
+                    osmElement.Add(boundsElement);
+
                     foreach (OSMNode node in Nodes)
                     {
-                        writeNode(writer, node);
+                        writeNode(osmElement, node);
                     }
                     foreach (OSMWay way in Ways)
                     {
-                        writeWay(writer, way);
+                        writeWay(osmElement, way);
                     }
                     foreach (OSMRelation relation in Relations)
                     {
-                        writeRelation(writer, relation);
+                        writeRelation(osmElement, relation);
                     }
-                    writer.WriteLine("</osm>");
+
+                    osmElement.Save(writer);
                 }
                 return true;
             }
@@ -315,56 +319,22 @@ namespace Levrum.Utils.Osm
             }
         }
 
-        const string c_nodeNoTagFormat = "  <node id=\"{0}\" timestamp=\"{1}\" uid=\"{2}\" user=\"{3}\" version=\"{4}\" changeset=\"{5}\" visible=\"{6}\" lat=\"{7}\" lon=\"{8}\" />";
-        const string c_nodeWithTagFormat = "  <node id=\"{0}\" timestamp=\"{1}\" uid=\"{2}\" user=\"{3}\" version=\"{4}\" changeset=\"{5}\" visible=\"{6}\" lat=\"{7}\" lon=\"{8}\" >";
-        const string c_tagFormat = "    <tag k=\"{0}\" v=\"{1}\" />";
-
-        private void writeNode(StreamWriter writer, OSMNode node)
+        private void writeNode(XElement parent, OSMNode node)
         {
-
-            var format = node.Tags.Count == 0 ? c_nodeNoTagFormat : c_nodeWithTagFormat;
-            writer.WriteLine(string.Format(format, node.ID, node.Timestamp, node.Uid, SecurityElement.Escape(node.User), node.Version, node.Changeset, node.Visible, node.Latitude, node.Longitude));
-
-            foreach (KeyValuePair<string, string> keyValuePair in node.Tags)
-            {
-                writer.WriteLine(string.Format(c_tagFormat, SecurityElement.Escape(keyValuePair.Key), SecurityElement.Escape(keyValuePair.Value)));
-            }
-            if (node.Tags.Count > 0)
-            {
-                writer.WriteLine("  </node>");
-            }
+            XElement nodeElement = node.ToXElement();
+            parent.Add(nodeElement);
         }
 
-        const string c_wayFormat = "  <way id=\"{0}\" timestamp=\"{1}\" uid=\"{2}\" user=\"{3}\" version=\"{4}\" changeset=\"{5}\" visible=\"{6}\">";
-        const string c_nodeRefFormat = "    <nd ref=\"{0}\" />";
-
-        private void writeWay(StreamWriter writer, OSMWay way)
+        private void writeWay(XElement parent, OSMWay way)
         {
-            writer.WriteLine(string.Format(c_wayFormat, way.ID, way.Timestamp, way.Uid, SecurityElement.Escape(way.User), way.Version, way.Changeset, way.Visible));
-            List<string> nodeIds = way.NodeReferences;
-            foreach (string node in nodeIds)
-            {
-                writer.WriteLine(string.Format(c_nodeRefFormat, node));
-            }
-
-            foreach (KeyValuePair<string, string> keyValuePair in way.Tags)
-            {
-                writer.WriteLine(string.Format(c_tagFormat, SecurityElement.Escape(keyValuePair.Key), SecurityElement.Escape(keyValuePair.Value)));
-            }
-            writer.WriteLine("  </way>");
+            XElement wayElement = way.ToXElement();
+            parent.Add(wayElement);
         }
 
-        const string c_relationFormat = "  <relation id=\"{0}\" timestamp=\"{1}\" uid=\"{2}\" user=\"{3}\" version=\"{4}\" changeset=\"{5}\" visible=\"{6}\">";
-        const string c_relationMemberFormat = "    <member type=\"{0}\" ref=\"{1}\" role=\"{2}\" />";
-
-        private void writeRelation(StreamWriter writer, OSMRelation relation)
+        private void writeRelation(XElement parent, OSMRelation relation)
         {
-            writer.WriteLine(string.Format(c_relationFormat, relation.ID, relation.Timestamp, relation.Uid, SecurityElement.Escape(relation.User), relation.Version, relation.Changeset, relation.Visible));
-            foreach (OSMRelationMember member in relation.Members)
-            {
-                writer.WriteLine(string.Format(c_relationMemberFormat, member.Type, member.Ref, SecurityElement.Escape(member.Role)));
-            }
-            writer.WriteLine("  </relation>");
+            XElement relationElement = relation.ToXElement();
+            parent.Add(relationElement);
         }
 
         #endregion
