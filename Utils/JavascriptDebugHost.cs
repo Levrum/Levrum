@@ -21,14 +21,14 @@ namespace Levrum.Utils
             WriteLine(json);
         }
 
-        public void Write(string message)
+        public void Write(object messageObj)
         {
-            writeMessage(message);
+            writeMessage(messageObj.ToString());
         }
 
-        public void WriteLine(string message)
+        public void WriteLine(object messageObj)
         {
-            string output = string.Format("{0}\n", message);
+            string output = string.Format("{0}\n", messageObj.ToString());
             writeMessage(output);
         }
 
