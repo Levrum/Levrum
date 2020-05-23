@@ -217,11 +217,19 @@ namespace Levrum.DataBridge
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            Cursor = Cursors.Wait;
-            updateParameters();
-            DataSource.Disconnect();
-            Cursor = Cursors.Arrow;
-            Close();
+            try
+            {
+                Cursor = Cursors.Wait;
+                updateParameters();
+                DataSource.Disconnect();
+                Close();
+            } catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "Unable to save Data Source", true);
+            } finally
+            {
+                Cursor = Cursors.Arrow;
+            }
         }
 
         private void updateParameters()

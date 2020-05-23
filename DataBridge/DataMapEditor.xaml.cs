@@ -82,7 +82,7 @@ namespace Levrum.DataBridge
         {
             try
             {
-                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), null, false);
+                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), null, false, DataMappingType.ResponseData);
                 dialog.Owner = Window;
                 dialog.ShowDialog();
                 if (dialog.Result != null)
@@ -213,7 +213,7 @@ namespace Levrum.DataBridge
         {
             try
             {
-                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), null, false);
+                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), null, false, DataMappingType.ResponseTiming);
                 dialog.Owner = Window;
                 dialog.ShowDialog();
                 if (dialog.Result != null)
