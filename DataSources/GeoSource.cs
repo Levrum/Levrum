@@ -38,6 +38,8 @@ namespace Levrum.Data.Sources
 
         private FileInfo s_file = null;
 
+        public string ErrorMessage {  get { return ("Error messages not implemented for type GeoSource"); } }
+
         [JsonIgnore]
         public FileInfo GeoFile
         {

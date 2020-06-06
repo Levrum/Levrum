@@ -13,7 +13,7 @@ namespace Levrum.Data.Sources
 
         public void AddValue(string column, object value)
         {
-            Data[column] = value;
+            Data[column] = value;   
         }
 
         public object GetValue(string ColumnName)
