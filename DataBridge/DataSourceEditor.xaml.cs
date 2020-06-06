@@ -466,6 +466,7 @@ namespace Levrum.DataBridge
             else
             {
                 SqlStatusText.Text = "Unable to connect!";
+                MessageBox.Show(dataSource.ErrorMessage);  // sorry, I don't have time to figure out WPF enough to do this more reasonably.  (20200606 CDN).
             }
             List<string> tables = dataSource.GetTables();
             tables.Sort();

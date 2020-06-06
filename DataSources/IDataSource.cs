@@ -28,6 +28,8 @@ namespace Levrum.Data.Sources
         List<string> GetColumns();
         List<string> GetColumnValues(string column);
         List<Record> GetRecords();
+
+        string ErrorMessage { get; }
     }
 
     public enum DataSourceType { CsvSource, SqlSource, EmergencyReportingSource, GeoSource };

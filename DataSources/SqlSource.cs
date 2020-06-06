@@ -81,18 +81,20 @@ namespace Levrum.Data.Sources
         {
             if (m_connected && testConnection())
                 return true;
+            string secure_cs = "";
             try
             {
                 SqlConnectionStringBuilder sqlcsb = new SqlConnectionStringBuilder();
                 sqlcsb.UserID = Parameters["User"];
                 sqlcsb.Password = Parameters["Password"];
-                
+
                 string dataSource = "";
                 if (!Parameters.ContainsKey("Port") || string.IsNullOrWhiteSpace(Parameters["Port"]))
                     dataSource = Parameters["Server"];
                 else
                     dataSource = string.Format("{0},{1}", Parameters["Server"], Parameters["Port"]);
 
+                secure_cs = "Server=" + dataSource + "; User=" + Parameters["User"] + "; PW=???????; ";
                 if (string.IsNullOrWhiteSpace(dataSource))
                 {
                     return false;
@@ -100,6 +102,7 @@ namespace Levrum.Data.Sources
 
                 sqlcsb.DataSource = dataSource;
                 sqlcsb.InitialCatalog = Parameters["Database"];
+                secure_cs += "Database=" + Parameters["Database"];
 
                 m_connection = new SqlConnection();
                 m_connection.ConnectionString = sqlcsb.ConnectionString;
@@ -108,11 +111,25 @@ namespace Levrum.Data.Sources
                 m_connected = true;
 
                 return true;
-            } catch (Exception ex)
+            }
+            catch (SqlException ex)
             {
+                m_sErrorMessage = "SQL error attempting connection '" + secure_cs + "': " + ex.Message;
+                if (null!=ex.InnerException)
+                {
+                    m_sErrorMessage += "\r\n Additional information: " + ex.InnerException.Message;
+                }
+                return (false);
+            }
+            catch (Exception ex)
+            {
+                m_sErrorMessage = "Generic exception attempting connection '" + secure_cs + "': " + ex.Message;
                 return false;
             }
         }
+
+        public string ErrorMessage {  get { return (m_sErrorMessage); } }
+        private string m_sErrorMessage = "";
 
         public void Disconnect()
         {
