@@ -115,10 +115,6 @@ namespace Levrum.Data.Sources
             catch (SqlException ex)
             {
                 m_sErrorMessage = "SQL error attempting connection '" + secure_cs + "': " + ex.Message;
-                if (null!=ex.InnerException)
-                {
-                    m_sErrorMessage += "\r\n Additional information: " + ex.InnerException.Message;
-                }
                 return (false);
             }
             catch (Exception ex)
