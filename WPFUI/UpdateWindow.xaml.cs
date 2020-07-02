@@ -35,6 +35,8 @@ namespace Levrum.UI.WPF
         public CancellationToken CancellationToken { get; set; }
         public bool WindowClosing { get; set; } = false;
         public WebClient DownloadClient { get; set; } = null;
+        public bool UpdateStarted { get; set; } = false;
+        public FileInfo File { get; set; } = null;
 
         public UpdateWindow(string appName, Version version)
         {
@@ -45,11 +47,12 @@ namespace Levrum.UI.WPF
 
         private void Window_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (Visibility == Visibility.Visible)
+            if (!UpdateStarted)
             {
                 CancellationTokenSource = new CancellationTokenSource();
                 CancellationToken = CancellationTokenSource.Token;
                 UpdateTask = new Task(() => { checkForUpdate(AppName, Version); }, CancellationToken);
+                UpdateStarted = true;
                 UpdateTask.Start();
             }
         }
@@ -69,8 +72,11 @@ namespace Levrum.UI.WPF
 
                 if (UpdateInfo != null && !string.IsNullOrWhiteSpace(UpdateInfo.URL))
                 {
-                    StatusTextBlock.Text = "Update Available!";
-                    Title = "Update Available!";
+                    Dispatcher.Invoke(() =>
+                    {
+                        StatusTextBlock.Text = "Update Available!";
+                        Title = "Update Available!";
+                    });
 
                     MessageBoxResult result = MessageBox.Show(string.Format("An update to version {0} is available. Update now? The application will restart once downloading is complete.", UpdateInfo.Version), "Update Available", MessageBoxButton.YesNo);
                     if (result == MessageBoxResult.No)
@@ -112,20 +118,40 @@ namespace Levrum.UI.WPF
                 {
                     tempDir.Create();
                 }
-                Title = "Downloading Update...";
-                StatusTextBlock.Text = "Beginning Download...";
+                Dispatcher.Invoke(() =>
+                {
+                    Title = "Downloading Update...";
+                    StatusTextBlock.Text = "Beginning Download...";
+                });
 
                 DownloadClient = new WebClient();
-                FileInfo file = new FileInfo(tempDir.FullName + "\\" + UpdateInfo.FileName);
-                DownloadClient.DownloadFile(new Uri(UpdateInfo.URL), file.FullName);
+                File = new FileInfo(tempDir.FullName + "\\" + UpdateInfo.FileName);
                 DownloadClient.DownloadProgressChanged += Client_DownloadProgressChanged;
-                StatusTextBlock.Text = "Download Complete!";
-                StatusTextBlock.FontSize = 32;
+                DownloadClient.DownloadFileCompleted += DownloadClient_DownloadFileCompleted;
+                DownloadClient.DownloadFileAsync(new Uri(UpdateInfo.URL), File.FullName);
+            } catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "Exception while downloading update", false);
+                WindowClosing = true;
+                Dispatcher.Invoke(() => { Close(); });
+                return;
+            }
+        }
+
+        private void DownloadClient_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        {
+            try
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    StatusTextBlock.Text = "Download Complete!";
+                    StatusTextBlock.FontSize = 32;
+                });
 
                 CancellationToken.ThrowIfCancellationRequested();
 
-                Process.Start(file.FullName);
-                Application.Current.Shutdown();
+                Process.Start(File.FullName);
+                Dispatcher.Invoke(() => { Application.Current.Shutdown(); });
             } catch (Exception ex)
             {
                 LogHelper.LogException(ex, "Exception while downloading update", false);
@@ -143,10 +169,13 @@ namespace Levrum.UI.WPF
                 return;
             }
 
-            StatusTextBlock.FontSize = 24;
-            double remainingMB = (e.TotalBytesToReceive - e.BytesReceived) / (1024 * 1024);
-            StatusTextBlock.Text = string.Format("Downloaded {0}% ({1:F2}MB remaining)...", e.ProgressPercentage, remainingMB);
-            ProgressBar.Value = e.ProgressPercentage;
+            Dispatcher.Invoke(() =>
+            {
+                StatusTextBlock.FontSize = 20;
+                double remainingMB = (e.TotalBytesToReceive - e.BytesReceived) / (1024.0 * 1024.0);
+                StatusTextBlock.Text = string.Format("Downloaded {0}% ({1:F2}MB remaining)...", e.ProgressPercentage, remainingMB);
+                ProgressBar.Value = e.ProgressPercentage;
+            });
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
