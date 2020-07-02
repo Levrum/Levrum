@@ -753,7 +753,10 @@ namespace Levrum.Data.Map
                     incident.Longitude = incident.Longitude * -1.0;
                 }
 
-                incident.Location = incident.Location.Trim();
+                if (incident.Location != null)
+                {
+                    incident.Location = incident.Location.Trim();
+                }
 
                 string natureCode = "Unknown";
                 if (incident.Data.ContainsKey("Code"))
@@ -795,8 +798,16 @@ namespace Levrum.Data.Map
                 DateTime baseTime = incident.Time;
                 if (baseTime == DateTime.MinValue)
                 {
-                    ErrorRecords.Add(new MapLoaderError(MapLoaderErrorType.BadValue, null, null, null, string.Format("Unable to generate benchmarks for Incident '{0}', no incident Time.", incident.Id)));
-                    continue;
+                    if (incident.Data.ContainsKey("CallReceived") && incident.Data["CallReceived"] is DateTime)
+                    {
+                        baseTime = (DateTime)incident.Data["CallReceived"];
+                    }
+
+                    if (baseTime == DateTime.MinValue)
+                    {
+                        ErrorRecords.Add(new MapLoaderError(MapLoaderErrorType.BadValue, null, null, null, string.Format("Unable to generate benchmarks for Incident '{0}', no incident Time.", incident.Id)));
+                        continue;
+                    }
                 }
 
                 if (incident.Data.ContainsKey("FirstAction"))
