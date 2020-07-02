@@ -37,5 +37,43 @@ namespace Levrum.Data.Classes.Tools
                 data.Data[outputKey] = new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second, time.Millisecond);
             }
         }
+
+        public void CreateDateTime(AnnotatedData data, object outputKey, object dateValue, object timeValue)
+        {
+            DateTime dateTime;
+            if (dateValue != null && timeValue != null)
+            {
+                if (DateTime.TryParse(string.Format("{0} {1}", dateValue.ToString(), timeValue.ToString()), out dateTime))
+                {
+                    data.Data[outputKey.ToString()] = dateTime;
+                }
+            } else if (dateValue != null)
+            {
+                if (DateTime.TryParse(dateValue.ToString(), out dateTime))
+                {
+                    data.Data[outputKey.ToString()] = dateTime;
+                }
+            } else if (timeValue != null)
+            {
+                if (DateTime.TryParse(timeValue.ToString(), out dateTime))
+                {
+                    data.Data[outputKey.ToString()] = dateTime;
+                }
+            }
+        }
+
+
+        public object CreateDateTime(object dateValue, object timeValue)
+        {
+            DateTime dateTime;
+            if (DateTime.TryParse(string.Format("{0} {1}", dateValue.ToString(), timeValue.ToString()), out dateTime))
+            {
+                return dateTime;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }
