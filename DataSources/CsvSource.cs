@@ -22,6 +22,9 @@ namespace Levrum.Data.Sources
         public string IDColumn { get; set; } = "";
         public string ResponseIDColumn { get; set; } = "";
 
+        public string ErrorMessage {  get { return (m_sErrorMessage); } }
+        private string m_sErrorMessage = "Error messages not implemented for type CsvSource";
+
         private FileInfo s_file = null;
 
         [JsonIgnore]

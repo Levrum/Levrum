@@ -62,7 +62,21 @@ namespace Levrum.Data.Map
                 Map = map;
                 foreach (IDataSource dataSource in map.DataSources)
                 {
-                    dataSource.Connect();
+                    if (null!=OnProgressUpdate) { OnProgressUpdate(this, "CXST: '" + dataSource.Name + "' data source -- connecting...", 0.0); }
+                    bool connect_ok = dataSource.Connect();
+                    if (connect_ok)
+                    {
+                        if (null!=OnProgressUpdate) { OnProgressUpdate(this, "CXOK: '" + dataSource.Name + " data source -- connected OK'", 0.0); }
+                    }
+                    else
+                    {
+                        if (null!=OnProgressUpdate) 
+                        { 
+                            OnProgressUpdate(this, "CXER: '" + dataSource.Name + "' data source -- connection failure: " +
+                                             dataSource.ErrorMessage,0.0); 
+                        }
+                        return (false);
+                    }
                 }
 
                 processIncidentDataMappings();
