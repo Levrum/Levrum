@@ -51,22 +51,19 @@ namespace Levrum.Data.Classes
             return output;
         }
 
-        public bool SetDataValue(string key, object value)
+        public void SetDataValue(string key, object value)
         {
             try
             {
-                if (!Data.ContainsKey(key)) { Data.Add(key, value); }
-                else { Data[key] = value; }
-                return (true);
+                Data[key] = value;
             }
             catch (Exception exc)
             {
                 LogHelper.LogException(exc, "Exception setting data value", false);
-                return (false);
             }
         }
 
-        public bool SetDataValues(string[] keys, object[] values)
+        public void SetDataValues(string[] keys, object[] values)
         {
             try
             {
@@ -95,13 +92,10 @@ namespace Levrum.Data.Classes
                         }
                     }
                 }
-
-                return true;
             }
             catch (Exception ex)
             {
                 LogHelper.LogException(ex, "Exception setting data values", false);
-                return false;
             }
         }
 
@@ -110,6 +104,33 @@ namespace Levrum.Data.Classes
             DateTime value = new DateTime(year, month, day, hour, minute, second, millisecond);
             if (!Data.ContainsKey(key)) { Data.Add(key, value); }
             else { Data[key] = value; }
+        }
+
+        public object[] GetDataDateTimeComponents(string key)
+        {
+            object[] output = new object[7] { 0, 0, 0, 0, 0, 0, 0 };
+
+            DateTime value = DateTime.MinValue;
+            if (Data.ContainsKey(key))
+            {
+                if (Data[key] is DateTime)
+                {
+                    value = (DateTime)Data[key];
+                }
+                DateTime.TryParse(Data[key].ToString(), out value);
+                if (value != DateTime.MinValue)
+                {
+                    output[0] = value.Year;
+                    output[1] = value.Month;
+                    output[2] = value.Day;
+                    output[3] = value.Hour;
+                    output[4] = value.Minute;
+                    output[5] = value.Second;
+                    output[6] = value.Millisecond;
+                }
+            }
+
+            return output;
         }
 
         public void Intern()

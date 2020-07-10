@@ -442,11 +442,11 @@ script();";
   };
 
   var script = () => {
-    let time = Incident.GetDataValue(""Time"");
-    let year = time.Year;
-    let month = time.Month;
-    let day = time.Day;
-    let hour = time.Hour;
+    let timeComponents = Incident.GetDataDateTimeComponents(""Time"");
+    let year = timeComponents[0];
+    let month = timeComponents[1];
+    let day = timeComponents[2];
+    let hour = timeComponents[3];
     let shiftYearTable = shiftTable[year];
     let shift = null;
     if (shiftYearTable !== undefined) {
