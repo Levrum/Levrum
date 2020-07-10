@@ -242,6 +242,8 @@ namespace Levrum.Data.Map
 
         private void processIncidentMappings()
         {
+            /// This function is deprecated and here only for reference
+            /// All incident mappings are now processed as IncidentData mappings
             HashSet<IDataSource> dataSources = (from mapping in Map.IncidentMappings
                                                 select mapping?.Column?.DataSource).ToHashSet();
 
@@ -793,6 +795,8 @@ namespace Levrum.Data.Map
             updateProgress(6, string.Format("Processing response data for {0} incidents", Incidents.Count), 0, true);
         }
 
+        string[] c_predefinedTimingDataFields = new string[] { "InQuarters", "SceneTime", "ComittedHours", "InService", "Hospital", "Transport", "ClearScene", "TravelTime", "OnScene", "TurnoutTime", "Responding", "Assigned" };
+
         private void cleanupBenchmarks()
         {
             updateProgress(7, string.Format("Processing response timings for {0} incidents", Incidents.Count), 0, true);
@@ -836,7 +840,7 @@ namespace Levrum.Data.Map
                         }
                     }
                 }
-
+                
                 foreach (ResponseData response in incident.Responses)
                 {
                     TimingData assigned = (from b in response.TimingData
@@ -934,7 +938,7 @@ namespace Levrum.Data.Map
                         travel = new TimingData("TravelTime", Math.Max(0, (onSceneTime - respondingTime).TotalMinutes));
                         response.TimingData.Add(travel);
                     }
-
+                    
                     TimingData clearScene = (from b in response.TimingData
                                              where b.Name == "ClearScene"
                                              select b).FirstOrDefault();
@@ -968,6 +972,7 @@ namespace Levrum.Data.Map
                     DateTime transportTime = DateTime.MinValue;
                     if (transport != null)
                     {
+                        incident.Data["TransportFlag"] = "Y";
                         if (!double.IsNaN(transport.Value))
                         {
                             transportTime = baseTime.AddMinutes(transport.Value);
@@ -998,6 +1003,33 @@ namespace Levrum.Data.Map
                                 clearScene.Data["RawData"] = transport.Data["RawData"];
                                 response.TimingData.Add(clearScene);
                             }
+                        }
+                    }
+
+                    TimingData hospital = (from b in response.TimingData
+                                           where b.Name == "Hospital"
+                                           select b).FirstOrDefault();
+
+                    DateTime hospitalTime = DateTime.MinValue;
+                    if (hospital != null)
+                    {
+                        incident.Data["TransportFlag"] = "Y";
+                        if (!double.IsNaN(hospital.Value)) {
+                            hospitalTime = baseTime.AddMinutes(hospital.Value);
+                        } else if (hospital.Data.ContainsKey("RawData"))
+                        {
+                            if (hospital.Data["RawData"] is DateTime)
+                            {
+                                hospitalTime = (DateTime)hospital.Data["RawData"];
+                                hospital.Value = (hospitalTime - baseTime).TotalMinutes;
+                            } else if (DateTime.TryParse(hospital.Data["RawData"] as string, out hospitalTime))
+                            {
+                                hospital.Value = (hospitalTime - baseTime).TotalMinutes;
+                            }
+                        }
+                        if (hospitalTime != DateTime.MinValue)
+                        {
+                            hospital.Data["DateTime"] = hospitalTime;
                         }
                     }
 
@@ -1076,6 +1108,39 @@ namespace Levrum.Data.Map
                             }
                         }
                         inQuarters.Data["DateTime"] = inQuartersTime;
+                    }
+
+                    foreach (TimingData timingData in response.TimingData)
+                    {
+                        if (c_predefinedTimingDataFields.Contains(timingData.Name))
+                        {
+                            continue;
+                        }
+
+                        if(double.IsNaN(timingData.Value))
+                        {
+                            if (timingData.Data.ContainsKey("DateTime")) {
+                                DateTime date = timingData.Data["DateTime"] is DateTime ? (DateTime)timingData.Data["DateTime"] : DateTime.MinValue;
+                                if (date == DateTime.MinValue && DateTime.TryParse(timingData.Data["DateTime"].ToString(), out date)) {
+                                    timingData.Value = (date - baseTime).TotalMinutes;
+                                }
+                            }  else if (timingData.Data.ContainsKey("RawData"))
+                            {
+                                DateTime date = timingData.Data["RawData"] is DateTime ? (DateTime)timingData.Data["RawData"] : DateTime.MinValue;
+                                if (date == DateTime.MinValue && DateTime.TryParse(timingData.Data["RawData"].ToString(), out date))
+                                {
+                                    timingData.Value = (date - baseTime).TotalMinutes;
+                                }
+                                else
+                                {
+                                    double minutes;
+                                    if (double.TryParse(timingData.Data["RawData"].ToString(), out minutes))
+                                    {
+                                        timingData.Value = minutes;
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -1394,6 +1459,11 @@ namespace Levrum.Data.Map
             updateProgress(JSProgressStep, message, percentage);
         }
 
+        public void CollectNativeGarbage()
+        {
+            GC.Collect();
+        }
+
         private class ProgressInfo
         {
             public int Number { get; set; } = 0;
@@ -1412,12 +1482,14 @@ namespace Levrum.Data.Map
 
         private void setupScriptEngine(V8ScriptEngine engine)
         {
+            engine.AddHostObject("Engine", engine);
             engine.AddHostObject("XHost", new ExtendedHostFunctions());
             engine.AddHostObject("Tools", new AnnotatedDataTools());
             engine.AddHostObject("Incidents", Incidents);
             engine.AddHostObject("Debug", DebugHost);
             engine.AddHostObject("Logger", Logger);
             engine.AddHostObject("MapLoader", this);
+            engine.AddHostType("object", typeof(object));
             engine.AddHostType("bool", typeof(bool));
             engine.AddHostType("double", typeof(double));
             engine.AddHostType("int", typeof(int));
@@ -1480,7 +1552,7 @@ namespace Levrum.Data.Map
                 chunks.Add(newChunk);
                 foreach (IncidentData incident in Incidents)
                 {
-                    if (newChunk.Count >= 10000)
+                    if (newChunk.Count >= 1000)
                     {
                         newChunk = new List<IncidentData>();
                         chunks.Add(newChunk);
@@ -1491,9 +1563,11 @@ namespace Levrum.Data.Map
                 pInfo.Count = Incidents.Count;
                 pInfo.Number = 0;
                 int n_pperrs = 0;
-
+                LogHelper.LogMessage(Utils.LogLevel.Trace, "Starting Per Incident script execution");
+                int numChunk = 0;
                 foreach (List<IncidentData> chunk in chunks)
                 {
+                    DateTime chunkStart = DateTime.Now;
                     using (V8ScriptEngine v8 = new V8ScriptEngine())
                     {
                         setupScriptEngine(v8);
@@ -1512,7 +1586,7 @@ namespace Levrum.Data.Map
                             try
                             {
                                 v8.Execute(script);
-                                v8.CollectGarbage(true);
+                                // v8.CollectGarbage(true);
                             }
                             catch (Exception ex)
                             {
@@ -1521,9 +1595,13 @@ namespace Levrum.Data.Map
                             }
                         }
                     }
+                    TimeSpan chunkTime = DateTime.Now - chunkStart;
+                    LogHelper.LogMessage(Utils.LogLevel.Trace, string.Format("Chunk {0} completed in {1} seconds", numChunk, chunkTime.TotalSeconds));
+                    numChunk++;
+                    GC.Collect();
                 }
 
-
+                LogHelper.LogMessage(Utils.LogLevel.Trace, "Finished Per Incident script execution");
 
                 if (n_pperrs > 0)
                 {
