@@ -18,6 +18,7 @@
         <avalonEdit:TextEditor Grid.Row="0" x:Name="TextBox" Text="Enter JavaScript here..." Margin="8,0,8,0" FontSize="14" TextChanged="TextBox_TextChanged" Foreground="DarkGray" GotFocus="TextBox_GotFocus" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"/>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Left">
             <Button x:Name="LoadButton" Width="80" Margin="8,8,8,8" Click="LoadButton_Click">_Load...</Button>
+            <Button x:Name="TemplatesButton" Width="100" Margin="8,8,8,8" Click="TemplatesButton_Click">_Templates...</Button>
             <Button x:Name="EditButton" Width="120" Margin="8,8,8,8" Click="EditButton_Click">Launch _Editor...</Button>
         </StackPanel>
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">

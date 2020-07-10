@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using Microsoft.Win32;
 
 using Levrum.Utils;
+using Levrum.UI.WPF;
 
 namespace Levrum.DataBridge
 {
@@ -46,13 +47,16 @@ namespace Levrum.DataBridge
 
         public string Result { get; set; } = null;
 
+        public ScriptType Type { get; set; } = ScriptType.PostLoad;
+
         bool TextSet { get; set; } = false;
 
         bool WaitingForEditor { get; set; } = false;
 
-        public EditScriptDialog(string _title = null, string _caption = null, string _text = null)
+        public EditScriptDialog(ScriptType _type = ScriptType.PostLoad, string _title = null, string _caption = null, string _text = null)
         {
             InitializeComponent();
+            Type = _type;
             TextSet = false;
             if (!string.IsNullOrEmpty(_title))
             {
@@ -152,8 +156,13 @@ namespace Levrum.DataBridge
             {
                 try
                 {
+                    string arguments = fileName;
+                    if (editorPath.ToLower().Contains("code.exe"))
+                    {
+                        arguments = string.Format("-n {0}", fileName); // If we're using VS Code, ensure we get a new window so WaitForExit() works
+                    }
                     ProcessStartInfo startInfo = new ProcessStartInfo(editorPath);
-                    startInfo.Arguments = fileName;
+                    startInfo.Arguments = arguments;
                     startInfo.WindowStyle = ProcessWindowStyle.Maximized;
                     Process p = new Process();
                     p.StartInfo = startInfo;
@@ -214,6 +223,48 @@ namespace Levrum.DataBridge
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             e.Cancel = WaitingForEditor;
+        }
+
+        private void TemplatesButton_Click(object sender, RoutedEventArgs e)
+        {
+            Dictionary<string, string> availableTemplates;
+            switch (Type)
+            {
+                case ScriptType.PostLoad:
+                    availableTemplates = ScriptTemplates.TemplateDictionary[ScriptType.PostLoad];
+                    break;
+                case ScriptType.PerIncident:
+                    availableTemplates = ScriptTemplates.TemplateDictionary[ScriptType.PerIncident];
+                    break;
+                case ScriptType.FinalProcessing:
+                    availableTemplates = ScriptTemplates.TemplateDictionary[ScriptType.FinalProcessing];
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+
+            ComboBoxSelectorForm selectorForm = new ComboBoxSelectorForm(new List<object>(availableTemplates.Keys), "Select Template", "Select Template:");
+            bool? result = selectorForm.ShowDialog();
+            if (result == true)
+            {
+                string selectedKey = selectorForm.Selection.ToString();
+                string template;
+                if (availableTemplates.TryGetValue(selectedKey, out template)) {
+                    if (TextSet == true)
+                    {
+                        MessageBoxResult okayToOverwrite = MessageBox.Show(string.Format("Overwrite your script with the template '{0}'?", selectedKey), "Overwrite script?", MessageBoxButton.YesNo);
+                        if (okayToOverwrite == MessageBoxResult.No)
+                        {
+                            return;
+                        }
+                    }
+
+                    Text = template;
+                } else
+                {
+                    LogHelper.LogErrOnce("EditScriptDialog.TemplateButton_OnClick()", string.Format("Unable to load template {0}", selectedKey));
+                }
+            }
         }
     }
 }
