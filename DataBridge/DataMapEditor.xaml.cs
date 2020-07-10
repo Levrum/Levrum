@@ -342,5 +342,32 @@ namespace Levrum.DataBridge
                 LogHelper.LogMessage(LogLevel.Error, "Unable to edit Response Timing Field", ex);
             }
         }
+
+        private void IncidentDataListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            DataMapping selectedField = IncidentDataListBox.SelectedItem as DataMapping;
+            if (selectedField != null)
+            {
+                EditIncidentFieldButton_Click(sender, e);
+            }
+        }
+
+        private void ResponseDataListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            DataMapping selectedField = ResponseDataListBox.SelectedItem as DataMapping;
+            if (selectedField != null)
+            {
+                EditResponseFieldButton_Click(sender, e);
+            }
+        }
+
+        private void BenchmarkListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            DataMapping selectedField = BenchmarkListBox.SelectedItem as DataMapping;
+            if (selectedField != null)
+            {
+                EditBenchmarkButton_Click(sender, e);
+            }
+        }
     }
 }
