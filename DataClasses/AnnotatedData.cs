@@ -72,21 +72,26 @@ namespace Levrum.Data.Classes
             {
                 for (int i = 0; i < keys.Length; i++)
                 {
+                    var key = keys[i];
+                    if (key == null)
+                    {
+                        continue;
+                    }
                     object value = null;
                     if (i < values.Length)
                     {
                         value = values[i];
                     }
-                    if (!Data.ContainsKey(keys[i]) && value != null) { Data.Add(keys[i], value); }
-                    else if (Data.ContainsKey(keys[i]))
+                    if (!Data.ContainsKey(key) && value != null) { Data.Add(key, value); }
+                    else if (Data.ContainsKey(key))
                     {
                         if (value != null)
                         {
-                            Data[keys[i]] = value;
+                            Data[key] = value;
                         }
                         else
                         {
-                            Data.Remove(keys[i]);
+                            Data.Remove(key);
                         }
                     }
                 }
