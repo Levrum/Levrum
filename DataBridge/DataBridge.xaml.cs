@@ -126,7 +126,11 @@ namespace Levrum.DataBridge
         {
             try
             {
-                UpdateWindow updateWindow = new UpdateWindow("databridge", Assembly.GetEntryAssembly().GetName().Version);
+                Version version = Assembly.GetEntryAssembly().GetName().Version;
+#if DEBUG
+                version = new Version(version.Major, version.Minor, version.Build, 9999);
+#endif
+                UpdateWindow updateWindow = new UpdateWindow("databridge", version);
                 updateWindow.ShowDialog();
             } catch (Exception ex)
             {
@@ -163,6 +167,7 @@ namespace Levrum.DataBridge
                 DocumentPane.Children.Add(document);
                 mapDocument = new DataMapDocument(map, document);
                 openDocuments.Add(mapDocument);
+                DocumentPane.SelectedContentIndex = DocumentPane.Children.IndexOf(document);
                 return mapDocument;
             }
             catch (Exception ex)
@@ -337,6 +342,10 @@ namespace Levrum.DataBridge
             ToolsMenu.IsEnabled = controlsEnabled;
             PropertiesMenu.IsEnabled = controlsEnabled;
             DockingManager.IsEnabled = controlsEnabled;
+
+            EditPhaseOneScript.IsEnabled = controlsEnabled;
+            EditPhaseTwoScript.IsEnabled = controlsEnabled;
+            EditPhaseThreeScript.IsEnabled = controlsEnabled;
 
             NewButton.IsEnabled = controlsEnabled;
             OpenButton.IsEnabled = controlsEnabled;
@@ -1199,7 +1208,7 @@ namespace Levrum.DataBridge
                 {
                     script = DataSources.Map.PostProcessingScript;
                 }
-                EditScriptDialog dialog = new EditScriptDialog(null, null, script);
+                EditScriptDialog dialog = new EditScriptDialog(ScriptType.PostLoad, "Edit Post-Loading Script", null, script);
                 dialog.Owner = this;
                 dialog.ShowDialog();
 
@@ -1224,7 +1233,7 @@ namespace Levrum.DataBridge
                 {
                     script = DataSources.Map.PerIncidentScript;
                 }
-                EditScriptDialog dialog = new EditScriptDialog(null, null, script);
+                EditScriptDialog dialog = new EditScriptDialog(ScriptType.PerIncident, "Edit Per Incident Script", null, script);
                 dialog.Owner = this;
                 dialog.ShowDialog();
 
@@ -1249,7 +1258,7 @@ namespace Levrum.DataBridge
                 {
                     script = DataSources.Map.FinalProcessingScript;
                 }
-                EditScriptDialog dialog = new EditScriptDialog(null, null, script);
+                EditScriptDialog dialog = new EditScriptDialog(ScriptType.FinalProcessing, "Edit Final Processing Script", null, script);
                 dialog.Owner = this;
                 dialog.ShowDialog();
 
