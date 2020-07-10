@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 using Newtonsoft.Json;
@@ -63,6 +64,15 @@ namespace Levrum.Data.Classes
             {
                 TimingData.AddRange(benchmarks);
             }
+        }
+
+        public TimingData GetTimingDataByName(string name)
+        {
+            TimingData output = (from TimingData t in TimingData
+                                 where t.Name == name
+                                 select t).FirstOrDefault();
+
+            return output;
         }
     }
 }
