@@ -70,7 +70,7 @@
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
                     <!-- <TextBlock Height="28" FontSize="16" Grid.Row="0">Data</TextBlock> -->
-                    <ListBox x:Name="IncidentDataListBox" Grid.Row="0" SelectionChanged="IncidentDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch">
+                    <ListBox x:Name="IncidentDataListBox" Grid.Row="0" SelectionChanged="IncidentDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="IncidentDataListBox_MouseDoubleClick">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="0,2">
@@ -104,7 +104,7 @@
                         <RowDefinition Height="200*"/>
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
-                    <ListBox Grid.Row="0" x:Name="ResponseDataListBox" SelectionChanged="ResponseDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch">
+                    <ListBox Grid.Row="0" x:Name="ResponseDataListBox" SelectionChanged="ResponseDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="ResponseDataListBox_MouseDoubleClick">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="0,2">
@@ -138,7 +138,7 @@
                         <RowDefinition Height="200*"/>
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
-                    <ListBox Grid.Row="0" x:Name="BenchmarkListBox" SelectionChanged="BenchmarkListBox_SelectionChanged" HorizontalContentAlignment="Stretch">
+                    <ListBox Grid.Row="0" x:Name="BenchmarkListBox" SelectionChanged="BenchmarkListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="BenchmarkListBox_MouseDoubleClick">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="0,2">
