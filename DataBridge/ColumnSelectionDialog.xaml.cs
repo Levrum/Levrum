@@ -109,6 +109,17 @@ namespace Levrum.DataBridge
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             Result.Field = FieldNameComboBox.Text;
+            if (string.IsNullOrWhiteSpace(Result.Column.ColumnName) || Result.Column.DataSource == null)
+            {
+                MessageBoxResult result = MessageBox.Show("Unable to save a column mapping without both a column name and a data source. Close without saving?", "Invalid column mapping", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    Close();
+                } else
+                {
+                    return;
+                }
+            }
             m_saving = true;
             Close();
         }
