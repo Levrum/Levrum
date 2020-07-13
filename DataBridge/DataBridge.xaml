@@ -50,6 +50,10 @@
                 <MenuItem Name="CreateIncidentJsonMenuItem" Header="Create _JSON..." Click="CreateJson_Click" IsEnabled="False"/>
                 <MenuItem Name="CreateCallResponseCSVsMenuItem" Header="Create CS_Vs..." Click="CreateCsv_Click" IsEnabled="False"/>
                 <Separator/>
+                <MenuItem Name="RecentFilesMenu" Header="Recent _Files">
+                    <MenuItem Name="NonePlaceholder" Header="None..." IsEnabled="False"/>
+                </MenuItem>
+                <Separator/>
                 <MenuItem Header="E_xit" Click="ExitMenuItem_Click"/>
             </MenuItem>
             <MenuItem Name="ToolsMenu" Header="_Tools" IsTabStop="False">
