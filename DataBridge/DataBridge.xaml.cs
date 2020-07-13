@@ -29,6 +29,7 @@ using Levrum.UI.WPF;
 
 using Levrum.Utils;
 using Levrum.Utils.Data;
+using System.Windows.Controls;
 
 namespace Levrum.DataBridge
 {
@@ -49,7 +50,7 @@ namespace Levrum.DataBridge
         public MainDataBridgeWindow()
         {
             InitializeComponent();
-            
+
             Assembly assembly = Assembly.GetExecutingAssembly();
             LicenseClient client = new LicenseClient(assembly, "databridge");
             client.OnLogMessage += LicenseClient_OnLogMessage;
@@ -92,6 +93,7 @@ namespace Levrum.DataBridge
                 }
             }
             checkForUpdates();
+            updateRecentFilesMenu();
             updateToolbarsAndMenus();
         }
 
@@ -132,7 +134,8 @@ namespace Levrum.DataBridge
 #endif
                 UpdateWindow updateWindow = new UpdateWindow("databridge", version);
                 updateWindow.ShowDialog();
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 LogHelper.LogException(ex, "Exception while checking for updates", false);
             }
@@ -150,6 +153,7 @@ namespace Levrum.DataBridge
                 {
                     int index = DocumentPane.IndexOfChild(mapDocument.Document);
                     DocumentPane.SelectedContentIndex = index;
+                    addRecentFile(fileName);
                     return mapDocument;
                 }
 
@@ -168,6 +172,7 @@ namespace Levrum.DataBridge
                 mapDocument = new DataMapDocument(map, document);
                 openDocuments.Add(mapDocument);
                 DocumentPane.SelectedContentIndex = DocumentPane.Children.IndexOf(document);
+                addRecentFile(fileName);
                 return mapDocument;
             }
             catch (Exception ex)
@@ -250,13 +255,14 @@ namespace Levrum.DataBridge
                     {
                         di = new DirectoryInfo(string.Format("{0}\\{1}", Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Levrum\\Data Maps"));
                         di.Create();
-                    } else
+                    }
+                    else
                     {
                         FileInfo lastFile = new FileInfo(map.Path);
                         di = lastFile.Directory;
                         sfd.FileName = lastFile.Name;
                     }
-                    
+
                     sfd.InitialDirectory = di.FullName;
                     sfd.DefaultExt = "dmap";
                     sfd.Filter = "Levrum DataMap files (*.dmap)|*.dmap|All files (*.*)|*.*";
@@ -283,12 +289,92 @@ namespace Levrum.DataBridge
 
                 SaveAsMenuItem.Header = string.Format("Save {0} _As...", map.Name);
                 SaveMenuItem.Header = string.Format("_Save {0}", map.Name);
+                addRecentFile(map.Path);
                 return true;
             }
             catch (Exception ex)
             {
                 logException(this, "Error saving DataMap", ex);
                 return false;
+            }
+        }
+
+        private void addRecentFile(string fileName)
+        {
+            List<string> recentFiles = getRecentFiles();
+            int lastIndex = recentFiles.IndexOf(fileName);
+            if (lastIndex == -1)
+            {
+                recentFiles.Insert(0, fileName);
+                if (recentFiles.Count > 10)
+                {
+                    recentFiles.RemoveAt(10);
+                }
+            }
+            else
+            {
+                recentFiles.RemoveAt(lastIndex);
+                recentFiles.Insert(0, fileName);
+            }
+
+            RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Levrum\DataMap\RecentFiles");
+            for (int i = 0; i < recentFiles.Count; i++)
+            {
+                key.SetValue(i.ToString(), recentFiles[i]);
+            }
+
+            updateRecentFilesMenu();
+        }
+
+        private List<string> getRecentFiles()
+        {
+            List<string> output = new List<string>();
+
+            RegistryKey key = Registry.CurrentUser.CreateSubKey(@"SOFTWARE\Levrum\DataMap\RecentFiles");
+            for (int i = 0; i < 10; i++)
+            {
+                string path = key.GetValue(i.ToString()) as string;
+                if (!string.IsNullOrEmpty(path))
+                {
+                    output.Add(path);
+                }
+            }
+
+            return output;
+        }
+
+        private void updateRecentFilesMenu()
+        {
+            RecentFilesMenu.Items.Clear();
+
+            List<string> recentFiles = getRecentFiles();
+            int index = 1;
+            for (int i = 0; i < recentFiles.Count; i++)
+            {
+                string path = recentFiles[i];
+                FileInfo file = new FileInfo(path);
+                if (file.Exists)
+                {
+                    MenuItem menuItem = new MenuItem();
+                    string usablePath = file.FullName;
+                    if (file.FullName.Length > 50)
+                    {
+                        var pathSegment = file.FullName.Substring(file.FullName.Length - 50, 50);
+                        usablePath = string.Format("...{0}", pathSegment.Substring(pathSegment.IndexOf('\\')));
+                    }
+                    if (usablePath.StartsWith(file.FullName.Substring(0, 3)))
+                    {
+                        usablePath = usablePath.Substring(3);
+                    }
+                    string shortcut = index != 10 ? string.Format("_{0}", index) : "1_0";
+                    menuItem.Header = string.Format("{0}: {1}{2}", shortcut, file.FullName.Substring(0, 3).ToUpper(), usablePath);
+                    menuItem.Click += (object sender, RoutedEventArgs e) =>
+                    {
+                        OpenDataMap(file.FullName);
+                    };
+                    RecentFilesMenu.Items.Add(menuItem);
+                    index++;
+                }
             }
         }
 
@@ -311,9 +397,10 @@ namespace Levrum.DataBridge
             {
                 Dispatcher.Invoke(new Action(() => { EnableControls(); }));
                 return;
-            } else
+            }
+            else
 
-            Cursor = Cursors.Arrow;
+                Cursor = Cursors.Arrow;
             toggleControls(false);
         }
 
@@ -323,16 +410,17 @@ namespace Levrum.DataBridge
             {
                 Dispatcher.Invoke(new Action(() => { DisableControls(); }));
                 return;
-            } else
+            }
+            else
 
-            Cursor = Cursors.Wait;
+                Cursor = Cursors.Wait;
             toggleControls(true);
         }
 
         private void toggleControls(bool runningOperation)
         {
             bool controlsEnabled = !runningOperation;
-            
+
             NewMenuItem.IsEnabled = controlsEnabled;
             OpenMenuItem.IsEnabled = controlsEnabled;
             SaveMenuItem.IsEnabled = controlsEnabled;
@@ -622,7 +710,8 @@ namespace Levrum.DataBridge
             }
             finally
             {
-                if (e.Cancel == false) { 
+                if (e.Cancel == false)
+                {
                     Application.Current.Shutdown();
                 }
             }
@@ -793,7 +882,8 @@ namespace Levrum.DataBridge
                         JsonSerializerSettings settings = new JsonSerializerSettings();
                         settings.TypeNameHandling = TypeNameHandling.All;
                         settings.Formatting = Formatting.Indented;
-                        using (TextWriter writer = File.CreateText(sfd.FileName)) {
+                        using (TextWriter writer = File.CreateText(sfd.FileName))
+                        {
                             var serializer = new JsonSerializer();
                             serializer.Formatting = Formatting.Indented;
                             serializer.TypeNameHandling = TypeNameHandling.Auto;
@@ -1089,7 +1179,8 @@ namespace Levrum.DataBridge
                 updateTransportAsClearScene();
 
                 SetChangesMade(DataSources.Map, true);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 logException(sender, "Unable to toggle transport as clearscene", ex);
             }
@@ -1102,7 +1193,8 @@ namespace Levrum.DataBridge
                 ToggleTransportAsClearSceneMenuItem.Header = "_Transport As ClearScene Enabled";
                 ToggleTransportAsClearSceneMenuItem.IsChecked = true;
                 ToggleTransportAsClearSceneButton.IsChecked = true;
-            } else
+            }
+            else
             {
                 ToggleTransportAsClearSceneMenuItem.Header = "_Transport As ClearScene Disabled";
                 ToggleTransportAsClearSceneMenuItem.IsChecked = false;
