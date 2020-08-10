@@ -812,9 +812,14 @@ namespace Levrum.Data.Map
                 DateTime baseTime = incident.Time;
                 if (baseTime == DateTime.MinValue)
                 {
-                    if (incident.Data.ContainsKey("CallReceived") && incident.Data["CallReceived"] is DateTime)
+                    if (incident.Data.ContainsKey("CallReceived"))
                     {
-                        baseTime = (DateTime)incident.Data["CallReceived"];
+                        if (incident.Data["CallReceived"] is DateTime)
+                        {
+                            baseTime = (DateTime)incident.Data["CallReceived"];
+                        } else {
+                            DateTime.TryParse(incident.Data["CallReceived"] as string, out baseTime);
+                        }
                     }
 
                     if (baseTime == DateTime.MinValue)
