@@ -168,7 +168,7 @@
             
         </StackPanel>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button x:Name="SaveButton" Width="80" Margin="0,8,0,8" Click="SaveButton_Click" IsEnabled="False">Save</Button>
+            <Button x:Name="SaveButton" Width="80" Margin="0,8,0,8" Click="SaveButton_Click">Save</Button>
             <Button x:Name="CancelButton" Width="80" Margin="8,8,8,8" Click="CancelButton_Click">Cancel</Button>
         </StackPanel>
     </Grid>
