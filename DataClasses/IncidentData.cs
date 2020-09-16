@@ -98,6 +98,9 @@ namespace Levrum.Data.Classes
                     } else if (Data["Longitude"] is double)
                     {
                         return (double)Data["Longitude"];
+                    } else if (Data["Longitude"] is int)
+                    {
+                        return Convert.ToDouble((int)Data["Longitude"]);
                     }
                 }
 
@@ -123,6 +126,9 @@ namespace Levrum.Data.Classes
                     else if (Data["Latitude"] is double)
                     {
                         return (double)Data["Latitude"];
+                    } else if (Data["Latitude"] is int)
+                    {
+                        return Convert.ToDouble((int)Data["Latitude"]);
                     }
                 }
 

@@ -33,6 +33,7 @@ namespace Levrum.Data.Map
 
         public bool InvertLongitude { get; set; } = false;
         public bool InvertLatitude { get; set; } = false;
+        public bool TritechCoordinates { get; set; } = false;
         public bool TransportAsClearScene { get; set; } = false;
 
         public List<CauseData> CauseTree { get; set; } = new List<CauseData>();
@@ -52,11 +53,11 @@ namespace Levrum.Data.Map
         {
             DataMap map = new DataMap(_name);
 
-            map.IncidentMappings.Add(new DataMapping("ID", ColumnType.stringField));
-            map.IncidentMappings.Add(new DataMapping("Time", ColumnType.dateField));
-            map.IncidentMappings.Add(new DataMapping("Location", ColumnType.stringField));
-            map.IncidentMappings.Add(new DataMapping("Latitude", ColumnType.doubleField));
-            map.IncidentMappings.Add(new DataMapping("Longitude", ColumnType.doubleField));
+            map.IncidentDataMappings.Add(new DataMapping("ID", ColumnType.stringField));
+            map.IncidentDataMappings.Add(new DataMapping("Time", ColumnType.dateField));
+            map.IncidentDataMappings.Add(new DataMapping("Location", ColumnType.stringField));
+            map.IncidentDataMappings.Add(new DataMapping("Latitude", ColumnType.doubleField));
+            map.IncidentDataMappings.Add(new DataMapping("Longitude", ColumnType.doubleField));
             map.IncidentDataMappings.Add(new DataMapping("Code", ColumnType.stringField));
             map.IncidentDataMappings.Add(new DataMapping("FirstEffAction", ColumnType.dateField));
 
