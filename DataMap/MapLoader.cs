@@ -775,14 +775,17 @@ namespace Levrum.Data.Map
                 {
                     natureCode = incident.Data["Code"].ToString().Trim();
                 }
-                string[] natureCodeData = GetNatureCodeData(natureCode);
-                if (!string.IsNullOrWhiteSpace(natureCodeData[0]))
+                if (Map.CauseTree != null && Map.CauseTree.Count != 0)
                 {
-                    incident.Data["CodeDescription"] = natureCodeData[0].Trim();
-                }
+                    string[] natureCodeData = GetNatureCodeData(natureCode);
+                    if (!string.IsNullOrWhiteSpace(natureCodeData[0]))
+                    {
+                        incident.Data["CodeDescription"] = natureCodeData[0].Trim();
+                    }
 
-                incident.Data["Category"] = natureCodeData[1].Trim();
-                incident.Data["Type"] = natureCodeData[2].Trim();
+                    incident.Data["Category"] = natureCodeData[1].Trim();
+                    incident.Data["Type"] = natureCodeData[2].Trim();
+                }
             }
 
             var sortedIncidents = Incidents.OrderBy(i => i.Time).ToList();

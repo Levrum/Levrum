@@ -350,7 +350,7 @@ namespace Levrum.Data.Sources
                     return output;
                 }
 
-                SqlCommand cmd = new SqlCommand(string.Format("SELECT * FROM {0}", Parameters["Table"], m_connection));
+                SqlCommand cmd = new SqlCommand(string.Format("SELECT * FROM {0}", Parameters["Table"]), m_connection);
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
                     while (dr.Read())

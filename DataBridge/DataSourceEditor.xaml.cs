@@ -132,7 +132,7 @@ namespace Levrum.DataBridge
                 SqlServerPassword.Password = DataSource.Parameters["Password"];
                 SqlServerDatabase.Text = DataSource.Parameters["Database"];
                 connectToSqlSource();
-                if (DataSource.Parameters["Query"] != null)
+                if (DataSource.Parameters.ContainsKey("Query") && DataSource.Parameters["Query"] != null)
                 {
                     SqlDataTypeComboBox.SelectedItem = SqlSourceTypes[1];
                     SqlQueryTextBox.Text = DataSource.Parameters["Query"];
