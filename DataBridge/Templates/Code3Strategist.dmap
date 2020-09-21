@@ -15,7 +15,7 @@
       {
         "$id": "4",
         "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
-        "Field": "CallReceived",
+        "Field": "Time",
         "ColumnType": 1,
         "Column": {
           "$id": "5",
