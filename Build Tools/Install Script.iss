@@ -9,6 +9,7 @@ AppVerName={#ApplicationName} {#ApplicationVersion}
 AppPublisher=Levrum
 DefaultDirName={localappdata}\Levrum\{#ApplicationName}
 DefaultGroupName={#ApplicationName}
+DisableDirPage=yes
 UninstallDisplayIcon={app}\databridge.ico
 Compression=lzma2
 SolidCompression=yes
