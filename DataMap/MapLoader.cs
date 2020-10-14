@@ -749,10 +749,44 @@ namespace Levrum.Data.Map
                 updateProgress(5, string.Format("Cleaning incident {0} of {1}", incidentNum, Incidents.Count), progress, incidentNum == Incidents.Count);
                 if (convertCoordinates)
                 {
-                    double[] xyPoint = { incident.Longitude, incident.Latitude };
-                    LatitudeLongitude latLon = converter.ConvertXYToLatLon(xyPoint);
-                    incident.Latitude = latLon.Latitude;
-                    incident.Longitude = latLon.Longitude;
+                    if (incident.Data.ContainsKey("X") && incident.Data.ContainsKey("Y"))
+                    {
+                        object xObj = incident.Data["X"];
+                        object yObj = incident.Data["Y"];
+                        double xCoord = double.NaN;
+                        double yCoord = double.NaN;
+
+                        bool convertFailed = false; 
+                        try
+                        {
+                            if (xCoord is double)
+                            {
+                                xCoord = (double)xObj;
+                            } else if (xCoord is string)
+                            {
+                                xCoord = double.Parse(xObj as string);
+                            }
+
+                            if (yCoord is double)
+                            {
+                                yCoord = (double)yObj;
+                            } else if (yCoord is string)
+                            {
+                                yCoord = double.Parse(xObj as string);
+                            }
+                        } catch (Exception ex)
+                        {
+                            convertFailed = true;
+                        }
+
+                        if (!convertFailed)
+                        {
+                            double[] xyPoint = { xCoord, yCoord };
+                            LatitudeLongitude latLon = converter.ConvertXYToLatLon(xyPoint);
+                            incident.Latitude = latLon.Latitude;
+                            incident.Longitude = latLon.Longitude;
+                        }
+                    }
                 }
 
                 if (Map.InvertLatitude)
