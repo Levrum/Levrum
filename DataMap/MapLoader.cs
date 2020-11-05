@@ -759,18 +759,24 @@ namespace Levrum.Data.Map
                         bool convertFailed = false; 
                         try
                         {
-                            if (xCoord is double)
+                            if (xObj is double)
                             {
                                 xCoord = (double)xObj;
-                            } else if (xCoord is string)
+                            } else if (xObj is int)
+                            {
+                                xCoord = Convert.ToDouble(xObj);
+                            }  else if (xObj is string)
                             {
                                 xCoord = double.Parse(xObj as string);
                             }
 
-                            if (yCoord is double)
+                            if (yObj is double)
                             {
                                 yCoord = (double)yObj;
-                            } else if (yCoord is string)
+                            } else if (yObj is int)
+                            {
+                                yCoord = Convert.ToDouble(yObj);
+                            } else if (yObj is string)
                             {
                                 yCoord = double.Parse(xObj as string);
                             }
