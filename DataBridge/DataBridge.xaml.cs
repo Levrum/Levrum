@@ -413,7 +413,7 @@ namespace Levrum.DataBridge
             }
             else
 
-                Cursor = Cursors.Wait;
+            Cursor = Cursors.Wait;
             toggleControls(true);
         }
 
