@@ -1,0 +1,1407 @@
+<Incidents>
+    <Incident xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <CanonicalVersion>3.0.6</CanonicalVersion>
+        <IncidentId>89217711-03d3-404e-bc3b-ac41000bb0c4</IncidentId>
+        <IncidentNumber>20N5807</IncidentNumber>
+        <NFIRSIncidentNumber>0006335</NFIRSIncidentNumber>
+        <IncidentDate>2020-09-25</IncidentDate>
+        <ModifyDateTimeUtc>2020-09-25T11:45:26.0000000</ModifyDateTimeUtc>
+        <LockedDateTime>2020-09-25T06:45:26-05:00</LockedDateTime>
+        <FirstLockDateTime>2020-09-25T06:45:26-05:00</FirstLockDateTime>
+        <IsActive>true</IsActive>
+        <IsLocked>true</IsLocked>
+        <AgencyDetails AgencyId="70cdd6f0-f65c-43fb-aa9e-62912f60a7f0" AgencyLoginId="NRHFD" AgencyNumber="220037">
+            <AgencyName>North Richland Hills Fire Department</AgencyName>
+            <AgencyCounty>Tarrant</AgencyCounty>
+            <AgencyStateId>220037</AgencyStateId>
+            <NFIRSFDID>WB625</NFIRSFDID>
+            <DepartmentState>TX</DepartmentState>
+            <AgencyTimeZoneId>Central Standard Time</AgencyTimeZoneId>
+            <AgencyTimeZoneOffset>-05:00</AgencyTimeZoneOffset>
+            <AgencyRespectsDaylightSavings>true</AgencyRespectsDaylightSavings>
+        </AgencyDetails>
+        <CADDetails>
+            <CADDetail>
+                <CADIncidentId>cec150dc-7f54-4b9b-814e-ac41000bb0a8</CADIncidentId>
+                <CADDispatchText>01:12:27 09/25/2020 - J J Parker VRES data. Phone: (817)514-1955, UNC: 0, Lat: 0, Long: 0, Est. Loc.: 5600 BOGOTA DR 01:14:15 09/25/2020 - J J Parker 85 YOA FEMALE WITH SKIN CRAWLING // SAID SHE WANTED US TO BRING HER MEDS BUT WAS ADVISED WE COULD NOT DO THAT 01:14:28 09/25/2020 - J J Parker AFTER DISPATCH SAID WE COULD NOT BRING HER MEDS, COMP ADV SHE WOULD JUST SHOOT HERSELF 01:16:47 09/25/2020 - J J Parker HAZARD ADV 7 FIREARMS IN THE RES AND JERRY ADV HE WOULD NOT GO BACK TO JAIL 01:19:48 09/25/2020 - J J Parker COMP CALLING BACK ASKING IF IT WAS OK TO SHOOT HERSELF SINCE WE WON'T GIVE HER ANY MEDS TO HELP HER SLEEP 01:22:32 09/25/2020 - T M Hope - From: J W Campbell PATROL 2 01:24:05 09/25/2020 - J J Parker - From: D S Ring AT 6900 BUENOS AIRES 01:24:25 09/25/2020 - J J Parker - From: C W Province AT 5612 BOGOTA 01:25:35 09/25/2020 - J J Parker - From: R M Cortes 7004 SAO PAULO CT 01:40:13 09/25/2020 - J J Parker - From: C D Ford REQ MEDICS // ADV CLEAR TO MAKE THE SCENE 02:13:12 09/25/2020 - T L McCurley - From: C W Province FOLLOWING M225 TO JPS
+                </CADDispatchText>
+            </CADDetail>
+            <CADDetail>
+                <CADIncidentId>656cf9be-59b5-4b13-bdf8-ac41000bb204</CADIncidentId>
+                <CADDispatchText>01:12:27 09/25/2020 - J J Parker VRES data. Phone: (817)514-1955, UNC: 0, Lat: 0, Long: 0, Est. Loc.: 5600 BOGOTA DR 01:14:15 09/25/2020 - J J Parker 85 YOA FEMALE WITH SKIN CRAWLING // SAID SHE WANTED US TO BRING HER MEDS BUT WAS ADVISED WE COULD NOT DO THAT 01:14:28 09/25/2020 - J J Parker AFTER DISPATCH SAID WE COULD NOT BRING HER MEDS, COMP ADV SHE WOULD JUST SHOOT HERSELF 01:16:47 09/25/2020 - J J Parker HAZARD ADV 7 FIREARMS IN THE RES AND JERRY ADV HE WOULD NOT GO BACK TO JAIL 01:19:48 09/25/2020 - J J Parker COMP CALLING BACK ASKING IF IT WAS OK TO SHOOT HERSELF SINCE WE WON'T GIVE HER ANY MEDS TO HELP HER SLEEP 01:22:32 09/25/2020 - T M Hope - From: J W Campbell PATROL 2 01:24:05 09/25/2020 - J J Parker - From: D S Ring AT 6900 BUENOS AIRES 01:24:25 09/25/2020 - J J Parker - From: C W Province AT 5612 BOGOTA 01:25:35 09/25/2020 - J J Parker - From: R M Cortes 7004 SAO PAULO CT 01:40:13 09/25/2020 - J J Parker - From: C D Ford REQ MEDICS // ADV CLEAR TO MAKE THE SCENE 02:13:12 09/25/2020 - T L McCurley - From: C W Province FOLLOWING M225 TO JPS
+                </CADDispatchText>
+            </CADDetail>
+        </CADDetails>
+        <Exposures>
+            <Exposure ExposureId="4583efc7-e278-4c55-b623-ac41000bb0c4" SequenceNumber="0">
+                <IncidentType NFIRSCode="321" EntityName="EMS call, excluding vehicle accident with injury" ListRef="5" BaseCode="321" BaseName="EMS call, excluding vehicle accident with injury">358</IncidentType>
+                <StationId>f5977ddb-7907-425f-a3c6-a57500a8d036</StationId>
+                <Station>5</Station>
+                <StationName>Fire Station 5</StationName>
+                <ShiftId>fb7ddc44-963b-4eaf-8059-a3fd00da1981</ShiftId>
+                <Shift>B</Shift>
+                <ShiftName>B Shift</ShiftName>
+                <DistrictId>b217464b-62a2-e911-810d-000d3a0064aa</DistrictId>
+                <District>54G</District>
+                <DistrictName>154G</DistrictName>
+                <ResourceFormUsed>false</ResourceFormUsed>
+                <FireServiceDeaths>0</FireServiceDeaths>
+                <OtherDeaths>0</OtherDeaths>
+                <FireServiceInjuries>0</FireServiceInjuries>
+                <OtherInjuries>0</OtherInjuries>
+                <PSAPDatetime>2020-09-25T01:14:35-05:00</PSAPDatetime>
+                <AlarmDatetime>2020-09-25T01:14:35-05:00</AlarmDatetime>
+                <DispatchNotifiedDatetime>2020-09-25T01:14:35-05:00</DispatchNotifiedDatetime>
+                <ArrivalDatetime>2020-09-25T01:46:44-05:00</ArrivalDatetime>
+                <LastUnitClearedDatetime>2020-09-25T03:09:56-05:00</LastUnitClearedDatetime>
+                <ActionsTaken>
+                    <Action NFIRSCode="33" EntityName="Provide advanced life support (ALS)" ListRef="7" BaseCode="33" BaseName="Provide advanced life support (ALS)">546</Action>
+                    <Action NFIRSCode="34" EntityName="Transport person" ListRef="7" BaseCode="34" BaseName="Transport person">547</Action>
+                    <Action NFIRSCode="73" EntityName="Provide manpower" ListRef="7" BaseCode="73" BaseName="Provide manpower">580</Action>
+                </ActionsTaken>
+                <AidDetails>
+                    <AidGivenOrReceived NFIRSCode="N" EntityName="None" ListRef="6" BaseCode="N" BaseName="None">526</AidGivenOrReceived>
+                </AidDetails>
+                <LocationDetails>
+                    <AddressOnWildland>false</AddressOnWildland>
+                    <LocationType NFIRSCode="1" EntityName="Street address" ListRef="1" BaseCode="1" BaseName="Street address">1</LocationType>
+                    <PropertyUse NFIRSCode="419" EntityName="1 or 2 family dwelling" ListRef="11" BaseCode="419" BaseName="1 or 2 family dwelling">696</PropertyUse>
+                    <AddressDetails>
+                        <NumberOrMilepost>5600</NumberOrMilepost>
+                        <StreetOrHighwayName>BOGOTA</StreetOrHighwayName>
+                        <StreetType NFIRSCode="DR" EntityName="Drive" ListRef="3" BaseCode="DR" BaseName="Drive">62</StreetType>
+                        <City>North Richland</City>
+                        <State NFIRSCode="TX" EntityName="Texas" ListRef="4" BaseCode="TX" BaseName="Texas">257</State>
+                        <Zip>76180</Zip>
+                    </AddressDetails>
+                    <Latitude>45.210000000</Latitude>
+                    <Longitude>123.110000000</Longitude>
+                </LocationDetails>
+                <OwnerDetails SequenceNumber="0">
+                    <AddressSameAsIncident>false</AddressSameAsIncident>
+                </OwnerDetails>
+                <OwnerInvolvedInIncident>false</OwnerInvolvedInIncident>
+                <PropertyLossIsNone>false</PropertyLossIsNone>
+                <ContentsLossIsNone>false</ContentsLossIsNone>
+                <PropertyValueIsNone>false</PropertyValueIsNone>
+                <ContentsValueIsNone>false</ContentsValueIsNone>
+                <ApparatusesAndPersonnel>
+                    <Apparatus SequenceNumber="0">
+                        <FireIncidentApparatusId>1f897ddf-d428-4678-bffe-ac41000bb122</FireIncidentApparatusId>
+                        <ApparatusId>cd1f3345-4c6f-4382-9e2a-a57500e0435e</ApparatusId>
+                        <ApparatusName>Q225</ApparatusName>
+                        <ApparatusType NFIRSCode="13" EntityName="Quint" ListRef="125" BaseCode="13" BaseName="Quint">4850</ApparatusType>
+                        <ApparatusUse NFIRSCode="1" EntityName="Suppression" ListRef="126" BaseCode="1" BaseName="Suppression">4889</ApparatusUse>
+                        <DispatchDatetime>2020-09-25T01:40:00-05:00</DispatchDatetime>
+                        <ArrivalDatetime>2020-09-25T01:46:44-05:00</ArrivalDatetime>
+                        <ClearDatetime>2020-09-25T02:16:45-05:00</ClearDatetime>
+                        <EnRouteDatetime>2020-09-25T01:41:50-05:00</EnRouteDatetime>
+                        <ActionsTaken>
+                            <Action NFIRSCode="73" EntityName="Provide manpower" ListRef="7" BaseCode="73" BaseName="Provide manpower">580</Action>
+                            <Action NFIRSCode="74" EntityName="Provide apparatus" ListRef="7" BaseCode="74" BaseName="Provide apparatus">581</Action>
+                            <Action NFIRSCode="75" EntityName="Provide equipment" ListRef="7" BaseCode="75" BaseName="Provide equipment">582</Action>
+                        </ActionsTaken>
+                        <Personnel>
+                            <IncidentApparatusPersonnel SequenceNumber="1">
+                                <ApparatusPersonnelId>224dbbda-8c17-4369-9516-ac41000bb128</ApparatusPersonnelId>
+                                <AgencyPersonId>83a8fb32-467b-42e7-a4b1-6cd6606a01da</AgencyPersonId>
+                                <PersonnelId>167</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>Paul</FirstName>
+                                    <LastName>VonWahlde</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>pvonwahlde</UserLoginId>
+                                <PatientContact>false</PatientContact>
+                                <MedicalPpeWorn>
+                                    <Ppe>
+                                        <Id>d6607164-ec10-40a6-9049-a220ed5a9c2e</Id>
+                                        <Value>Eye Protection</Value>
+                                    </Ppe>
+                                    <Ppe>
+                                        <Id>64deb221-ec87-4966-aca8-58a78e17033e</Id>
+                                        <Value>Mask-N95 (Reuse)</Value>
+                                    </Ppe>
+                                    <Ppe>
+                                        <Id>a96eed2a-7553-46dd-8e25-0265d6244fbf</Id>
+                                        <Value>Gloves</Value>
+                                    </Ppe>
+                                </MedicalPpeWorn>
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="2">
+                                <ApparatusPersonnelId>e28afd84-6363-4e12-b7eb-ac41000bb142</ApparatusPersonnelId>
+                                <AgencyPersonId>91e9cf18-9e3f-4701-a742-a57d00fcadb9</AgencyPersonId>
+                                <PersonnelId>192</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>JASON</FirstName>
+                                    <LastName>DAVIS</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>jdavis</UserLoginId>
+                                <PatientContact>false</PatientContact>
+                                <MedicalPpeWorn>
+                                    <Ppe>
+                                        <Id>a96eed2a-7553-46dd-8e25-0265d6244fbf</Id>
+                                        <Value>Gloves</Value>
+                                    </Ppe>
+                                    <Ppe>
+                                        <Id>64deb221-ec87-4966-aca8-58a78e17033e</Id>
+                                        <Value>Mask-N95 (Reuse)</Value>
+                                    </Ppe>
+                                    <Ppe>
+                                        <Id>d6607164-ec10-40a6-9049-a220ed5a9c2e</Id>
+                                        <Value>Eye Protection</Value>
+                                    </Ppe>
+                                </MedicalPpeWorn>
+                            </IncidentApparatusPersonnel>
+                        </Personnel>
+                        <Priority>Emergent</Priority>
+                    </Apparatus>
+                    <Apparatus SequenceNumber="1">
+                        <FireIncidentApparatusId>c4d4ec54-a9db-4d42-b853-ac41000bb23a</FireIncidentApparatusId>
+                        <ApparatusId>786cf5ff-4733-4f29-9ec2-5d04c891fa2b</ApparatusId>
+                        <ApparatusName>M225</ApparatusName>
+                        <ApparatusType NFIRSCode="76" EntityName="ALS unit" ListRef="125" BaseCode="76" BaseName="ALS unit">4878</ApparatusType>
+                        <ApparatusUse NFIRSCode="2" EntityName="EMS" ListRef="126" BaseCode="2" BaseName="EMS">4890</ApparatusUse>
+                        <DispatchDatetime>2020-09-25T01:40:00-05:00</DispatchDatetime>
+                        <ArrivalDatetime>2020-09-25T01:46:46-05:00</ArrivalDatetime>
+                        <ClearDatetime>2020-09-25T03:09:56-05:00</ClearDatetime>
+                        <EnRouteDatetime>2020-09-25T01:42:10-05:00</EnRouteDatetime>
+                        <ActionsTaken>
+                            <Action NFIRSCode="33" EntityName="Provide advanced life support (ALS)" ListRef="7" BaseCode="33" BaseName="Provide advanced life support (ALS)">546</Action>
+                            <Action NFIRSCode="34" EntityName="Transport person" ListRef="7" BaseCode="34" BaseName="Transport person">547</Action>
+                            <Action NFIRSCode="73" EntityName="Provide manpower" ListRef="7" BaseCode="73" BaseName="Provide manpower">580</Action>
+                            <Action NFIRSCode="74" EntityName="Provide apparatus" ListRef="7" BaseCode="74" BaseName="Provide apparatus">581</Action>
+                        </ActionsTaken>
+                        <Personnel>
+                            <IncidentApparatusPersonnel SequenceNumber="0">
+                                <ApparatusPersonnelId>ea73a4d1-5b18-4fc7-8849-ac41000bb23f</ApparatusPersonnelId>
+                                <AgencyPersonId>6f38a751-7804-47ce-8295-a58300ec30c6</AgencyPersonId>
+                                <PersonnelId>195</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>DAVID</FirstName>
+                                    <LastName>RODELA</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>drodela</UserLoginId>
+                                <PatientContact>true</PatientContact>
+                                <MedicalPpeWorn>
+                                    <Ppe>
+                                        <Id>64deb221-ec87-4966-aca8-58a78e17033e</Id>
+                                        <Value>Mask-N95 (Reuse)</Value>
+                                    </Ppe>
+                                    <Ppe>
+                                        <Id>a96eed2a-7553-46dd-8e25-0265d6244fbf</Id>
+                                        <Value>Gloves</Value>
+                                    </Ppe>
+                                    <Ppe>
+                                        <Id>d6607164-ec10-40a6-9049-a220ed5a9c2e</Id>
+                                        <Value>Eye Protection</Value>
+                                    </Ppe>
+                                </MedicalPpeWorn>
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="1">
+                                <ApparatusPersonnelId>1f4e84ce-82fc-4c08-82bb-ac41000bb243</ApparatusPersonnelId>
+                                <AgencyPersonId>cb66617e-4b20-ea11-8105-000d3a0143be</AgencyPersonId>
+                                <PersonnelId>238</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>MASON</FirstName>
+                                    <LastName>GUIDRY</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>mguidry</UserLoginId>
+                                <PatientContact>true</PatientContact>
+                                <MedicalPpeWorn>
+                                    <Ppe>
+                                        <Id>64deb221-ec87-4966-aca8-58a78e17033e</Id>
+                                        <Value>Mask-N95 (Reuse)</Value>
+                                    </Ppe>
+                                    <Ppe>
+                                        <Id>a96eed2a-7553-46dd-8e25-0265d6244fbf</Id>
+                                        <Value>Gloves</Value>
+                                    </Ppe>
+                                    <Ppe>
+                                        <Id>d6607164-ec10-40a6-9049-a220ed5a9c2e</Id>
+                                        <Value>Eye Protection</Value>
+                                    </Ppe>
+                                </MedicalPpeWorn>
+                            </IncidentApparatusPersonnel>
+                        </Personnel>
+                        <Priority>Emergent</Priority>
+                    </Apparatus>
+                </ApparatusesAndPersonnel>
+                <SuppressionApparatusCount>1</SuppressionApparatusCount>
+                <SuppressionPersonnelCount>2</SuppressionPersonnelCount>
+                <EmsApparatusCount>1</EmsApparatusCount>
+                <EmsPersonnelCount>2</EmsPersonnelCount>
+                <OtherApparatusCount>0</OtherApparatusCount>
+                <OtherPersonnelCount>0</OtherPersonnelCount>
+                <ResourcesIncludeMutualAid>false</ResourcesIncludeMutualAid>
+                <ReportWriterDetails>
+                    <NameDetails>
+                        <FirstName>Paul</FirstName>
+                        <LastName>VonWahlde</LastName>
+                    </NameDetails>
+                    <NFIRSPersonnelId>167</NFIRSPersonnelId>
+                    <Assignment>Q225</Assignment>
+                    <Datetime>2020-09-25T01:00:00-05:00</Datetime>
+                    <Rank>Driver Engineer</Rank>
+                </ReportWriterDetails>
+                <OfficerInChargeDetails>
+                    <NameDetails>
+                        <FirstName>Paul</FirstName>
+                        <LastName>VonWahlde</LastName>
+                    </NameDetails>
+                    <NFIRSPersonnelId>167</NFIRSPersonnelId>
+                    <Assignment>Q225</Assignment>
+                    <Datetime>2020-09-25T01:00:00-05:00</Datetime>
+                    <Rank>Driver Engineer</Rank>
+                </OfficerInChargeDetails>
+                <Narratives>
+                    <Remark SequenceNumber="0">
+                        <FirstName>Paul</FirstName>
+                        <LastName>VonWahlde</LastName>
+                        <CreatedDatetime>2020-09-25T06:38:57-05:00</CreatedDatetime>
+                        <Remarks>NRHFD Q225 and M225 were dispatched to an 85 y/o female with a medical emergency. Crews arrived and were briefed by members of NRHPD. The patient was assessed, moved to the cot, and taken to the MICU. The patient was detained under a mental app by NRHPD. Vitals were assessed and transport was initiated to JPS by M225. Q225 remained on scene and ensured that the patients husband would be able to care for himself. He demonstrated to us that he could call 911 and refused any assistance. Q225 cleared and returned to service. M225 transported without incident and returned to service.</Remarks>
+                    </Remark>
+                </Narratives>
+                <CADNotes>01:12:27 09/25/2020 - J J Parker VRES data. Phone: (817)514-1955, UNC: 0, Lat: 0, Long: 0, Est. Loc.: 5600 BOGOTA DR 01:14:15 09/25/2020 - J J Parker 85 YOA FEMALE WITH SKIN CRAWLING // SAID SHE WANTED US TO BRING HER MEDS BUT WAS ADVISED WE COULD NOT DO THAT 01:14:28 09/25/2020 - J J Parker AFTER DISPATCH SAID WE COULD NOT BRING HER MEDS, COMP ADV SHE WOULD JUST SHOOT HERSELF 01:16:47 09/25/2020 - J J Parker HAZARD ADV 7 FIREARMS IN THE RES AND JERRY ADV HE WOULD NOT GO BACK TO JAIL 01:19:48 09/25/2020 - J J Parker COMP CALLING BACK ASKING IF IT WAS OK TO SHOOT HERSELF SINCE WE WON'T GIVE HER ANY MEDS TO HELP HER SLEEP 01:22:32 09/25/2020 - T M Hope - From: J W Campbell PATROL 2 01:24:05 09/25/2020 - J J Parker - From: D S Ring AT 6900 BUENOS AIRES 01:24:25 09/25/2020 - J J Parker - From: C W Province AT 5612 BOGOTA 01:25:35 09/25/2020 - J J Parker - From: R M Cortes 7004 SAO PAULO CT 01:40:13 09/25/2020 - J J Parker - From: C D Ford REQ MEDICS // ADV CLEAR TO MAKE THE SCENE 02:13:12 09/25/2020 - T L McCurley - From: C W Province FOLLOWING M225 TO JPS
+                </CADNotes>
+                <Covid19Factor NFIRSCode="3" EntityName="No, COVID-19 was not a factor" ListRef="146" BaseCode="3" BaseName="No, COVID-19 was not a factor">18075</Covid19Factor>
+            </Exposure>
+        </Exposures>
+    </Incident>
+    <Incident xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <CanonicalVersion>3.0.6</CanonicalVersion>
+        <IncidentId>d479dd53-77c7-4440-b8c6-ac4001435f9a</IncidentId>
+        <IncidentNumber>20N5805</IncidentNumber>
+        <NFIRSIncidentNumber>0006332</NFIRSIncidentNumber>
+        <IncidentDate>2020-09-24</IncidentDate>
+        <ModifyDateTimeUtc>2020-09-25T12:05:50.0000000</ModifyDateTimeUtc>
+        <LockedDateTime>2020-09-25T07:05:50-05:00</LockedDateTime>
+        <FirstLockDateTime>2020-09-25T07:05:50-05:00</FirstLockDateTime>
+        <IsActive>true</IsActive>
+        <IsLocked>true</IsLocked>
+        <AgencyDetails AgencyId="70cdd6f0-f65c-43fb-aa9e-62912f60a7f0" AgencyLoginId="NRHFD" AgencyNumber="220037">
+            <AgencyName>North Richland Hills Fire Department</AgencyName>
+            <AgencyCounty>Tarrant</AgencyCounty>
+            <AgencyStateId>220037</AgencyStateId>
+            <NFIRSFDID>WB625</NFIRSFDID>
+            <DepartmentState>TX</DepartmentState>
+            <AgencyTimeZoneId>Central Standard Time</AgencyTimeZoneId>
+            <AgencyTimeZoneOffset>-05:00</AgencyTimeZoneOffset>
+            <AgencyRespectsDaylightSavings>true</AgencyRespectsDaylightSavings>
+        </AgencyDetails>
+        <CADDetails>
+            <CADDetail>
+                <CADIncidentId>bcf4c165-5d03-4a7e-ac27-ac4001435fd0</CADIncidentId>
+                <CADDispatchText>20:34:15 09/24/2020 - J J Parker WPH2 data. Phone: (214)982-0096, UNC: 0, Lat: 32.85213589, Long: -97.1435165 20:34:43 09/24/2020 - J J Parker PARKINSONS AND HAVING HALLUCINATIONS 20:34:57 09/24/2020 - J J Parker FIGHTING CAREGIVERS 20:35:13 09/24/2020 - J J Parker MALE IN HER LATE 60S 20:35:44 09/24/2020 - J J Parker NO COVID 20:36:40 09/24/2020 - J J Parker NEEDS TO GO TO THE HOSP BUT IS FIGHTING NURSES 20:46:58 09/24/2020 - C W Province MEDICAL CALL, PD CLEARED BY FD 20:47:00 09/24/2020 - D S Ring fd call 20:54:17 09/24/2020 - J J Parker - From: Q-221 REQ OFC COME BACK TO THE SCENE
+                </CADDispatchText>
+            </CADDetail>
+            <CADDetail>
+                <CADIncidentId>475c7e57-496e-4024-8bb7-ac4001436117</CADIncidentId>
+                <CADDispatchText>20:34:15 09/24/2020 - J J Parker WPH2 data. Phone: (214)982-0096, UNC: 0, Lat: 32.85213589, Long: -97.1435165 20:34:43 09/24/2020 - J J Parker PARKINSONS AND HAVING HALLUCINATIONS 20:34:57 09/24/2020 - J J Parker FIGHTING CAREGIVERS 20:35:13 09/24/2020 - J J Parker MALE IN HER LATE 60S 20:35:44 09/24/2020 - J J Parker NO COVID 20:36:40 09/24/2020 - J J Parker NEEDS TO GO TO THE HOSP BUT IS FIGHTING NURSES 20:46:58 09/24/2020 - C W Province MEDICAL CALL, PD CLEARED BY FD 20:47:00 09/24/2020 - D S Ring fd call 20:54:17 09/24/2020 - J J Parker - From: Q-221 REQ OFC COME BACK TO THE SCENE
+                </CADDispatchText>
+            </CADDetail>
+        </CADDetails>
+        <Exposures>
+            <Exposure ExposureId="1f24d665-ff9e-48ed-a7c8-ac4001435f9a" SequenceNumber="0">
+                <IncidentType NFIRSCode="321" EntityName="EMS call, excluding vehicle accident with injury" ListRef="5" BaseCode="321" BaseName="EMS call, excluding vehicle accident with injury">358</IncidentType>
+                <StationId>815717ca-5583-4de9-820a-b85741023468</StationId>
+                <Station>1</Station>
+                <StationName>Fire Station 1</StationName>
+                <ShiftId>fb7ddc44-963b-4eaf-8059-a3fd00da1981</ShiftId>
+                <Shift>B</Shift>
+                <ShiftName>B Shift</ShiftName>
+                <DistrictId>23262fcd-5ea2-e911-810d-000d3a0064aa</DistrictId>
+                <District>14G</District>
+                <DistrictName>114G</DistrictName>
+                <ResourceFormUsed>false</ResourceFormUsed>
+                <FireServiceDeaths>0</FireServiceDeaths>
+                <OtherDeaths>0</OtherDeaths>
+                <FireServiceInjuries>0</FireServiceInjuries>
+                <OtherInjuries>0</OtherInjuries>
+                <PSAPDatetime>2020-09-24T20:36:12-05:00</PSAPDatetime>
+                <AlarmDatetime>2020-09-24T20:36:12-05:00</AlarmDatetime>
+                <DispatchNotifiedDatetime>2020-09-24T20:36:12-05:00</DispatchNotifiedDatetime>
+                <ArrivalDatetime>2020-09-24T20:41:55-05:00</ArrivalDatetime>
+                <LastUnitClearedDatetime>2020-09-24T22:55:13-05:00</LastUnitClearedDatetime>
+                <ActionsTaken>
+                    <Action NFIRSCode="33" EntityName="Provide advanced life support (ALS)" ListRef="7" BaseCode="33" BaseName="Provide advanced life support (ALS)">546</Action>
+                    <Action NFIRSCode="34" EntityName="Transport person" ListRef="7" BaseCode="34" BaseName="Transport person">547</Action>
+                    <Action NFIRSCode="73" EntityName="Provide manpower" ListRef="7" BaseCode="73" BaseName="Provide manpower">580</Action>
+                </ActionsTaken>
+                <AidDetails>
+                    <AidGivenOrReceived NFIRSCode="N" EntityName="None" ListRef="6" BaseCode="N" BaseName="None">526</AidGivenOrReceived>
+                </AidDetails>
+                <LocationDetails>
+                    <AddressOnWildland>false</AddressOnWildland>
+                    <LocationType NFIRSCode="1" EntityName="Street address" ListRef="1" BaseCode="1" BaseName="Street address">1</LocationType>
+                    <PropertyUse NFIRSCode="419" EntityName="1 or 2 family dwelling" ListRef="11" BaseCode="419" BaseName="1 or 2 family dwelling">696</PropertyUse>
+                    <AddressDetails>
+                        <NumberOrMilepost>8000</NumberOrMilepost>
+                        <StreetOrHighwayName>SEVILLE</StreetOrHighwayName>
+                        <StreetType NFIRSCode="DR" EntityName="Drive" ListRef="3" BaseCode="DR" BaseName="Drive">62</StreetType>
+                        <City>North Richland</City>
+                        <State NFIRSCode="TX" EntityName="Texas" ListRef="4" BaseCode="TX" BaseName="Texas">257</State>
+                        <Zip>76182</Zip>
+                    </AddressDetails>
+                    <Latitude>45.50000000</Latitude>
+                    <Longitude>-122.90000000</Longitude>
+                </LocationDetails>
+                <OwnerDetails SequenceNumber="0">
+                    <AddressSameAsIncident>false</AddressSameAsIncident>
+                </OwnerDetails>
+                <OwnerInvolvedInIncident>false</OwnerInvolvedInIncident>
+                <PropertyLossIsNone>false</PropertyLossIsNone>
+                <ContentsLossIsNone>false</ContentsLossIsNone>
+                <PropertyValueIsNone>false</PropertyValueIsNone>
+                <ContentsValueIsNone>false</ContentsValueIsNone>
+                <ApparatusesAndPersonnel>
+                    <Apparatus SequenceNumber="0">
+                        <FireIncidentApparatusId>48cccc55-0e92-446d-b651-ac4001435fe4</FireIncidentApparatusId>
+                        <ApparatusId>3ecc4c0a-ed40-4631-8681-bd36c57e5e5a</ApparatusId>
+                        <ApparatusName>Q221</ApparatusName>
+                        <ApparatusType NFIRSCode="13" EntityName="Quint" ListRef="125" BaseCode="13" BaseName="Quint">4850</ApparatusType>
+                        <ApparatusUse NFIRSCode="1" EntityName="Suppression" ListRef="126" BaseCode="1" BaseName="Suppression">4889</ApparatusUse>
+                        <DispatchDatetime>2020-09-24T20:37:13-05:00</DispatchDatetime>
+                        <ArrivalDatetime>2020-09-24T20:41:55-05:00</ArrivalDatetime>
+                        <ClearDatetime>2020-09-24T21:29:42-05:00</ClearDatetime>
+                        <EnRouteDatetime>2020-09-24T20:38:45-05:00</EnRouteDatetime>
+                        <InDistrictDatetime>2020-09-24T21:29:42-05:00</InDistrictDatetime>
+                        <ActionsTaken>
+                            <Action NFIRSCode="73" EntityName="Provide manpower" ListRef="7" BaseCode="73" BaseName="Provide manpower">580</Action>
+                            <Action NFIRSCode="74" EntityName="Provide apparatus" ListRef="7" BaseCode="74" BaseName="Provide apparatus">581</Action>
+                            <Action NFIRSCode="75" EntityName="Provide equipment" ListRef="7" BaseCode="75" BaseName="Provide equipment">582</Action>
+                        </ActionsTaken>
+                        <Personnel>
+                            <IncidentApparatusPersonnel SequenceNumber="1">
+                                <ApparatusPersonnelId>8ae399e1-ad0a-4128-87aa-ac4001435fe9</ApparatusPersonnelId>
+                                <AgencyPersonId>78a6640c-f1ea-4baf-bc8a-753f4aeb3c48</AgencyPersonId>
+                                <PersonnelId>98</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>Jeffery</FirstName>
+                                    <LastName>Blalock</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>jblalock</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="2">
+                                <ApparatusPersonnelId>c475bfda-a30f-46da-a930-ac4001435fed</ApparatusPersonnelId>
+                                <AgencyPersonId>948112a0-61e9-4e6f-ba37-ea3fdb012dfa</AgencyPersonId>
+                                <PersonnelId>116</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>BRIAN</FirstName>
+                                    <LastName>BEAUDETTE</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>bbeaudette</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="3">
+                                <ApparatusPersonnelId>11cc986d-4f12-4f98-80ba-ac400143600b</ApparatusPersonnelId>
+                                <AgencyPersonId>66ad49c5-4b43-e811-8102-000d3a0064aa</AgencyPersonId>
+                                <PersonnelId>218</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>TRISTAN</FirstName>
+                                    <MiddleInitial />
+                                    <LastName>CLARKE</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>tclarke</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="4">
+                                <ApparatusPersonnelId>54295550-ba0a-4e40-b038-ac4100646fa5</ApparatusPersonnelId>
+                                <AgencyPersonId>182d8b04-965f-e911-810b-000d3a0064aa</AgencyPersonId>
+                                <PersonnelId>229</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>ANDREW</FirstName>
+                                    <LastName>BEFORT</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>abefort</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                        </Personnel>
+                        <ResponseDelays>
+                            <Delay>None/No Delay</Delay>
+                        </ResponseDelays>
+                        <Priority>Emergent</Priority>
+                        <RespondedFromZone>114H</RespondedFromZone>
+                    </Apparatus>
+                    <Apparatus SequenceNumber="1">
+                        <FireIncidentApparatusId>2f64f040-1b32-4cfa-a5d8-ac400143612c</FireIncidentApparatusId>
+                        <ApparatusId>5093b8e4-8486-4e7a-9110-1aed64b3ab06</ApparatusId>
+                        <ApparatusName>M223</ApparatusName>
+                        <ApparatusType NFIRSCode="76" EntityName="ALS unit" ListRef="125" BaseCode="76" BaseName="ALS unit">4878</ApparatusType>
+                        <ApparatusUse NFIRSCode="2" EntityName="EMS" ListRef="126" BaseCode="2" BaseName="EMS">4890</ApparatusUse>
+                        <DispatchDatetime>2020-09-24T20:37:13-05:00</DispatchDatetime>
+                        <ArrivalDatetime>2020-09-24T20:44:03-05:00</ArrivalDatetime>
+                        <ClearDatetime>2020-09-24T22:55:13-05:00</ClearDatetime>
+                        <EnRouteDatetime>2020-09-24T20:37:32-05:00</EnRouteDatetime>
+                        <ActionsTaken>
+                            <Action NFIRSCode="33" EntityName="Provide advanced life support (ALS)" ListRef="7" BaseCode="33" BaseName="Provide advanced life support (ALS)">546</Action>
+                            <Action NFIRSCode="34" EntityName="Transport person" ListRef="7" BaseCode="34" BaseName="Transport person">547</Action>
+                            <Action NFIRSCode="73" EntityName="Provide manpower" ListRef="7" BaseCode="73" BaseName="Provide manpower">580</Action>
+                            <Action NFIRSCode="74" EntityName="Provide apparatus" ListRef="7" BaseCode="74" BaseName="Provide apparatus">581</Action>
+                        </ActionsTaken>
+                        <Personnel>
+                            <IncidentApparatusPersonnel SequenceNumber="1">
+                                <ApparatusPersonnelId>211fca02-788a-4c91-b198-ac4001436136</ApparatusPersonnelId>
+                                <AgencyPersonId>d272b7a0-965f-e911-810b-000d3a0064aa</AgencyPersonId>
+                                <PersonnelId>227</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>BRENT</FirstName>
+                                    <LastName>GIBSON</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>bgibson</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="2">
+                                <ApparatusPersonnelId>f1c340dc-9b58-468a-b703-ac4001436148</ApparatusPersonnelId>
+                                <AgencyPersonId>ef79ec44-d99f-434c-a3fd-a58300ef231b</AgencyPersonId>
+                                <PersonnelId>198</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>COLE</FirstName>
+                                    <LastName>BELEW</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>cbelew</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="3">
+                                <ApparatusPersonnelId>1ff0e5f6-94dc-4a2d-9009-ac4100646f50</ApparatusPersonnelId>
+                                <AgencyPersonId>a0937fd0-4219-4b27-ac31-e1ee8e05f6d7</AgencyPersonId>
+                                <PersonnelId>179</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>Thomas</FirstName>
+                                    <LastName>Spencer</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>tspencer</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                        </Personnel>
+                        <ResponseDelays>
+                            <Delay>None/No Delay</Delay>
+                        </ResponseDelays>
+                        <Priority>Emergent</Priority>
+                        <RespondedFromZone>132A</RespondedFromZone>
+                    </Apparatus>
+                </ApparatusesAndPersonnel>
+                <SuppressionApparatusCount>1</SuppressionApparatusCount>
+                <SuppressionPersonnelCount>4</SuppressionPersonnelCount>
+                <EmsApparatusCount>1</EmsApparatusCount>
+                <EmsPersonnelCount>3</EmsPersonnelCount>
+                <OtherApparatusCount>0</OtherApparatusCount>
+                <OtherPersonnelCount>0</OtherPersonnelCount>
+                <ResourcesIncludeMutualAid>false</ResourcesIncludeMutualAid>
+                <ReportWriterDetails>
+                    <NameDetails>
+                        <FirstName>BRIAN</FirstName>
+                        <LastName>BEAUDETTE</LastName>
+                    </NameDetails>
+                    <NFIRSPersonnelId>116</NFIRSPersonnelId>
+                    <Assignment>Captain</Assignment>
+                    <Datetime>2020-09-24T01:00:00-05:00</Datetime>
+                    <Rank>Captain</Rank>
+                </ReportWriterDetails>
+                <OfficerInChargeDetails>
+                    <NameDetails>
+                        <FirstName>BRIAN</FirstName>
+                        <LastName>BEAUDETTE</LastName>
+                    </NameDetails>
+                    <NFIRSPersonnelId>116</NFIRSPersonnelId>
+                    <Assignment>Captain</Assignment>
+                    <Datetime>2020-09-24T01:00:00-05:00</Datetime>
+                    <Rank>Captain</Rank>
+                </OfficerInChargeDetails>
+                <Narratives>
+                    <Remark SequenceNumber="0">
+                        <FirstName>BRIAN</FirstName>
+                        <LastName>BEAUDETTE</LastName>
+                        <CreatedDatetime>2020-09-24T21:47:55-05:00</CreatedDatetime>
+                        <Remarks>Quint 221 and Medic 223 responded to a 78 year old male that was at home and family stated that they could not take care of him at least for the night. Family stated that earlier in the day that he was having hallucinations and acting combative. The caregiver that was there earlier in the day stated that he was also being very mean and tried to kick her earlier. That particular caregiver was not there at the time when we were called. When we arrived the patient was walking around the patio with his walker and stated that he was fine. When we arrived, he was very cooperative and basically stated that he did not want to go to the hospital. One of the issues that we were having was that the sister stated that she could not take care him, due to his issues. The caretakers were not willing to stay so there was no one going to be at the residence with him overnight and we could not let him stay alone by himself even though he thought he could. Pt was incontinent at this time and was still not willing to go. After speaking to the family and the caregivers it was clear that no one was going to stay with the patient. Quint 221 personnel then went out and told the patient that he was going to have to go to the hospital and be observed. The sister was well informed that she needed to get with the case workers at the facility and try and find some other arrangements for him until family was able to return from North Carolina to take care of the patient. There were several attempts made to try and contact the wife who was in North Carolina, however, we were not able to contact the female during the time we were there. The patient reluctantly chose to go with us. His sister stated that she was going to go to the hospital so that she could hopefully make other arrangements for him. Patient was then transported to Baylor Grapevine for further evaluation. Quint 221 then cleared the scene.</Remarks>
+                    </Remark>
+                    <Remark SequenceNumber="0">
+                        <FirstName>BRIAN</FirstName>
+                        <LastName>BEAUDETTE</LastName>
+                        <ApparatusName>Q221</ApparatusName>
+                        <CreatedDatetime>2020-09-24T22:15:26-05:00</CreatedDatetime>
+                        <Remarks>Quint 221 and Medic 223 responded to a 78 year old male that was at home and family stated that they could not take care of him at least for the night. Family stated that earlier in the day that he was having hallucinations and acting combative. The caregiver that was there earlier in the day stated that he was also being very mean and tried to kick her earlier. That particular caregiver was not there at the time when we were called. When we arrived the patient was walking around the patio with his walker and stated that he was fine. When we arrived, he was very cooperative and basically stated that he did not want to go to the hospital. One of the issues that we were having was that the sister stated that she could not take care him, due to his issues. The caretakers were not willing to stay so there was no one going to be at the residence with him overnight and we could not let him stay alone by himself even though he thought he could. Pt was incontinent at this time and was still not willing to go. After speaking to the family and the caregivers it was clear that no one was going to stay with the patient. Quint 221 personnel then went out and told the patient that he was going to have to go to the hospital and be observed. The sister was well informed that she needed to get with the case workers at the facility and try and find some other arrangements for him until family was able to return from North Carolina to take care of the patient. There were several attempts made to try and contact the wife who was in North Carolina, however, we were not able to contact the female during the time we were there. The patient reluctantly chose to go with us. His sister stated that she was going to go to the hospital so that she could hopefully make other arrangements for him. Patient was then transported to Baylor Grapevine for further evaluation. Quint 221 then cleared the scene.</Remarks>
+                    </Remark>
+                </Narratives>
+                <CADNotes>20:34:15 09/24/2020 - J J Parker WPH2 data. Phone: (214)982-0096, UNC: 0, Lat: 32.85213589, Long: -97.1435165 20:34:43 09/24/2020 - J J Parker PARKINSONS AND HAVING HALLUCINATIONS 20:34:57 09/24/2020 - J J Parker FIGHTING CAREGIVERS 20:35:13 09/24/2020 - J J Parker MALE IN HER LATE 60S 20:35:44 09/24/2020 - J J Parker NO COVID 20:36:40 09/24/2020 - J J Parker NEEDS TO GO TO THE HOSP BUT IS FIGHTING NURSES 20:46:58 09/24/2020 - C W Province MEDICAL CALL, PD CLEARED BY FD 20:47:00 09/24/2020 - D S Ring fd call 20:54:17 09/24/2020 - J J Parker - From: Q-221 REQ OFC COME BACK TO THE SCENE
+                </CADNotes>
+                <Covid19Factor NFIRSCode="3" EntityName="No, COVID-19 was not a factor" ListRef="146" BaseCode="3" BaseName="No, COVID-19 was not a factor">18075</Covid19Factor>
+            </Exposure>
+        </Exposures>
+    </Incident>
+    <Incident xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <CanonicalVersion>3.0.6</CanonicalVersion>
+        <IncidentId>277d8655-b93e-408e-84cd-ac4001273485</IncidentId>
+        <IncidentNumber>20N5802</IncidentNumber>
+        <NFIRSIncidentNumber>0006328</NFIRSIncidentNumber>
+        <IncidentDate>2020-09-24</IncidentDate>
+        <ModifyDateTimeUtc>2020-09-25T03:30:10.0000000</ModifyDateTimeUtc>
+        <LockedDateTime>2020-09-24T22:30:10-05:00</LockedDateTime>
+        <FirstLockDateTime>2020-09-24T22:30:10-05:00</FirstLockDateTime>
+        <IsActive>true</IsActive>
+        <IsLocked>true</IsLocked>
+        <AgencyDetails AgencyId="70cdd6f0-f65c-43fb-aa9e-62912f60a7f0" AgencyLoginId="NRHFD" AgencyNumber="220037">
+            <AgencyName>North Richland Hills Fire Department</AgencyName>
+            <AgencyCounty>Tarrant</AgencyCounty>
+            <AgencyStateId>220037</AgencyStateId>
+            <NFIRSFDID>WB625</NFIRSFDID>
+            <DepartmentState>TX</DepartmentState>
+            <AgencyTimeZoneId>Central Standard Time</AgencyTimeZoneId>
+            <AgencyTimeZoneOffset>-05:00</AgencyTimeZoneOffset>
+            <AgencyRespectsDaylightSavings>true</AgencyRespectsDaylightSavings>
+        </AgencyDetails>
+        <CADDetails>
+            <CADDetail>
+                <CADIncidentId>8f6d7a37-7f18-422d-bd85-ac40012734b5</CADIncidentId>
+                <CADDispatchText>18:51:38 09/24/2020 - K M Moreno WRLS data. Phone: (817)917-9619, UNC: 0, Lat: 32.8888607, Long: -97.2042417 18:51:55 09/24/2020 - K M Moreno 58YO MALE 18:51:59 09/24/2020 - K M Moreno POSS HEART TROUBLE 18:52:02 09/24/2020 - K M Moreno NOT BREATHING 18:53:30 09/24/2020 - C D Osman NEED PD / CANT GET SUBJ OUT OF CHAIR TO DO CPR 18:53:40 09/24/2020 - K M Moreno FRONT DOOR IS UNLOCKED 18:53:48 09/24/2020 - K M Moreno MALE IS TRYING TO BREATHE 18:54:15 09/24/2020 - T M Hope N398 ADVISED UNIT TO STEP IT UP 18:54:20 09/24/2020 - T M Hope N344 CODE 18:54:50 09/24/2020 - K M Moreno MALE ATTEMPTED TO TAKE NITRO 18:54:54 09/24/2020 - K M Moreno UNK IF HE STILL HAS IT 18:55:12 09/24/2020 - T M Hope - From: B N Allison ENRT CODE 1 19:18:36 09/24/2020 - J J Parker - From: M-221 TRANS TO NHH CODE 3 19:21:12 09/24/2020 - J J Parker - From: Q-221 ENRT TO NHH TO PICK UP PERSONNEL
+                </CADDispatchText>
+            </CADDetail>
+            <CADDetail>
+                <CADIncidentId>90c3a5ff-3856-4577-a603-ac4001273782</CADIncidentId>
+                <CADDispatchText>18:51:38 09/24/2020 - K M Moreno WRLS data. Phone: (817)917-9619, UNC: 0, Lat: 32.8888607, Long: -97.2042417 18:51:55 09/24/2020 - K M Moreno 58YO MALE 18:51:59 09/24/2020 - K M Moreno POSS HEART TROUBLE 18:52:02 09/24/2020 - K M Moreno NOT BREATHING 18:53:30 09/24/2020 - C D Osman NEED PD / CANT GET SUBJ OUT OF CHAIR TO DO CPR 18:53:40 09/24/2020 - K M Moreno FRONT DOOR IS UNLOCKED 18:53:48 09/24/2020 - K M Moreno MALE IS TRYING TO BREATHE 18:54:15 09/24/2020 - T M Hope N398 ADVISED UNIT TO STEP IT UP 18:54:20 09/24/2020 - T M Hope N344 CODE 18:54:50 09/24/2020 - K M Moreno MALE ATTEMPTED TO TAKE NITRO 18:54:54 09/24/2020 - K M Moreno UNK IF HE STILL HAS IT 18:55:12 09/24/2020 - T M Hope - From: B N Allison ENRT CODE 1 19:18:36 09/24/2020 - J J Parker - From: M-221 TRANS TO NHH CODE 3 19:21:12 09/24/2020 - J J Parker - From: Q-221 ENRT TO NHH TO PICK UP PERSONNEL
+                </CADDispatchText>
+            </CADDetail>
+            <CADDetail>
+                <CADIncidentId>996e036e-be1e-4098-b83c-ac40012739a2</CADIncidentId>
+                <CADDispatchText>18:51:38 09/24/2020 - K M Moreno WRLS data. Phone: (817)917-9619, UNC: 0, Lat: 32.8888607, Long: -97.2042417 18:51:55 09/24/2020 - K M Moreno 58YO MALE 18:51:59 09/24/2020 - K M Moreno POSS HEART TROUBLE 18:52:02 09/24/2020 - K M Moreno NOT BREATHING 18:53:30 09/24/2020 - C D Osman NEED PD / CANT GET SUBJ OUT OF CHAIR TO DO CPR 18:53:40 09/24/2020 - K M Moreno FRONT DOOR IS UNLOCKED 18:53:48 09/24/2020 - K M Moreno MALE IS TRYING TO BREATHE 18:54:15 09/24/2020 - T M Hope N398 ADVISED UNIT TO STEP IT UP 18:54:20 09/24/2020 - T M Hope N344 CODE 18:54:50 09/24/2020 - K M Moreno MALE ATTEMPTED TO TAKE NITRO 18:54:54 09/24/2020 - K M Moreno UNK IF HE STILL HAS IT 18:55:12 09/24/2020 - T M Hope - From: B N Allison ENRT CODE 1 19:18:36 09/24/2020 - J J Parker - From: M-221 TRANS TO NHH CODE 3 19:21:12 09/24/2020 - J J Parker - From: Q-221 ENRT TO NHH TO PICK UP PERSONNEL
+                </CADDispatchText>
+            </CADDetail>
+        </CADDetails>
+        <Exposures>
+            <Exposure ExposureId="e5db3761-e066-48ed-90fe-ac4001273485" SequenceNumber="0">
+                <IncidentType NFIRSCode="321" EntityName="EMS call, excluding vehicle accident with injury" ListRef="5" BaseCode="321" BaseName="EMS call, excluding vehicle accident with injury">358</IncidentType>
+                <StationId>815717ca-5583-4de9-820a-b85741023468</StationId>
+                <Station>1</Station>
+                <StationName>Fire Station 1</StationName>
+                <ShiftId>fb7ddc44-963b-4eaf-8059-a3fd00da1981</ShiftId>
+                <Shift>B</Shift>
+                <ShiftName>B Shift</ShiftName>
+                <DistrictId>b5b061fe-5ea2-e911-810d-000d3a0064aa</DistrictId>
+                <District>14M</District>
+                <DistrictName>114M</DistrictName>
+                <ResourceFormUsed>false</ResourceFormUsed>
+                <FireServiceDeaths>0</FireServiceDeaths>
+                <OtherDeaths>0</OtherDeaths>
+                <FireServiceInjuries>0</FireServiceInjuries>
+                <OtherInjuries>0</OtherInjuries>
+                <PSAPDatetime>2020-09-24T18:52:08-05:00</PSAPDatetime>
+                <AlarmDatetime>2020-09-24T18:52:08-05:00</AlarmDatetime>
+                <DispatchNotifiedDatetime>2020-09-24T18:52:08-05:00</DispatchNotifiedDatetime>
+                <ArrivalDatetime>2020-09-24T18:58:05-05:00</ArrivalDatetime>
+                <LastUnitClearedDatetime>2020-09-24T21:11:42-05:00</LastUnitClearedDatetime>
+                <ActionsTaken>
+                    <Action NFIRSCode="33" EntityName="Provide advanced life support (ALS)" ListRef="7" BaseCode="33" BaseName="Provide advanced life support (ALS)">546</Action>
+                    <Action NFIRSCode="34" EntityName="Transport person" ListRef="7" BaseCode="34" BaseName="Transport person">547</Action>
+                    <Action NFIRSCode="73" EntityName="Provide manpower" ListRef="7" BaseCode="73" BaseName="Provide manpower">580</Action>
+                </ActionsTaken>
+                <AidDetails>
+                    <AidGivenOrReceived NFIRSCode="N" EntityName="None" ListRef="6" BaseCode="N" BaseName="None">526</AidGivenOrReceived>
+                </AidDetails>
+                <LocationDetails>
+                    <AddressOnWildland>false</AddressOnWildland>
+                    <LocationType NFIRSCode="1" EntityName="Street address" ListRef="1" BaseCode="1" BaseName="Street address">1</LocationType>
+                    <PropertyUse NFIRSCode="419" EntityName="1 or 2 family dwelling" ListRef="11" BaseCode="419" BaseName="1 or 2 family dwelling">696</PropertyUse>
+                    <AddressDetails>
+                        <NumberOrMilepost>8309</NumberOrMilepost>
+                        <StreetOrHighwayName>ELM</StreetOrHighwayName>
+                        <StreetType NFIRSCode="CT" EntityName="Court" ListRef="3" BaseCode="CT" BaseName="Court">48</StreetType>
+                        <City>North Richland</City>
+                        <State NFIRSCode="TX" EntityName="Texas" ListRef="4" BaseCode="TX" BaseName="Texas">257</State>
+                        <Zip>76180</Zip>
+                    </AddressDetails>
+                    <Latitude>45.00000000</Latitude>
+                    <Longitude>-123.00000000</Longitude>
+                </LocationDetails>
+                <OwnerDetails SequenceNumber="0">
+                    <AddressSameAsIncident>false</AddressSameAsIncident>
+                </OwnerDetails>
+                <OwnerInvolvedInIncident>false</OwnerInvolvedInIncident>
+                <PropertyLossIsNone>false</PropertyLossIsNone>
+                <ContentsLossIsNone>false</ContentsLossIsNone>
+                <PropertyValueIsNone>false</PropertyValueIsNone>
+                <ContentsValueIsNone>false</ContentsValueIsNone>
+                <ApparatusesAndPersonnel>
+                    <Apparatus SequenceNumber="0">
+                        <FireIncidentApparatusId>896cd97b-3965-456a-b026-ac4001273513</FireIncidentApparatusId>
+                        <ApparatusId>1500ef64-e652-4ce0-b20b-f150d60244d3</ApparatusId>
+                        <ApparatusName>M221</ApparatusName>
+                        <ApparatusType NFIRSCode="76" EntityName="ALS unit" ListRef="125" BaseCode="76" BaseName="ALS unit">4878</ApparatusType>
+                        <ApparatusUse NFIRSCode="2" EntityName="EMS" ListRef="126" BaseCode="2" BaseName="EMS">4890</ApparatusUse>
+                        <DispatchDatetime>2020-09-24T18:52:08-05:00</DispatchDatetime>
+                        <ArrivalDatetime>2020-09-24T19:01:25-05:00</ArrivalDatetime>
+                        <ClearDatetime>2020-09-24T21:11:42-05:00</ClearDatetime>
+                        <EnRouteDatetime>2020-09-24T18:54:16-05:00</EnRouteDatetime>
+                        <InDistrictDatetime>2020-09-24T21:11:42-05:00</InDistrictDatetime>
+                        <ActionsTaken>
+                            <Action NFIRSCode="33" EntityName="Provide advanced life support (ALS)" ListRef="7" BaseCode="33" BaseName="Provide advanced life support (ALS)">546</Action>
+                            <Action NFIRSCode="34" EntityName="Transport person" ListRef="7" BaseCode="34" BaseName="Transport person">547</Action>
+                            <Action NFIRSCode="73" EntityName="Provide manpower" ListRef="7" BaseCode="73" BaseName="Provide manpower">580</Action>
+                            <Action NFIRSCode="74" EntityName="Provide apparatus" ListRef="7" BaseCode="74" BaseName="Provide apparatus">581</Action>
+                        </ActionsTaken>
+                        <Personnel>
+                            <IncidentApparatusPersonnel SequenceNumber="1">
+                                <ApparatusPersonnelId>37f37221-60c5-4c6e-83a6-ac4001273537</ApparatusPersonnelId>
+                                <AgencyPersonId>b0cca78d-4a43-e811-8102-000d3a0064aa</AgencyPersonId>
+                                <PersonnelId>217</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>JACK</FirstName>
+                                    <MiddleInitial />
+                                    <LastName>NOAH</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>jnoah</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="2">
+                                <ApparatusPersonnelId>af758921-53e8-4651-9606-ac400127353b</ApparatusPersonnelId>
+                                <AgencyPersonId>182d8b04-965f-e911-810b-000d3a0064aa</AgencyPersonId>
+                                <PersonnelId>229</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>ANDREW</FirstName>
+                                    <LastName>BEFORT</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>abefort</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                        </Personnel>
+                        <ResponseDelays>
+                            <Delay>None/No Delay</Delay>
+                        </ResponseDelays>
+                        <Priority>Emergent</Priority>
+                        <RespondedFromZone>114H</RespondedFromZone>
+                    </Apparatus>
+                    <Apparatus SequenceNumber="1">
+                        <FireIncidentApparatusId>b010a0b9-1b22-4f28-98f1-ac4001273790</FireIncidentApparatusId>
+                        <ApparatusId>3ecc4c0a-ed40-4631-8681-bd36c57e5e5a</ApparatusId>
+                        <ApparatusName>Q221</ApparatusName>
+                        <ApparatusType NFIRSCode="13" EntityName="Quint" ListRef="125" BaseCode="13" BaseName="Quint">4850</ApparatusType>
+                        <ApparatusUse NFIRSCode="1" EntityName="Suppression" ListRef="126" BaseCode="1" BaseName="Suppression">4889</ApparatusUse>
+                        <DispatchDatetime>2020-09-24T18:52:58-05:00</DispatchDatetime>
+                        <ArrivalDatetime>2020-09-24T18:58:05-05:00</ArrivalDatetime>
+                        <ClearDatetime>2020-09-24T19:51:32-05:00</ClearDatetime>
+                        <EnRouteDatetime>2020-09-24T18:53:15-05:00</EnRouteDatetime>
+                        <InDistrictDatetime>2020-09-24T19:51:32-05:00</InDistrictDatetime>
+                        <ActionsTaken>
+                            <Action NFIRSCode="73" EntityName="Provide manpower" ListRef="7" BaseCode="73" BaseName="Provide manpower">580</Action>
+                            <Action NFIRSCode="74" EntityName="Provide apparatus" ListRef="7" BaseCode="74" BaseName="Provide apparatus">581</Action>
+                            <Action NFIRSCode="75" EntityName="Provide equipment" ListRef="7" BaseCode="75" BaseName="Provide equipment">582</Action>
+                        </ActionsTaken>
+                        <Personnel>
+                            <IncidentApparatusPersonnel SequenceNumber="1">
+                                <ApparatusPersonnelId>aa09322c-b339-4ae1-8dbd-ac4001273798</ApparatusPersonnelId>
+                                <AgencyPersonId>78a6640c-f1ea-4baf-bc8a-753f4aeb3c48</AgencyPersonId>
+                                <PersonnelId>98</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>Jeffery</FirstName>
+                                    <LastName>Blalock</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>jblalock</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="2">
+                                <ApparatusPersonnelId>f256fe86-d380-42a5-af75-ac400127379f</ApparatusPersonnelId>
+                                <AgencyPersonId>948112a0-61e9-4e6f-ba37-ea3fdb012dfa</AgencyPersonId>
+                                <PersonnelId>116</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>BRIAN</FirstName>
+                                    <LastName>BEAUDETTE</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>bbeaudette</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="3">
+                                <ApparatusPersonnelId>dcf8d089-d216-4cf8-8f4a-ac40012737ab</ApparatusPersonnelId>
+                                <AgencyPersonId>66ad49c5-4b43-e811-8102-000d3a0064aa</AgencyPersonId>
+                                <PersonnelId>218</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>TRISTAN</FirstName>
+                                    <MiddleInitial />
+                                    <LastName>CLARKE</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>tclarke</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                        </Personnel>
+                        <ResponseDelays>
+                            <Delay>None/No Delay</Delay>
+                        </ResponseDelays>
+                        <Priority>Emergent</Priority>
+                        <RespondedFromZone>114H</RespondedFromZone>
+                    </Apparatus>
+                    <Apparatus SequenceNumber="2">
+                        <FireIncidentApparatusId>ddc20d6d-9340-40d0-9e3f-ac40012739a9</FireIncidentApparatusId>
+                        <ApparatusId>5093b8e4-8486-4e7a-9110-1aed64b3ab06</ApparatusId>
+                        <ApparatusName>M223</ApparatusName>
+                        <ApparatusType NFIRSCode="76" EntityName="ALS unit" ListRef="125" BaseCode="76" BaseName="ALS unit">4878</ApparatusType>
+                        <ApparatusUse NFIRSCode="2" EntityName="EMS" ListRef="126" BaseCode="2" BaseName="EMS">4890</ApparatusUse>
+                        <DispatchDatetime>2020-09-24T18:52:58-05:00</DispatchDatetime>
+                        <ClearDatetime>2020-09-24T18:54:22-05:00</ClearDatetime>
+                        <EnRouteDatetime>2020-09-24T18:53:01-05:00</EnRouteDatetime>
+                        <InDistrictDatetime>2020-09-24T18:54:22-05:00</InDistrictDatetime>
+                        <IsCancelledPriorToArrival>true</IsCancelledPriorToArrival>
+                        <ActionsTaken>
+                            <Action NFIRSCode="93" EntityName="Cancelled en route" ListRef="7" BaseCode="93" BaseName="Cancelled en route">600</Action>
+                        </ActionsTaken>
+                        <Personnel>
+                            <IncidentApparatusPersonnel SequenceNumber="1">
+                                <ApparatusPersonnelId>80ca151f-1f27-470b-b9ad-ac40012739b6</ApparatusPersonnelId>
+                                <AgencyPersonId>d272b7a0-965f-e911-810b-000d3a0064aa</AgencyPersonId>
+                                <PersonnelId>227</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>BRENT</FirstName>
+                                    <LastName>GIBSON</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>bgibson</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="2">
+                                <ApparatusPersonnelId>454dcf0d-9dae-4851-8825-ac40012739c9</ApparatusPersonnelId>
+                                <AgencyPersonId>ef79ec44-d99f-434c-a3fd-a58300ef231b</AgencyPersonId>
+                                <PersonnelId>198</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>COLE</FirstName>
+                                    <LastName>BELEW</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>cbelew</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                        </Personnel>
+                        <ResponseDelays>
+                            <Delay>None/No Delay</Delay>
+                        </ResponseDelays>
+                        <Priority>Emergent</Priority>
+                        <RespondedFromZone>132A</RespondedFromZone>
+                    </Apparatus>
+                </ApparatusesAndPersonnel>
+                <SuppressionApparatusCount>1</SuppressionApparatusCount>
+                <SuppressionPersonnelCount>3</SuppressionPersonnelCount>
+                <EmsApparatusCount>2</EmsApparatusCount>
+                <EmsPersonnelCount>4</EmsPersonnelCount>
+                <OtherApparatusCount>0</OtherApparatusCount>
+                <OtherPersonnelCount>0</OtherPersonnelCount>
+                <ResourcesIncludeMutualAid>false</ResourcesIncludeMutualAid>
+                <ReportWriterDetails>
+                    <NameDetails>
+                        <FirstName>BRIAN</FirstName>
+                        <LastName>BEAUDETTE</LastName>
+                    </NameDetails>
+                    <NFIRSPersonnelId>116</NFIRSPersonnelId>
+                    <Assignment>Captain</Assignment>
+                    <Datetime>2020-09-24T01:00:00-05:00</Datetime>
+                    <Rank>Captain</Rank>
+                </ReportWriterDetails>
+                <OfficerInChargeDetails>
+                    <NameDetails>
+                        <FirstName>BRIAN</FirstName>
+                        <LastName>BEAUDETTE</LastName>
+                    </NameDetails>
+                    <NFIRSPersonnelId>116</NFIRSPersonnelId>
+                    <Assignment>Captain</Assignment>
+                    <Datetime>2020-09-24T01:00:00-05:00</Datetime>
+                    <Rank>Captain</Rank>
+                </OfficerInChargeDetails>
+                <Narratives>
+                    <Remark SequenceNumber="0">
+                        <FirstName>BRIAN</FirstName>
+                        <LastName>BEAUDETTE</LastName>
+                        <CreatedDatetime>2020-09-24T22:17:54-05:00</CreatedDatetime>
+                        <Remarks>Quint 221 and Medic 221 responded to a 58 year old male that was in cardiac arrest. We arrived on the scene to find a 58 year old male that was sitting in a chair in far back room. Upon our arrival, the male was unresponsive and cyanotic. CPR was initiated, while in the chair. The patient was a large male and there was lot of stuff in the home which caused some difficulty in moving the patient out to the cot. Patient was placed on a sheet to move him to an area where we could begin proper ALS procedures. As soon, as available patient was then placed on the Lucas device and backboard. Patient was then moved onto the cot and wheeled out to the ambulance. Once in the back of the ambulance Medic 221 began to perform ALS procedures. Patient was then transported to North Hills for further care and evaluation. Quint 221, remained out of service until personnel will reunited with the unit. Quint 221 then cleared the scene.</Remarks>
+                    </Remark>
+                    <Remark SequenceNumber="0">
+                        <FirstName>BRIAN</FirstName>
+                        <LastName>BEAUDETTE</LastName>
+                        <ApparatusName>Q221</ApparatusName>
+                        <CreatedDatetime>2020-09-24T22:29:46-05:00</CreatedDatetime>
+                        <Remarks>Quint 221 and Medic 221 responded to a 58 year old male that was in cardiac arrest. We arrived on the scene to find a 58 year old male that was sitting in a chair in far back room. Upon our arrival, the male was unresponsive and cyanotic. CPR was initiated, while in the chair. The patient was a large male and there was lot of stuff in the home which caused some difficulty in moving the patient out to the cot. Patient was placed on a sheet to move him to an area where we could begin proper ALS procedures. As soon, as available patient was then placed on the Lucas device and backboard. Patient was then moved onto the cot and wheeled out to the ambulance. Once in the back of the ambulance Medic 221 began to perform ALS procedures. Patient was then transported to North Hills for further care and evaluation. Quint 221, remained out of service until personnel will reunited with the unit. Quint 221 then cleared the scene.</Remarks>
+                    </Remark>
+                </Narratives>
+                <CADNotes>18:51:38 09/24/2020 - K M Moreno WRLS data. Phone: (817)917-9619, UNC: 0, Lat: 32.8888607, Long: -97.2042417 18:51:55 09/24/2020 - K M Moreno 58YO MALE 18:51:59 09/24/2020 - K M Moreno POSS HEART TROUBLE 18:52:02 09/24/2020 - K M Moreno NOT BREATHING 18:53:30 09/24/2020 - C D Osman NEED PD / CANT GET SUBJ OUT OF CHAIR TO DO CPR 18:53:40 09/24/2020 - K M Moreno FRONT DOOR IS UNLOCKED 18:53:48 09/24/2020 - K M Moreno MALE IS TRYING TO BREATHE 18:54:15 09/24/2020 - T M Hope N398 ADVISED UNIT TO STEP IT UP 18:54:20 09/24/2020 - T M Hope N344 CODE 18:54:50 09/24/2020 - K M Moreno MALE ATTEMPTED TO TAKE NITRO 18:54:54 09/24/2020 - K M Moreno UNK IF HE STILL HAS IT 18:55:12 09/24/2020 - T M Hope - From: B N Allison ENRT CODE 1 19:18:36 09/24/2020 - J J Parker - From: M-221 TRANS TO NHH CODE 3 19:21:12 09/24/2020 - J J Parker - From: Q-221 ENRT TO NHH TO PICK UP PERSONNEL
+                </CADNotes>
+                <Covid19Factor NFIRSCode="3" EntityName="No, COVID-19 was not a factor" ListRef="146" BaseCode="3" BaseName="No, COVID-19 was not a factor">18075</Covid19Factor>
+            </Exposure>
+        </Exposures>
+    </Incident>
+    <Incident xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <CanonicalVersion>3.0.6</CanonicalVersion>
+        <IncidentId>b3fd0ffa-6c2c-480e-a7f4-ac40015f945a</IncidentId>
+        <IncidentNumber>20N5806</IncidentNumber>
+        <NFIRSIncidentNumber>0006334</NFIRSIncidentNumber>
+        <IncidentDate>2020-09-24</IncidentDate>
+        <ModifyDateTimeUtc>2020-09-25T07:52:10.0000000</ModifyDateTimeUtc>
+        <LockedDateTime>2020-09-25T02:52:10-05:00</LockedDateTime>
+        <FirstLockDateTime>2020-09-25T02:52:10-05:00</FirstLockDateTime>
+        <IsActive>true</IsActive>
+        <IsLocked>true</IsLocked>
+        <AgencyDetails AgencyId="70cdd6f0-f65c-43fb-aa9e-62912f60a7f0" AgencyLoginId="NRHFD" AgencyNumber="220037">
+            <AgencyName>North Richland Hills Fire Department</AgencyName>
+            <AgencyCounty>Tarrant</AgencyCounty>
+            <AgencyStateId>220037</AgencyStateId>
+            <NFIRSFDID>WB625</NFIRSFDID>
+            <DepartmentState>TX</DepartmentState>
+            <AgencyTimeZoneId>Central Standard Time</AgencyTimeZoneId>
+            <AgencyTimeZoneOffset>-05:00</AgencyTimeZoneOffset>
+            <AgencyRespectsDaylightSavings>true</AgencyRespectsDaylightSavings>
+        </AgencyDetails>
+        <CADDetails>
+            <CADDetail>
+                <CADIncidentId>4864bf58-f51c-486b-abe6-ac40015f9476</CADIncidentId>
+                <CADDispatchText>22:16:25 09/24/2020 - T M Hope PBXb data. Phone: (817)686-1811, UNC: 0, Lat: 0, Long: 0, Est. Loc.: 7501 GLENVIEW DR 22:16:37 09/24/2020 - T M Hope *EDITED* ROOM 101 22:16:56 09/24/2020 - T M Hope PT BORN IN 1944 22:17:10 09/24/2020 - T M Hope ON ON2 22:17:32 09/24/2020 - T M Hope COVID - NEG 22:18:42 09/24/2020 - T M Hope FIRE CH 2 22:36:13 09/24/2020 - T M Hope - From: M-222 CODE 1 NHH
+                </CADDispatchText>
+            </CADDetail>
+            <CADDetail>
+                <CADIncidentId>da0cf71b-3f32-488e-a71d-ac40015f966f</CADIncidentId>
+                <CADDispatchText>22:16:25 09/24/2020 - T M Hope PBXb data. Phone: (817)686-1811, UNC: 0, Lat: 0, Long: 0, Est. Loc.: 7501 GLENVIEW DR 22:16:37 09/24/2020 - T M Hope *EDITED* ROOM 101 22:16:56 09/24/2020 - T M Hope PT BORN IN 1944 22:17:10 09/24/2020 - T M Hope ON ON2 22:17:32 09/24/2020 - T M Hope COVID - NEG 22:18:42 09/24/2020 - T M Hope FIRE CH 2 22:36:13 09/24/2020 - T M Hope - From: M-222 CODE 1 NHH
+                </CADDispatchText>
+            </CADDetail>
+        </CADDetails>
+        <Exposures>
+            <Exposure ExposureId="74274f40-1767-4aac-88f9-ac40015f945a" SequenceNumber="0">
+                <IncidentType NFIRSCode="321" EntityName="EMS call, excluding vehicle accident with injury" ListRef="5" BaseCode="321" BaseName="EMS call, excluding vehicle accident with injury">358</IncidentType>
+                <StationId>cc23abfb-30b3-42fa-9a0c-b1db5ebd2282</StationId>
+                <Station>2</Station>
+                <StationName>Fire Station 2</StationName>
+                <ShiftId>fb7ddc44-963b-4eaf-8059-a3fd00da1981</ShiftId>
+                <Shift>B</Shift>
+                <ShiftName>B Shift</ShiftName>
+                <DistrictId>465a4a6b-5fa2-e911-810d-000d3a0064aa</DistrictId>
+                <District>23F</District>
+                <DistrictName>123F</DistrictName>
+                <ResourceFormUsed>false</ResourceFormUsed>
+                <FireServiceDeaths>0</FireServiceDeaths>
+                <OtherDeaths>0</OtherDeaths>
+                <FireServiceInjuries>0</FireServiceInjuries>
+                <OtherInjuries>0</OtherInjuries>
+                <PSAPDatetime>2020-09-24T22:17:33-05:00</PSAPDatetime>
+                <AlarmDatetime>2020-09-24T22:17:33-05:00</AlarmDatetime>
+                <DispatchNotifiedDatetime>2020-09-24T22:17:33-05:00</DispatchNotifiedDatetime>
+                <ArrivalDatetime>2020-09-24T22:22:11-05:00</ArrivalDatetime>
+                <LastUnitClearedDatetime>2020-09-24T23:05:37-05:00</LastUnitClearedDatetime>
+                <ActionsTaken>
+                    <Action NFIRSCode="33" EntityName="Provide advanced life support (ALS)" ListRef="7" BaseCode="33" BaseName="Provide advanced life support (ALS)">546</Action>
+                    <Action NFIRSCode="34" EntityName="Transport person" ListRef="7" BaseCode="34" BaseName="Transport person">547</Action>
+                </ActionsTaken>
+                <AidDetails>
+                    <AidGivenOrReceived NFIRSCode="N" EntityName="None" ListRef="6" BaseCode="N" BaseName="None">526</AidGivenOrReceived>
+                </AidDetails>
+                <LocationDetails>
+                    <AddressOnWildland>false</AddressOnWildland>
+                    <LocationType NFIRSCode="1" EntityName="Street address" ListRef="1" BaseCode="1" BaseName="Street address">1</LocationType>
+                    <PropertyUse NFIRSCode="459" EntityName="Residential board and care" ListRef="11" BaseCode="459" BaseName="Residential board and care">700</PropertyUse>
+                    <AddressDetails>
+                        <NumberOrMilepost>7501</NumberOrMilepost>
+                        <StreetOrHighwayName>GLENVIEW</StreetOrHighwayName>
+                        <StreetType NFIRSCode="DR" EntityName="Drive" ListRef="3" BaseCode="DR" BaseName="Drive">62</StreetType>
+                        <ApartmentNumber>101</ApartmentNumber>
+                        <City>North Richland</City>
+                        <State NFIRSCode="TX" EntityName="Texas" ListRef="4" BaseCode="TX" BaseName="Texas">257</State>
+                        <Zip>76118</Zip>
+                    </AddressDetails>
+                    <Latitude>45.1600000</Latitude>
+                    <Longitude>-123.2100000</Longitude>
+                </LocationDetails>
+                <OwnerDetails SequenceNumber="0">
+                    <AddressSameAsIncident>false</AddressSameAsIncident>
+                </OwnerDetails>
+                <OwnerInvolvedInIncident>false</OwnerInvolvedInIncident>
+                <PropertyLossIsNone>false</PropertyLossIsNone>
+                <ContentsLossIsNone>false</ContentsLossIsNone>
+                <PropertyValueIsNone>false</PropertyValueIsNone>
+                <ContentsValueIsNone>false</ContentsValueIsNone>
+                <ApparatusesAndPersonnel>
+                    <Apparatus SequenceNumber="0">
+                        <FireIncidentApparatusId>da18b2d9-6e34-411f-9f43-ac40015f949f</FireIncidentApparatusId>
+                        <ApparatusId>2929e02c-17fc-e911-8111-000d3a0064aa</ApparatusId>
+                        <ApparatusName>Q222</ApparatusName>
+                        <ApparatusType NFIRSCode="13" EntityName="Quint" ListRef="125" BaseCode="13" BaseName="Quint">4850</ApparatusType>
+                        <ApparatusUse NFIRSCode="1" EntityName="Suppression" ListRef="126" BaseCode="1" BaseName="Suppression">4889</ApparatusUse>
+                        <DispatchDatetime>2020-09-24T22:18:06-05:00</DispatchDatetime>
+                        <ArrivalDatetime>2020-09-24T22:22:11-05:00</ArrivalDatetime>
+                        <ClearDatetime>2020-09-24T22:36:22-05:00</ClearDatetime>
+                        <EnRouteDatetime>2020-09-24T22:19:14-05:00</EnRouteDatetime>
+                        <ActionsTaken>
+                            <Action NFIRSCode="33" EntityName="Provide advanced life support (ALS)" ListRef="7" BaseCode="33" BaseName="Provide advanced life support (ALS)">546</Action>
+                        </ActionsTaken>
+                        <Personnel>
+                            <IncidentApparatusPersonnel SequenceNumber="0">
+                                <ApparatusPersonnelId>3773c917-facf-44c7-bd65-ac40015f94a6</ApparatusPersonnelId>
+                                <AgencyPersonId>b61461ed-c8cf-4f38-b33a-1f6589edba8e</AgencyPersonId>
+                                <PersonnelId>174</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>Rayburn</FirstName>
+                                    <LastName>Murphy</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>rmurphy</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="1">
+                                <ApparatusPersonnelId>b435f2e3-5924-4def-9c61-ac40015f94ac</ApparatusPersonnelId>
+                                <AgencyPersonId>5382bdba-404f-4962-bf40-24684b6c8b4a</AgencyPersonId>
+                                <PersonnelId>94</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>Jason</FirstName>
+                                    <LastName>Bolitho</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>jbolitho</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="2">
+                                <ApparatusPersonnelId>219f8a7e-0f30-4f50-a98c-ac40015f94b0</ApparatusPersonnelId>
+                                <AgencyPersonId>f47bc4eb-6d66-4a7c-89b8-a73600ce4de2</AgencyPersonId>
+                                <PersonnelId>207</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>BRYN</FirstName>
+                                    <LastName>HUDSON</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>bhudson</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                        </Personnel>
+                        <Priority>Emergent</Priority>
+                    </Apparatus>
+                    <Apparatus SequenceNumber="1">
+                        <FireIncidentApparatusId>b1f0ca85-efdb-4b59-9159-ac40015f96c6</FireIncidentApparatusId>
+                        <ApparatusId>d1ac14d8-fa1f-4ecf-806d-94bdddb6c45f</ApparatusId>
+                        <ApparatusName>M222</ApparatusName>
+                        <ApparatusType NFIRSCode="76" EntityName="ALS unit" ListRef="125" BaseCode="76" BaseName="ALS unit">4878</ApparatusType>
+                        <ApparatusUse NFIRSCode="2" EntityName="EMS" ListRef="126" BaseCode="2" BaseName="EMS">4890</ApparatusUse>
+                        <DispatchDatetime>2020-09-24T22:18:06-05:00</DispatchDatetime>
+                        <ArrivalDatetime>2020-09-24T22:22:14-05:00</ArrivalDatetime>
+                        <ClearDatetime>2020-09-24T23:05:37-05:00</ClearDatetime>
+                        <EnRouteDatetime>2020-09-24T22:18:45-05:00</EnRouteDatetime>
+                        <ActionsTaken>
+                            <Action NFIRSCode="33" EntityName="Provide advanced life support (ALS)" ListRef="7" BaseCode="33" BaseName="Provide advanced life support (ALS)">546</Action>
+                            <Action NFIRSCode="34" EntityName="Transport person" ListRef="7" BaseCode="34" BaseName="Transport person">547</Action>
+                        </ActionsTaken>
+                        <Personnel>
+                            <IncidentApparatusPersonnel SequenceNumber="0">
+                                <ApparatusPersonnelId>1e194483-1989-406b-9759-ac40015f96cb</ApparatusPersonnelId>
+                                <AgencyPersonId>77a8c258-1ebd-e911-810e-000d3a0064aa</AgencyPersonId>
+                                <PersonnelId>235</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>JOSEL</FirstName>
+                                    <LastName>LOPEZ</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>jlopez</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="1">
+                                <ApparatusPersonnelId>16272b30-c91f-4013-bfb8-ac40015f96d0</ApparatusPersonnelId>
+                                <AgencyPersonId>bee04928-195c-4a93-9ce5-ebeccfe4f572</AgencyPersonId>
+                                <PersonnelId>117</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>RICHARD</FirstName>
+                                    <LastName>ABELINO</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>rabelino</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                        </Personnel>
+                        <Priority>Emergent</Priority>
+                    </Apparatus>
+                </ApparatusesAndPersonnel>
+                <SuppressionApparatusCount>1</SuppressionApparatusCount>
+                <SuppressionPersonnelCount>3</SuppressionPersonnelCount>
+                <EmsApparatusCount>1</EmsApparatusCount>
+                <EmsPersonnelCount>2</EmsPersonnelCount>
+                <OtherApparatusCount>0</OtherApparatusCount>
+                <OtherPersonnelCount>0</OtherPersonnelCount>
+                <ResourcesIncludeMutualAid>false</ResourcesIncludeMutualAid>
+                <ReportWriterDetails>
+                    <NameDetails>
+                        <FirstName>Jason</FirstName>
+                        <LastName>Bolitho</LastName>
+                    </NameDetails>
+                    <NFIRSPersonnelId>94</NFIRSPersonnelId>
+                    <Assignment>OIC</Assignment>
+                    <Datetime>2020-09-25T01:00:00-05:00</Datetime>
+                    <Rank>Captain</Rank>
+                </ReportWriterDetails>
+                <OfficerInChargeDetails>
+                    <NameDetails>
+                        <FirstName>Jason</FirstName>
+                        <LastName>Bolitho</LastName>
+                    </NameDetails>
+                    <NFIRSPersonnelId>94</NFIRSPersonnelId>
+                    <Assignment>OIC</Assignment>
+                    <Datetime>2020-09-25T01:00:00-05:00</Datetime>
+                    <Rank>Captain</Rank>
+                </OfficerInChargeDetails>
+                <Narratives>
+                    <Remark SequenceNumber="0">
+                        <FirstName>Jason</FirstName>
+                        <LastName>Bolitho</LastName>
+                        <CreatedDatetime>2020-09-25T02:51:11-05:00</CreatedDatetime>
+                        <Remarks>Units arrived and found a 65yo male complaining of difficulty breathing. The pt was loaded for treatment and transported to North Hills Hospital.</Remarks>
+                    </Remark>
+                </Narratives>
+                <CADNotes>22:16:25 09/24/2020 - T M Hope PBXb data. Phone: (817)686-1811, UNC: 0, Lat: 0, Long: 0, Est. Loc.: 7501 GLENVIEW DR 22:16:37 09/24/2020 - T M Hope *EDITED* ROOM 101 22:16:56 09/24/2020 - T M Hope PT BORN IN 1944 22:17:10 09/24/2020 - T M Hope ON ON2 22:17:32 09/24/2020 - T M Hope COVID - NEG 22:18:42 09/24/2020 - T M Hope FIRE CH 2 22:36:13 09/24/2020 - T M Hope - From: M-222 CODE 1 NHH
+                </CADNotes>
+                <Covid19Factor NFIRSCode="3" EntityName="No, COVID-19 was not a factor" ListRef="146" BaseCode="3" BaseName="No, COVID-19 was not a factor">18075</Covid19Factor>
+            </Exposure>
+        </Exposures>
+    </Incident>
+    <Incident xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <CanonicalVersion>3.0.6</CanonicalVersion>
+        <IncidentId>240bb338-0856-4c57-bc61-ac4000ec0edc</IncidentId>
+        <IncidentNumber>20N5795</IncidentNumber>
+        <NFIRSIncidentNumber>0006321</NFIRSIncidentNumber>
+        <IncidentDate>2020-09-24</IncidentDate>
+        <ModifyDateTimeUtc>2020-09-25T01:52:01.0000000</ModifyDateTimeUtc>
+        <LockedDateTime>2020-09-24T20:52:01-05:00</LockedDateTime>
+        <FirstLockDateTime>2020-09-24T20:52:01-05:00</FirstLockDateTime>
+        <IsActive>true</IsActive>
+        <IsLocked>true</IsLocked>
+        <AgencyDetails AgencyId="70cdd6f0-f65c-43fb-aa9e-62912f60a7f0" AgencyLoginId="NRHFD" AgencyNumber="220037">
+            <AgencyName>North Richland Hills Fire Department</AgencyName>
+            <AgencyCounty>Tarrant</AgencyCounty>
+            <AgencyStateId>220037</AgencyStateId>
+            <NFIRSFDID>WB625</NFIRSFDID>
+            <DepartmentState>TX</DepartmentState>
+            <AgencyTimeZoneId>Central Standard Time</AgencyTimeZoneId>
+            <AgencyTimeZoneOffset>-05:00</AgencyTimeZoneOffset>
+            <AgencyRespectsDaylightSavings>true</AgencyRespectsDaylightSavings>
+        </AgencyDetails>
+        <CADDetails>
+            <CADDetail>
+                <CADIncidentId>5396c7f1-88c8-47dd-adf8-ac4000ec0f03</CADIncidentId>
+                <CADDispatchText>15:04:41 09/24/2020 - C D Osman WRLS data. Phone: (682)554-9766, UNC: 0, Lat: 32.83407926, Long: -97.1961307 15:05:24 09/24/2020 - C D Osman *EDITED* THIRD PARTY COMP/FEMALE PARTY ASKED COMP TO CALL POLICE/COMP NO LONGER ON SCENE 15:05:30 09/24/2020 - C D Osman *EDITED* BM VS BF 15:06:04 09/24/2020 - C D Osman IN THE MIDDLE OF STATION 121 AND THIS APT COMPLEX/IN THE STREET 15:06:26 09/24/2020 - C D Osman NO WEAPONS 15:06:31 09/24/2020 - C D Osman VERBAL AT THE TIME 15:07:04 09/24/2020 - C D Osman MALE MULTI COLOR JACKET/FEMALE IN BLU SHIRT 15:08:23 09/24/2020 - L T Obrien RCVD CALL FROM SECOND CALLER WHO ADV 1637 WEYLAND #2047, SAID FEMALE CAME OUTSIDE YELLING TO CALL THE POLICE, WAS SEEN LIMPING 15:09:06 09/24/2020 - L T Obrien FEMALE TOLD THAT UBER DRIVER DROPPED HER OFF, IS BLEEDING FROM KNEE AND FOOT, IS UNSURE IF THE CAR DROVE HER OVER OR NOT 15:09:10 09/24/2020 - L T Obrien REFUSING MEDICS 15:09:47 09/24/2020 - L T Obrien SECOND CALLER-RHONDANA GREENWOOD 817 724 8158-WORKS FOR PROPERTY 15:10:08 09/24/2020 - L T Obrien CALLER WAS NOT SURE THE DESC OF THE UBER DRIVER 15:19:59 09/24/2020 - K M Moreno Address change from 1598 WEYLAND DR to 1598 WEYLAND DR #2047 for Active call 372f 15:22:40 09/24/2020 - K M Moreno Address change from 1598 WEYLAND DR #2047 to 1637 WEYLAND #2047 for Active call 372f 15:23:04 09/24/2020 - K M Moreno Address change from 1637 WEYLAND #2047 to 1628 WEYLAND DR BL38APT 2047; STATION 121 AT TOWN CENTER for Active call 372f 15:29:23 09/24/2020 - T K Johnson followinjg medis to nhh
+                </CADDispatchText>
+            </CADDetail>
+            <CADDetail>
+                <CADIncidentId>6d0e03fe-4716-4ac4-9faf-ac4000ec1075</CADIncidentId>
+                <CADDispatchText>15:04:41 09/24/2020 - C D Osman WRLS data. Phone: (682)554-9766, UNC: 0, Lat: 32.83407926, Long: -97.1961307 15:05:24 09/24/2020 - C D Osman *EDITED* THIRD PARTY COMP/FEMALE PARTY ASKED COMP TO CALL POLICE/COMP NO LONGER ON SCENE 15:05:30 09/24/2020 - C D Osman *EDITED* BM VS BF 15:06:04 09/24/2020 - C D Osman IN THE MIDDLE OF STATION 121 AND THIS APT COMPLEX/IN THE STREET 15:06:26 09/24/2020 - C D Osman NO WEAPONS 15:06:31 09/24/2020 - C D Osman VERBAL AT THE TIME 15:07:04 09/24/2020 - C D Osman MALE MULTI COLOR JACKET/FEMALE IN BLU SHIRT 15:08:23 09/24/2020 - L T Obrien RCVD CALL FROM SECOND CALLER WHO ADV 1637 WEYLAND #2047, SAID FEMALE CAME OUTSIDE YELLING TO CALL THE POLICE, WAS SEEN LIMPING 15:09:06 09/24/2020 - L T Obrien FEMALE TOLD THAT UBER DRIVER DROPPED HER OFF, IS BLEEDING FROM KNEE AND FOOT, IS UNSURE IF THE CAR DROVE HER OVER OR NOT 15:09:10 09/24/2020 - L T Obrien REFUSING MEDICS 15:09:47 09/24/2020 - L T Obrien SECOND CALLER-RHONDANA GREENWOOD 817 724 8158-WORKS FOR PROPERTY 15:10:08 09/24/2020 - L T Obrien CALLER WAS NOT SURE THE DESC OF THE UBER DRIVER 15:19:59 09/24/2020 - K M Moreno Address change from 1598 WEYLAND DR to 1598 WEYLAND DR #2047 for Active call 372f 15:22:40 09/24/2020 - K M Moreno Address change from 1598 WEYLAND DR #2047 to 1637 WEYLAND #2047 for Active call 372f 15:23:04 09/24/2020 - K M Moreno Address change from 1637 WEYLAND #2047 to 1628 WEYLAND DR BL38APT 2047; STATION 121 AT TOWN CENTER for Active call 372f 15:29:23 09/24/2020 - T K Johnson followinjg medis to nhh
+                </CADDispatchText>
+            </CADDetail>
+        </CADDetails>
+        <Exposures>
+            <Exposure ExposureId="9f0efee6-1b7e-4931-84e4-ac4000ec0edc" SequenceNumber="0">
+                <IncidentType NFIRSCode="323" EntityName="Motor vehicle/pedestrian accident (MV Ped)" ListRef="5" BaseCode="323" BaseName="Motor vehicle/pedestrian accident (MV Ped)">360</IncidentType>
+                <StationId>6472cfaf-b417-45de-a608-16f047799734</StationId>
+                <Station>3</Station>
+                <StationName>Fire Station 3</StationName>
+                <ShiftId>fb7ddc44-963b-4eaf-8059-a3fd00da1981</ShiftId>
+                <Shift>B</Shift>
+                <ShiftName>B Shift</ShiftName>
+                <DistrictId>f15c3a31-60a2-e911-810d-000d3a0064aa</DistrictId>
+                <District>32J</District>
+                <DistrictName>132J</DistrictName>
+                <ResourceFormUsed>false</ResourceFormUsed>
+                <FireServiceDeaths>0</FireServiceDeaths>
+                <OtherDeaths>0</OtherDeaths>
+                <FireServiceInjuries>0</FireServiceInjuries>
+                <OtherInjuries>0</OtherInjuries>
+                <PSAPDatetime>2020-09-24T15:06:46-05:00</PSAPDatetime>
+                <AlarmDatetime>2020-09-24T15:06:46-05:00</AlarmDatetime>
+                <DispatchNotifiedDatetime>2020-09-24T15:06:46-05:00</DispatchNotifiedDatetime>
+                <ArrivalDatetime>2020-09-24T15:22:10-05:00</ArrivalDatetime>
+                <LastUnitClearedDatetime>2020-09-24T16:17:40-05:00</LastUnitClearedDatetime>
+                <ActionsTaken>
+                    <Action NFIRSCode="33" EntityName="Provide advanced life support (ALS)" ListRef="7" BaseCode="33" BaseName="Provide advanced life support (ALS)">546</Action>
+                    <Action NFIRSCode="34" EntityName="Transport person" ListRef="7" BaseCode="34" BaseName="Transport person">547</Action>
+                    <Action NFIRSCode="73" EntityName="Provide manpower" ListRef="7" BaseCode="73" BaseName="Provide manpower">580</Action>
+                </ActionsTaken>
+                <AidDetails>
+                    <AidGivenOrReceived NFIRSCode="N" EntityName="None" ListRef="6" BaseCode="N" BaseName="None">526</AidGivenOrReceived>
+                </AidDetails>
+                <LocationDetails>
+                    <AddressOnWildland>false</AddressOnWildland>
+                    <LocationType NFIRSCode="1" EntityName="Street address" ListRef="1" BaseCode="1" BaseName="Street address">1</LocationType>
+                    <PropertyUse NFIRSCode="429" EntityName="Multifamily dwelling" ListRef="11" BaseCode="429" BaseName="Multifamily dwelling">697</PropertyUse>
+                    <AddressDetails>
+                        <NumberOrMilepost>1628</NumberOrMilepost>
+                        <StreetOrHighwayName>WEYLAND DR</StreetOrHighwayName>
+                        <StreetType NFIRSCode="DR" EntityName="Drive" ListRef="3" BaseCode="DR" BaseName="Drive">62</StreetType>
+                        <ApartmentNumber>2047</ApartmentNumber>
+                        <City>North Richland</City>
+                        <State NFIRSCode="TX" EntityName="Texas" ListRef="4" BaseCode="TX" BaseName="Texas">257</State>
+                        <Zip>76180</Zip>
+                    </AddressDetails>
+                    <Latitude>45.3900000</Latitude>
+                    <Longitude>-123.2750000</Longitude>
+                </LocationDetails>
+                <OwnerDetails SequenceNumber="0">
+                    <AddressSameAsIncident>false</AddressSameAsIncident>
+                </OwnerDetails>
+                <OwnerInvolvedInIncident>false</OwnerInvolvedInIncident>
+                <PropertyLossIsNone>false</PropertyLossIsNone>
+                <ContentsLossIsNone>false</ContentsLossIsNone>
+                <PropertyValueIsNone>false</PropertyValueIsNone>
+                <ContentsValueIsNone>false</ContentsValueIsNone>
+                <ApparatusesAndPersonnel>
+                    <Apparatus SequenceNumber="0">
+                        <FireIncidentApparatusId>dc6e394c-0c0b-4022-824b-ac4000ec0f24</FireIncidentApparatusId>
+                        <ApparatusId>40ff1431-0c9e-41b7-a44e-1057d458657c</ApparatusId>
+                        <ApparatusName>E223</ApparatusName>
+                        <ApparatusType NFIRSCode="11" EntityName="Engine" ListRef="125" BaseCode="11" BaseName="Engine">4848</ApparatusType>
+                        <ApparatusUse NFIRSCode="1" EntityName="Suppression" ListRef="126" BaseCode="1" BaseName="Suppression">4889</ApparatusUse>
+                        <DispatchDatetime>2020-09-24T15:18:28-05:00</DispatchDatetime>
+                        <ArrivalDatetime>2020-09-24T15:26:17-05:00</ArrivalDatetime>
+                        <ClearDatetime>2020-09-24T15:27:32-05:00</ClearDatetime>
+                        <EnRouteDatetime>2020-09-24T15:18:31-05:00</EnRouteDatetime>
+                        <ActionsTaken>
+                            <Action NFIRSCode="33" EntityName="Provide advanced life support (ALS)" ListRef="7" BaseCode="33" BaseName="Provide advanced life support (ALS)">546</Action>
+                            <Action NFIRSCode="73" EntityName="Provide manpower" ListRef="7" BaseCode="73" BaseName="Provide manpower">580</Action>
+                            <Action NFIRSCode="74" EntityName="Provide apparatus" ListRef="7" BaseCode="74" BaseName="Provide apparatus">581</Action>
+                            <Action NFIRSCode="75" EntityName="Provide equipment" ListRef="7" BaseCode="75" BaseName="Provide equipment">582</Action>
+                        </ActionsTaken>
+                        <Personnel>
+                            <IncidentApparatusPersonnel SequenceNumber="1">
+                                <ApparatusPersonnelId>37eebc91-0de0-4a4d-b58d-ac4000ec0f39</ApparatusPersonnelId>
+                                <AgencyPersonId>ef79ec44-d99f-434c-a3fd-a58300ef231b</AgencyPersonId>
+                                <PersonnelId>198</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>COLE</FirstName>
+                                    <LastName>BELEW</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>cbelew</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="2">
+                                <ApparatusPersonnelId>25f1babd-24b0-40a6-90dc-ac4000ec0f46</ApparatusPersonnelId>
+                                <AgencyPersonId>384a0579-eca7-4c2f-b92b-23f3e4e03db2</AgencyPersonId>
+                                <PersonnelId>148</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>BOBBY</FirstName>
+                                    <LastName>THOMAS</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>bthomas</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="3">
+                                <ApparatusPersonnelId>3025d6f5-e372-4b7b-a7c2-ac4000ec0f4b</ApparatusPersonnelId>
+                                <AgencyPersonId>a0937fd0-4219-4b27-ac31-e1ee8e05f6d7</AgencyPersonId>
+                                <PersonnelId>179</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>Thomas</FirstName>
+                                    <LastName>Spencer</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>tspencer</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="4">
+                                <ApparatusPersonnelId>e4b22128-5c96-47bf-bc9a-ac400147455d</ApparatusPersonnelId>
+                                <AgencyPersonId>5d0898b8-1fbd-e911-810e-000d3a0064aa</AgencyPersonId>
+                                <PersonnelId>234</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>DREW</FirstName>
+                                    <LastName>WEINBERG</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>dweinberg</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                        </Personnel>
+                        <ResponseDelays>
+                            <Delay>None/No Delay</Delay>
+                        </ResponseDelays>
+                        <Priority>Emergent</Priority>
+                    </Apparatus>
+                    <Apparatus SequenceNumber="1">
+                        <FireIncidentApparatusId>aef4c5df-bb7e-4d1e-a9f3-ac4000ec1144</FireIncidentApparatusId>
+                        <ApparatusId>5093b8e4-8486-4e7a-9110-1aed64b3ab06</ApparatusId>
+                        <ApparatusName>M223</ApparatusName>
+                        <ApparatusType NFIRSCode="76" EntityName="ALS unit" ListRef="125" BaseCode="76" BaseName="ALS unit">4878</ApparatusType>
+                        <ApparatusUse NFIRSCode="2" EntityName="EMS" ListRef="126" BaseCode="2" BaseName="EMS">4890</ApparatusUse>
+                        <DispatchDatetime>2020-09-24T15:18:28-05:00</DispatchDatetime>
+                        <ArrivalDatetime>2020-09-24T15:22:10-05:00</ArrivalDatetime>
+                        <ClearDatetime>2020-09-24T16:17:40-05:00</ClearDatetime>
+                        <EnRouteDatetime>2020-09-24T15:22:09-05:00</EnRouteDatetime>
+                        <ActionsTaken>
+                            <Action NFIRSCode="33" EntityName="Provide advanced life support (ALS)" ListRef="7" BaseCode="33" BaseName="Provide advanced life support (ALS)">546</Action>
+                            <Action NFIRSCode="34" EntityName="Transport person" ListRef="7" BaseCode="34" BaseName="Transport person">547</Action>
+                            <Action NFIRSCode="73" EntityName="Provide manpower" ListRef="7" BaseCode="73" BaseName="Provide manpower">580</Action>
+                            <Action NFIRSCode="74" EntityName="Provide apparatus" ListRef="7" BaseCode="74" BaseName="Provide apparatus">581</Action>
+                        </ActionsTaken>
+                        <Personnel>
+                            <IncidentApparatusPersonnel SequenceNumber="1">
+                                <ApparatusPersonnelId>a91c71a3-a6cc-4722-a218-ac4000ec114a</ApparatusPersonnelId>
+                                <AgencyPersonId>d272b7a0-965f-e911-810b-000d3a0064aa</AgencyPersonId>
+                                <PersonnelId>227</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>BRENT</FirstName>
+                                    <LastName>GIBSON</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>bgibson</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="2">
+                                <ApparatusPersonnelId>3c3cd717-a6fe-ea11-811f-000d3a0064aa</ApparatusPersonnelId>
+                                <AgencyPersonId>5d0898b8-1fbd-e911-810e-000d3a0064aa</AgencyPersonId>
+                                <PersonnelId>234</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>DREW</FirstName>
+                                    <LastName>WEINBERG</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>dweinberg</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="3">
+                                <ApparatusPersonnelId>74fc89ea-7e42-449d-a0de-ac40014745d8</ApparatusPersonnelId>
+                                <AgencyPersonId>a0937fd0-4219-4b27-ac31-e1ee8e05f6d7</AgencyPersonId>
+                                <PersonnelId>179</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>Thomas</FirstName>
+                                    <LastName>Spencer</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>tspencer</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                            <IncidentApparatusPersonnel SequenceNumber="4">
+                                <ApparatusPersonnelId>dbacfaff-3bf0-4655-a802-ac40014745e1</ApparatusPersonnelId>
+                                <AgencyPersonId>ef79ec44-d99f-434c-a3fd-a58300ef231b</AgencyPersonId>
+                                <PersonnelId>198</PersonnelId>
+                                <NameDetails>
+                                    <FirstName>COLE</FirstName>
+                                    <LastName>BELEW</LastName>
+                                </NameDetails>
+                                <FireProductsExposedTo />
+                                <PpeWorn />
+                                <DecontaminationProceduresCompleted />
+                                <UserLoginId>cbelew</UserLoginId>
+                                <MedicalPpeWorn />
+                            </IncidentApparatusPersonnel>
+                        </Personnel>
+                        <ResponseDelays>
+                            <Delay>None/No Delay</Delay>
+                        </ResponseDelays>
+                        <Priority>Emergent</Priority>
+                    </Apparatus>
+                </ApparatusesAndPersonnel>
+                <SuppressionApparatusCount>1</SuppressionApparatusCount>
+                <SuppressionPersonnelCount>4</SuppressionPersonnelCount>
+                <EmsApparatusCount>1</EmsApparatusCount>
+                <EmsPersonnelCount>4</EmsPersonnelCount>
+                <OtherApparatusCount>0</OtherApparatusCount>
+                <OtherPersonnelCount>0</OtherPersonnelCount>
+                <ResourcesIncludeMutualAid>false</ResourcesIncludeMutualAid>
+                <ReportWriterDetails>
+                    <NameDetails>
+                        <FirstName>BOBBY</FirstName>
+                        <LastName>THOMAS</LastName>
+                    </NameDetails>
+                    <NFIRSPersonnelId>148</NFIRSPersonnelId>
+                    <Assignment>Captain</Assignment>
+                    <Datetime>2020-09-24T01:00:00-05:00</Datetime>
+                    <Rank>Captain</Rank>
+                </ReportWriterDetails>
+                <OfficerInChargeDetails>
+                    <NameDetails>
+                        <FirstName>BOBBY</FirstName>
+                        <LastName>THOMAS</LastName>
+                    </NameDetails>
+                    <NFIRSPersonnelId>148</NFIRSPersonnelId>
+                    <Assignment>Captain</Assignment>
+                    <Datetime>2020-09-24T01:00:00-05:00</Datetime>
+                    <Rank>Captain</Rank>
+                </OfficerInChargeDetails>
+                <Narratives>
+                    <Remark SequenceNumber="0">
+                        <FirstName>BOBBY</FirstName>
+                        <LastName>THOMAS</LastName>
+                        <CreatedDatetime>2020-09-24T15:37:31-05:00</CreatedDatetime>
+                        <Remarks>Medic and Engine 223 responded to a medical call. Units arrived to find a 18 year old female sitting on the curb in the parking lot with NRH PD. Patient stated she was hit by her boyfriends car as he was leaving. Patient was found with a small cut to her right knee. Patient was loaded on the cot and moved to the ambulance where vitals performed. Patient was transported code 1 to Medical City North Hills without incident. Engine 223 cleared the scene available.</Remarks>
+                    </Remark>
+                </Narratives>
+                <CADNotes>15:04:41 09/24/2020 - C D Osman WRLS data. Phone: (682)554-9766, UNC: 0, Lat: 32.83407926, Long: -97.1961307 15:05:24 09/24/2020 - C D Osman *EDITED* THIRD PARTY COMP/FEMALE PARTY ASKED COMP TO CALL POLICE/COMP NO LONGER ON SCENE 15:05:30 09/24/2020 - C D Osman *EDITED* BM VS BF 15:06:04 09/24/2020 - C D Osman IN THE MIDDLE OF STATION 121 AND THIS APT COMPLEX/IN THE STREET 15:06:26 09/24/2020 - C D Osman NO WEAPONS 15:06:31 09/24/2020 - C D Osman VERBAL AT THE TIME 15:07:04 09/24/2020 - C D Osman MALE MULTI COLOR JACKET/FEMALE IN BLU SHIRT 15:08:23 09/24/2020 - L T Obrien RCVD CALL FROM SECOND CALLER WHO ADV 1637 WEYLAND #2047, SAID FEMALE CAME OUTSIDE YELLING TO CALL THE POLICE, WAS SEEN LIMPING 15:09:06 09/24/2020 - L T Obrien FEMALE TOLD THAT UBER DRIVER DROPPED HER OFF, IS BLEEDING FROM KNEE AND FOOT, IS UNSURE IF THE CAR DROVE HER OVER OR NOT 15:09:10 09/24/2020 - L T Obrien REFUSING MEDICS 15:09:47 09/24/2020 - L T Obrien SECOND CALLER-RHONDANA GREENWOOD 817 724 8158-WORKS FOR PROPERTY 15:10:08 09/24/2020 - L T Obrien CALLER WAS NOT SURE THE DESC OF THE UBER DRIVER 15:19:59 09/24/2020 - K M Moreno Address change from 1598 WEYLAND DR to 1598 WEYLAND DR #2047 for Active call 372f 15:22:40 09/24/2020 - K M Moreno Address change from 1598 WEYLAND DR #2047 to 1637 WEYLAND #2047 for Active call 372f 15:23:04 09/24/2020 - K M Moreno Address change from 1637 WEYLAND #2047 to 1628 WEYLAND DR BL38APT 2047; STATION 121 AT TOWN CENTER for Active call 372f 15:29:23 09/24/2020 - T K Johnson followinjg medis to nhh
+                </CADNotes>
+                <Covid19Factor NFIRSCode="3" EntityName="No, COVID-19 was not a factor" ListRef="146" BaseCode="3" BaseName="No, COVID-19 was not a factor">18075</Covid19Factor>
+                <QualityControlFirstName>BOBBY</QualityControlFirstName>
+                <QualityControlLastName>THOMAS</QualityControlLastName>
+                <QualityControlCompletedDate>2020-09-24T00:00:00</QualityControlCompletedDate>
+            </Exposure>
+        </Exposures>
+    </Incident>
+</Incidents>
