@@ -121,26 +121,11 @@ namespace Levrum.Data.Sources
             Stream stream = null;
             try
             {
-                if (Parameters.ContainsKey("CompressedContents"))
-                {
-                    string compressedContents = Parameters["CompressedContents"];
-                    string xmlContents = LZString.decompressFromUTF16(compressedContents);
+                Parameters.TryGetValue("CompressedContents", out string compressedContents);
+                stream = XmlUtils.GetXmlStream(compressedContents, XmlFile);
 
-                    stream = new MemoryStream(Encoding.UTF8.GetBytes(xmlContents));
-                }
-                else
-                {
-                    stream = XmlFile.OpenRead();
-                }
-                if ((!XmlFile.Directory.Exists) || (!XmlFile.Exists)) { return (new List<string>()); }
-                XDocument doc = XDocument.Load(stream);
-                var allElements = doc.Descendants();
-                HashSet<string> output = new HashSet<string>();
-                foreach (var element in allElements)
-                {
-                    output.Add(element.Name.ToString());
-                }
-                return output.ToList();
+                var columns = XmlUtils.GetColumns(stream);
+                return columns;
             }
             catch (Exception ex)
             {
@@ -160,25 +145,10 @@ namespace Levrum.Data.Sources
             Stream stream = null;
             try
             {
-                if (Parameters.ContainsKey("CompressedContents"))
-                {
-                    string compressedContents = Parameters["CompressedContents"];
-                    string xmlContents = LZString.decompressFromUTF16(compressedContents);
+                Parameters.TryGetValue("CompressedContents", out string compressedContents);
+                stream = XmlUtils.GetXmlStream(compressedContents, XmlFile);
 
-                    stream = new MemoryStream(Encoding.UTF8.GetBytes(xmlContents));
-                }
-                else
-                {
-                    stream = XmlFile.OpenRead();
-                }
-
-                List<string> values = new List<string>();
-                XDocument doc = XDocument.Load(stream);
-                var nodes = doc.Descendants(column);
-                foreach(var node in nodes)
-                {
-                    values.Add(node.Value);
-                }
+                List<string> values = XmlUtils.GetColumnValues(column, stream);
 
                 return values;
             } catch (Exception ex)
@@ -200,62 +170,10 @@ namespace Levrum.Data.Sources
             Stream stream = null;
             try
             {
-                if (Parameters.ContainsKey("CompressedContents"))
-                {
-                    string compressedContents = Parameters["CompressedContents"];
-                    string xmlContents = LZString.decompressFromUTF16(compressedContents);
+                Parameters.TryGetValue("CompressedContents", out string compressedContents);
+                stream = XmlUtils.GetXmlStream(compressedContents, XmlFile);
 
-                    stream = new MemoryStream(Encoding.UTF8.GetBytes(xmlContents));
-                }
-                else
-                {
-                    stream = XmlFile.OpenRead();
-                }
-
-                List<Record> records = new List<Record>();
-                XDocument doc = XDocument.Load(stream);
-                var incidentNodes = doc.Descendants(IncidentNode);
-                List<string> columns = GetColumns();
-                foreach (var incidentNode in incidentNodes)
-                {
-                    var incidentChildren = incidentNode.Elements();
-                    var responseNodes = incidentNode.Descendants(ResponseNode);
-                    foreach (var responseNode in responseNodes)
-                    {
-                        // var responseChildren = responseNode.Elements();
-                        Dictionary<string, string> values = new Dictionary<string, string>();
-                        foreach (var column in columns)
-                        {
-                            var responseColumns = responseNode.Descendants(column).ToList();
-                            if (responseColumns.Count < 1)
-                            {
-                                var incidentColumns = incidentNode.Descendants(column).ToList();
-                                if (incidentColumns.Count == 0)
-                                    values[column] = "NULL";
-                                else if (incidentColumns.Count == 1)
-                                {
-                                    values[column] = incidentColumns[0].Value;
-                                }
-                                else
-                                {
-                                    values[column] = "MULTIPLE VALUES";
-                                }
-                            } else if (responseColumns.Count == 1)
-                            {
-                                values[column] = responseColumns[0].Value;
-                            } else
-                            {
-                                values[column] = "MULTIPLE VALUES";
-                            }
-                        }
-                        Record record = new Record();
-                        foreach(KeyValuePair<string, string> kvp in values)
-                        {
-                            record.AddValue(kvp.Key, kvp.Value);
-                        }
-                        records.Add(record);
-                    }
-                }
+                List<Record> records = XmlUtils.GetRecords(stream, IncidentNode, ResponseNode);
 
                 return records;
             } catch (Exception ex)
