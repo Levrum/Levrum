@@ -54,18 +54,32 @@ namespace DailyXMLAggregator
 
         public static void GetConfigurationPathFromUser()
         {
-            Console.WriteLine($"Current configuration path: {ConfigurationFile.FullName}");
-            Console.Write("Would you like to change the configuration path? y/n: ");
-            var key = Console.ReadKey();
-            Console.WriteLine();
-            if (key.Key == ConsoleKey.Y)
+            bool configurationLoaded = false;
+            while (!configurationLoaded)
             {
-                string path = Console.ReadLine();
-                ConfigurationFile = new FileInfo(path);
-                Console.WriteLine($"Configuration path successfully changed to {ConfigurationFile.FullName}");
+                Console.WriteLine($"Current configuration path: {ConfigurationFile.FullName}");
+                Console.Write("Would you like to change the configuration path? y/n: ");
+                var key = Console.ReadKey();
+                Console.WriteLine();
+                if (key.Key == ConsoleKey.Y)
+                {
+                    Console.Write("Enter new configuration path: ");
+                    string path = Console.ReadLine();
+                    ConfigurationFile = new FileInfo(path);
+                    Console.WriteLine($"Configuration path successfully changed to {ConfigurationFile.FullName}");
+                }
+                Console.WriteLine();
+                try
+                {
+                    LoadConfiguration();
+                    configurationLoaded = true;
+                }
+                catch (FileNotFoundException ex)
+                {
+                    Console.WriteLine("Configuration file does not exist");
+                    configurationLoaded = false;
+                }
             }
-
-            LoadConfiguration();
         }
     }
 }
