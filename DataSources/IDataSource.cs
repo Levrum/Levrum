@@ -32,7 +32,7 @@ namespace Levrum.Data.Sources
         string ErrorMessage { get; }
     }
 
-    public enum DataSourceType { CsvSource, SqlSource, EmergencyReportingSource, GeoSource, XmlSource };
+    public enum DataSourceType { CsvSource, SqlSource, EmergencyReportingSource, GeoSource, XmlSource, DailyDigestXmlSource };
 
     public class IDataSourceConcreteClassConverter : DefaultContractResolver
     {
