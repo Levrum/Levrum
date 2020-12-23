@@ -9,6 +9,8 @@ namespace DailyXMLAggregator
 {
     public static class DataManager
     {
+        public static XmlSchema XmlSchema { get; set; } = new XmlSchema(XmlSchema.Type.EsoNrhStandard);
+
         public static List<FileInfo> FilesToProcess { get; set; } = new List<FileInfo>();
 
         /// <summary>
@@ -52,10 +54,21 @@ namespace DailyXMLAggregator
             bool allowDuplicateIds = false;
 
             XElement incidents = digestXML.Element("Incidents");
-            XElement newIncident = incidentXML.Element("Incident");
+            XElement newIncident = incidentXML.Descendants(XmlSchema.IncidentNode).First();
 
             // Check if incident id already exists in file
-            bool isDuplicateId = incidents.Elements().Any(el => el.Element("IncidentId").Value == newIncident.Element("IncidentId").Value);
+            //bool isDuplicateId = incidents.Elements().Any(el => el.Element(XmlSchema.IncidentIdNode).Value == newIncident.Descendants(XmlSchema.IncidentIdNode).FirstOrDefault()?.Value);
+            bool isDuplicateId = false;
+            foreach (XElement incident in incidents.Elements())
+            {
+                var incidentId = incident.Descendants(XmlSchema.IncidentIdNode).First().Value;
+                var newIncidentId = newIncident.Descendants(XmlSchema.IncidentIdNode).First().Value;
+                if (incidentId == newIncidentId)
+                {
+                    isDuplicateId = true;
+                    break;
+                }
+            }
             if (!allowDuplicateIds && isDuplicateId)
             {
                 return;
@@ -250,12 +263,46 @@ namespace DailyXMLAggregator
         /// <returns></returns>
         private static DateTime GetDate(XElement incidentElement)
         {
-            XElement exposures = incidentElement.Element("Exposures");
-            XElement exposure = exposures.Element("Exposure");
-            XElement datetime = exposure.Element("AlarmDatetime");
+            XElement datetime = incidentElement.Descendants(XmlSchema.IncidentDateTimeNode).First();
             string dateString = datetime.Value;
             var dto = DateTimeOffset.Parse(dateString);
             return dto.DateTime;
+        }
+    }
+
+    public class XmlSchema
+    {
+        public enum Type { FireIncident, EsoNrhStandard }
+
+        public string IncidentNode { get; protected set; }
+        public string IncidentIdNode { get; protected set; }
+        public string IncidentDateTimeNode { get; protected set; }
+
+        public XmlSchema (Type type)
+        {
+            switch (type)
+            {
+                case Type.FireIncident:
+                    InitializeFireIncident();
+                    break;
+                case Type.EsoNrhStandard:
+                    InitializeEsoStandard();
+                    break;
+            }
+        }
+
+        private void InitializeFireIncident()
+        {
+            IncidentNode = "Incident";
+            IncidentIdNode = "IncidentId";
+            IncidentDateTimeNode = "AlarmDatetime";
+        }
+
+        private void InitializeEsoStandard()
+        {
+            IncidentNode = "Incident";
+            IncidentIdNode = "IncidentNumber";
+            IncidentDateTimeNode = "AlarmDatetime";
         }
     }
 }
