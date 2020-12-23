@@ -94,6 +94,10 @@ namespace Levrum.Data.Sources
                 {
                     output = JsonConvert.DeserializeObject<XmlSource>(jo.ToString(), s_serializerSettings);
                 }
+                else if (type == DataSourceType.DailyDigestXmlSource)
+                {
+                    output = JsonConvert.DeserializeObject<DailyDigestXmlSource>(jo.ToString(), s_serializerSettings);
+                }
                 else
                 {
                     throw new NotImplementedException();

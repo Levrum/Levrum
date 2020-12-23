@@ -42,7 +42,7 @@ namespace Levrum.DataBridge
         public IDataSource DataSource { get; set; } = null;
         private IDataSource OriginalDataSource { get; set; } = null;
 
-        public static List<DataSourceTypeInfo> DataSourceTypes { get; } = new List<DataSourceTypeInfo>(new DataSourceTypeInfo[] { DataSourceTypeInfo.CsvSource, DataSourceTypeInfo.SqlSource, DataSourceTypeInfo.GeoSource, DataSourceTypeInfo.XmlSource });
+        public static List<DataSourceTypeInfo> DataSourceTypes { get; } = new List<DataSourceTypeInfo>(new DataSourceTypeInfo[] { DataSourceTypeInfo.CsvSource, DataSourceTypeInfo.SqlSource, DataSourceTypeInfo.GeoSource, DataSourceTypeInfo.XmlSource, DataSourceTypeInfo.DailyDigestXmlSource });
 
         public static Dictionary<string, DataSourceTypeInfo> SourceTypesByExtension = new Dictionary<string, DataSourceTypeInfo>()
         {
@@ -231,6 +231,37 @@ namespace Levrum.DataBridge
                     }
                 }
             }
+            else if (DataSource.Type == DataSourceType.DailyDigestXmlSource)
+            {
+                DataSourceTypeComboBox.SelectedItem = DataSourceTypes[4];
+                updateDisplayOptions();
+                if (DataSource.Parameters.ContainsKey("Directory"))
+                {
+                    try
+                    {
+                        DailyDigestFolderNameTextBox.Text = DataSource.Parameters["Directory"];
+                        DailyDigestXmlSource dailyDigestSource = DataSource as DailyDigestXmlSource;
+                        if (dailyDigestSource == null)
+                        {
+                            return;
+                        }
+
+                        List<string> columns = dailyDigestSource.GetColumns();
+                        DailyDigestIncidentNodeComboBox.ItemsSource = columns;
+                        DailyDigestIncidentNodeComboBox.SelectedItem = dailyDigestSource.IncidentNode;
+                        DailyDigestIncidentIdNodeComboBox.ItemsSource = columns;
+                        DailyDigestIncidentIdNodeComboBox.SelectedItem = dailyDigestSource.IDColumn;
+                        DailyDigestResponseNodeComboBox.ItemsSource = columns;
+                        DailyDigestResponseNodeComboBox.SelectedItem = dailyDigestSource.ResponseNode;
+                        DailyDigestResponseIdNodeComboBox.ItemsSource = columns;
+                        DailyDigestResponseIdNodeComboBox.SelectedItem = dailyDigestSource.ResponseIDColumn;
+                    } catch (Exception ex)
+                    {
+                        LogHelper.LogMessage(LogLevel.Error, $"Unable to load DailyDigestSource from folder '{DataSource.Parameters["Directory"]}'", ex);
+                        return;
+                    }
+                }
+            }
             
         }
 
@@ -334,7 +365,12 @@ namespace Levrum.DataBridge
                     DataSource.Parameters["CompressedContentsTimeStamp"] = File.GetLastWriteTime(XmlFileNameTextBox.Text).Ticks.ToString();
                     DataSource.Parameters["CompressedContents"] = compressedContents;
                 }
-            } else 
+            }
+            else if (DataSource is DailyDigestXmlSource)
+            {
+                DataSource.Parameters["Directory"] = DailyDigestFolderNameTextBox.Text;
+            }
+            else
             {
                 throw new NotImplementedException();
             }
@@ -369,6 +405,11 @@ namespace Levrum.DataBridge
             } else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.XmlSource)
             {
                 DataSource = new XmlSource();
+                ChangesMade = true;
+            }
+            else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.DailyDigestXmlSource)
+            {
+                DataSource = new DailyDigestXmlSource();
                 ChangesMade = true;
             }
             updateDisplayOptions();
@@ -418,6 +459,19 @@ namespace Levrum.DataBridge
                 GeoOptionsPanel.Visibility = Visibility.Hidden;
                 XmlOptionsGrid.Visibility = Visibility.Visible;
                 XmlOptionsPanel.Visibility = Visibility.Visible;
+            }
+            else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.DailyDigestXmlSource)
+            {
+                CsvOptionsGrid.Visibility = Visibility.Hidden;
+                CsvOptionsButtons.Visibility = Visibility.Hidden;
+                SqlOptionsGrid.Visibility = Visibility.Hidden;
+                SqlOptionsPanel.Visibility = Visibility.Hidden;
+                GeoOptionsGrid.Visibility = Visibility.Hidden;
+                GeoOptionsPanel.Visibility = Visibility.Hidden;
+                XmlOptionsGrid.Visibility = Visibility.Hidden;
+                XmlOptionsPanel.Visibility = Visibility.Hidden;
+                DailyDigestOptionsGrid.Visibility = Visibility.Visible;
+
             }
         }
 
@@ -905,6 +959,77 @@ namespace Levrum.DataBridge
         {
 
         }
+
+        private void DailyDigestFolderSelectButton_Click(object sender, RoutedEventArgs e)
+        {
+            DirectoryInfo directory = null;
+            try
+            {
+                using (System.Windows.Forms.FolderBrowserDialog fbd = new System.Windows.Forms.FolderBrowserDialog())
+                {
+                    if (fbd.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    {
+                        return;
+                    }
+                    directory = new DirectoryInfo(fbd.SelectedPath);
+                }
+
+                DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
+                if (source == null)
+                {
+                    IDataSource lastSource = DataSource;
+                    DataSource = source = new DailyDigestXmlSource();
+                    if (lastSource != null)
+                    {
+                        DataSource.Name = lastSource.Name;
+                    }
+                }
+                if (source.DailyDigestDirectory != null && (directory.FullName == source.DailyDigestDirectory.FullName))
+                {
+                    return;
+                }
+                source.DailyDigestDirectory = new DirectoryInfo(directory.FullName);
+                DailyDigestFolderNameTextBox.Text = directory.FullName;
+
+                List<string> nodes = source.GetColumns();
+                DailyDigestIncidentNodeComboBox.ItemsSource = nodes;
+                DailyDigestIncidentIdNodeComboBox.ItemsSource = nodes;
+                DailyDigestResponseNodeComboBox.ItemsSource = nodes;
+                DailyDigestResponseIdNodeComboBox.ItemsSource = nodes;
+                ChangesMade = true;
+            }
+            catch (Exception ex)
+            {
+                string name = "Unknown";
+                if (directory != null)
+                    name = directory.Name;
+                LogHelper.LogMessage(LogLevel.Error, string.Format("Exception reading from directory '{0}'", name), ex);
+            }
+        }
+
+        private void DailyDigestIncidentNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
+            source.IncidentNode = DailyDigestIncidentNodeComboBox.SelectedItem as string;
+        }
+
+        private void DailyDigestIncidentIdNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
+            source.IDColumn = DailyDigestIncidentIdNodeComboBox.SelectedItem as string;
+        }
+
+        private void DailyDigestResponseNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
+            source.ResponseNode = DailyDigestResponseNodeComboBox.SelectedItem as string;
+        }
+
+        private void DailyDigestResponseIdNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
+            source.ResponseIDColumn = DailyDigestResponseIdNodeComboBox.SelectedItem as string;
+        }
     }
 
     public class DataSourceTypeInfo
@@ -913,6 +1038,7 @@ namespace Levrum.DataBridge
         public static DataSourceTypeInfo SqlSource = new DataSourceTypeInfo("SQL Server");
         public static DataSourceTypeInfo GeoSource = new DataSourceTypeInfo("Geographical Data");
         public static DataSourceTypeInfo XmlSource = new DataSourceTypeInfo("XML File");
+        public static DataSourceTypeInfo DailyDigestXmlSource = new DataSourceTypeInfo("Daily Digest XML Source");
 
         public string Name { get; set; } = string.Empty;
         public string Data { get; set; } = string.Empty;

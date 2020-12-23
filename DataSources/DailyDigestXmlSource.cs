@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Levrum.Utils;
-using Newtonsoft.Json
+using Newtonsoft.Json;
 
 namespace Levrum.Data.Sources
 {
@@ -26,9 +26,9 @@ namespace Levrum.Data.Sources
         [JsonIgnore]
         public List<string> RequiredParameters { get { return new List<string>(s_requiredParameters); } }
 
-        public Dictionary<string, string> Parameters { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
 
-        public string ErrorMessage => throw new NotImplementedException();
+        public string ErrorMessage { get { return m_sErrorMessage; } }
         private string m_sErrorMessage = "Error messages not implemented for the type DailyDigestXmlSource";
 
         private DirectoryInfo s_directory = null;
@@ -119,9 +119,11 @@ namespace Levrum.Data.Sources
             try
             {
                 var firstFile = DailyDigestDirectory.EnumerateFiles().First();
-                using Stream stream = firstFile.OpenRead();
-                List<string> columns =  XmlUtils.GetColumns(stream);
-                return columns;
+                using (Stream stream = firstFile.OpenRead())
+                {
+                    List<string> columns = XmlUtils.GetColumns(stream);
+                    return columns;
+                }
             }catch (Exception ex)
             {
                 LogHelper.LogException(ex, "Exception in GetColumns");
@@ -137,9 +139,11 @@ namespace Levrum.Data.Sources
                 var xmlFiles = DailyDigestDirectory.GetFiles();
                 foreach (FileInfo file in xmlFiles)
                 {
-                    using Stream stream = file.OpenRead();
-                    List<string> values = XmlUtils.GetColumnValues(column, stream);
-                    columnValues.AddRange(values);
+                    using (Stream stream = file.OpenRead())
+                    {
+                        List<string> values = XmlUtils.GetColumnValues(column, stream);
+                        columnValues.AddRange(values);
+                    }
                 }
 
                 return columnValues;
@@ -158,9 +162,11 @@ namespace Levrum.Data.Sources
                 var xmlFiles = DailyDigestDirectory.GetFiles();
                 foreach (FileInfo file in xmlFiles)
                 {
-                    using Stream stream = file.OpenRead();
-                    List<Record> fileRecords = XmlUtils.GetRecords(stream, IncidentNode, ResponseNode);
-                    records.AddRange(fileRecords);
+                    using (Stream stream = file.OpenRead())
+                    {
+                        List<Record> fileRecords = XmlUtils.GetRecords(stream, IncidentNode, ResponseNode);
+                        records.AddRange(fileRecords);
+                    }
                 }
 
                 return records;
