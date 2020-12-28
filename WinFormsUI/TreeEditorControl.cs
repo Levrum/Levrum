@@ -1232,7 +1232,7 @@ namespace Levrum.UI.WinForms
             bool seenOne = false;
             foreach (Control control in container.Controls)
             {
-                if (!(control is Button))
+                if (!(control is Button) || !control.Visible)
                 {
                     continue;
                 }
