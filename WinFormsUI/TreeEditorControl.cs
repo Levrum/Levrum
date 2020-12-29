@@ -600,6 +600,18 @@ namespace Levrum.UI.WinForms
                         {
                             if (control.Tag == droppedData)
                             {
+                                foreach (var data in m_recyclingBin)
+                                {
+                                    if (data.Control.Tag == droppedData)
+                                    {
+                                        m_recyclingBin.Remove(data);
+                                        if (!m_recyclingBin.Any())
+                                        {
+                                            m_btnUndoDelete.Visible = false;
+                                        }
+                                        break;
+                                    }
+                                }
                                 control.Visible = true;
                                 break;
                             }
