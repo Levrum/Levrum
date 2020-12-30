@@ -50,6 +50,9 @@ namespace Levrum.Data.Map
 
         public DataMap Map { get; set; }
 
+        public DateTime StartDate { get; set; } = DateTime.MinValue;
+        public DateTime EndDate { get; set; } = DateTime.MaxValue;
+
         public MapLoader()
         {
             Logger = LogManager.GetCurrentClassLogger();
@@ -402,7 +405,7 @@ namespace Levrum.Data.Map
                 double progressPerSource = 100 / numSources;
                 double progress = completedSources * progressPerSource;
                 updateProgress(1, string.Format("Getting incident data records from data source {0}", dataSource.Name), progress);
-                List<Record> recordsFromSource = dataSource.GetRecords();
+                List<Record> recordsFromSource = dataSource.GetRecords(StartDate, EndDate);
                 int recordNumber = 0;
                 foreach (Record record in recordsFromSource)
                 {

@@ -22,6 +22,8 @@ namespace Levrum.Data.Sources
         public string IDColumn { get; set; } = "";
         public string ResponseIDColumn { get; set; } = "";
 
+        public string DateColumn { get; set; } = "";
+
         public string ErrorMessage {  get { return (m_sErrorMessage); } }
         private string m_sErrorMessage = "Error messages not implemented for type CsvSource";
 
@@ -193,6 +195,11 @@ namespace Levrum.Data.Sources
 
         public List<Record> GetRecords()
         {
+            return GetRecords(DateTime.MinValue, DateTime.MaxValue);
+        }
+
+        public List<Record> GetRecords(DateTime startDate, DateTime endDate)
+        {
             Stream stream = null;
             try
             {
@@ -217,11 +224,31 @@ namespace Levrum.Data.Sources
                     while (csvReader.Read())
                     {
                         Record record = new Record();
+                        bool validDate = true;
                         foreach (string column in csvReader.Context.HeaderRecord)
                         {
-                            record.AddValue(column, csvReader.GetField(column));
+                            if (column != DateColumn)
+                            {
+                                record.AddValue(column, csvReader.GetField(column));
+                            } else
+                            {
+                                string dateColumnValue = csvReader.GetField(column);
+                                DateTime dateTime;
+                                if (!DateTime.TryParse(dateColumnValue, out dateTime))
+                                {
+                                    validDate = false;
+                                    break;
+                                } else if (dateTime < startDate || dateTime > endDate)
+                                {
+                                    validDate = false;
+                                    break;
+                                }
+                            }
                         }
-                        records.Add(record);
+                        if (validDate == true)
+                        {
+                            records.Add(record);
+                        }
                     };
                 }
 

@@ -20,6 +20,8 @@ namespace Levrum.Data.Sources
         string IDColumn { get; set; }
         string ResponseIDColumn { get; set; }
 
+        string DateColumn { get; set; }
+
         List<string> RequiredParameters { get; }
         Dictionary<string, string> Parameters { get; set; }
 
@@ -28,6 +30,7 @@ namespace Levrum.Data.Sources
         List<string> GetColumns();
         List<string> GetColumnValues(string column);
         List<Record> GetRecords();
+        List<Record> GetRecords(DateTime startDate, DateTime endDate);
 
         string ErrorMessage { get; }
     }

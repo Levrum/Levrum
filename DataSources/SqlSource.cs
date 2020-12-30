@@ -37,6 +37,8 @@ namespace Levrum.Data.Sources
         public string IDColumn { get; set; } = "";
         public string ResponseIDColumn { get; set; } = "";
 
+        public string DateColumn { get; set; } = "";
+
         static readonly string[] s_requiredParameters = new string[] { "Server", "Port", "User", "Password", "Database" };
 
         [JsonIgnore]
@@ -317,6 +319,11 @@ namespace Levrum.Data.Sources
 
         public List<Record> GetRecords()
         {
+            return GetRecords(DateTime.MinValue, DateTime.MaxValue);
+        }
+
+        public List<Record> GetRecords(DateTime startDate, DateTime endDate)
+        {
             List<Record> output = new List<Record>();
             if (m_cachedRecords != null)
             {
@@ -326,10 +333,10 @@ namespace Levrum.Data.Sources
             {
                 if (Parameters.ContainsKey("Table"))
                 {
-                    output = getRecordsFromTable();
+                    output = getRecordsFromTable(startDate, endDate);
                 } else if (Parameters.ContainsKey("Query"))
                 {
-                    output = getRecordsFromQuery();
+                    output = getRecordsFromQuery(startDate, endDate);
                 }
             } finally
             {
@@ -339,7 +346,7 @@ namespace Levrum.Data.Sources
             return output;
         }
 
-        private List<Record> getRecordsFromTable()
+        private List<Record> getRecordsFromTable(DateTime startDate, DateTime endDate)
         {
             List<Record> output = new List<Record>();
             try
@@ -350,7 +357,19 @@ namespace Levrum.Data.Sources
                     return output;
                 }
 
-                SqlCommand cmd = new SqlCommand(string.Format("SELECT * FROM {0}", Parameters["Table"]), m_connection);
+                SqlCommand cmd;
+
+                if (!string.IsNullOrWhiteSpace(DateColumn) && (startDate != DateTime.MinValue || endDate != DateTime.MaxValue))
+                {
+                    cmd = new SqlCommand(
+                        string.Format("SELECT * FROM {0} WHERE {1} >= DATETIMEFROMPARTS({2}, {3}, {4}, {5}, {6}, {7}, {8}) AND {1} <= DATETIMEFROMPARTS({9}, {10}, {11}, {12}, {13}, {14}, {15})",
+                        Parameters["Table"], DateColumn, startDate.Year, startDate.Month, startDate.Day, startDate.Hour, startDate.Minute, startDate.Second, startDate.Millisecond,
+                        endDate.Year, endDate.Month, endDate.Day, endDate.Hour, endDate.Minute, endDate.Second, endDate.Millisecond), m_connection);
+                }
+                else
+                {
+                    cmd = new SqlCommand(string.Format("SELECT * FROM {0}", Parameters["Table"]), m_connection);
+                }
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
                     while (dr.Read())
@@ -371,7 +390,7 @@ namespace Levrum.Data.Sources
             return output;
         }
 
-        private List<Record> getRecordsFromQuery()
+        private List<Record> getRecordsFromQuery(DateTime startDate, DateTime endDate)
         {
             List<Record> output = new List<Record>();
             try
@@ -382,7 +401,42 @@ namespace Levrum.Data.Sources
                     return output;
                 }
 
-                SqlCommand cmd = new SqlCommand(Parameters["Query"], m_connection);
+                SqlCommand cmd = null;
+
+                string query = Parameters["Query"];
+                if (startDate != DateTime.MinValue || endDate != DateTime.MaxValue)
+                {
+                    string lcQuery = query.ToLowerInvariant();
+                    int startIndex = lcQuery.IndexOf("!!startdate!!");
+                    if (startIndex != -1)
+                    {
+                        query = lcQuery.Replace("!!startdate!!",
+                            string.Format("DATETIMEFROMPARTS({0}, {1}, {2}, {3}, {4}, {5}, {6})",
+                            startDate.Year,
+                            startDate.Month,
+                            startDate.Day,
+                            startDate.Hour,
+                            startDate.Minute,
+                            startDate.Second,
+                            startDate.Millisecond));
+                    }
+
+                    int endIndex = lcQuery.IndexOf("!!enddate!!");
+                    if (endIndex != -1)
+                    {
+                        query.Replace("!!enddate!!",
+                            string.Format("DATETIMEFROMPARTS({0}, {1}, {2}, {3}, {4}, {5}, {6})", 
+                            endDate.Year, 
+                            endDate.Month, 
+                            endDate.Day, 
+                            endDate.Hour, 
+                            endDate.Minute, 
+                            endDate.Second, 
+                            endDate.Millisecond));
+                    }
+                }
+
+                cmd = new SqlCommand(query, m_connection);
                 cmd.CommandTimeout = 120;
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
