@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Xml.Linq;
 
 using ProjNet;
 
@@ -41,7 +42,7 @@ namespace Levrum.DataBridge
         public IDataSource DataSource { get; set; } = null;
         private IDataSource OriginalDataSource { get; set; } = null;
 
-        public static List<DataSourceTypeInfo> DataSourceTypes { get; } = new List<DataSourceTypeInfo>(new DataSourceTypeInfo[] { DataSourceTypeInfo.CsvSource, DataSourceTypeInfo.SqlSource, DataSourceTypeInfo.GeoSource });
+        public static List<DataSourceTypeInfo> DataSourceTypes { get; } = new List<DataSourceTypeInfo>(new DataSourceTypeInfo[] { DataSourceTypeInfo.CsvSource, DataSourceTypeInfo.SqlSource, DataSourceTypeInfo.GeoSource, DataSourceTypeInfo.XmlSource, DataSourceTypeInfo.DailyDigestXmlSource });
 
         public static Dictionary<string, DataSourceTypeInfo> SourceTypesByExtension = new Dictionary<string, DataSourceTypeInfo>()
         {
@@ -49,7 +50,8 @@ namespace Levrum.DataBridge
             { ".sql", DataSourceTypeInfo.SqlSource },
             { ".shp", DataSourceTypeInfo.GeoSource },
             { ".zip", DataSourceTypeInfo.GeoSource },
-            { ".geojson", DataSourceTypeInfo.GeoSource }
+            { ".geojson", DataSourceTypeInfo.GeoSource },
+            { ".xml", DataSourceTypeInfo.XmlSource }
         };
 
         public static List<DataSourceTypeInfo> SqlSourceTypes { get; } = new List<DataSourceTypeInfo>(new DataSourceTypeInfo[] { "Table", "Query" });
@@ -148,7 +150,6 @@ namespace Levrum.DataBridge
             else if (DataSource.Type == DataSourceType.GeoSource)
             {
                 DataSourceTypeComboBox.SelectedItem = DataSourceTypes[2];
-                updateDisplayOptions();
                 if (DataSource.Parameters.ContainsKey("File"))
                 {
                     try
@@ -165,6 +166,7 @@ namespace Levrum.DataBridge
                 GeoSource geoSource = DataSource as GeoSource;
                 if (geoSource == null)
                 {
+                    updateDisplayOptions();
                     return;
                 }
 
@@ -189,7 +191,78 @@ namespace Levrum.DataBridge
                         ProjectionColumnComboBox.SelectedItem = info;
                     }
                 }
+                updateDisplayOptions();
+            } else if (DataSource.Type == DataSourceType.XmlSource)
+            {
+                DataSourceTypeComboBox.SelectedItem = DataSourceTypes[3];
+                updateDisplayOptions();
+                if (DataSource.Parameters.ContainsKey("File"))
+                {
+                    try
+                    {
+                        XmlFileNameTextBox.Text = DataSource.Parameters["File"];
+                        XmlSource xmlSource = DataSource as XmlSource;
+                        if (xmlSource == null)
+                        {
+                            return;
+                        }
+                        if (DataSource.Parameters.ContainsKey("EmbedXML"))
+                        {
+                            bool embedXml = false;
+                            if (bool.TryParse(DataSource.Parameters["EmbedXML"], out embedXml))
+                            {
+                                EmbedXmlCheckBox.IsChecked = true;
+                            }
+                        }
+
+                        List<string> columns = xmlSource.GetColumns();
+                        XmlIncidentNodeComboBox.ItemsSource = columns;
+                        XmlIncidentNodeComboBox.SelectedItem = xmlSource.IncidentNode;
+                        XmlIncidentIdNodeComboBox.ItemsSource = columns;
+                        XmlIncidentIdNodeComboBox.SelectedItem = xmlSource.IDColumn;
+                        XmlResponseNodeComboBox.ItemsSource = columns;
+                        XmlResponseNodeComboBox.SelectedItem = xmlSource.ResponseNode;
+                        XmlResponseIdNodeComboBox.ItemsSource = columns;
+                        XmlResponseIdNodeComboBox.SelectedItem = xmlSource.ResponseIDColumn;
+                    } catch (Exception ex)
+                    {
+                        LogHelper.LogMessage(LogLevel.Error, string.Format("Unable to load XmlSource from file '{0}'", DataSource.Parameters["File"]), ex);
+                        return;
+                    }
+                }
             }
+            else if (DataSource.Type == DataSourceType.DailyDigestXmlSource)
+            {
+                DataSourceTypeComboBox.SelectedItem = DataSourceTypes[4];
+                updateDisplayOptions();
+                if (DataSource.Parameters.ContainsKey("Directory"))
+                {
+                    try
+                    {
+                        DailyDigestFolderNameTextBox.Text = DataSource.Parameters["Directory"];
+                        DailyDigestXmlSource dailyDigestSource = DataSource as DailyDigestXmlSource;
+                        if (dailyDigestSource == null)
+                        {
+                            return;
+                        }
+
+                        List<string> columns = dailyDigestSource.GetColumns();
+                        DailyDigestIncidentNodeComboBox.ItemsSource = columns;
+                        DailyDigestIncidentNodeComboBox.SelectedItem = dailyDigestSource.IncidentNode;
+                        DailyDigestIncidentIdNodeComboBox.ItemsSource = columns;
+                        DailyDigestIncidentIdNodeComboBox.SelectedItem = dailyDigestSource.IDColumn;
+                        DailyDigestResponseNodeComboBox.ItemsSource = columns;
+                        DailyDigestResponseNodeComboBox.SelectedItem = dailyDigestSource.ResponseNode;
+                        DailyDigestResponseIdNodeComboBox.ItemsSource = columns;
+                        DailyDigestResponseIdNodeComboBox.SelectedItem = dailyDigestSource.ResponseIDColumn;
+                    } catch (Exception ex)
+                    {
+                        LogHelper.LogMessage(LogLevel.Error, $"Unable to load DailyDigestSource from folder '{DataSource.Parameters["Directory"]}'", ex);
+                        return;
+                    }
+                }
+            }
+            
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -279,6 +352,24 @@ namespace Levrum.DataBridge
                 DataSource.Parameters["Projection"] = info.Data;
                 DataSource.Parameters["ProjectionName"] = info.Name;
             }
+            else if (DataSource is XmlSource)
+            {
+                DataSource.Parameters["File"] = XmlFileNameTextBox.Text;
+                bool embedXml;
+                if (DataSource.Parameters.ContainsKey("EmbedXML") &&
+                    bool.TryParse(DataSource.Parameters["EmbedXML"], out embedXml)
+                    && embedXml)
+                {
+                    string fileContents = File.ReadAllText(XmlFileNameTextBox.Text);
+                    string compressedContents = LZString.compressToUTF16(fileContents);
+                    DataSource.Parameters["CompressedContentsTimeStamp"] = File.GetLastWriteTime(XmlFileNameTextBox.Text).Ticks.ToString();
+                    DataSource.Parameters["CompressedContents"] = compressedContents;
+                }
+            }
+            else if (DataSource is DailyDigestXmlSource)
+            {
+                DataSource.Parameters["Directory"] = DailyDigestFolderNameTextBox.Text;
+            }
             else
             {
                 throw new NotImplementedException();
@@ -297,8 +388,6 @@ namespace Levrum.DataBridge
                 DataSource.Disconnect();
             }
 
-            SaveButton.IsEnabled = false;
-
             if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.CsvSource)
             {
                 DataSource = new CsvSource();
@@ -312,6 +401,15 @@ namespace Levrum.DataBridge
             else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.GeoSource)
             {
                 DataSource = new GeoSource();
+                ChangesMade = true;
+            } else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.XmlSource)
+            {
+                DataSource = new XmlSource();
+                ChangesMade = true;
+            }
+            else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.DailyDigestXmlSource)
+            {
+                DataSource = new DailyDigestXmlSource();
                 ChangesMade = true;
             }
             updateDisplayOptions();
@@ -327,6 +425,8 @@ namespace Levrum.DataBridge
                 SqlOptionsPanel.Visibility = Visibility.Hidden;
                 GeoOptionsGrid.Visibility = Visibility.Hidden;
                 GeoOptionsPanel.Visibility = Visibility.Hidden;
+                XmlOptionsGrid.Visibility = Visibility.Hidden;
+                XmlOptionsPanel.Visibility = Visibility.Hidden;
             }
             else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.SqlSource)
             {
@@ -336,15 +436,42 @@ namespace Levrum.DataBridge
                 SqlOptionsPanel.Visibility = Visibility.Visible;
                 GeoOptionsGrid.Visibility = Visibility.Hidden;
                 GeoOptionsPanel.Visibility = Visibility.Hidden;
+                XmlOptionsGrid.Visibility = Visibility.Hidden;
+                XmlOptionsPanel.Visibility = Visibility.Hidden;
             }
             else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.GeoSource)
+            {
+                CsvOptionsGrid.Visibility = Visibility.Collapsed;
+                CsvOptionsButtons.Visibility = Visibility.Collapsed;
+                SqlOptionsGrid.Visibility = Visibility.Hidden;
+                SqlOptionsPanel.Visibility = Visibility.Hidden;
+                GeoOptionsGrid.Visibility = Visibility.Visible;
+                GeoOptionsPanel.Visibility = Visibility.Visible;
+                XmlOptionsGrid.Visibility = Visibility.Hidden;
+                XmlOptionsPanel.Visibility = Visibility.Hidden;
+            } else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.XmlSource)
             {
                 CsvOptionsGrid.Visibility = Visibility.Hidden;
                 CsvOptionsButtons.Visibility = Visibility.Hidden;
                 SqlOptionsGrid.Visibility = Visibility.Hidden;
                 SqlOptionsPanel.Visibility = Visibility.Hidden;
-                GeoOptionsGrid.Visibility = Visibility.Visible;
-                GeoOptionsPanel.Visibility = Visibility.Visible;
+                GeoOptionsGrid.Visibility = Visibility.Hidden;
+                GeoOptionsPanel.Visibility = Visibility.Hidden;
+                XmlOptionsGrid.Visibility = Visibility.Visible;
+                XmlOptionsPanel.Visibility = Visibility.Visible;
+            }
+            else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.DailyDigestXmlSource)
+            {
+                CsvOptionsGrid.Visibility = Visibility.Hidden;
+                CsvOptionsButtons.Visibility = Visibility.Hidden;
+                SqlOptionsGrid.Visibility = Visibility.Hidden;
+                SqlOptionsPanel.Visibility = Visibility.Hidden;
+                GeoOptionsGrid.Visibility = Visibility.Hidden;
+                GeoOptionsPanel.Visibility = Visibility.Hidden;
+                XmlOptionsGrid.Visibility = Visibility.Hidden;
+                XmlOptionsPanel.Visibility = Visibility.Hidden;
+                DailyDigestOptionsGrid.Visibility = Visibility.Visible;
+
             }
         }
 
@@ -638,6 +765,8 @@ namespace Levrum.DataBridge
                 index++;
             }
             GeoSummaryTextBox.Text = summaryBuilder.ToString();
+            CsvOptionsButtons.Visibility = Visibility.Hidden;
+            CsvOptionsGrid.Visibility = Visibility.Hidden;
         }
 
         private void EmbedCsvCheckBox_Click(object sender, RoutedEventArgs e)
@@ -741,6 +870,166 @@ namespace Levrum.DataBridge
 
             e.Effects = DragDropEffects.None;
         }
+
+        private void XmlFileSelectButton_Click(object sender, RoutedEventArgs e)
+        {
+            FileInfo info = null;
+            try
+            {
+                OpenFileDialog ofd = new OpenFileDialog();
+                ofd.DefaultExt = "xml";
+                ofd.Filter = "XML Files (*.xml)|*.xml|All Files (*.*)|*.*";
+                if (ofd.ShowDialog() == false)
+                {
+                    return;
+                }
+
+                XmlSource source = DataSource as XmlSource;
+                if (source == null)
+                {
+                    IDataSource lastSource = DataSource;
+                    DataSource = source = new XmlSource();
+                    if (lastSource != null)
+                    {
+                        DataSource.Name = lastSource.Name;
+                    }
+                }
+                info = new FileInfo(ofd.FileName);
+                if (source.XmlFile != null && (info.FullName == source.XmlFile.FullName))
+                {
+                    return;
+                }
+                source.XmlFile = new FileInfo(ofd.FileName);
+                XmlFileNameTextBox.Text = ofd.FileName;
+
+                List<string> nodes = source.GetColumns();
+                XmlIncidentNodeComboBox.ItemsSource = nodes;
+                XmlIncidentIdNodeComboBox.ItemsSource = nodes;
+                XmlResponseNodeComboBox.ItemsSource = nodes;
+                XmlResponseIdNodeComboBox.ItemsSource = nodes;
+                ChangesMade = true;
+            }
+            catch (Exception ex)
+            {
+                string name = "Unknown";
+                if (info != null)
+                    name = info.Name;
+                LogHelper.LogMessage(LogLevel.Error, string.Format("Exception reading CSV File '{0}'", name), ex);
+            }
+        }
+
+        private void XmlIncidentNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            XmlSource source = DataSource as XmlSource;
+            source.IncidentNode = XmlIncidentNodeComboBox.SelectedItem as string;
+        }
+
+        private void XmlIncidentIdNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            XmlSource source = DataSource as XmlSource;
+            source.IDColumn = XmlIncidentIdNodeComboBox.SelectedItem as string;
+        }
+
+        private void XmlResponseNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            XmlSource source = DataSource as XmlSource;
+            source.ResponseNode = XmlResponseNodeComboBox.SelectedItem as string;
+        }
+
+        private void XmlResponseIdNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            XmlSource source = DataSource as XmlSource;
+            source.ResponseIDColumn = XmlResponseIdNodeComboBox.SelectedItem as string;
+        }
+
+        private void SummarizeXmlButton_Click(object sender, RoutedEventArgs e)
+        {
+            FileInfo xmlFileInfo = new FileInfo(XmlFileNameTextBox.Text);
+            XDocument doc = XDocument.Load(XmlFileNameTextBox.Text);
+            var nodes = doc.Descendants().ToList();
+            var topLevel = doc.Root.Nodes().ToList();
+            long bytes = xmlFileInfo.Length;
+
+            XmlSummaryTextBox.Text = string.Format("XML File: {0} was last modified at {1} and is {2} bytes long.\n\nThe file contains {3} top level nodes and {4} nodes total.",
+                xmlFileInfo.Name, xmlFileInfo.LastWriteTime, bytes, topLevel.Count, nodes.Count);
+
+        }
+
+        private void EmbedXmlCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void DailyDigestFolderSelectButton_Click(object sender, RoutedEventArgs e)
+        {
+            DirectoryInfo directory = null;
+            try
+            {
+                using (System.Windows.Forms.FolderBrowserDialog fbd = new System.Windows.Forms.FolderBrowserDialog())
+                {
+                    if (fbd.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                    {
+                        return;
+                    }
+                    directory = new DirectoryInfo(fbd.SelectedPath);
+                }
+
+                DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
+                if (source == null)
+                {
+                    IDataSource lastSource = DataSource;
+                    DataSource = source = new DailyDigestXmlSource();
+                    if (lastSource != null)
+                    {
+                        DataSource.Name = lastSource.Name;
+                    }
+                }
+                if (source.DailyDigestDirectory != null && (directory.FullName == source.DailyDigestDirectory.FullName))
+                {
+                    return;
+                }
+                source.DailyDigestDirectory = new DirectoryInfo(directory.FullName);
+                DailyDigestFolderNameTextBox.Text = directory.FullName;
+
+                List<string> nodes = source.GetColumns();
+                DailyDigestIncidentNodeComboBox.ItemsSource = nodes;
+                DailyDigestIncidentIdNodeComboBox.ItemsSource = nodes;
+                DailyDigestResponseNodeComboBox.ItemsSource = nodes;
+                DailyDigestResponseIdNodeComboBox.ItemsSource = nodes;
+                ChangesMade = true;
+            }
+            catch (Exception ex)
+            {
+                string name = "Unknown";
+                if (directory != null)
+                    name = directory.Name;
+                LogHelper.LogMessage(LogLevel.Error, string.Format("Exception reading from directory '{0}'", name), ex);
+            }
+        }
+
+        private void DailyDigestIncidentNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
+            source.IncidentNode = DailyDigestIncidentNodeComboBox.SelectedItem as string;
+        }
+
+        private void DailyDigestIncidentIdNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
+            source.IDColumn = DailyDigestIncidentIdNodeComboBox.SelectedItem as string;
+        }
+
+        private void DailyDigestResponseNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
+            source.ResponseNode = DailyDigestResponseNodeComboBox.SelectedItem as string;
+        }
+
+        private void DailyDigestResponseIdNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
+            source.ResponseIDColumn = DailyDigestResponseIdNodeComboBox.SelectedItem as string;
+        }
     }
 
     public class DataSourceTypeInfo
@@ -748,6 +1037,8 @@ namespace Levrum.DataBridge
         public static DataSourceTypeInfo CsvSource = new DataSourceTypeInfo("CSV File");
         public static DataSourceTypeInfo SqlSource = new DataSourceTypeInfo("SQL Server");
         public static DataSourceTypeInfo GeoSource = new DataSourceTypeInfo("Geographical Data");
+        public static DataSourceTypeInfo XmlSource = new DataSourceTypeInfo("XML File");
+        public static DataSourceTypeInfo DailyDigestXmlSource = new DataSourceTypeInfo("Daily Digest XML Source");
 
         public string Name { get; set; } = string.Empty;
         public string Data { get; set; } = string.Empty;

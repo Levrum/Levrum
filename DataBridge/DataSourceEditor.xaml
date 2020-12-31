@@ -156,6 +156,92 @@
                 </Grid>
             </Grid>
         </Grid>
+        <Grid x:Name="XmlOptionsGrid" Grid.Row="1" Visibility="Hidden">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="300*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="36"/>
+                    <ColumnDefinition Width="120*"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="98"/>
+                    <ColumnDefinition Width="70*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Height="16" Grid.Column="0" Margin="8,0,0,0">File:</TextBlock>
+                <TextBox x:Name="XmlFileNameTextBox" Height="24" Grid.Column="1" IsEnabled="False" Background="LightGray" VerticalContentAlignment="Center"></TextBox>
+                <Button x:Name="XmlFileSelectButton" Height="24" Grid.Column="2" Margin="8,0,8,0" Click="XmlFileSelectButton_Click">Select...</Button>
+                <TextBlock Height="16" Grid.Column="3" Margin="0,0,0,0">Incident Element:</TextBlock>
+                <ComboBox x:Name="XmlIncidentNodeComboBox" Grid.Column="4" Margin="0,8,8,8" SelectionChanged="XmlIncidentNodeComboBox_SelectionChanged"></ComboBox>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="76"/>
+                    <ColumnDefinition Width="70*"/>
+                    <ColumnDefinition Width="106"/>
+                    <ColumnDefinition Width="70*"/>
+                    <ColumnDefinition Width="74"/>
+                    <ColumnDefinition Width="70*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Height="16" Grid.Column="0" Margin="8,0,0,0">Incident ID:</TextBlock>
+                <ComboBox x:Name="XmlIncidentIdNodeComboBox" Grid.Column="1" Margin="0,8,8,8" SelectionChanged="XmlIncidentIdNodeComboBox_SelectionChanged"></ComboBox>
+                <TextBlock Height="16" Grid.Column="2" Margin="0,0,0,0">Response Element:</TextBlock>
+                <ComboBox x:Name="XmlResponseNodeComboBox" Grid.Column="3" Margin="0,8,8,8" SelectionChanged="XmlResponseNodeComboBox_SelectionChanged"></ComboBox>
+                <TextBlock Height="16" Grid.Column="4" Margin="0,0,0,0">Response ID:</TextBlock>
+                <ComboBox x:Name="XmlResponseIdNodeComboBox" Grid.Column="5" Margin="0,8,8,8" SelectionChanged="XmlResponseIdNodeComboBox_SelectionChanged"></ComboBox>
+            </Grid>
+            <Grid Grid.Row="2">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="280*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Margin="10,0,0,0" FontSize="14">Summary</TextBlock>
+                    <avalonEdit:TextEditor x:Name="XmlSummaryTextBox" Grid.Row="1" Margin="8,0,8,0" Foreground="DarkSlateGray" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="WhiteSmoke">
+                        No data available...
+                    </avalonEdit:TextEditor>
+                </Grid>
+            </Grid>
+        </Grid>
+        <Grid x:Name="DailyDigestOptionsGrid" Grid.Row="1" Visibility="Hidden">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="40"/>
+                <RowDefinition Height="300*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="120*"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="98"/>
+                    <ColumnDefinition Width="70*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Height="16" Grid.Column="0" Margin="8,0,0,0">Folder:</TextBlock>
+                <TextBox x:Name="DailyDigestFolderNameTextBox" Height="24" Grid.Column="1" IsEnabled="False" Background="LightGray" VerticalContentAlignment="Center"></TextBox>
+                <Button x:Name="DailyDigestFolderSelectButton" Height="24" Grid.Column="2" Margin="8,0,8,0" Click="DailyDigestFolderSelectButton_Click">Select...</Button>
+                <TextBlock Height="16" Grid.Column="3" Margin="0,0,0,0">Incident Element:</TextBlock>
+                <ComboBox x:Name="DailyDigestIncidentNodeComboBox" Grid.Column="4" Margin="0,8,8,8" SelectionChanged="DailyDigestIncidentNodeComboBox_SelectionChanged"></ComboBox>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="76"/>
+                    <ColumnDefinition Width="70*"/>
+                    <ColumnDefinition Width="106"/>
+                    <ColumnDefinition Width="70*"/>
+                    <ColumnDefinition Width="74"/>
+                    <ColumnDefinition Width="70*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Height="16" Grid.Column="0" Margin="8,0,0,0">Incident ID:</TextBlock>
+                <ComboBox x:Name="DailyDigestIncidentIdNodeComboBox" Grid.Column="1" Margin="0,8,8,8" SelectionChanged="DailyDigestIncidentIdNodeComboBox_SelectionChanged"></ComboBox>
+                <TextBlock Height="16" Grid.Column="2" Margin="0,0,0,0">Response Element:</TextBlock>
+                <ComboBox x:Name="DailyDigestResponseNodeComboBox" Grid.Column="3" Margin="0,8,8,8" SelectionChanged="DailyDigestResponseNodeComboBox_SelectionChanged"></ComboBox>
+                <TextBlock Height="16" Grid.Column="4" Margin="0,0,0,0">Response ID:</TextBlock>
+                <ComboBox x:Name="DailyDigestResponseIdNodeComboBox" Grid.Column="5" Margin="0,8,8,8" SelectionChanged="DailyDigestResponseIdNodeComboBox_SelectionChanged"></ComboBox>
+            </Grid>
+        </Grid>
         <StackPanel x:Name="SqlOptionsPanel" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Stretch" Visibility="Hidden">
             <Button x:Name="ConnectButton" Width="80" Margin="8,8,0,8" Click="ConnectButton_Click">Connect</Button>
             <TextBlock x:Name="SqlStatusText" Margin="8,8,0,8" VerticalAlignment="Center">Disconnected</TextBlock>
@@ -165,7 +251,10 @@
             <CheckBox x:Name="EmbedCsvCheckBox" Margin="8,8,0,8" Click="EmbedCsvCheckBox_Click" VerticalContentAlignment="Center" ToolTip="Saves the CSV file as part of your DataMap">Embed CSV file in DataMap</CheckBox>
         </StackPanel>
         <StackPanel x:Name="GeoOptionsPanel" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Visibility="Hidden">
-            
+        </StackPanel>
+        <StackPanel x:Name="XmlOptionsPanel" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Visibility="Hidden">
+            <Button x:Name="SummarizeXmlButton" Width="80" Margin="8,8,0,8" Click="SummarizeXmlButton_Click">Summarize</Button>
+            <CheckBox x:Name="EmbedXmlCheckBox" Margin="8,8,0,8" Click="EmbedXmlCheckBox_Click" VerticalContentAlignment="Center" ToolTip="Saves the XML file as part of your DataMap">Embed XML file in DataMap</CheckBox>
         </StackPanel>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button x:Name="SaveButton" Width="80" Margin="0,8,0,8" Click="SaveButton_Click">Save</Button>

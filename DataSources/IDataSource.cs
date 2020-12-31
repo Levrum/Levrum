@@ -35,7 +35,7 @@ namespace Levrum.Data.Sources
         string ErrorMessage { get; }
     }
 
-    public enum DataSourceType { CsvSource, SqlSource, EmergencyReportingSource, GeoSource };
+    public enum DataSourceType { CsvSource, SqlSource, EmergencyReportingSource, GeoSource, XmlSource, DailyDigestXmlSource };
 
     public class IDataSourceConcreteClassConverter : DefaultContractResolver
     {
@@ -92,6 +92,14 @@ namespace Levrum.Data.Sources
                 else if (type == DataSourceType.GeoSource)
                 {
                     output = JsonConvert.DeserializeObject<GeoSource>(jo.ToString(), s_serializerSettings);
+                }
+                else if (type == DataSourceType.XmlSource)
+                {
+                    output = JsonConvert.DeserializeObject<XmlSource>(jo.ToString(), s_serializerSettings);
+                }
+                else if (type == DataSourceType.DailyDigestXmlSource)
+                {
+                    output = JsonConvert.DeserializeObject<DailyDigestXmlSource>(jo.ToString(), s_serializerSettings);
                 }
                 else
                 {

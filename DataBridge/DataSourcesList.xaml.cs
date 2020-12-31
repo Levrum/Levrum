@@ -83,6 +83,9 @@ namespace Levrum.DataBridge
                         } else if (newSource is GeoSource)
                         {
                             baseName = "Geo Source";
+                        } else if (newSource is XmlSource)
+                        {
+                            baseName = "XML Source";
                         }
 
                         int i = 1;
