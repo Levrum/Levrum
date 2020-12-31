@@ -36,7 +36,19 @@ namespace Levrum.UI.WinForms
             }
         }
 
-        public bool UnsavedWork { get; private set; } = false;
+        private bool m_unsavedWork = false;
+        public bool UnsavedWork
+        {
+            get
+            {
+                return m_unsavedWork;
+            }
+            set
+            {
+                m_unsavedWork = value;
+                m_btnSaveTree.Enabled = value;
+            }
+        }
         private string m_savePath;
 
         public bool SaveTreeToFile { get; set; } = true;
@@ -203,6 +215,8 @@ namespace Levrum.UI.WinForms
                     }                        
                 }
 
+                UnsavedWork = true;
+
                 m_flpOrganizedData.ResumeLayout();
                 foreach (Control control in parentControls)
                 {
@@ -225,6 +239,8 @@ namespace Levrum.UI.WinForms
 
         private void DeleteRecycledItems()
         {
+            m_btnUndoDelete.Visible = false;
+
             // Delete all dropped items
             foreach (DraggedData draggedData in m_recyclingBin)
             {
@@ -334,6 +350,8 @@ namespace Levrum.UI.WinForms
                 ICategoryData data = parentPanel.Tag as ICategoryData;
                 data.Children.Add(panelCatData);
             }
+
+            UnsavedWork = true;
 
             return newPanel;
         }
@@ -634,6 +652,8 @@ namespace Levrum.UI.WinForms
                     }
 
                     receivingPanelData.Values.Add(droppedData);
+
+                    UnsavedWork = true;
 
                     // Keep values on top and containers on bottom
                     List<Control> panels = new List<Control>();
@@ -965,6 +985,8 @@ namespace Levrum.UI.WinForms
 
         private void m_btnSaveTree_Click(object sender, EventArgs e)
         {
+            DeleteRecycledItems();
+
             if (m_savePath != null)
             {
                 SaveTree(m_savePath);
@@ -983,9 +1005,9 @@ namespace Levrum.UI.WinForms
             }
 
             List<ICategoryData> tree = ConvertToTree();
-            if (!tree?.Any() ?? true)
+            if (tree is null)
             {
-                return;
+                throw new Exception("Tree is null");
             }
 
             if (SaveTreeToFile)
@@ -1529,7 +1551,10 @@ namespace Levrum.UI.WinForms
                 LogHelper.LogException(ex);
                 return;
             }
+
             LoadTree(tree, m_flpOrganizedData);
+
+            m_savePath = fileName;
         }
 
         private void SubPanel_Paint(object sender, PaintEventArgs e)
