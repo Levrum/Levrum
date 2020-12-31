@@ -35,6 +35,7 @@ namespace Levrum.Data.Sources
 
         public string IDColumn { get; set; }
         public string ResponseIDColumn { get; set; }
+        public string DateColumn { get;set; }
 
         private FileInfo s_file = null;
 
@@ -129,6 +130,10 @@ namespace Levrum.Data.Sources
 
         public List<Record> GetRecords()
         {
+            return new List<Record>();
+        }
+
+        public List<Record> GetRecords(DateTime startDate, DateTime endDate) {
             return new List<Record>();
         }
 
