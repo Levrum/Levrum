@@ -21,6 +21,8 @@ namespace Levrum.Data.Sources
         public string ResponseNode { get; set; }
         public string ResponseIDColumn { get; set; } = "";
 
+        public string DateColumn { get;set; } = "";
+
         static readonly string[] s_requiredParameters = new string[] { "Directory" };
 
         [JsonIgnore]
@@ -154,7 +156,11 @@ namespace Levrum.Data.Sources
             }
         }
 
-        public List<Record> GetRecords()
+        public List<Record> GetRecords() {
+            return GetRecords(DateTime.MinValue, DateTime.MaxValue);
+        }
+
+        public List<Record> GetRecords(DateTime startDate, DateTime endDate)
         {
             try
             {

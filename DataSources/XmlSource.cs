@@ -27,6 +27,8 @@ namespace Levrum.Data.Sources
         public string ResponseNode { get; set; } = "";
         public string ResponseIDColumn { get; set; } = "";
         
+        public string DateColumn { get;set; } = "";
+
         public string ErrorMessage {  get { return (m_sErrorMessage); } }
         private string m_sErrorMessage = "Error messages not implemented for type XmlSource";
 
@@ -165,7 +167,11 @@ namespace Levrum.Data.Sources
             }
         }
 
-        public List<Record> GetRecords()
+        public List<Record> GetRecords() {
+            return GetRecords(DateTime.MinValue, DateTime.MaxValue);
+        }
+
+        public List<Record> GetRecords(DateTime startDate, DateTime endDate)
         {
             Stream stream = null;
             try
