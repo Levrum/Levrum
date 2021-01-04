@@ -1133,6 +1133,8 @@ namespace Levrum.UI.WinForms
                     }
                 }
             }
+
+            UpdateUnorganizedPanel();
         }
 
         private void MarkBlocksInTreeAsAdded(List<ICategoryData> tree)
@@ -1200,7 +1202,9 @@ namespace Levrum.UI.WinForms
                         blockToMark.Image = null;
                     }
                 }
-            }            
+            }
+
+            UpdateUnorganizedPanel();
         }
 
         private void MarkValueBlockAsNotAdded(ICategorizedValue valueBlockData)
@@ -1217,6 +1221,8 @@ namespace Levrum.UI.WinForms
                     }
                 }
             }
+
+            UpdateUnorganizedPanel();
         }
 
         private void MarkAllValueBlocksAsNotAdded()
@@ -1763,36 +1769,66 @@ namespace Levrum.UI.WinForms
             m_recyclingBin.Clear();            
         }
 
-        private void m_cbOnlyUnadded_Click(object sender, EventArgs e)
+        private void HideAddedBlocks()
         {
             m_flpUnorganizedData.SuspendLayout();
 
-            if (m_cbOnlyUnadded.Checked)
+            foreach (Control control in m_flpUnorganizedData.Controls)
             {
-                foreach (Control control in m_flpUnorganizedData.Controls)
-                {
-                    Button button = control as Button;
-                    if (button == null)
-                        continue;
+                Button button = control as Button;
+                if (button == null)
+                    continue;
 
-                    if (button.Image != null)
-                    {
-                        button.Visible = false;
-                    }
-                }
-            }
-            else
-            {
-                foreach (Control control in m_flpUnorganizedData.Controls)
+                if (button.Image != null)
                 {
-                    if (!(control is Button))
-                        continue;
-
-                    control.Visible = true;
+                    button.Visible = false;
                 }
             }
 
             m_flpUnorganizedData.ResumeLayout();
+        }
+
+        private void ShowAddedBlocks()
+        {
+            m_flpUnorganizedData.SuspendLayout();
+
+            foreach (Control control in m_flpUnorganizedData.Controls)
+            {
+                if (!(control is Button))
+                    continue;
+
+                control.Visible = true;
+            }
+
+            m_flpUnorganizedData.ResumeLayout();
+        }
+
+        private void UpdateUnorganizedPanel()
+        {
+            bool hideAdded = m_cbOnlyUnadded.Checked;
+
+            m_flpUnorganizedData.SuspendLayout();
+            foreach (Control control in m_flpUnorganizedData.Controls)
+            {
+                Button button = control as Button;
+                if (button == null)
+                    continue;
+
+                if (button.Image == null)
+                {
+                    button.Visible = true;
+                }
+                else
+                {
+                    button.Visible = !hideAdded;
+                }
+            }
+            m_flpUnorganizedData.ResumeLayout();
+        }
+        
+        private void m_cbOnlyUnadded_Click(object sender, EventArgs e)
+        {
+            UpdateUnorganizedPanel();
         }
 
         private void m_flpOrganizedData_ControlAdded(object sender, ControlEventArgs e)
