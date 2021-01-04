@@ -205,15 +205,44 @@ namespace Levrum.UI.WinForms
                 }
 
                 m_recyclingBin = allDraggedData;
+                m_flpUnorganizedData.SuspendLayout();
                 foreach (DraggedData draggedData in allDraggedData)
                 {
                     draggedData.Control.Visible = false;
 
+                    HashSet<Button> allOrganizedBlocks = GetControlDescendants(m_flpOrganizedData)
+                            .Select(c => c as Button)
+                            .Where(b => b?.Tag != null)
+                            .ToHashSet();
                     if (draggedData.Control is Button)
                     {
-                        MarkValueBlockAsNotAdded(draggedData.Control as Button);
+                        var draggedDataValue = (draggedData.Data as ICategorizedValue).Value;
+                        allOrganizedBlocks.Remove(draggedData.Control as Button);
+                        HashSet<string> allOrganizedBlockValues = allOrganizedBlocks.Select(b => (b.Tag as ICategorizedValue).Value).ToHashSet();
+                        if (!allOrganizedBlockValues.Contains(draggedDataValue))
+                        {
+                            MarkValueBlockAsNotAdded(draggedData.Control as Button);
+                        }
                     }                        
+                    else if (draggedData.Control is FlowLayoutPanel)
+                    {                        
+                        HashSet<Button> allDraggedBlocks = GetControlDescendants(draggedData.Control)
+                            .Select(c => c as Button)
+                            .Where(b => b?.Tag != null)
+                            .ToHashSet();
+                        allOrganizedBlocks.RemoveWhere(b => allDraggedBlocks.Contains(b));
+                        HashSet<string> allOrganizedBlockValues = allOrganizedBlocks.Select(b => (b.Tag as ICategorizedValue).Value).ToHashSet();
+                        foreach (var draggedBlock in allDraggedBlocks)
+                        {
+                            if (!allOrganizedBlockValues.Contains((draggedBlock.Tag as ICategorizedValue).Value))
+                            {
+                                MarkValueBlockAsNotAdded(draggedBlock);
+                            }
+                        }
+                        
+                    }
                 }
+                m_flpUnorganizedData.ResumeLayout();
 
                 UnsavedWork = true;
 
@@ -623,6 +652,7 @@ namespace Levrum.UI.WinForms
                                     if (data.Control.Tag == droppedData)
                                     {
                                         m_recyclingBin.Remove(data);
+                                        MarkValueBlockAsAdded(data.Data as ICategorizedValue);
                                         if (!m_recyclingBin.Any())
                                         {
                                             m_btnUndoDelete.Visible = false;
@@ -1137,6 +1167,25 @@ namespace Levrum.UI.WinForms
             }
         }
 
+        private void MarkValueBlocksInTreeAsNotAdded(List<ICategoryData> tree)
+        {
+            m_flpUnorganizedData.SuspendLayout();
+
+            foreach (var catData in tree)
+            {
+                foreach (var catValue in catData.Values)
+                {
+                    MarkValueBlockAsNotAdded(catValue);
+                }
+                if (catData.Children?.Any() ?? false)
+                {
+                    MarkValueBlocksInTreeAsNotAdded(catData.Children);
+                }
+            }
+
+            m_flpUnorganizedData.ResumeLayout();
+        }
+
         private void MarkValueBlockAsNotAdded(Button valueBlock)
         {
             foreach (Control control in m_flpUnorganizedData.Controls)
@@ -1144,12 +1193,30 @@ namespace Levrum.UI.WinForms
                 if (control is Button)
                 {
                     Button blockToMark = control as Button;
-                    if (blockToMark.Tag == valueBlock.Tag)
+                    ICategorizedValue blockToMarkData = blockToMark.Tag as ICategorizedValue;
+                    ICategorizedValue valueBlockData = valueBlock.Tag as ICategorizedValue;
+                    if (blockToMarkData.Value == valueBlockData.Value)
                     {
                         blockToMark.Image = null;
                     }
                 }
             }            
+        }
+
+        private void MarkValueBlockAsNotAdded(ICategorizedValue valueBlockData)
+        {
+            foreach (Control control in m_flpUnorganizedData.Controls)
+            {
+                if (control is Button)
+                {
+                    Button blockToMark = control as Button;
+                    ICategorizedValue blockToMarkData = blockToMark.Tag as ICategorizedValue;
+                    if (blockToMarkData.Value == valueBlockData.Value)
+                    {
+                        blockToMark.Image = null;
+                    }
+                }
+            }
         }
 
         private void MarkAllValueBlocksAsNotAdded()
@@ -1668,6 +1735,11 @@ namespace Levrum.UI.WinForms
 
         private void m_btnUndoDelete_Click(object sender, EventArgs e)
         {
+            m_undoDeleteTimer.Enabled = false;
+            m_btnUndoDelete.Visible = false;
+
+            m_flpOrganizedData.SuspendLayout();
+            m_flpUnorganizedData.SuspendLayout();
             foreach (DraggedData draggedData in m_recyclingBin)
             {
                 draggedData.Control.Visible = true;
@@ -1675,11 +1747,20 @@ namespace Levrum.UI.WinForms
                 if (draggedData.Control is Button)
                 {
                     MarkValueBlockAsAdded(draggedData.Control as Button);
-                }                
+                }
+                else if (draggedData.Control is FlowLayoutPanel)
+                {
+                    var catData = draggedData.Data as ICategoryData;
+                    foreach (var value in catData.Values)
+                    {
+                        MarkValueBlockAsAdded(value);
+                    }
+                    MarkBlocksInTreeAsAdded(catData.Children);
+                }
             }
-            m_recyclingBin.Clear();
-            m_btnUndoDelete.Visible = false;
-            m_undoDeleteTimer.Enabled = false;
+            m_flpUnorganizedData.ResumeLayout();
+            m_flpOrganizedData.ResumeLayout();
+            m_recyclingBin.Clear();            
         }
 
         private void m_cbOnlyUnadded_Click(object sender, EventArgs e)
@@ -1723,6 +1804,21 @@ namespace Levrum.UI.WinForms
         private void button1_Click(object sender, EventArgs e)
         {
             SaveTree();
+        }
+
+        private List<Control> GetControlDescendants(Control control)
+        {
+            List<Control> descendants = new List<Control>();
+            /*if (control.Controls.Count < 1)
+            {
+                return descendants;
+            }*/
+            foreach (Control child in control.Controls)
+            {
+                descendants.Add(child);
+                descendants.AddRange(GetControlDescendants(child));
+            }
+            return descendants;
         }
     }
 }
