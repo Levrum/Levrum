@@ -28,6 +28,15 @@ namespace Levrum.UI.WinForms
             }
         }
 
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == (Keys.Control | Keys.S) && UnsavedWork)
+            {
+                SaveTree(m_savePath);
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
         public List<ICategoryData> Tree
         {
             get
