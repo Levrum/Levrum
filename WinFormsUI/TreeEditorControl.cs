@@ -56,6 +56,7 @@ namespace Levrum.UI.WinForms
             {
                 m_unsavedWork = value;
                 m_btnSaveTree.Enabled = value;
+                m_labelTreeSaved.Visible = !value;
             }
         }
         private string m_savePath;
@@ -1077,8 +1078,6 @@ namespace Levrum.UI.WinForms
                 {
                     MessageBox.Show("Could not save tree.");
                 }
-
-                MessageBox.Show("Successfully Saved Tree!");
             }
             OnSaveTree?.Invoke(tree);
         }

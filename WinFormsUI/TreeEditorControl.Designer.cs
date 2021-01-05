@@ -45,6 +45,7 @@
             this.m_lbDataFields = new System.Windows.Forms.ListBox();
             this.m_labelDataFieldsHeader = new System.Windows.Forms.Label();
             this.m_btnSaveAs = new System.Windows.Forms.Button();
+            this.m_labelTreeSaved = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.m_scMain)).BeginInit();
             this.m_scMain.Panel1.SuspendLayout();
             this.m_scMain.Panel2.SuspendLayout();
@@ -74,7 +75,7 @@
             this.m_scMain.Panel2.Controls.Add(this.m_cbOnlyUnadded);
             this.m_scMain.Panel2.Controls.Add(this.m_pDelete);
             this.m_scMain.Panel2.Controls.Add(this.m_flpUnorganizedData);
-            this.m_scMain.Size = new System.Drawing.Size(847, 473);
+            this.m_scMain.Size = new System.Drawing.Size(847, 461);
             this.m_scMain.SplitterDistance = 496;
             this.m_scMain.TabIndex = 0;
             // 
@@ -91,7 +92,7 @@
             this.m_flpOrganizedData.ForeColor = System.Drawing.SystemColors.ControlText;
             this.m_flpOrganizedData.Location = new System.Drawing.Point(0, 0);
             this.m_flpOrganizedData.Name = "m_flpOrganizedData";
-            this.m_flpOrganizedData.Size = new System.Drawing.Size(496, 473);
+            this.m_flpOrganizedData.Size = new System.Drawing.Size(496, 461);
             this.m_flpOrganizedData.TabIndex = 0;
             this.m_flpOrganizedData.Click += new System.EventHandler(this.OrganizedData_Click);
             this.m_flpOrganizedData.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.m_flpOrganizedData_ControlAdded);
@@ -125,7 +126,7 @@
             this.m_btnUndoDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.m_btnUndoDelete.ForeColor = System.Drawing.Color.LightGray;
             this.m_btnUndoDelete.Image = global::Levrum.UI.WinForms.Properties.Resources.undo;
-            this.m_btnUndoDelete.Location = new System.Drawing.Point(-3, 441);
+            this.m_btnUndoDelete.Location = new System.Drawing.Point(-3, 429);
             this.m_btnUndoDelete.Name = "m_btnUndoDelete";
             this.m_btnUndoDelete.Size = new System.Drawing.Size(347, 32);
             this.m_btnUndoDelete.TabIndex = 4;
@@ -155,7 +156,7 @@
             this.m_pDelete.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_pDelete.Location = new System.Drawing.Point(0, 0);
             this.m_pDelete.Name = "m_pDelete";
-            this.m_pDelete.Size = new System.Drawing.Size(347, 473);
+            this.m_pDelete.Size = new System.Drawing.Size(347, 461);
             this.m_pDelete.TabIndex = 1;
             this.m_pDelete.Visible = false;
             this.m_pDelete.DragDrop += new System.Windows.Forms.DragEventHandler(this.DeletePanel_DragDrop);
@@ -165,7 +166,7 @@
             // 
             this.pictureBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.pictureBox1.Image = global::Levrum.UI.WinForms.Properties.Resources.delete;
-            this.pictureBox1.Location = new System.Drawing.Point(123, 187);
+            this.pictureBox1.Location = new System.Drawing.Point(123, 181);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(100, 99);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
@@ -184,7 +185,7 @@
             this.m_flpUnorganizedData.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.m_flpUnorganizedData.Location = new System.Drawing.Point(0, 27);
             this.m_flpUnorganizedData.Name = "m_flpUnorganizedData";
-            this.m_flpUnorganizedData.Size = new System.Drawing.Size(347, 446);
+            this.m_flpUnorganizedData.Size = new System.Drawing.Size(347, 434);
             this.m_flpUnorganizedData.TabIndex = 1;
             this.m_flpUnorganizedData.Click += new System.EventHandler(this.UnorganizedData_Click);
             this.m_flpUnorganizedData.DragDrop += new System.Windows.Forms.DragEventHandler(this.DeletePanel_DragDrop);
@@ -195,7 +196,7 @@
             this.m_btnSaveTree.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.m_btnSaveTree.AutoSize = true;
             this.m_btnSaveTree.Enabled = false;
-            this.m_btnSaveTree.Location = new System.Drawing.Point(19, 487);
+            this.m_btnSaveTree.Location = new System.Drawing.Point(19, 476);
             this.m_btnSaveTree.Name = "m_btnSaveTree";
             this.m_btnSaveTree.Size = new System.Drawing.Size(59, 23);
             this.m_btnSaveTree.TabIndex = 2;
@@ -207,7 +208,7 @@
             // 
             this.m_btnLoadIncidents.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.m_btnLoadIncidents.AutoSize = true;
-            this.m_btnLoadIncidents.Location = new System.Drawing.Point(719, 487);
+            this.m_btnLoadIncidents.Location = new System.Drawing.Point(713, 477);
             this.m_btnLoadIncidents.Name = "m_btnLoadIncidents";
             this.m_btnLoadIncidents.Size = new System.Drawing.Size(108, 23);
             this.m_btnLoadIncidents.TabIndex = 3;
@@ -219,7 +220,7 @@
             // 
             this.m_cbDefaultTree.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.m_cbDefaultTree.FormattingEnabled = true;
-            this.m_cbDefaultTree.Location = new System.Drawing.Point(150, 487);
+            this.m_cbDefaultTree.Location = new System.Drawing.Point(149, 478);
             this.m_cbDefaultTree.Name = "m_cbDefaultTree";
             this.m_cbDefaultTree.Size = new System.Drawing.Size(121, 21);
             this.m_cbDefaultTree.TabIndex = 4;
@@ -242,7 +243,7 @@
             this.m_lbDataFields.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
             this.m_lbDataFields.FormattingEnabled = true;
             this.m_lbDataFields.ItemHeight = 15;
-            this.m_lbDataFields.Location = new System.Drawing.Point(629, 323);
+            this.m_lbDataFields.Location = new System.Drawing.Point(612, 307);
             this.m_lbDataFields.Name = "m_lbDataFields";
             this.m_lbDataFields.Size = new System.Drawing.Size(210, 154);
             this.m_lbDataFields.TabIndex = 5;
@@ -254,7 +255,7 @@
             this.m_labelDataFieldsHeader.BackColor = System.Drawing.Color.White;
             this.m_labelDataFieldsHeader.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.m_labelDataFieldsHeader.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_labelDataFieldsHeader.Location = new System.Drawing.Point(629, 302);
+            this.m_labelDataFieldsHeader.Location = new System.Drawing.Point(612, 286);
             this.m_labelDataFieldsHeader.Name = "m_labelDataFieldsHeader";
             this.m_labelDataFieldsHeader.Size = new System.Drawing.Size(210, 18);
             this.m_labelDataFieldsHeader.TabIndex = 6;
@@ -266,7 +267,7 @@
             this.m_btnSaveAs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.m_btnSaveAs.AutoSize = true;
             this.m_btnSaveAs.Enabled = false;
-            this.m_btnSaveAs.Location = new System.Drawing.Point(84, 487);
+            this.m_btnSaveAs.Location = new System.Drawing.Point(84, 476);
             this.m_btnSaveAs.Name = "m_btnSaveAs";
             this.m_btnSaveAs.Size = new System.Drawing.Size(59, 23);
             this.m_btnSaveAs.TabIndex = 7;
@@ -274,10 +275,23 @@
             this.m_btnSaveAs.UseVisualStyleBackColor = true;
             this.m_btnSaveAs.Click += new System.EventHandler(this.button1_Click);
             // 
+            // m_labelTreeSaved
+            // 
+            this.m_labelTreeSaved.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.m_labelTreeSaved.AutoSize = true;
+            this.m_labelTreeSaved.ForeColor = System.Drawing.Color.Green;
+            this.m_labelTreeSaved.Location = new System.Drawing.Point(18, 503);
+            this.m_labelTreeSaved.Name = "m_labelTreeSaved";
+            this.m_labelTreeSaved.Size = new System.Drawing.Size(125, 13);
+            this.m_labelTreeSaved.TabIndex = 8;
+            this.m_labelTreeSaved.Text = "Tree Saved Successfully";
+            this.m_labelTreeSaved.Visible = false;
+            // 
             // TreeEditorControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.m_labelTreeSaved);
             this.Controls.Add(this.m_btnSaveAs);
             this.Controls.Add(this.m_cbDefaultTree);
             this.Controls.Add(this.m_labelDataFieldsHeader);
@@ -324,5 +338,6 @@
         private System.Windows.Forms.CheckBox m_cbOnlyUnadded;
         private System.Windows.Forms.Button m_btnUndoDelete;
         private System.Windows.Forms.Button m_btnSaveAs;
+        private System.Windows.Forms.Label m_labelTreeSaved;
     }
 }
