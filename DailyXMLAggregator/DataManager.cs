@@ -214,7 +214,7 @@ namespace DailyXMLAggregator
         /// <returns></returns>
         private static FileInfo GetDigestFile(DateTime date)
         {
-            string fileName = $"{date.Month}-{date.Day}-{date.Year}.xml";
+            string fileName = $"{date.Year}-{date.Month}-{date.Day}.xml";
             string filePath = Path.Combine(ConfigurationManager.ArchiveDirectory.FullName, fileName);
             FileInfo file = new FileInfo(filePath);
             if (!file.Exists)
