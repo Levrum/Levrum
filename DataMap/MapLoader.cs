@@ -128,6 +128,23 @@ namespace Levrum.Data.Map
                     return false;
 
                 executePostProcessing();
+
+                if (Cancelling())
+                    return false;
+
+                DateTime firstIncident = DateTime.MaxValue;
+                DateTime lastIncident = DateTime.MinValue;
+                foreach (IncidentData incident in Incidents)
+                {
+                    if (incident.Time != DateTime.MinValue)
+                    {
+                        firstIncident = incident.Time < firstIncident ? incident.Time : firstIncident;
+                        lastIncident = incident.Time > lastIncident ? incident.Time : lastIncident;
+                    }
+                }
+
+                Incidents.Data.SetValue("FirstIncident", firstIncident);
+                Incidents.Data.SetValue("LastIncident", lastIncident);
             }
             finally
             {
@@ -147,6 +164,45 @@ namespace Levrum.Data.Map
             return true;
         }
 
+        public bool LoadMapAndAppend(DataMap map, DataSet<IncidentData> lastIncidents)
+        {
+            if (lastIncidents.Data.ContainsKey("FirstIncident") && lastIncidents.Data["FirstIncident"] is DateTime)
+            {
+                StartDate = (DateTime)lastIncidents.Data["FirstIncident"];
+            }
+
+            if (lastIncidents.Data.ContainsKey("LastIncident") && lastIncidents.Data["LastIncident"] is DateTime)
+            {
+                EndDate = (DateTime)lastIncidents.Data["LastIncident"];
+            }
+
+            bool success = LoadMap(map);
+            if (!success)
+            {
+                return false;
+            }
+
+            DataSet<IncidentData> loaderOutput = Incidents;
+            Incidents = new DataSet<IncidentData>();
+            Incidents.AddRange(lastIncidents);
+            Incidents.AddRange(loaderOutput);
+
+            DateTime firstIncident = DateTime.MaxValue;
+            DateTime lastIncident = DateTime.MinValue;
+            foreach (IncidentData incident in Incidents)
+            {
+                if (incident.Time != DateTime.MinValue) {
+                    firstIncident = incident.Time < firstIncident ? incident.Time : firstIncident;
+                    lastIncident = incident.Time > lastIncident ? incident.Time : lastIncident;
+                }
+            }
+
+            Incidents.Data.SetValue("FirstIncident", firstIncident);
+            Incidents.Data.SetValue("LastIncident", lastIncident);
+
+            return true;
+        }
+        
         public bool Cancelling()
         {
             if (Worker == null)
