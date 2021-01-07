@@ -28,6 +28,15 @@ namespace Levrum.UI.WinForms
             }
         }
 
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == (Keys.Control | Keys.S) && UnsavedWork)
+            {
+                SaveTree(m_savePath);
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
         public List<ICategoryData> Tree
         {
             get
@@ -36,7 +45,20 @@ namespace Levrum.UI.WinForms
             }
         }
 
-        public bool UnsavedWork { get; private set; } = false;
+        private bool m_unsavedWork = false;
+        public bool UnsavedWork
+        {
+            get
+            {
+                return m_unsavedWork;
+            }
+            set
+            {
+                m_unsavedWork = value;
+                m_btnSaveTree.Enabled = value;
+                m_labelTreeSaved.Visible = !value;
+            }
+        }
         private string m_savePath;
 
         public bool SaveTreeToFile { get; set; } = true;
@@ -193,15 +215,46 @@ namespace Levrum.UI.WinForms
                 }
 
                 m_recyclingBin = allDraggedData;
+                m_flpUnorganizedData.SuspendLayout();
                 foreach (DraggedData draggedData in allDraggedData)
                 {
                     draggedData.Control.Visible = false;
 
+                    HashSet<Button> allOrganizedBlocks = GetControlDescendants(m_flpOrganizedData)
+                            .Select(c => c as Button)
+                            .Where(b => b?.Tag != null)
+                            .ToHashSet();
                     if (draggedData.Control is Button)
                     {
-                        MarkValueBlockAsNotAdded(draggedData.Control as Button);
+                        var draggedDataValue = (draggedData.Data as ICategorizedValue).Value;
+                        allOrganizedBlocks.Remove(draggedData.Control as Button);
+                        HashSet<string> allOrganizedBlockValues = allOrganizedBlocks.Select(b => (b.Tag as ICategorizedValue).Value).ToHashSet();
+                        if (!allOrganizedBlockValues.Contains(draggedDataValue))
+                        {
+                            MarkValueBlockAsNotAdded(draggedData.Control as Button);
+                        }
                     }                        
+                    else if (draggedData.Control is FlowLayoutPanel)
+                    {                        
+                        HashSet<Button> allDraggedBlocks = GetControlDescendants(draggedData.Control)
+                            .Select(c => c as Button)
+                            .Where(b => b?.Tag != null)
+                            .ToHashSet();
+                        allOrganizedBlocks.RemoveWhere(b => allDraggedBlocks.Contains(b));
+                        HashSet<string> allOrganizedBlockValues = allOrganizedBlocks.Select(b => (b.Tag as ICategorizedValue).Value).ToHashSet();
+                        foreach (var draggedBlock in allDraggedBlocks)
+                        {
+                            if (!allOrganizedBlockValues.Contains((draggedBlock.Tag as ICategorizedValue).Value))
+                            {
+                                MarkValueBlockAsNotAdded(draggedBlock);
+                            }
+                        }
+                        
+                    }
                 }
+                m_flpUnorganizedData.ResumeLayout();
+
+                UnsavedWork = true;
 
                 m_flpOrganizedData.ResumeLayout();
                 foreach (Control control in parentControls)
@@ -225,6 +278,8 @@ namespace Levrum.UI.WinForms
 
         private void DeleteRecycledItems()
         {
+            m_btnUndoDelete.Visible = false;
+
             // Delete all dropped items
             foreach (DraggedData draggedData in m_recyclingBin)
             {
@@ -334,6 +389,8 @@ namespace Levrum.UI.WinForms
                 ICategoryData data = parentPanel.Tag as ICategoryData;
                 data.Children.Add(panelCatData);
             }
+
+            UnsavedWork = true;
 
             return newPanel;
         }
@@ -600,6 +657,19 @@ namespace Levrum.UI.WinForms
                         {
                             if (control.Tag == droppedData)
                             {
+                                foreach (var data in m_recyclingBin)
+                                {
+                                    if (data.Control.Tag == droppedData)
+                                    {
+                                        m_recyclingBin.Remove(data);
+                                        MarkValueBlockAsAdded(data.Data as ICategorizedValue);
+                                        if (!m_recyclingBin.Any())
+                                        {
+                                            m_btnUndoDelete.Visible = false;
+                                        }
+                                        break;
+                                    }
+                                }
                                 control.Visible = true;
                                 break;
                             }
@@ -622,6 +692,8 @@ namespace Levrum.UI.WinForms
                     }
 
                     receivingPanelData.Values.Add(droppedData);
+
+                    UnsavedWork = true;
 
                     // Keep values on top and containers on bottom
                     List<Control> panels = new List<Control>();
@@ -953,6 +1025,8 @@ namespace Levrum.UI.WinForms
 
         private void m_btnSaveTree_Click(object sender, EventArgs e)
         {
+            DeleteRecycledItems();
+
             if (m_savePath != null)
             {
                 SaveTree(m_savePath);
@@ -971,9 +1045,9 @@ namespace Levrum.UI.WinForms
             }
 
             List<ICategoryData> tree = ConvertToTree();
-            if (!tree?.Any() ?? true)
+            if (tree is null)
             {
-                return;
+                throw new Exception("Tree is null");
             }
 
             if (SaveTreeToFile)
@@ -1004,8 +1078,6 @@ namespace Levrum.UI.WinForms
                 {
                     MessageBox.Show("Could not save tree.");
                 }
-
-                MessageBox.Show("Successfully Saved Tree!");
             }
             OnSaveTree?.Invoke(tree);
         }
@@ -1069,6 +1141,8 @@ namespace Levrum.UI.WinForms
                     }
                 }
             }
+
+            UpdateUnorganizedPanel();
         }
 
         private void MarkBlocksInTreeAsAdded(List<ICategoryData> tree)
@@ -1103,6 +1177,25 @@ namespace Levrum.UI.WinForms
             }
         }
 
+        private void MarkValueBlocksInTreeAsNotAdded(List<ICategoryData> tree)
+        {
+            m_flpUnorganizedData.SuspendLayout();
+
+            foreach (var catData in tree)
+            {
+                foreach (var catValue in catData.Values)
+                {
+                    MarkValueBlockAsNotAdded(catValue);
+                }
+                if (catData.Children?.Any() ?? false)
+                {
+                    MarkValueBlocksInTreeAsNotAdded(catData.Children);
+                }
+            }
+
+            m_flpUnorganizedData.ResumeLayout();
+        }
+
         private void MarkValueBlockAsNotAdded(Button valueBlock)
         {
             foreach (Control control in m_flpUnorganizedData.Controls)
@@ -1110,12 +1203,34 @@ namespace Levrum.UI.WinForms
                 if (control is Button)
                 {
                     Button blockToMark = control as Button;
-                    if (blockToMark.Tag == valueBlock.Tag)
+                    ICategorizedValue blockToMarkData = blockToMark.Tag as ICategorizedValue;
+                    ICategorizedValue valueBlockData = valueBlock.Tag as ICategorizedValue;
+                    if (blockToMarkData.Value == valueBlockData.Value)
                     {
                         blockToMark.Image = null;
                     }
                 }
-            }            
+            }
+
+            UpdateUnorganizedPanel();
+        }
+
+        private void MarkValueBlockAsNotAdded(ICategorizedValue valueBlockData)
+        {
+            foreach (Control control in m_flpUnorganizedData.Controls)
+            {
+                if (control is Button)
+                {
+                    Button blockToMark = control as Button;
+                    ICategorizedValue blockToMarkData = blockToMark.Tag as ICategorizedValue;
+                    if (blockToMarkData.Value == valueBlockData.Value)
+                    {
+                        blockToMark.Image = null;
+                    }
+                }
+            }
+
+            UpdateUnorganizedPanel();
         }
 
         private void MarkAllValueBlocksAsNotAdded()
@@ -1232,7 +1347,7 @@ namespace Levrum.UI.WinForms
             bool seenOne = false;
             foreach (Control control in container.Controls)
             {
-                if (!(control is Button))
+                if (!(control is Button) || !control.Visible)
                 {
                     continue;
                 }
@@ -1517,7 +1632,10 @@ namespace Levrum.UI.WinForms
                 LogHelper.LogException(ex);
                 return;
             }
+
             LoadTree(tree, m_flpOrganizedData);
+
+            m_savePath = fileName;
         }
 
         private void SubPanel_Paint(object sender, PaintEventArgs e)
@@ -1631,6 +1749,11 @@ namespace Levrum.UI.WinForms
 
         private void m_btnUndoDelete_Click(object sender, EventArgs e)
         {
+            m_undoDeleteTimer.Enabled = false;
+            m_btnUndoDelete.Visible = false;
+
+            m_flpOrganizedData.SuspendLayout();
+            m_flpUnorganizedData.SuspendLayout();
             foreach (DraggedData draggedData in m_recyclingBin)
             {
                 draggedData.Control.Visible = true;
@@ -1638,43 +1761,82 @@ namespace Levrum.UI.WinForms
                 if (draggedData.Control is Button)
                 {
                     MarkValueBlockAsAdded(draggedData.Control as Button);
-                }                
+                }
+                else if (draggedData.Control is FlowLayoutPanel)
+                {
+                    var catData = draggedData.Data as ICategoryData;
+                    foreach (var value in catData.Values)
+                    {
+                        MarkValueBlockAsAdded(value);
+                    }
+                    MarkBlocksInTreeAsAdded(catData.Children);
+                }
             }
-            m_recyclingBin.Clear();
-            m_btnUndoDelete.Visible = false;
-            m_undoDeleteTimer.Enabled = false;
+            m_flpUnorganizedData.ResumeLayout();
+            m_flpOrganizedData.ResumeLayout();
+            m_recyclingBin.Clear();            
         }
 
-        private void m_cbOnlyUnadded_Click(object sender, EventArgs e)
+        private void HideAddedBlocks()
         {
             m_flpUnorganizedData.SuspendLayout();
 
-            if (m_cbOnlyUnadded.Checked)
+            foreach (Control control in m_flpUnorganizedData.Controls)
             {
-                foreach (Control control in m_flpUnorganizedData.Controls)
-                {
-                    Button button = control as Button;
-                    if (button == null)
-                        continue;
+                Button button = control as Button;
+                if (button == null)
+                    continue;
 
-                    if (button.Image != null)
-                    {
-                        button.Visible = false;
-                    }
-                }
-            }
-            else
-            {
-                foreach (Control control in m_flpUnorganizedData.Controls)
+                if (button.Image != null)
                 {
-                    if (!(control is Button))
-                        continue;
-
-                    control.Visible = true;
+                    button.Visible = false;
                 }
             }
 
             m_flpUnorganizedData.ResumeLayout();
+        }
+
+        private void ShowAddedBlocks()
+        {
+            m_flpUnorganizedData.SuspendLayout();
+
+            foreach (Control control in m_flpUnorganizedData.Controls)
+            {
+                if (!(control is Button))
+                    continue;
+
+                control.Visible = true;
+            }
+
+            m_flpUnorganizedData.ResumeLayout();
+        }
+
+        private void UpdateUnorganizedPanel()
+        {
+            bool hideAdded = m_cbOnlyUnadded.Checked;
+
+            m_flpUnorganizedData.SuspendLayout();
+            foreach (Control control in m_flpUnorganizedData.Controls)
+            {
+                Button button = control as Button;
+                if (button == null)
+                    continue;
+
+                if (button.Image == null)
+                {
+                    button.Visible = true;
+                }
+                else
+                {
+                    button.Visible = !hideAdded;
+                }
+            }
+            m_flpUnorganizedData.ResumeLayout();
+        }
+        
+        private void m_cbOnlyUnadded_Click(object sender, EventArgs e)
+        {
+            UpdateUnorganizedPanel();
         }
 
         private void m_flpOrganizedData_ControlAdded(object sender, ControlEventArgs e)
@@ -1686,6 +1848,21 @@ namespace Levrum.UI.WinForms
         private void button1_Click(object sender, EventArgs e)
         {
             SaveTree();
+        }
+
+        private List<Control> GetControlDescendants(Control control)
+        {
+            List<Control> descendants = new List<Control>();
+            /*if (control.Controls.Count < 1)
+            {
+                return descendants;
+            }*/
+            foreach (Control child in control.Controls)
+            {
+                descendants.Add(child);
+                descendants.AddRange(GetControlDescendants(child));
+            }
+            return descendants;
         }
     }
 }
