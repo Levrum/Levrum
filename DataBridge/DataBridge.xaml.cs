@@ -837,6 +837,17 @@ namespace Levrum.DataBridge
                     return;
                 }
                 file = new FileInfo(sfd.FileName);
+
+                bool appendData = false;
+                if (file.Exists)
+                {
+                    MessageBoxResult result = MessageBox.Show("Do you want to append to this existing DataSet if possible?", "Append to DataSet?", MessageBoxButton.YesNoCancel);
+                    if (result == MessageBoxResult.Cancel)
+                        return;
+
+                    appendData = result == MessageBoxResult.Yes;
+                }
+
                 Cursor = Cursors.Wait;
                 if (!DataSources.Map.Data.ContainsKey("LastJsonExport") || DataSources.Map.Data["LastJsonExport"] as string != sfd.FileName)
                 {
@@ -858,7 +869,27 @@ namespace Levrum.DataBridge
                     {
                         DisableControls();
 
-                        loader.LoadMap(DataSources.Map);
+                        DataSet<IncidentData> lastData;
+                        if (appendData)
+                        {
+                            LogHelper.LogMessage(LogLevel.Info, string.Format("Attempting to append incidents to existing DataSet"));
+                            try
+                            {
+                                string incidentJson = File.ReadAllText(sfd.FileName);
+                                lastData = JsonConvert.DeserializeObject<DataSet<IncidentData>>(incidentJson);
+                                loader.LoadMapAndAppend(DataSources.Map, lastData);
+                            } 
+                            catch (Exception ex)
+                            {
+                                appendData = false;
+                                logException(newSender, "Unable to load previous DataSet", ex);
+                                loader.LoadMap(DataSources.Map);
+                            }
+                        } else
+                        {
+                            loader.LoadMap(DataSources.Map);
+                        }
+
                         foreach (IncidentData incident in loader.Incidents)
                         {
                             incident.Intern();
