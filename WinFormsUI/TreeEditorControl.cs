@@ -651,15 +651,22 @@ namespace Levrum.UI.WinForms
                     }
 
                     // Check if receving panel already contains dragged data
-                    if (receivingPanelData.Values.Contains(droppedData))
+                    if (receivingPanelData.Values.Select(v => v.Value).Contains(droppedData.Value))
                     {
                         foreach (Control control in receivingPanel.Controls)
                         {
-                            if (control.Tag == droppedData)
+                            if (!(control.Tag is ICategorizedValue))
+                                continue;
+                            string controlValue = (control.Tag as ICategorizedValue).Value;
+                            if (controlValue == droppedData.Value)
                             {
-                                foreach (var data in m_recyclingBin)
+                                foreach (DraggedData data in m_recyclingBin)
                                 {
-                                    if (data.Control.Tag == droppedData)
+                                    ICategorizedValue dataValue = data.Control.Tag as ICategorizedValue;
+                                    if (dataValue is null)
+                                        return;
+
+                                    if (dataValue.Value == droppedData.Value)
                                     {
                                         m_recyclingBin.Remove(data);
                                         MarkValueBlockAsAdded(data.Data as ICategorizedValue);
