@@ -290,12 +290,26 @@ namespace Levrum.UI.WinForms
                 }
                 else if (draggedData.Data is ICategorizedValue)
                 {
-                    oldParentData?.Values?.Remove(draggedData.Data as ICategorizedValue);
+                    ICategorizedValue draggedCatValue = draggedData.Data as ICategorizedValue;
+                    oldParentData?.Values?.Remove(draggedCatValue);
 
                     // Mark block as not added
-                    if (!ValueBlockIsAdded(draggedData.Data as ICategorizedValue, m_flpOrganizedData))
+                    if (!ValueBlockIsAdded(draggedCatValue, m_flpOrganizedData))
                     {
-                        MarkValueBlockAsNotAdded(draggedData.Control as Button);
+                        bool markAsNotAdded = true;
+                        List<Button> allOrganizedButtons = GetControlDescendants(m_flpOrganizedData).Where(c => c is Button).Cast<Button>().ToList();
+                        foreach (Button button in allOrganizedButtons)
+                        {
+                            ICategorizedValue value = button.Tag as ICategorizedValue;
+                            if (value is null)
+                                continue;
+                            else if (value.Value == draggedCatValue.Value)
+                                markAsNotAdded = false;
+                        }
+                        if (markAsNotAdded)
+                        {
+                            MarkValueBlockAsNotAdded(draggedData.Control as Button);
+                        }
                     }
                 }
                 draggedData.Control.Parent.Controls.Remove(draggedData.Control);
@@ -672,7 +686,10 @@ namespace Levrum.UI.WinForms
                                         MarkValueBlockAsAdded(data.Data as ICategorizedValue);
                                         if (!m_recyclingBin.Any())
                                         {
-                                            m_btnUndoDelete.Visible = false;
+                                            m_undoDeleteTimer.Enabled = false;
+                                            m_btnUndoDelete.Visible = false;                                            
+
+                                            DeleteRecycledItems();
                                         }
                                         break;
                                     }
