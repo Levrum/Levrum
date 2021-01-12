@@ -179,8 +179,22 @@ namespace Levrum.Data.Sources
                 Parameters.TryGetValue("CompressedContents", out string compressedContents);
                 stream = XmlUtils.GetXmlStream(compressedContents, XmlFile);
 
-                List<Record> records = XmlUtils.GetRecords(stream, IncidentNode, ResponseNode);
-
+                List<Record> records = new List<Record>();
+                foreach (Record record in XmlUtils.GetRecords(stream, IncidentNode, ResponseNode))
+                {
+                    object dateColumnValue;
+                    if (record.Data.TryGetValue(DateColumn, out dateColumnValue) && dateColumnValue is string)
+                    {
+                        DateTime recordDate;
+                        if (DateTime.TryParse(dateColumnValue as string, out recordDate) && (recordDate < startDate || recordDate > endDate))
+                        {
+                            // The date parsed okay and was too early or too late so don't include it.
+                            continue;
+                        }
+                    }
+                    // Either we couldn't determine the date or it was okay. If you want to exclude dates we can't parse, you'll need to rewrite the section above this.
+                    records.Add(record);
+                }
                 return records;
             } catch (Exception ex)
             {

@@ -123,6 +123,8 @@ namespace Levrum.DataBridge
                 IdColumnComboBox.SelectedItem = DataSource.IDColumn;
                 ResponseIdColumnComboBox.ItemsSource = columns;
                 ResponseIdColumnComboBox.SelectedItem = DataSource.ResponseIDColumn;
+                DateColumnComboBox.ItemsSource = columns;
+                DateColumnComboBox.SelectedItem = DataSource.DateColumn;
             }
             else if (DataSource.Type == DataSourceType.SqlSource)
             {
@@ -146,6 +148,7 @@ namespace Levrum.DataBridge
 
                 SqlIdColumnComboBox.SelectedItem = DataSource.IDColumn;
                 SqlResponseIdColumnComboBox.SelectedItem = DataSource.ResponseIDColumn;
+                SqlDateColumnComboBox.SelectedItem = DataSource.DateColumn;
             }
             else if (DataSource.Type == DataSourceType.GeoSource)
             {
@@ -224,6 +227,8 @@ namespace Levrum.DataBridge
                         XmlResponseNodeComboBox.SelectedItem = xmlSource.ResponseNode;
                         XmlResponseIdNodeComboBox.ItemsSource = columns;
                         XmlResponseIdNodeComboBox.SelectedItem = xmlSource.ResponseIDColumn;
+                        XmlDateNodeComboBox.ItemsSource = columns;
+                        XmlDateNodeComboBox.SelectedItem = xmlSource.DateColumn;
                     } catch (Exception ex)
                     {
                         LogHelper.LogMessage(LogLevel.Error, string.Format("Unable to load XmlSource from file '{0}'", DataSource.Parameters["File"]), ex);
@@ -255,6 +260,8 @@ namespace Levrum.DataBridge
                         DailyDigestResponseNodeComboBox.SelectedItem = dailyDigestSource.ResponseNode;
                         DailyDigestResponseIdNodeComboBox.ItemsSource = columns;
                         DailyDigestResponseIdNodeComboBox.SelectedItem = dailyDigestSource.ResponseIDColumn;
+                        DailyDigestDateNodeComboBox.ItemsSource = columns;
+                        DailyDigestDateNodeComboBox.SelectedItem = dailyDigestSource.DateColumn;
                     } catch (Exception ex)
                     {
                         LogHelper.LogMessage(LogLevel.Error, $"Unable to load DailyDigestSource from folder '{DataSource.Parameters["Directory"]}'", ex);
@@ -526,6 +533,7 @@ namespace Levrum.DataBridge
                 List<string> columns = source.GetColumns();
                 IdColumnComboBox.ItemsSource = columns;
                 ResponseIdColumnComboBox.ItemsSource = columns;
+                DateColumnComboBox.ItemsSource = columns;
                 ChangesMade = true;
             }
             catch (Exception ex)
@@ -600,8 +608,10 @@ namespace Levrum.DataBridge
             SqlTableComboBox.ItemsSource = tables;
             if (dataSource.Parameters.ContainsKey("Query"))
             {
-                SqlIdColumnComboBox.ItemsSource = dataSource.GetColumns();
-                SqlResponseIdColumnComboBox.ItemsSource = dataSource.GetColumns();
+                List<string> columns = dataSource.GetColumns();
+                SqlIdColumnComboBox.ItemsSource = columns;
+                SqlResponseIdColumnComboBox.ItemsSource = columns;
+                SqlDateColumnComboBox.ItemsSource = columns;
             }
             dataSource.Disconnect();
         }
@@ -907,6 +917,7 @@ namespace Levrum.DataBridge
                 XmlIncidentIdNodeComboBox.ItemsSource = nodes;
                 XmlResponseNodeComboBox.ItemsSource = nodes;
                 XmlResponseIdNodeComboBox.ItemsSource = nodes;
+                XmlDateNodeComboBox.ItemsSource = nodes;
                 ChangesMade = true;
             }
             catch (Exception ex)
@@ -996,6 +1007,7 @@ namespace Levrum.DataBridge
                 DailyDigestIncidentIdNodeComboBox.ItemsSource = nodes;
                 DailyDigestResponseNodeComboBox.ItemsSource = nodes;
                 DailyDigestResponseIdNodeComboBox.ItemsSource = nodes;
+                DailyDigestDateNodeComboBox.ItemsSource = nodes;
                 ChangesMade = true;
             }
             catch (Exception ex)
@@ -1029,6 +1041,30 @@ namespace Levrum.DataBridge
         {
             DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
             source.ResponseIDColumn = DailyDigestResponseIdNodeComboBox.SelectedItem as string;
+        }
+
+        private void DateColumnComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            CsvSource source = DataSource as CsvSource;
+            source.DateColumn = DateColumnComboBox.SelectedItem as string;
+        }
+
+        private void SqlDateColumnComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            SqlSource source = DataSource as SqlSource;
+            source.DateColumn = SqlDateColumnComboBox.SelectedItem as string;
+        }
+
+        private void XmlDateNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            XmlSource source = DataSource as XmlSource;
+            source.DateColumn = XmlDateNodeComboBox.SelectedItem as string;
+        }
+
+        private void DailyDigestDateNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
+            source.DateColumn = DailyDigestDateNodeComboBox.SelectedItem as string;
         }
     }
 

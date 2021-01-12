@@ -166,12 +166,52 @@ namespace Levrum.Data.Sources
             {
                 List<Record> records = new List<Record>();
                 var xmlFiles = DailyDigestDirectory.GetFiles();
+                DateTime startDay = new DateTime(startDate.Year, startDate.Month, startDate.Day, 0, 0, 0);
+                DateTime endDay = new DateTime(endDate.Year, endDate.Month, endDate.Day, 11, 59, 59, 999);
                 foreach (FileInfo file in xmlFiles)
                 {
+                    bool filterRecords = false;
+                    string digestDateStr = file.Name.Substring(0, file.Name.Length - file.Extension.Length);
+                    string[] dateFragments = digestDateStr.Split('-');
+                    int year, month, day;
+                    if (dateFragments.Length != 3 || !(int.TryParse(dateFragments[0], out year) && int.TryParse(dateFragments[1], out month) && int.TryParse(dateFragments[2], out day)))
+                    {
+                        // If things are named correctly we'll filter based on the file name, which is faster. Otherwise we'll filter the records.
+                        filterRecords = true;
+                    } else
+                    {
+                        DateTime digestDay = new DateTime(year, month, day);
+                        if (digestDay < startDate || digestDay > endDate)
+                        {
+                            // Skip this file
+                            continue;
+                        }
+                    }                    
+
                     using (Stream stream = file.OpenRead())
                     {
                         List<Record> fileRecords = XmlUtils.GetRecords(stream, IncidentNode, ResponseNode);
-                        records.AddRange(fileRecords);
+                        if (!filterRecords || string.IsNullOrWhiteSpace(DateColumn))
+                        {
+                            records.AddRange(fileRecords);
+                        } else
+                        {
+                            foreach (Record record in fileRecords)
+                            {
+                                object dateColumnValue;
+                                if (record.Data.TryGetValue(DateColumn, out dateColumnValue) && dateColumnValue is string)
+                                {
+                                    DateTime recordDate;
+                                    if (DateTime.TryParse(dateColumnValue as string, out recordDate) && (recordDate < startDate || recordDate > endDate))
+                                    {
+                                        // The date parsed okay and was too early or too late so don't include it.
+                                        continue;
+                                    }
+                                }
+                                // Either we couldn't determine the date or it was okay. If you want to exclude dates we can't parse, you'll need to rewrite the section above this.
+                                records.Add(record);
+                            }
+                        }
                     }
                 }
 
