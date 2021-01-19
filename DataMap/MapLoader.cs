@@ -78,6 +78,8 @@ namespace Levrum.Data.Map
                     }
                 }
 
+                Incidents = new DataSet<IncidentData>();
+
                 processIncidentDataMappings();
 
                 if (Cancelling())
@@ -166,14 +168,15 @@ namespace Levrum.Data.Map
 
         public bool LoadMapAndAppend(DataMap map, DataSet<IncidentData> lastIncidents)
         {
-            if (lastIncidents.Data.ContainsKey("FirstIncident") && lastIncidents.Data["FirstIncident"] is DateTime)
+            if (StartDate == DateTime.MinValue && lastIncidents.Data.ContainsKey("LastIncident") && lastIncidents.Data["LastIncident"] is DateTime)
             {
-                StartDate = (DateTime)lastIncidents.Data["FirstIncident"];
+                StartDate = (DateTime)lastIncidents.Data["LastIncident"];
+                StartDate = StartDate.AddMilliseconds(1.0);
             }
 
-            if (lastIncidents.Data.ContainsKey("LastIncident") && lastIncidents.Data["LastIncident"] is DateTime)
+            if (EndDate == DateTime.MaxValue)
             {
-                EndDate = (DateTime)lastIncidents.Data["LastIncident"];
+                EndDate = DateTime.Now;
             }
 
             bool success = LoadMap(map);
@@ -500,7 +503,11 @@ namespace Levrum.Data.Map
                         nmapping++;
                         string scolname = mapping?.Column?.ColumnName;
                         if (string.IsNullOrEmpty(scolname)) { throw (new Exception("Unable to identify column name in incident mapping #" + nmapping)); }
-                        if (!record.HasColumn(scolname)) { throw (new Exception("Incident record does not contain column '" + scolname + "' (#" + nmapping + ")"));  }
+                        if (!record.HasColumn(scolname)) 
+                        {
+                            AddErrorRecord(MapLoaderErrorType.NullValue, dataSource, mapping, record); // throw (new Exception("Incident record does not contain column '" + scolname + "' (#" + nmapping + ")"));  
+                            continue;
+                        }
 
                         string stringValue = record.GetValue(mapping.Column.ColumnName).ToString();
                         if (string.IsNullOrEmpty(stringValue))
@@ -547,7 +554,7 @@ namespace Levrum.Data.Map
                 double progressPerSource = 100 / numSources;
                 double progress = completedSources * progressPerSource;
                 updateProgress(2, string.Format("Getting response data records from data source {0}", dataSource.Name), progress);
-                List<Record> recordsFromSource = dataSource.GetRecords();
+                List<Record> recordsFromSource = dataSource.GetRecords(StartDate, EndDate);
                 int recordNumber = 0;
                 foreach (Record record in recordsFromSource)
                 {
@@ -572,14 +579,19 @@ namespace Levrum.Data.Map
                         continue;
                     }
 
+                    
                     if (!IncidentsById.TryGetValue(recordIncidentId, out incident))
                     {
+                        // Creating incidents for orphaned response data breaks incremental updates.
+                        if (StartDate != DateTime.MinValue || EndDate != DateTime.MaxValue) { 
+                            continue;
+                        }
+                        
                         incident = new IncidentData();
                         incident.Id = recordIncidentId;
                         IncidentsById.Add(recordIncidentId, incident);
                         Incidents.Add(incident);
-                    }
-
+                    }                    
 
                     string recordResponseId = string.Empty;
                     object recordResponseIdValue = record.GetValue(dataSource.ResponseIDColumn);
@@ -658,7 +670,7 @@ namespace Levrum.Data.Map
                 double progressPerSource = 100 / numSources;
                 double progress = completedSources * progressPerSource;
                 updateProgress(3, string.Format("Getting response timing records from data source {0}", dataSource.Name), progress);
-                List<Record> recordsFromSource = dataSource.GetRecords();
+                List<Record> recordsFromSource = dataSource.GetRecords(StartDate, EndDate);
                 int recordNumber = 0;
                 foreach (Record record in recordsFromSource)
                 {
@@ -685,6 +697,12 @@ namespace Levrum.Data.Map
 
                     if (!IncidentsById.TryGetValue(recordIncidentId, out incident))
                     {
+                        // Creating incidents for orphaned response data breaks incremental updates.
+                        if (StartDate != DateTime.MinValue || EndDate != DateTime.MaxValue)
+                        {
+                            continue;
+                        }
+
                         incident = new IncidentData();
                         incident.Id = recordIncidentId;
                         IncidentsById.Add(recordIncidentId, incident);
@@ -798,6 +816,7 @@ namespace Levrum.Data.Map
             updateProgress(5, string.Format("Processing incident data and nature codes for {0} incidents", Incidents.Count), 0, true);
 
             int incidentNum = 0;
+            List<string> locationPieces = new List<string>();
             foreach (IncidentData incident in Incidents)
             {
                 if (Cancelling())
@@ -854,6 +873,39 @@ namespace Levrum.Data.Map
                     }
                 }
 
+                if (incident.Time == DateTime.MinValue)
+                {
+                    if (incident.Data.ContainsKey("DispatchDate") && incident.Data["DispatchDate"] is DateTime && incident.Data.ContainsKey("DispatchTime"))
+                    {
+                        incident.Time = (DateTime)incident.Data["DispatchDate"];
+                        if (incident.Data["DispatchTime"] is DateTime)
+                        {
+                            DateTime dispatchTime = (DateTime)incident.Data["DispatchTime"];
+                            incident.Time = new DateTime(incident.Time.Year, incident.Time.Month, incident.Time.Day, dispatchTime.Hour, dispatchTime.Minute, dispatchTime.Second, dispatchTime.Millisecond);
+                        } else if (incident.Data["DispatchTime"] is int)
+                        {
+                            string timeStr = incident.Data["DispatchTime"].ToString();
+                            int seconds = 0, minutes = 0, hours = 0;
+                            if (timeStr.Length <= 2) 
+                            {
+                                seconds = int.Parse(timeStr);
+                            } else if (timeStr.Length <= 4)
+                            {
+                                int minuteDigits = timeStr.Length - 2;
+                                seconds = int.Parse(timeStr.Substring(minuteDigits, 2));
+                                minutes = int.Parse(timeStr.Substring(0, minuteDigits));
+                            } else if (timeStr.Length <= 6)
+                            {
+                                int hourDigits = timeStr.Length - 4;
+                                seconds = int.Parse(timeStr.Substring(hourDigits + 2, 2));
+                                minutes = int.Parse(timeStr.Substring(hourDigits, 2));
+                                hours = int.Parse(timeStr.Substring(hourDigits));
+                            }
+                            incident.Time = new DateTime(incident.Time.Year, incident.Time.Month, incident.Time.Day, hours, minutes, seconds, 0);
+                        }
+                    }
+                }
+                
                 if (Map.InvertLatitude)
                 {
                     incident.Latitude = incident.Latitude * -1.0;
@@ -867,6 +919,67 @@ namespace Levrum.Data.Map
                 if (incident.Location != null)
                 {
                     incident.Location = incident.Location.Trim();
+                } 
+                else if (string.IsNullOrWhiteSpace(incident.Location))
+                {
+                    if (incident.Data.ContainsKey("StreetNumber") || incident.Data.ContainsKey("StreetName")) 
+                    {
+                        locationPieces.Clear();
+                        if (incident.Data.ContainsKey("StreetNumber")) 
+                        {
+                            string streetNumber = incident.Data["StreetNumber"].ToString();
+                            if (!string.IsNullOrWhiteSpace(streetNumber))
+                            {
+                                locationPieces.Add(streetNumber);
+                            }
+                        }
+
+                        if (incident.Data.ContainsKey("StreetName"))
+                        {
+                            string streetName = incident.Data["StreetName"].ToString();
+                            if (!string.IsNullOrWhiteSpace(streetName))
+                            {
+                                locationPieces.Add(streetName);
+                            }
+                        }
+                        
+                        if (incident.Data.ContainsKey("StreetType"))
+                        {
+                            string streetType = incident.Data["StreetType"].ToString();
+                            if (!string.IsNullOrWhiteSpace(streetType))
+                            {
+                                locationPieces.Add(streetType);
+                            }
+                        }
+
+                        if (incident.Data.ContainsKey("AptNumber"))
+                        {
+                            string apartmentNumber = incident.Data["AptNumber"].ToString();
+                            if (!string.IsNullOrWhiteSpace(apartmentNumber))
+                            {
+                                locationPieces.Add(apartmentNumber);
+                            }
+                        }
+
+                        switch (locationPieces.Count) 
+                        { 
+                            case 1:
+                                incident.Location = locationPieces[0];
+                                break;
+                            case 2:
+                                incident.Location = string.Format("{0} {1}", locationPieces[0], locationPieces[1]);
+                                break;
+                            case 3:
+                                incident.Location = string.Format("{0} {1} {2}", locationPieces[0], locationPieces[1], locationPieces[2]);
+                                break;
+                            case 4:
+                                incident.Location = string.Format("{0} {1} {2} {3}", locationPieces[0], locationPieces[1], locationPieces[2], locationPieces[3]);
+                                break;
+                            default:
+                                incident.Location = null;
+                                break;
+                        }
+                    }
                 }
 
                 string natureCode = "Unknown";

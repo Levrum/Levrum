@@ -42,7 +42,7 @@ namespace Levrum.DataBridge
             } 
         }
 
-        public List<string> DefaultIncidentDataFields = new List<string>(new string[] { "Time", "Latitude", "Longitude", "Location", "City", "State", "Code", "Category", "Type", "Jurisdiction", "District", "CallProcessed", "Cancelled", "FirstAction" });
+        public List<string> DefaultIncidentDataFields = new List<string>(new string[] { "Time", "Latitude", "Longitude", "Location", "City", "State", "Code", "Jurisdiction", "District", "CallProcessed", "Cancelled", "FirstAction", "DispatchDate", "DispatchTime", "StreetName", "StreetNumber", "StreetType", "AptNumber", "Category", "Type" });
         public List<string> DefaultResponseDataFields = new List<string>(new string[] { "Unit", "UnitType", "Urgency", "Shift" });
         public List<string> DefaultResponseTimingFields = new List<string>(new string[] { "Assigned", "Responding", "OnScene", "ClearScene", "Transport", "Hospital", "InService", "InQuarters" });
 
