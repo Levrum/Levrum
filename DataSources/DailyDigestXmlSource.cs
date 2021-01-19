@@ -181,10 +181,14 @@ namespace Levrum.Data.Sources
                     } else
                     {
                         DateTime digestDay = new DateTime(year, month, day);
-                        if (digestDay < startDate || digestDay > endDate)
+                        if (digestDay < startDay || digestDay > endDay)
                         {
                             // Skip this file
                             continue;
+                        } else if (digestDay == startDay || digestDay == endDay)
+                        {
+                            // We need to filter the records based on the column so we don't get duplicates
+                            filterRecords = true;
                         }
                     }                    
 
