@@ -832,6 +832,7 @@ namespace Levrum.DataBridge
 
                 sfd.DefaultExt = "json";
                 sfd.Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*";
+                sfd.OverwritePrompt = false;
                 if (sfd.ShowDialog() == false)
                 {
                     return;
