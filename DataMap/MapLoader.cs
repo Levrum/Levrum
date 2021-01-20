@@ -927,7 +927,7 @@ namespace Levrum.Data.Map
                         locationPieces.Clear();
                         if (incident.Data.ContainsKey("StreetNumber")) 
                         {
-                            string streetNumber = incident.Data["StreetNumber"].ToString();
+                            string streetNumber = incident.Data["StreetNumber"].ToString().Trim();
                             if (!string.IsNullOrWhiteSpace(streetNumber))
                             {
                                 locationPieces.Add(streetNumber);
@@ -936,7 +936,7 @@ namespace Levrum.Data.Map
 
                         if (incident.Data.ContainsKey("StreetName"))
                         {
-                            string streetName = incident.Data["StreetName"].ToString();
+                            string streetName = incident.Data["StreetName"].ToString().Trim();
                             if (!string.IsNullOrWhiteSpace(streetName))
                             {
                                 locationPieces.Add(streetName);
@@ -945,7 +945,7 @@ namespace Levrum.Data.Map
                         
                         if (incident.Data.ContainsKey("StreetType"))
                         {
-                            string streetType = incident.Data["StreetType"].ToString();
+                            string streetType = incident.Data["StreetType"].ToString().Trim();
                             if (!string.IsNullOrWhiteSpace(streetType))
                             {
                                 locationPieces.Add(streetType);
@@ -954,7 +954,7 @@ namespace Levrum.Data.Map
 
                         if (incident.Data.ContainsKey("AptNumber"))
                         {
-                            string apartmentNumber = incident.Data["AptNumber"].ToString();
+                            string apartmentNumber = incident.Data["AptNumber"].ToString().Trim();
                             if (!string.IsNullOrWhiteSpace(apartmentNumber))
                             {
                                 locationPieces.Add(apartmentNumber);
