@@ -184,7 +184,7 @@ namespace Levrum.Data.Classes
                 }
             }
 
-            Responses = new DataSet<ResponseData>(this);
+            Data["Responses"] = new DataSet<ResponseData>(this);
 
             if (responses != null)
                 Responses.AddRange(responses);
@@ -205,7 +205,7 @@ namespace Levrum.Data.Classes
                 Data.Add(kvp.Key, kvp.Value);
             }
 
-            Responses = new DataSet<ResponseData>(this);
+            Data["Responses"] = new DataSet<ResponseData>(this);
 
             Responses.AddRange(source.Responses);
 
