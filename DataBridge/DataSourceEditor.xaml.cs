@@ -434,6 +434,8 @@ namespace Levrum.DataBridge
                 GeoOptionsPanel.Visibility = Visibility.Hidden;
                 XmlOptionsGrid.Visibility = Visibility.Hidden;
                 XmlOptionsPanel.Visibility = Visibility.Hidden;
+                DailyDigestOptionsGrid.Visibility = Visibility.Hidden;
+                DailyDigestOptionsPanel.Visibility = Visibility.Hidden;
             }
             else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.SqlSource)
             {
@@ -445,6 +447,8 @@ namespace Levrum.DataBridge
                 GeoOptionsPanel.Visibility = Visibility.Hidden;
                 XmlOptionsGrid.Visibility = Visibility.Hidden;
                 XmlOptionsPanel.Visibility = Visibility.Hidden;
+                DailyDigestOptionsGrid.Visibility = Visibility.Hidden;
+                DailyDigestOptionsPanel.Visibility = Visibility.Hidden;
             }
             else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.GeoSource)
             {
@@ -456,7 +460,10 @@ namespace Levrum.DataBridge
                 GeoOptionsPanel.Visibility = Visibility.Visible;
                 XmlOptionsGrid.Visibility = Visibility.Hidden;
                 XmlOptionsPanel.Visibility = Visibility.Hidden;
-            } else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.XmlSource)
+                DailyDigestOptionsGrid.Visibility = Visibility.Hidden;
+                DailyDigestOptionsPanel.Visibility = Visibility.Hidden;
+            } 
+            else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.XmlSource)
             {
                 CsvOptionsGrid.Visibility = Visibility.Hidden;
                 CsvOptionsButtons.Visibility = Visibility.Hidden;
@@ -466,6 +473,8 @@ namespace Levrum.DataBridge
                 GeoOptionsPanel.Visibility = Visibility.Hidden;
                 XmlOptionsGrid.Visibility = Visibility.Visible;
                 XmlOptionsPanel.Visibility = Visibility.Visible;
+                DailyDigestOptionsGrid.Visibility = Visibility.Hidden;
+                DailyDigestOptionsPanel.Visibility = Visibility.Hidden;
             }
             else if (DataSourceTypeComboBox.SelectedItem == DataSourceTypeInfo.DailyDigestXmlSource)
             {
@@ -478,7 +487,7 @@ namespace Levrum.DataBridge
                 XmlOptionsGrid.Visibility = Visibility.Hidden;
                 XmlOptionsPanel.Visibility = Visibility.Hidden;
                 DailyDigestOptionsGrid.Visibility = Visibility.Visible;
-
+                DailyDigestOptionsPanel.Visibility = Visibility.Visible;
             }
         }
 
@@ -1065,6 +1074,11 @@ namespace Levrum.DataBridge
         {
             DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
             source.DateColumn = DailyDigestDateNodeComboBox.SelectedItem as string;
+        }
+
+        private void SummarizeDailyDigestButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 
