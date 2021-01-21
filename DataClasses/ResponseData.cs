@@ -55,10 +55,21 @@ namespace Levrum.Data.Classes
 
         }
 
-        public ResponseData(string id = "", TimingData[] benchmarks = null)
+        public ResponseData(string id = "", InternedDictionary<string, object> data = null, TimingData[] benchmarks = null)
         {
             Id = id;
             TimingData = new DataSet<TimingData>(this);
+
+            foreach (KeyValuePair<string, object> kvp in data)
+            {
+                if (!Data.ContainsKey(kvp.Key))
+                {
+                    Data.Add(kvp.Key, kvp.Value);
+                } else
+                {
+                    Data[kvp.Key] = kvp.Value;
+                }
+            }
 
             if (benchmarks != null)
             {

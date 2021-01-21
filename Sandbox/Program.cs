@@ -342,5 +342,91 @@ namespace Sandbox.DefaultCommands
 
             return "Ways split successfully!";
         }
+
+        static string s_testjson = "{  \"$id\": \"1\",  \"Parent\": null,  \"Contents\": {    \"$id\": \"2\",    \"$values\": [      {        \"$id\": \"3\",        \"Time\": \"2021-01-19T23:03:40.088235-06:00\",        \"Location\": \"\",        \"Longitude\": \"NaN\",        \"Latitude\": \"NaN\",        \"Responses\": {          \"$id\": \"4\",          \"Parent\": {            \"$ref\": \"3\"          },          \"Contents\": {            \"$id\": \"5\",            \"$values\": [              {                \"$id\": \"6\",                \"Id\": \"Moo\",                \"Benchmarks\": {                  \"$id\": \"7\",                  \"Parent\": {                    \"$ref\": \"6\"                  },                  \"Contents\": {                    \"$id\": \"8\",                    \"$values\": []                  },                  \"Data\": {                    \"$id\": \"9\"                  }                },                \"Data\": {                  \"Id\": \"Moo\",                  \"Unit\": \"Also Moo\",                  \"UnitType\": \"Cow\",                  \"Shift\": \"Night Shift\",                  \"Benchmarks\": {                   \"$ref\": \"7\"                  }                }              }            ]          },          \"Data\": {            \"$id\": \"10\"          }        },        \"Data\": {          \"Id\": \"Moo\",          \"Time\": \"2021-01-19T23:03:40.088235-06:00\",          \"Responses\": {            \"$ref\": \"4\"          }        }      }    ]  },  \"Data\": {    \"$id\": \"11\",    \"Test\": \"Test\"  }}";
+
+        public static string testserialize(List<string> args)
+        {
+            DataSet<IncidentData> test = new DataSet<IncidentData>();
+
+            test.Data["Test"] = "Test";
+
+            IncidentData incident = new IncidentData();
+            incident.Id = "Moo";
+            incident.Time = DateTime.Now;
+
+            ResponseData response = new ResponseData();
+            response.Id = "Moo";
+            response.Data.Add("Unit", "Also Moo");
+            response.Data.Add("UnitType", "Cow");
+            response.Data.Add("Shift", "Night Shift");
+            incident.Responses.Add(response);
+
+            test.Add(incident);
+
+            JsonSerializerSettings settings = new JsonSerializerSettings() { Formatting = Formatting.Indented, TypeNameHandling = TypeNameHandling.Auto, PreserveReferencesHandling = PreserveReferencesHandling.All };
+
+            string json = JsonConvert.SerializeObject(test, test.GetType(), settings);
+            Console.WriteLine(json);
+
+            return "Test passed.";
+        }
+
+        public static string tests016(List<string> args)
+        {
+            DataSet016<IncidentData016> test = new DataSet016<IncidentData016>();
+
+            IncidentData016 incident = new IncidentData016();
+            incident.Id = "d479dd53-77c7-4440-b8c6-ac4001435f9a";
+            incident.Time = DateTime.Now;
+            incident.Longitude = 0.0;
+            incident.Latitude = 0.0;
+            incident.Location = string.Empty;
+
+            ResponseData016 response = new ResponseData016();
+            response.Id = "Moo";
+            response.Data.Add("Unit", "Also Moo");
+            response.Data.Add("UnitType", "Cow");
+            response.Data.Add("Shift", "Night Shift");
+            incident.Responses.Add(response);
+
+            test.Add(incident);
+
+            JsonSerializerSettings settings = new JsonSerializerSettings() { Formatting = Formatting.Indented, TypeNameHandling = TypeNameHandling.Auto, PreserveReferencesHandling = PreserveReferencesHandling.Objects };// PreserveReferencesHandling = PreserveReferencesHandling.All };
+
+            string json = JsonConvert.SerializeObject(test, settings);
+            Console.WriteLine(json);
+
+            json = JsonConvert.SerializeObject(incident, settings);
+            Console.WriteLine(json);
+
+            return "Test passed.";
+        }
+
+        public static string testds016(List<string> args)
+        {
+            string json = "[  {    \"$id\": \"1\",    \"Time\": \"2021-01-20T21:55:41.5579044-06:00\",    \"Location\": \"\",    \"Longitude\": 0.0,    \"Latitude\": 0.0,    \"Responses\": [      {        \"$id\": \"2\",        \"Id\": \"Moo\",        \"Benchmarks\": [],        \"Data\": {          \"Id\": \"Moo\",          \"Unit\": \"Also Moo\",          \"UnitType\": \"Cow\",          \"Shift\": \"Night Shift\",          \"Benchmarks\": {            \"$type\": \"Levrum.Data.Classes.DataSet016`1[[Levrum.Data.Classes.TimingData, Levrum.Data.Classes]], Levrum.Data.Classes\",            \"$values\": []          }        }      }    ],    \"Data\": {      \"Id\": \"d479dd53-77c7-4440-b8c6-ac4001435f9a\",      \"Time\": \"2021-01-20T21:55:41.5579044-06:00\",      \"Longitude\": 0.0,      \"Latitude\": 0.0,      \"Location\": \"\",      \"Responses\": {        \"$type\": \"Levrum.Data.Classes.DataSet016`1[[Levrum.Data.Classes.ResponseData016, Levrum.Data.Classes]], Levrum.Data.Classes\",        \"$values\": [          {            \"$ref\": \"2\"          }        ]      }    }  }]";
+            DataSet016<IncidentData016> test = JsonConvert.DeserializeObject<DataSet016<IncidentData016>>(json, new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.Objects, TypeNameHandling = TypeNameHandling.Auto });
+
+            json = "{  \"$id\": \"1\",  \"Time\": \"2021-01-20T16:14:49.6769059-06:00\",  \"Location\": \"\",  \"Longitude\": 0.0,  \"Latitude\": 0.0,  \"Responses\": [],  \"Data\": {    \"Id\": \"d479dd53-77c7-4440-b8c6-ac4001435f9a\",    \"Time\": \"2021-01-20T16:14:49.6769059-06:00\",    \"Longitude\": 0.0,    \"Latitude\": 0.0,    \"Location\": \"\",    \"Responses\": {      \"$type\": \"Levrum.Data.Classes.DataSet016`1[[Levrum.Data.Classes.ResponseData016, Levrum.Data.Classes]], Levrum.Data.Classes\",      \"$values\": []    }  }}";
+            IncidentData016 test2 = JsonConvert.DeserializeObject<IncidentData016>(json);
+
+            return "Test passed.";
+        }
+
+        public static string testds(List<string> args)
+        {
+            if (args.Count == 0)
+            {
+                DataSet<IncidentData> test = JsonConvert.DeserializeObject<DataSet<IncidentData>>(s_testjson);
+
+                return "Test passed.";
+            } else
+            {
+                DataSet<IncidentData> test = DataSet<IncidentData>.Deserialize(args[0]);
+
+                return "Test passed.";
+            }
+        }
     }
 }

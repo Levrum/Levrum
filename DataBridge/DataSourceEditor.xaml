@@ -26,7 +26,7 @@
             <TextBlock Height="16" Grid.Column="2" Margin="10,0,0,0" VerticalAlignment="Center">Name:</TextBlock>
             <TextBox x:Name="NameTextBox" Height="24" Grid.Column="3" TextChanged="NameTextBox_TextChanged" VerticalContentAlignment="Center" Margin="0,0,8,0"></TextBox>
         </Grid>
-        <Grid x:Name="CsvOptionsGrid" Grid.Row="1" Visibility="Hidden">
+        <Grid x:Name="CsvOptionsGrid" Grid.Row="1" Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition Height="40"/>
                 <RowDefinition Height="300*"/>
@@ -219,7 +219,7 @@
                 </Grid>
             </Grid>
         </Grid>
-        <Grid x:Name="DailyDigestOptionsGrid" Grid.Row="1" Visibility="Visible">
+        <Grid x:Name="DailyDigestOptionsGrid" Grid.Row="1" Visibility="Hidden">
             <Grid.RowDefinitions>
                 <RowDefinition Height="40"/>
                 <RowDefinition Height="40"/>
@@ -259,6 +259,18 @@
                 <TextBlock Height="16" Grid.Column="6" Margin="0">Date:</TextBlock>
                 <ComboBox x:Name="DailyDigestDateNodeComboBox" Grid.Column="7" Margin="0,8,8,8" SelectionChanged="DailyDigestDateNodeComboBox_SelectionChanged"/>
             </Grid>
+            <Grid Grid.Row="2">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="280*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Margin="10,0,0,0" FontSize="14">Summary</TextBlock>
+                    <avalonEdit:TextEditor x:Name="DailyDigestSummaryTextBox" Grid.Row="1" Margin="8,0,8,0" Foreground="DarkSlateGray" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="WhiteSmoke">
+                        No data available...
+                    </avalonEdit:TextEditor>
+                </Grid>
+            </Grid>
         </Grid>
         <StackPanel x:Name="SqlOptionsPanel" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Stretch" Visibility="Hidden">
             <Button x:Name="ConnectButton" Width="80" Margin="8,8,0,8" Click="ConnectButton_Click">Connect</Button>
@@ -271,8 +283,12 @@
         <StackPanel x:Name="GeoOptionsPanel" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Visibility="Hidden">
         </StackPanel>
         <StackPanel x:Name="XmlOptionsPanel" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Visibility="Hidden">
-            <Button x:Name="SummarizeXmlButton" Width="80" Margin="8,8,0,8" Click="SummarizeXmlButton_Click">Summarize</Button>
-            <CheckBox x:Name="EmbedXmlCheckBox" Margin="8,8,0,8" Click="EmbedXmlCheckBox_Click" VerticalContentAlignment="Center" ToolTip="Saves the XML file as part of your DataMap">Embed XML file in DataMap</CheckBox>
+            <Button x:Name="SummarizeXmlButton" Width="80" Margin="8,8,0,8" Click="SummarizeXmlButton_Click" Visibility="Hidden">Summarize</Button>
+            <CheckBox x:Name="EmbedXmlCheckBox" Margin="8,8,0,8" Click="EmbedXmlCheckBox_Click" VerticalContentAlignment="Center" ToolTip="Saves the XML file as part of your DataMap" Visibility="Hidden">Embed XML file in DataMap</CheckBox>
+        </StackPanel>
+        <StackPanel x:Name="DailyDigestOptionsPanel" Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left" Visibility="Hidden">
+            <!-- <Button x:Name="SummarizeDailyDigestButton" Width="80" Margin="8,8,0,8" Click="SummarizeDailyDigestButton_Click">Summarize</Button> -->
+            <!-- <CheckBox x:Name="EmbedDailyDigestCheckBox" Margin="8,8,0,8" Click="EmbedDailyDigestCheckBox_Click" VerticalContentAlignment="Center" ToolTip="Saves the XML file as part of your DataMap">Embed XML file in DataMap</CheckBox> -->
         </StackPanel>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button x:Name="SaveButton" Width="80" Margin="0,8,0,8" Click="SaveButton_Click">Save</Button>

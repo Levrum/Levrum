@@ -140,7 +140,8 @@ namespace Levrum.Data.Classes
             }
         }
 
-        public DataSet<ResponseData> Responses { 
+        public DataSet<ResponseData> Responses 
+        { 
             get
             {
                 DataSet<ResponseData> output = new DataSet<ResponseData>(this);
@@ -180,11 +181,18 @@ namespace Levrum.Data.Classes
             {
                 foreach (KeyValuePair<string, object> kvp in data)
                 {
-                    Data.Add(kvp.Key, kvp.Value);
+                    if (!Data.ContainsKey(kvp.Key))
+                    {
+                        Data.Add(kvp.Key, kvp.Value);
+                    } 
+                    else
+                    {
+                        Data[kvp.Key] = kvp.Value;
+                    }
                 }
             }
 
-            Responses = new DataSet<ResponseData>(this);
+            Data["Responses"] = new DataSet<ResponseData>(this);
 
             if (responses != null)
                 Responses.AddRange(responses);
@@ -205,7 +213,7 @@ namespace Levrum.Data.Classes
                 Data.Add(kvp.Key, kvp.Value);
             }
 
-            Responses = new DataSet<ResponseData>(this);
+            Data["Responses"] = new DataSet<ResponseData>(this);
 
             Responses.AddRange(source.Responses);
 
