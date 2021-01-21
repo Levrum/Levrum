@@ -337,7 +337,7 @@ namespace Levrum.Data.Classes
             {
                 if (typeof(T) == typeof(IncidentData))
                 {
-                    DataSet016<IncidentData016> oldDataSet = JsonConvert.DeserializeObject<DataSet016<IncidentData016>>(json, new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All });
+                    DataSet016<IncidentData016> oldDataSet = JsonConvert.DeserializeObject<DataSet016<IncidentData016>>(json, new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.Objects, TypeNameHandling = TypeNameHandling.Auto });
                     DataSet<IncidentData> output = new DataSet<IncidentData>();
                     foreach (IncidentData016 oldIncident in oldDataSet)
                     {
@@ -345,6 +345,7 @@ namespace Levrum.Data.Classes
                         foreach (ResponseData016 oldResponse in oldIncident.Responses)
                         {
                             ResponseData response = new ResponseData(oldResponse.Id, oldResponse.Data, oldResponse.TimingData.ToArray());
+                            incident.Responses.Add(response);
                         }
                         output.Add(incident);
                     }
