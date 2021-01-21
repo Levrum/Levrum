@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -251,5 +252,111 @@ namespace Levrum.Data.Classes
         }
 
         #endregion
+
+        public string Serialize()
+        {
+            JsonSerializerSettings settings = new JsonSerializerSettings();
+            settings.TypeNameHandling = TypeNameHandling.All;
+            settings.Formatting = Formatting.Indented;
+            settings.PreserveReferencesHandling = PreserveReferencesHandling.All;
+
+            return JsonConvert.SerializeObject(this, settings);
+        }
+
+        public void Serialize(string fileName)
+        {
+            using (TextWriter writer = File.CreateText(fileName))
+            {
+                var serializer = new JsonSerializer();
+                serializer.Formatting = Formatting.Indented;
+                serializer.TypeNameHandling = TypeNameHandling.Auto;
+                serializer.PreserveReferencesHandling = PreserveReferencesHandling.All;
+                serializer.Serialize(writer, this);
+            }
+        }
+
+        public void Serialize(FileInfo file)
+        {
+            Serialize(file.FullName);
+        }
+
+        public static DataSet<T> Deserialize(string fileName)
+        {
+            return Deserialize(new FileInfo(fileName));
+        }
+
+        public static DataSet<T> Deserialize(FileInfo file)
+        {
+            try
+            {
+                using (StreamReader streamReader = new StreamReader(file.OpenRead()))
+                using (JsonReader reader = new JsonTextReader(streamReader))
+                {
+                    var serializer = new JsonSerializer();
+                    DataSet<T> output = serializer.Deserialize<DataSet<T>>(reader);
+                    return output;
+                }
+            } catch (Exception ex)
+            {
+                // Try and load old-style DataSets here
+                try
+                {
+                    using (StreamReader streamReader = new StreamReader(file.OpenRead()))
+                    {
+                        string json = streamReader.ReadToEnd();
+                        json = json.Replace("DataSet", "DataSet016");
+                        json = json.Replace("IncidentData", "IncidentData016");
+                        json = json.Replace("ResponseData", "ResponseData016");
+                        return DeserializeJson(json, true);
+                    }
+                }
+                catch (Exception ex2)
+                {
+                    throw new Exception(string.Format("String does not contain valid DataSet JSON: {0} {1}", ex, ex2));
+                }
+            }
+        }
+
+        public static DataSet<T> DeserializeJson(string json, bool forceOldStyle = false)
+        {
+            Exception lastEx = null;
+            if (!forceOldStyle) {
+                try
+                {
+                    DataSet<T> output = JsonConvert.DeserializeObject<DataSet<T>>(json);
+                    return output;
+                }
+                catch (Exception ex)
+                {
+                    lastEx = ex;
+                }
+            }
+
+            // Try and load old-style DataSets here
+            try
+            {
+                if (typeof(T) == typeof(IncidentData))
+                {
+                    DataSet016<IncidentData016> oldDataSet = JsonConvert.DeserializeObject<DataSet016<IncidentData016>>(json, new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.All });
+                    DataSet<IncidentData> output = new DataSet<IncidentData>();
+                    foreach (IncidentData016 oldIncident in oldDataSet)
+                    {
+                        IncidentData incident = new IncidentData(data: oldIncident.Data);
+                        foreach (ResponseData016 oldResponse in oldIncident.Responses)
+                        {
+                            ResponseData response = new ResponseData(oldResponse.Id, oldResponse.Data, oldResponse.TimingData.ToArray());
+                        }
+                        output.Add(incident);
+                    }
+                    return output as DataSet<T>;
+                } else
+                {
+                    throw new NotImplementedException();
+                }
+            } catch (Exception ex2)
+            {
+                throw new Exception(string.Format("String does not contain valid DataSet JSON: {0} {1}", lastEx, ex2));
+            }
+        }
     }
 }
