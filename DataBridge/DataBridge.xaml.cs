@@ -284,7 +284,7 @@ namespace Levrum.DataBridge
                 File.WriteAllText(map.Path, mapJson);
                 if (document != null)
                 {
-                    document.ChangesMade = false;
+                    SetChangesMade(map, false);
                 }
 
                 SaveAsMenuItem.Header = string.Format("Save {0} _As...", map.Name);
@@ -543,6 +543,8 @@ namespace Levrum.DataBridge
             {
                 document.ChangesMade = status;
             }
+
+            document.Document.Title = status == true ? string.Format("{0}*", map.Name) : map.Name;
         }
 
         public DataMapDocument GetDocumentForMap(DataMap map)
