@@ -249,6 +249,38 @@ namespace Levrum.Data.Sources
                 }
 
                 string query = Parameters["Query"].Replace("'", "''");
+                string lcQuery = query.ToLowerInvariant();
+                int startIndex = lcQuery.IndexOf("!!startdate!!");
+                if (startIndex != -1)
+                {
+                    query = query.Remove(startIndex, "!!startdate!!".Length);
+                    query = query.Insert(startIndex, 
+                        string.Format("DATETIMEFROMPARTS({0}, {1}, {2}, {3}, {4}, {5}, {6})",
+                        DateTime.MinValue.Year,
+                        DateTime.MinValue.Month,
+                        DateTime.MinValue.Day,
+                        DateTime.MinValue.Hour,
+                        DateTime.MinValue.Minute,
+                        DateTime.MinValue.Second,
+                        DateTime.MinValue.Millisecond));
+                }
+
+                lcQuery = query.ToLowerInvariant();
+                int endIndex = lcQuery.IndexOf("!!enddate!!");
+                if (endIndex != -1)
+                {
+                    query = query.Remove(endIndex, "!!enddate!!".Length);
+                    query = query.Insert(endIndex,
+                        string.Format("DATETIMEFROMPARTS({0}, {1}, {2}, {3}, {4}, {5}, {6})",
+                        DateTime.MaxValue.Year,
+                        DateTime.MaxValue.Month,
+                        DateTime.MaxValue.Day,
+                        DateTime.MaxValue.Hour,
+                        DateTime.MaxValue.Minute,
+                        DateTime.MaxValue.Second,
+                        DateTime.MaxValue.Millisecond));
+                }
+
                 SqlCommand cmd = new SqlCommand(string.Format("SELECT name FROM sys.dm_exec_describe_first_result_set('{0}', NULL, 0);", query), m_connection);
                 using (SqlDataReader dr = cmd.ExecuteReader())
                 {
@@ -404,36 +436,47 @@ namespace Levrum.Data.Sources
                 SqlCommand cmd = null;
 
                 string query = Parameters["Query"];
-                if (startDate != DateTime.MinValue || endDate != DateTime.MaxValue)
+
+                string lcQuery = query.ToLowerInvariant();
+                int startIndex = lcQuery.IndexOf("!!startdate!!");
+                if (startIndex != -1)
                 {
-                    string lcQuery = query.ToLowerInvariant();
-                    int startIndex = lcQuery.IndexOf("!!startdate!!");
-                    if (startIndex != -1)
+                    if (startDate == DateTime.MinValue)
                     {
-                        query = lcQuery.Replace("!!startdate!!",
-                            string.Format("DATETIMEFROMPARTS({0}, {1}, {2}, {3}, {4}, {5}, {6})",
-                            startDate.Year,
-                            startDate.Month,
-                            startDate.Day,
-                            startDate.Hour,
-                            startDate.Minute,
-                            startDate.Second,
-                            startDate.Millisecond));
+                        startDate = new DateTime(1900, 1, 1);
                     }
 
-                    int endIndex = lcQuery.IndexOf("!!enddate!!");
-                    if (endIndex != -1)
+                    query = query.Remove(startIndex, "!!startdate!!".Length);
+                    query = query.Insert(startIndex,
+                            string.Format("DATETIMEFROMPARTS({0}, {1}, {2}, {3}, {4}, {5}, {6})",
+                        startDate.Year,
+                        startDate.Month,
+                        startDate.Day,
+                        startDate.Hour,
+                        startDate.Minute,
+                        startDate.Second,
+                        startDate.Millisecond));
+                }
+
+                lcQuery = query.ToLowerInvariant();
+                int endIndex = lcQuery.IndexOf("!!enddate!!");
+                if (endIndex != -1)
+                {
+                    if (endDate == DateTime.MaxValue)
                     {
-                        query.Replace("!!enddate!!",
-                            string.Format("DATETIMEFROMPARTS({0}, {1}, {2}, {3}, {4}, {5}, {6})", 
-                            endDate.Year, 
-                            endDate.Month, 
-                            endDate.Day, 
-                            endDate.Hour, 
-                            endDate.Minute, 
-                            endDate.Second, 
-                            endDate.Millisecond));
+                        endDate = new DateTime(2100, 1, 1);
                     }
+
+                    query = query.Remove(endIndex, "!!enddate!!".Length);
+                    query = query.Insert(endIndex,
+                            string.Format("DATETIMEFROMPARTS({0}, {1}, {2}, {3}, {4}, {5}, {6})", 
+                        endDate.Year, 
+                        endDate.Month, 
+                        endDate.Day, 
+                        endDate.Hour, 
+                        endDate.Minute, 
+                        endDate.Second, 
+                        endDate.Millisecond));
                 }
 
                 cmd = new SqlCommand(query, m_connection);
