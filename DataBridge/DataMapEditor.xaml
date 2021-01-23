@@ -23,7 +23,9 @@
     <Grid Background="WhiteSmoke">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="260*"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="260*"/>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="260*"/>
         </Grid.ColumnDefinitions>
         <GroupBox Grid.Column="0">
@@ -75,13 +77,13 @@
                             <DataTemplate>
                                 <Grid Margin="0,2">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column ="0" Text="{Binding Field}"/>
-                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}" HorizontalAlignment="Center"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding Column.ColumnName}" HorizontalAlignment="Right"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}" HorizontalAlignment="Center" Margin="8,0,8,0"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Column.ShortColumnName}" HorizontalAlignment="Right"/>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -94,7 +96,8 @@
                 </Grid>
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Column="1">
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="2"/>
+        <GroupBox Grid.Column="2">
             <GroupBox.Header>
                 <TextBlock Text="Response Data" FontSize="16" FontWeight="DemiBold"/>
             </GroupBox.Header>
@@ -109,13 +112,13 @@
                             <DataTemplate>
                                 <Grid Margin="0,2">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column ="0" Text="{Binding Field}"/>
-                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}" HorizontalAlignment="Center"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding Column.ColumnName}" HorizontalAlignment="Right"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}" HorizontalAlignment="Center" Margin="8,0,8,0"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Column.ShortColumnName}" HorizontalAlignment="Right"/>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -128,7 +131,8 @@
                 </Grid>
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Column="2">
+        <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="2"/>
+        <GroupBox Grid.Column="4">
             <GroupBox.Header>
                 <TextBlock Text="Response Timings" FontSize="16" FontWeight="DemiBold"/>
             </GroupBox.Header>
@@ -143,13 +147,13 @@
                             <DataTemplate>
                                 <Grid Margin="0,2">
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column ="0" Text="{Binding Field}"/>
-                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}" HorizontalAlignment="Center"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding Column.ColumnName}" HorizontalAlignment="Right"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}" HorizontalAlignment="Center" Margin="8,0,8,0"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding Column.ShortColumnName}" HorizontalAlignment="Right"/>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
