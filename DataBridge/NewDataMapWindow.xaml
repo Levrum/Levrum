@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:Levrum.DataBridge"
         mc:Ignorable="d"
         Title="Create New DataMap" Height="450" Width="800"
-        WindowStartupLocation="Manual">
+        WindowStartupLocation="Manual"
+        FocusManager.FocusedElement="{Binding ElementName=FinishButton}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="140*"/>
