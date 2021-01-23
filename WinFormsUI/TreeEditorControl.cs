@@ -290,12 +290,26 @@ namespace Levrum.UI.WinForms
                 }
                 else if (draggedData.Data is ICategorizedValue)
                 {
-                    oldParentData?.Values?.Remove(draggedData.Data as ICategorizedValue);
+                    ICategorizedValue draggedCatValue = draggedData.Data as ICategorizedValue;
+                    oldParentData?.Values?.Remove(draggedCatValue);
 
                     // Mark block as not added
-                    if (!ValueBlockIsAdded(draggedData.Data as ICategorizedValue, m_flpOrganizedData))
+                    if (!ValueBlockIsAdded(draggedCatValue, m_flpOrganizedData))
                     {
-                        MarkValueBlockAsNotAdded(draggedData.Control as Button);
+                        bool markAsNotAdded = true;
+                        List<Button> allOrganizedButtons = GetControlDescendants(m_flpOrganizedData).Where(c => c is Button).Cast<Button>().ToList();
+                        foreach (Button button in allOrganizedButtons)
+                        {
+                            ICategorizedValue value = button.Tag as ICategorizedValue;
+                            if (value is null)
+                                continue;
+                            else if (value.Value == draggedCatValue.Value)
+                                markAsNotAdded = false;
+                        }
+                        if (markAsNotAdded)
+                        {
+                            MarkValueBlockAsNotAdded(draggedData.Control as Button);
+                        }
                     }
                 }
                 draggedData.Control.Parent.Controls.Remove(draggedData.Control);
@@ -651,21 +665,31 @@ namespace Levrum.UI.WinForms
                     }
 
                     // Check if receving panel already contains dragged data
-                    if (receivingPanelData.Values.Contains(droppedData))
+                    if (receivingPanelData.Values.Select(v => v.Value).Contains(droppedData.Value))
                     {
                         foreach (Control control in receivingPanel.Controls)
                         {
-                            if (control.Tag == droppedData)
+                            if (!(control.Tag is ICategorizedValue))
+                                continue;
+                            string controlValue = (control.Tag as ICategorizedValue).Value;
+                            if (controlValue == droppedData.Value)
                             {
-                                foreach (var data in m_recyclingBin)
+                                foreach (DraggedData data in m_recyclingBin)
                                 {
-                                    if (data.Control.Tag == droppedData)
+                                    ICategorizedValue dataValue = data.Control.Tag as ICategorizedValue;
+                                    if (dataValue is null)
+                                        return;
+
+                                    if (dataValue.Value == droppedData.Value)
                                     {
                                         m_recyclingBin.Remove(data);
                                         MarkValueBlockAsAdded(data.Data as ICategorizedValue);
                                         if (!m_recyclingBin.Any())
                                         {
-                                            m_btnUndoDelete.Visible = false;
+                                            m_undoDeleteTimer.Enabled = false;
+                                            m_btnUndoDelete.Visible = false;                                            
+
+                                            DeleteRecycledItems();
                                         }
                                         break;
                                     }
