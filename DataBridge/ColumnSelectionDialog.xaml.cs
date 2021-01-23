@@ -37,7 +37,7 @@ namespace Levrum.DataBridge
                 {
                     FieldNameComboBox.Text = value.Field;
                     FieldSourceComboBox.SelectedItem = value.Column.DataSource;
-                    ColumnComboBox.SelectedItem = value.Column.ColumnName;
+                    ColumnAutoCompleteBox.SelectedItem = value.Column.ColumnName;
                 }
             } 
         }
@@ -96,14 +96,28 @@ namespace Levrum.DataBridge
 
         private void ColumnComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            Result.Column.ColumnName = ColumnComboBox.SelectedItem as string;
+            // Result.Column.ColumnName = ColumnComboBox.SelectedItem as string;
         }
 
         private void FieldSourceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             IDataSource selectedSource = (IDataSource)FieldSourceComboBox.SelectedItem;
             Result.Column.DataSource = selectedSource;
-            ColumnComboBox.ItemsSource = selectedSource.GetColumns();
+            ColumnAutoCompleteBox.ItemsSource = selectedSource.GetColumns();
+        }
+
+        private void ColumnAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Result.Column.ColumnName = ColumnAutoCompleteBox.SelectedItem as string;
+        }
+
+        private void ColumnAutoCompleteBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            AutoCompleteBox box = sender as AutoCompleteBox;
+            if (box != null)
+            {
+                box.Dispatcher.BeginInvoke((Action)(() => { box.IsDropDownOpen = true; }));
+            }
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -142,6 +156,11 @@ namespace Levrum.DataBridge
             {
                 Result = null;
             }
+        }
+
+        private void Window_LocationChanged(object sender, EventArgs e)
+        {
+            ColumnAutoCompleteBox.Dispatcher.BeginInvoke((Action)(() => { ColumnAutoCompleteBox.IsDropDownOpen = false; }));
         }
     }
 }
