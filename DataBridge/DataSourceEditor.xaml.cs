@@ -219,16 +219,16 @@ namespace Levrum.DataBridge
                         }
 
                         List<string> columns = xmlSource.GetColumns();
-                        XmlIncidentNodeComboBox.ItemsSource = columns;
-                        XmlIncidentNodeComboBox.SelectedItem = xmlSource.IncidentNode;
-                        XmlIncidentIdNodeComboBox.ItemsSource = columns;
-                        XmlIncidentIdNodeComboBox.SelectedItem = xmlSource.IDColumn;
-                        XmlResponseNodeComboBox.ItemsSource = columns;
-                        XmlResponseNodeComboBox.SelectedItem = xmlSource.ResponseNode;
-                        XmlResponseIdNodeComboBox.ItemsSource = columns;
-                        XmlResponseIdNodeComboBox.SelectedItem = xmlSource.ResponseIDColumn;
-                        XmlDateNodeComboBox.ItemsSource = columns;
-                        XmlDateNodeComboBox.SelectedItem = xmlSource.DateColumn;
+                        XmlIncidentNodeAutoCompleteBox.ItemsSource = columns;
+                        XmlIncidentNodeAutoCompleteBox.SelectedItem = xmlSource.IncidentNode;
+                        XmlIncidentIdNodeAutoCompleteBox.ItemsSource = columns;
+                        XmlIncidentIdNodeAutoCompleteBox.SelectedItem = xmlSource.IDColumn;
+                        XmlResponseNodeAutoCompleteBox.ItemsSource = columns;
+                        XmlResponseNodeAutoCompleteBox.SelectedItem = xmlSource.ResponseNode;
+                        XmlResponseIdNodeAutoCompleteBox.ItemsSource = columns;
+                        XmlResponseIdNodeAutoCompleteBox.SelectedItem = xmlSource.ResponseIDColumn;
+                        XmlDateNodeAutoCompleteBox.ItemsSource = columns;
+                        XmlDateNodeAutoCompleteBox.SelectedItem = xmlSource.DateColumn;
                     } catch (Exception ex)
                     {
                         LogHelper.LogMessage(LogLevel.Error, string.Format("Unable to load XmlSource from file '{0}'", DataSource.Parameters["File"]), ex);
@@ -252,16 +252,16 @@ namespace Levrum.DataBridge
                         }
 
                         List<string> columns = dailyDigestSource.GetColumns();
-                        DailyDigestIncidentNodeComboBox.ItemsSource = columns;
-                        DailyDigestIncidentNodeComboBox.SelectedItem = dailyDigestSource.IncidentNode;
-                        DailyDigestIncidentIdNodeComboBox.ItemsSource = columns;
-                        DailyDigestIncidentIdNodeComboBox.SelectedItem = dailyDigestSource.IDColumn;
-                        DailyDigestResponseNodeComboBox.ItemsSource = columns;
-                        DailyDigestResponseNodeComboBox.SelectedItem = dailyDigestSource.ResponseNode;
-                        DailyDigestResponseIdNodeComboBox.ItemsSource = columns;
-                        DailyDigestResponseIdNodeComboBox.SelectedItem = dailyDigestSource.ResponseIDColumn;
-                        DailyDigestDateNodeComboBox.ItemsSource = columns;
-                        DailyDigestDateNodeComboBox.SelectedItem = dailyDigestSource.DateColumn;
+                        DailyDigestIncidentNodeAutoCompleteBox.ItemsSource = columns;
+                        DailyDigestIncidentNodeAutoCompleteBox.SelectedItem = dailyDigestSource.IncidentNode;
+                        DailyDigestIncidentIdNodeAutoCompleteBox.ItemsSource = columns;
+                        DailyDigestIncidentIdNodeAutoCompleteBox.SelectedItem = dailyDigestSource.IDColumn;
+                        DailyDigestResponseNodeAutoCompleteBox.ItemsSource = columns;
+                        DailyDigestResponseNodeAutoCompleteBox.SelectedItem = dailyDigestSource.ResponseNode;
+                        DailyDigestResponseIdNodeAutoCompleteBox.ItemsSource = columns;
+                        DailyDigestResponseIdNodeAutoCompleteBox.SelectedItem = dailyDigestSource.ResponseIDColumn;
+                        DailyDigestDateNodeAutoCompleteBox.ItemsSource = columns;
+                        DailyDigestDateNodeAutoCompleteBox.SelectedItem = dailyDigestSource.DateColumn;
                     } catch (Exception ex)
                     {
                         LogHelper.LogMessage(LogLevel.Error, $"Unable to load DailyDigestSource from folder '{DataSource.Parameters["Directory"]}'", ex);
@@ -342,6 +342,7 @@ namespace Levrum.DataBridge
                         DataSource.Parameters.Remove("Query");
                     }
                     DataSource.Parameters["Table"] = SqlTableComboBox.SelectedItem as string;
+                    SqlDateColumnComboBox.Visibility = Visibility.Visible;
                 }
                 else
                 {
@@ -350,6 +351,7 @@ namespace Levrum.DataBridge
                         DataSource.Parameters.Remove("Table");
                     }
                     DataSource.Parameters["Query"] = SqlQueryTextBox.Text;
+                    SqlDateColumnComboBox.Visibility = Visibility.Hidden;
                 }
             }
             else if (DataSource is GeoSource)
@@ -922,11 +924,11 @@ namespace Levrum.DataBridge
                 XmlFileNameTextBox.Text = ofd.FileName;
 
                 List<string> nodes = source.GetColumns();
-                XmlIncidentNodeComboBox.ItemsSource = nodes;
-                XmlIncidentIdNodeComboBox.ItemsSource = nodes;
-                XmlResponseNodeComboBox.ItemsSource = nodes;
-                XmlResponseIdNodeComboBox.ItemsSource = nodes;
-                XmlDateNodeComboBox.ItemsSource = nodes;
+                XmlIncidentNodeAutoCompleteBox.ItemsSource = nodes;
+                XmlIncidentIdNodeAutoCompleteBox.ItemsSource = nodes;
+                XmlResponseNodeAutoCompleteBox.ItemsSource = nodes;
+                XmlResponseIdNodeAutoCompleteBox.ItemsSource = nodes;
+                XmlDateNodeAutoCompleteBox.ItemsSource = nodes;
                 ChangesMade = true;
             }
             catch (Exception ex)
@@ -938,28 +940,34 @@ namespace Levrum.DataBridge
             }
         }
 
-        private void XmlIncidentNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void XmlIncidentNodeAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             XmlSource source = DataSource as XmlSource;
-            source.IncidentNode = XmlIncidentNodeComboBox.SelectedItem as string;
+            source.IncidentNode = XmlIncidentNodeAutoCompleteBox.SelectedItem as string;
         }
 
-        private void XmlIncidentIdNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void XmlIncidentIdNodeAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             XmlSource source = DataSource as XmlSource;
-            source.IDColumn = XmlIncidentIdNodeComboBox.SelectedItem as string;
+            source.IDColumn = XmlIncidentIdNodeAutoCompleteBox.SelectedItem as string;
         }
 
-        private void XmlResponseNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void XmlResponseNodeAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             XmlSource source = DataSource as XmlSource;
-            source.ResponseNode = XmlResponseNodeComboBox.SelectedItem as string;
+            source.ResponseNode = XmlResponseNodeAutoCompleteBox.SelectedItem as string;
         }
 
-        private void XmlResponseIdNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void XmlResponseIdNodeAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             XmlSource source = DataSource as XmlSource;
-            source.ResponseIDColumn = XmlResponseIdNodeComboBox.SelectedItem as string;
+            source.ResponseIDColumn = XmlResponseIdNodeAutoCompleteBox.SelectedItem as string;
+        }
+
+        private void XmlDateNodeAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            XmlSource source = DataSource as XmlSource;
+            source.DateColumn = XmlDateNodeAutoCompleteBox.SelectedItem as string;
         }
 
         private void SummarizeXmlButton_Click(object sender, RoutedEventArgs e)
@@ -1012,11 +1020,11 @@ namespace Levrum.DataBridge
                 DailyDigestFolderNameTextBox.Text = directory.FullName;
 
                 List<string> nodes = source.GetColumns();
-                DailyDigestIncidentNodeComboBox.ItemsSource = nodes;
-                DailyDigestIncidentIdNodeComboBox.ItemsSource = nodes;
-                DailyDigestResponseNodeComboBox.ItemsSource = nodes;
-                DailyDigestResponseIdNodeComboBox.ItemsSource = nodes;
-                DailyDigestDateNodeComboBox.ItemsSource = nodes;
+                DailyDigestIncidentNodeAutoCompleteBox.ItemsSource = nodes;
+                DailyDigestIncidentIdNodeAutoCompleteBox.ItemsSource = nodes;
+                DailyDigestResponseNodeAutoCompleteBox.ItemsSource = nodes;
+                DailyDigestResponseIdNodeAutoCompleteBox.ItemsSource = nodes;
+                DailyDigestDateNodeAutoCompleteBox.ItemsSource = nodes;
                 ChangesMade = true;
             }
             catch (Exception ex)
@@ -1028,28 +1036,28 @@ namespace Levrum.DataBridge
             }
         }
 
-        private void DailyDigestIncidentNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DailyDigestIncidentNodeAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
-            source.IncidentNode = DailyDigestIncidentNodeComboBox.SelectedItem as string;
+            source.IncidentNode = DailyDigestIncidentNodeAutoCompleteBox.SelectedItem as string;
         }
 
-        private void DailyDigestIncidentIdNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DailyDigestIncidentIdNodeAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
-            source.IDColumn = DailyDigestIncidentIdNodeComboBox.SelectedItem as string;
+            source.IDColumn = DailyDigestIncidentIdNodeAutoCompleteBox.SelectedItem as string;
         }
 
-        private void DailyDigestResponseNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DailyDigestResponseNodeAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
-            source.ResponseNode = DailyDigestResponseNodeComboBox.SelectedItem as string;
+            source.ResponseNode = DailyDigestResponseNodeAutoCompleteBox.SelectedItem as string;
         }
 
-        private void DailyDigestResponseIdNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DailyDigestResponseIdNodeAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
-            source.ResponseIDColumn = DailyDigestResponseIdNodeComboBox.SelectedItem as string;
+            source.ResponseIDColumn = DailyDigestResponseIdNodeAutoCompleteBox.SelectedItem as string;
         }
 
         private void DateColumnComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -1064,16 +1072,10 @@ namespace Levrum.DataBridge
             source.DateColumn = SqlDateColumnComboBox.SelectedItem as string;
         }
 
-        private void XmlDateNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            XmlSource source = DataSource as XmlSource;
-            source.DateColumn = XmlDateNodeComboBox.SelectedItem as string;
-        }
-
-        private void DailyDigestDateNodeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DailyDigestDateNodeAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             DailyDigestXmlSource source = DataSource as DailyDigestXmlSource;
-            source.DateColumn = DailyDigestDateNodeComboBox.SelectedItem as string;
+            source.DateColumn = DailyDigestDateNodeAutoCompleteBox.SelectedItem as string;
         }
 
         private void SummarizeDailyDigestButton_Click(object sender, RoutedEventArgs e)
