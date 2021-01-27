@@ -304,9 +304,6 @@ namespace Levrum.Data.Classes
                     using (StreamReader streamReader = new StreamReader(file.OpenRead()))
                     {
                         string json = streamReader.ReadToEnd();
-                        json = json.Replace("DataSet", "DataSet016");
-                        json = json.Replace("IncidentData", "IncidentData016");
-                        json = json.Replace("ResponseData", "ResponseData016");
                         return DeserializeJson(json, true);
                     }
                 }
@@ -337,6 +334,10 @@ namespace Levrum.Data.Classes
             {
                 if (typeof(T) == typeof(IncidentData))
                 {
+                    json = json.Replace("DataSet", "DataSet016");
+                    json = json.Replace("IncidentData", "IncidentData016");
+                    json = json.Replace("ResponseData", "ResponseData016");
+
                     DataSet016<IncidentData016> oldDataSet = JsonConvert.DeserializeObject<DataSet016<IncidentData016>>(json, new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.Objects, TypeNameHandling = TypeNameHandling.Auto });
                     DataSet<IncidentData> output = new DataSet<IncidentData>();
                     foreach (IncidentData016 oldIncident in oldDataSet)
