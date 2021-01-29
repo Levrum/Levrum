@@ -301,14 +301,43 @@ namespace Levrum.Data.Classes
                 // Try and load old-style DataSets here
                 try
                 {
+                    DataSet<IncidentData> output = new DataSet<IncidentData>();
+                    FileInfo tempFile = new FileInfo(Path.GetTempFileName());
                     using (StreamReader streamReader = new StreamReader(file.OpenRead()))
+                    using (StreamWriter tempWriter = new StreamWriter(tempFile.OpenWrite()))
                     {
-                        string json = streamReader.ReadToEnd();
-                        json = json.Replace("DataSet", "DataSet016");
-                        json = json.Replace("IncidentData", "IncidentData016");
-                        json = json.Replace("ResponseData", "ResponseData016");
-                        return DeserializeJson(json, true);
+                        while (!streamReader.EndOfStream)
+                        {
+                            var line = streamReader.ReadLine()
+                                .Replace("DataSet", "DataSet016")
+                                .Replace("IncidentData", "IncidentData016")
+                                .Replace("ResponseData", "ResponseData016");
+                            tempWriter.WriteLine(line);
+                        }
                     }
+                    using (StreamReader tempReader = tempFile.OpenText())
+                    using (JsonReader jsonReader = new JsonTextReader(tempReader))
+                    {
+                        JsonSerializer jsonSerializer = new JsonSerializer
+                        {
+                            PreserveReferencesHandling = PreserveReferencesHandling.All,
+                            TypeNameHandling = TypeNameHandling.All
+                        };
+
+                        var oldDataSet = jsonSerializer.Deserialize<DataSet016<IncidentData016>>(jsonReader);
+                        foreach (IncidentData016 oldIncident in oldDataSet)
+                        {
+                            IncidentData incident = new IncidentData(data: oldIncident.Data);
+                            foreach (ResponseData016 oldResponse in oldIncident.Responses)
+                            {
+                                ResponseData response = new ResponseData(oldResponse.Id, oldResponse.Data, oldResponse.TimingData.ToArray());
+                                incident.Responses.Add(response);
+                            }
+                            output.Add(incident);
+                        }
+                    }
+                    tempFile.Delete();
+                    return output as DataSet<T>;
                 }
                 catch (Exception ex2)
                 {
@@ -337,6 +366,10 @@ namespace Levrum.Data.Classes
             {
                 if (typeof(T) == typeof(IncidentData))
                 {
+                    json = json.Replace("DataSet", "DataSet016");
+                    json = json.Replace("IncidentData", "IncidentData016");
+                    json = json.Replace("ResponseData", "ResponseData016");
+
                     DataSet016<IncidentData016> oldDataSet = JsonConvert.DeserializeObject<DataSet016<IncidentData016>>(json, new JsonSerializerSettings() { PreserveReferencesHandling = PreserveReferencesHandling.Objects, TypeNameHandling = TypeNameHandling.Auto });
                     DataSet<IncidentData> output = new DataSet<IncidentData>();
                     foreach (IncidentData016 oldIncident in oldDataSet)

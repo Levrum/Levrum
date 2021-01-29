@@ -1674,15 +1674,29 @@ namespace Levrum.UI.WinForms
 
         private void m_bgwLoadIncidentData_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            string fileName = e.Argument.ToString();
-            List<IncidentData> incidents = null;
+            FileInfo file = new FileInfo(e.Argument.ToString());
+            char firstChar;
+            using (StreamReader reader = file.OpenText())
+            {
+                firstChar = (char)reader.Peek();
+            }
+            DataSet<IncidentData> incidents = null;
             try
             {
-                incidents = JsonConvert.DeserializeObject<List<IncidentData>>(File.ReadAllText(fileName), new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.All });
+                if (firstChar == '[')
+                {
+                    incidents = DataSet<IncidentData>.Deserialize(file);
+                }
+                else if (firstChar == '{')
+                {
+                    incidents = JsonConvert.DeserializeObject<DataSet<IncidentData>>(File.ReadAllText(file.FullName), new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.All });
+                }
+                else
+                    throw new Exception("Invalid JSON");
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Could not load incidents");
+                LogHelper.LogException(ex, "Could not load incidents", true);
                 Cursor.Current = Cursors.Default;
                 return;
             }
@@ -1698,10 +1712,10 @@ namespace Levrum.UI.WinForms
 
         private void m_bgwLoadIncidentData_RunWorkerCompleted(object sender, System.ComponentModel.RunWorkerCompletedEventArgs e)
         {
-            GetDataFieldFromUser(e.Result as List<IncidentData>);
+            GetDataFieldFromUser(e.Result as DataSet<IncidentData>);
         }
 
-        public void GetDataFieldFromUser(List<IncidentData> incidents)
+        public void GetDataFieldFromUser(DataSet<IncidentData> incidents)
         {
             this.Cursor = Cursors.Default;
 
