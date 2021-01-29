@@ -520,6 +520,8 @@ namespace Levrum.DataBridge
 
                     InvertLatitudeButton.IsChecked = false;
                     InvertLongitudeButton.IsChecked = false;
+                    ToggleRestorePrecisionButton.IsChecked = false;
+                    ToggleTransportAsClearSceneButton.IsChecked = false;
                     ConvertCoordinateButton.IsChecked = false;
                 }
 
@@ -546,8 +548,6 @@ namespace Levrum.DataBridge
             {
                 document.ChangesMade = status;
             }
-
-            document.Document.Title = status == true ? string.Format("{0}*", map.Name) : map.Name;
         }
 
         public DataMapDocument GetDocumentForMap(DataMap map)
@@ -628,7 +628,14 @@ namespace Levrum.DataBridge
 
                 FileInfo csvFileInfo = new FileInfo(incidentCsvFileName);
                 sfd.Title = "Save Response CSV";
-                sfd.FileName = string.Format("{0} Responses.csv", csvFileInfo.Name.Substring(0, csvFileInfo.Name.Length - 4));
+
+                string fn = csvFileInfo.Name.Substring(0, csvFileInfo.Name.Length - 4);
+                if (fn.ToLowerInvariant().EndsWith("incidents"))
+                {
+                    fn = fn.Substring(0, fn.Length - 9);
+                }
+
+                sfd.FileName = string.Format("{0} Responses.csv", fn);
                 if (sfd.ShowDialog() == false)
                 {
                     return;
@@ -756,7 +763,8 @@ namespace Levrum.DataBridge
                 editor.Window = this;
                 document.Content = editor;
                 DocumentPane.Children.Add(document);
-                openDocuments.Add(new DataMapDocument(newMap, document));
+                DataMapDocument newDocument = new DataMapDocument(newMap, document);
+                openDocuments.Add(newDocument);
                 document.IsActive = true;
             }
             catch (Exception ex)
@@ -988,7 +996,7 @@ namespace Levrum.DataBridge
                 {
                     return;
                 }
-                Cursor = Cursors.Wait;
+
                 string incidentCsvFileName = sfd.FileName;
 
                 sfd.Title = "Save Response CSV";
@@ -1004,12 +1012,19 @@ namespace Levrum.DataBridge
                 else
                 {
                     FileInfo csvFileInfo = new FileInfo(incidentCsvFileName);
-                    sfd.FileName = string.Format("{0} Responses.csv", csvFileInfo.Name.Substring(0, csvFileInfo.Name.Length - 4));
+                    string fn = csvFileInfo.Name.Substring(0, csvFileInfo.Name.Length - 4);
+                    if (fn.ToLowerInvariant().EndsWith("incidents"))
+                    {
+                        fn = fn.Substring(0, fn.Length - 9).Trim();
+                    }
+
+                    sfd.FileName = string.Format("{0} Responses.csv", fn);
                 }
                 if (sfd.ShowDialog() == false)
                 {
                     return;
                 }
+                Cursor = Cursors.Wait;
                 string responseCsvFileName = sfd.FileName;
                 if (!DataSources.Map.Data.ContainsKey("LastCsvIncidentExport") || DataSources.Map.Data["LastCsvIncidentExport"] as string != incidentCsvFileName ||
                     !DataSources.Map.Data.ContainsKey("LastCsvResponseExport") || DataSources.Map.Data["LastCsvResponseExport"] as string != responseCsvFileName)
@@ -1532,13 +1547,44 @@ namespace Levrum.DataBridge
     {
         public DataMap Map { get; set; }
         public LayoutDocument Document { get; set; } = null;
-        public bool ChangesMade { get; set; } = false;
+
+        private bool m_changesMade = false;
+        public bool ChangesMade 
+        { 
+            get 
+            { 
+                return m_changesMade; 
+            } 
+            set 
+            { 
+                if (m_changesMade == false && value == true)
+                {
+                    OnChangesMade?.Invoke(Map, value);
+                }
+                m_changesMade = value;
+                Document.Title = value == true ? string.Format("{0}*", Map.Name) : Map.Name;
+            } 
+        }
+
+        public delegate void ChangesMadeDelegate(DataMap map, bool status);
+
+        public event ChangesMadeDelegate OnChangesMade;
 
         public DataMapDocument(DataMap _map, LayoutDocument _document, bool _changesMade = false)
         {
             Map = _map;
             Document = _document;
             ChangesMade = _changesMade;
+
+            Map.IncidentDataMappings.CollectionChanged += dataMappings_CollectionChanged;
+            Map.ResponseDataMappings.CollectionChanged += dataMappings_CollectionChanged;
+            Map.BenchmarkMappings.CollectionChanged += dataMappings_CollectionChanged;
+            Map.DataSources.CollectionChanged += dataMappings_CollectionChanged;
+        }
+
+        private void dataMappings_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            ChangesMade = true;
         }
     }
 }
