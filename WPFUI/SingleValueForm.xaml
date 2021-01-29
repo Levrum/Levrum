@@ -5,17 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Levrum.UI.WPF"
         mc:Ignorable="d"
-        Title="Enter value" Height="150" Width="800"
+        Title="Enter value" Height="138" Width="400"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="38"/>
-            <RowDefinition Height="38"/>
+            <RowDefinition Height="22"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <Label Grid.Row="0" x:Name="Label" Content="Text Input:" FontSize="18" FontWeight="DemiBold" Margin="4,0,0,0"/>
-        <TextBox Grid.Row="1" x:Name="TextBox" Text="Enter text here..." Margin="8,0,8,0" FontSize="14" TextChanged="TextBox_TextChanged" Foreground="DarkGray" GotFocus="TextBox_GotFocus" TextWrapping="NoWrap" AcceptsReturn="False"/>
+        <TextBox Grid.Row="1" x:Name="TextBox" Text="Enter text here..." Margin="8,0,8,0" FontSize="14" TextChanged="TextBox_TextChanged" Foreground="DarkGray" GotFocus="TextBox_GotFocus" TextWrapping="NoWrap" AcceptsReturn="False" PreviewTextInput="TextBox_PreviewTextInput" DataObject.Pasting="TextBox_Pasting"/>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button x:Name="SaveButton" Width="80" Margin="0,8,0,8" Click="SaveButton_Click">Save</Button>
             <Button x:Name="CancelButton" Width="80" Margin="8,8,8,8" Click="CancelButton_Click">Cancel</Button>

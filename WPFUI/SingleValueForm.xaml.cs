@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -51,8 +52,9 @@ namespace Levrum.UI.WPF
         public string Result { get; set; } = null;
 
         bool TextSet { get; set; } = false;
+        public bool Numeric { get; set; } = false;
 
-        public SingleValueForm(string _title = null, string _caption = null, string _text = null)
+        public SingleValueForm(string _title = null, string _caption = null, string _text = null, bool _numeric = false)
         {
             InitializeComponent();
             TextSet = false;
@@ -73,6 +75,8 @@ namespace Levrum.UI.WPF
                 TextBox.Text = _text;
                 TextBox.Foreground = Brushes.Black;
             }
+
+            Numeric = _numeric;
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -100,6 +104,32 @@ namespace Levrum.UI.WPF
             {
                 TextBox.Text = string.Empty;
                 TextBox.Foreground = Brushes.Black;
+            }
+        }
+
+        private void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            if (Numeric) {
+                double value;
+                bool isNumeric = double.TryParse(e.Text, out value);
+                e.Handled = !isNumeric;
+            }
+        }
+
+        private void TextBox_Pasting(object sender, DataObjectPastingEventArgs e)
+        {
+            if (e.DataObject.GetDataPresent(typeof(string)))
+            {
+                string text = (string)e.DataObject.GetData(typeof(string));
+                double value;
+                if (!double.TryParse(text, out value))
+                {
+                    e.CancelCommand();
+                }
+            }
+            else
+            {
+                e.CancelCommand();
             }
         }
     }
