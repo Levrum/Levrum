@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Levrum.DataBridge"
+             xmlns:dd="urn:gong-wpf-dragdrop"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -33,46 +34,12 @@
                 <TextBlock Text="Incident Data" FontSize="16" FontWeight="DemiBold"/>
             </GroupBox.Header>
             <Grid Margin="0,0,0,0">
-                <!-- <Grid.RowDefinitions>
-                    <RowDefinition Height="80"/>
-                    <RowDefinition Height="300*"/>
-                </Grid.RowDefinitions> -->
-                <!--
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="75"/>
-                        <ColumnDefinition Width="250*"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel>
-                        <TextBlock Height="20" FontSize="14">Time:</TextBlock>
-                        <TextBlock Height="20" FontSize="14">Latitude:</TextBlock>
-                        <TextBlock Height="20" FontSize="14">Longitude:</TextBlock>
-                        <TextBlock Height="20" FontSize="14">Location:</TextBlock>
-                    </StackPanel>
-                    <StackPanel Grid.Column="1">
-                        <Button x:Name="IncidentTimeButton" Height="20" FontSize="14" VerticalContentAlignment="Center" Click="IncidentTimeButton_Click" Background="Transparent">
-                            <TextBlock x:Name="IncidentTimeButtonText" Margin="0,-2,0,0">Click to select...</TextBlock>
-                        </Button>
-                        <Button x:Name="IncidentLatitudeButton" Height="20" FontSize="14" VerticalContentAlignment="Center" Click="IncidentLatitudeButton_Click" Background="Transparent">
-                            <TextBlock x:Name="IncidentLatitudeButtonText" Margin="0,-2,0,0">Click to select...</TextBlock>
-                        </Button>
-                        <Button x:Name="IncidentLongitudeButton" Height="20" FontSize="14" VerticalContentAlignment="Center" Click="IncidentLongitudeButton_Click" Background="Transparent">
-                            <TextBlock x:Name="IncidentLongitudeButtonText" Margin="0,-2,0,0">Click to select...</TextBlock>
-                        </Button>
-                        <Button x:Name="IncidentLocationButton" Height="20" FontSize="14" VerticalContentAlignment="Center" Click="IncidentLocationButton_Click" Background="Transparent">
-                            <TextBlock x:Name="IncidentLocationButtonText" Margin="0,-2,0,0">Click to select...</TextBlock>
-                        </Button>
-                    </StackPanel>
-                </Grid>
-                -->
                 <Grid Grid.Row="1" Margin="0,4,0,0">
                     <Grid.RowDefinitions>
-                        <!-- <RowDefinition Height="22"/> -->
                         <RowDefinition Height="200*"/>
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
-                    <!-- <TextBlock Height="28" FontSize="16" Grid.Row="0">Data</TextBlock> -->
-                    <ListBox x:Name="IncidentDataListBox" Grid.Row="0" SelectionChanged="IncidentDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="IncidentDataListBox_MouseDoubleClick">
+                    <ListBox x:Name="IncidentDataListBox" Grid.Row="0" SelectionChanged="IncidentDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="IncidentDataListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="0,2">
@@ -107,7 +74,7 @@
                         <RowDefinition Height="200*"/>
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
-                    <ListBox Grid.Row="0" x:Name="ResponseDataListBox" SelectionChanged="ResponseDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="ResponseDataListBox_MouseDoubleClick">
+                    <ListBox Grid.Row="0" x:Name="ResponseDataListBox" SelectionChanged="ResponseDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="ResponseDataListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="0,2">
@@ -142,7 +109,7 @@
                         <RowDefinition Height="200*"/>
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
-                    <ListBox Grid.Row="0" x:Name="BenchmarkListBox" SelectionChanged="BenchmarkListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="BenchmarkListBox_MouseDoubleClick">
+                    <ListBox Grid.Row="0" x:Name="BenchmarkListBox" SelectionChanged="BenchmarkListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="BenchmarkListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Grid Margin="0,2">

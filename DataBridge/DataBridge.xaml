@@ -4,11 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Levrum.DataBridge"
-        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
-        xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
+        xmlns:avdock="https://github.com/Dirkster99/AvalonDock"
         mc:Ignorable="d"
         Title="Levrum DataBridge" Height="700" Width="1368" Icon="databridge.ico"
-        Closing="Window_Closing">
+        Closing="Window_Closing" 
+        AllowDrop="True" 
+        Drop="Window_Drop" 
+        DragDrop.DragEnter="Window_DragEnter">
     <Window.Resources>
         <Style TargetType="Image" x:Key="DynamicImageOpacity">
             <Style.Triggers>
@@ -66,7 +68,8 @@
                 <MenuItem x:Name="EditProjectionMenuItem" Header="Edit Conversion _Projection..." Click="EditProjection_Click" IsEnabled="False"/>
                 <MenuItem x:Name="ToggleInvertLongitudeMenuItem" Header="Enable Invert Lon_gitude" Click="ToggleInvertLongitude_Click" IsEnabled="False"/>
                 <MenuItem x:Name="ToggleInvertLatitudeMenuItem" Header="Enable Invert _Latitude" Click="ToggleInvertLatitude_Click" IsEnabled="False"/>
-                <MenuItem x:Name="ToggleTransportAsClearSceneMenuItem" Header="Enable _Transport As ClearScene" Click="ToggleTransportAsClearScene_Click" IsEnabled="False"/>
+                <MenuItem x:Name="ToggleRestorePrecisionMenuItem" Header="Enable _Restore Precision" Click="ToggleRestorePrecision_Click" IsEnabled="False"/>
+                <MenuItem x:Name="ToggleTransportAsClearSceneMenuItem" Header="Enable Tra_nsport As ClearScene" Click="ToggleTransportAsClearScene_Click" IsEnabled="False"/>
                 <Separator/>
                 <MenuItem x:Name="EditCauseTreeMenuItem" Header="Edit Cause _Tree..." Click="EditCauseTree_Click" IsEnabled="False"/>
             </MenuItem>
@@ -126,6 +129,9 @@
                 <ToggleButton x:Name="InvertLatitudeButton" Margin="0,0,0,-1" Click="ToggleInvertLatitude_Click" ToolTip="Toggle Invert Latitude">
                     <Image x:Name="InvertLatitudeButtonIcon" Source="/DataBridge;component/Resources/YIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
                 </ToggleButton>
+                <ToggleButton x:Name="ToggleRestorePrecisionButton" Margin="0,0,0,-1" Click="ToggleRestorePrecision_Click" ToolTip="Toggle Restore Precision">
+                    <Image x:Name="ToggleRestorePrecisionButtonIcon" Source="/DataBridge;component/Resources/PrecisionIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
+                </ToggleButton>
                 <ToggleButton x:Name="ToggleTransportAsClearSceneButton" Margin="0,0,0,-1" Click="ToggleTransportAsClearScene_Click" ToolTip="Toggle Transport As ClearScene">
                     <Image x:Name="ToggleTransportAsClearSceneButtonIcon" Source="/DataBridge;component/Resources/Ambulance.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
                 </ToggleButton>
@@ -154,33 +160,33 @@
                 </Button>
             </ToolBar>
         </ToolBarTray>
-        <xcad:DockingManager Name="DockingManager" Grid.Row="2" DocumentClosing="DockingManager_DocumentClosing">
-            <xcad:DockingManager.Theme>
-                <xcad:Vs2013LightTheme/>
-            </xcad:DockingManager.Theme>
-            <xcad:DockingManager.DocumentHeaderTemplate>
+        <avdock:DockingManager Name="DockingManager" Grid.Row="2" DocumentClosing="DockingManager_DocumentClosing">
+            <avdock:DockingManager.Theme>
+                <avdock:Vs2013LightTheme/>
+            </avdock:DockingManager.Theme>
+            <avdock:DockingManager.DocumentHeaderTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
                         <Image Source="{Binding IconSource}" Margin="0,0,4,0"/>
                         <TextBlock Text="{Binding Title}" />
                     </StackPanel>
                 </DataTemplate>
-            </xcad:DockingManager.DocumentHeaderTemplate>
-            <xcad:LayoutRoot x:Name="_layoutRoot">
-                <xcad:LayoutPanel Orientation="Vertical">
-                    <xcad:LayoutDocumentPaneGroup >
-                        <xcad:LayoutDocumentPane x:Name="DocumentPane" PropertyChanged="DocumentPane_PropertyChanged">
-                        </xcad:LayoutDocumentPane>
-                    </xcad:LayoutDocumentPaneGroup >
-                    <xcad:LayoutAnchorablePane DockHeight="200">
-                        <xcad:LayoutAnchorable ContentId="sources" Title="Data Sources" CanHide="False" CanClose="False"
+            </avdock:DockingManager.DocumentHeaderTemplate>
+            <avdock:LayoutRoot x:Name="_layoutRoot">
+                <avdock:LayoutPanel Orientation="Vertical">
+                    <avdock:LayoutDocumentPaneGroup >
+                        <avdock:LayoutDocumentPane x:Name="DocumentPane" PropertyChanged="DocumentPane_PropertyChanged">
+                        </avdock:LayoutDocumentPane>
+                    </avdock:LayoutDocumentPaneGroup >
+                    <avdock:LayoutAnchorablePane DockHeight="200">
+                        <avdock:LayoutAnchorable ContentId="sources" Title="Data Sources" CanHide="False" CanClose="False"
                                             AutoHideWidth="240">
                             <local:DataSourcesList x:Name="DataSources" Margin="0,0,0,0" IsEnabled="False"/>
-                        </xcad:LayoutAnchorable>
-                    </xcad:LayoutAnchorablePane>
-                </xcad:LayoutPanel>
-            </xcad:LayoutRoot>
-        </xcad:DockingManager>
+                        </avdock:LayoutAnchorable>
+                    </avdock:LayoutAnchorablePane>
+                </avdock:LayoutPanel>
+            </avdock:LayoutRoot>
+        </avdock:DockingManager>
         <StatusBar Grid.Row="3">
             <StatusBarItem>
                 <ProgressBar x:Name="StatusBarProgress" Width="200" Height="18" Maximum="100" Margin="2,0,0,0"/>

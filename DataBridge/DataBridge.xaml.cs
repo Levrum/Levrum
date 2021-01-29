@@ -14,8 +14,8 @@ using System.Windows.Input;
 
 using Microsoft.Win32;
 
-using Xceed.Wpf.AvalonDock;
-using Xceed.Wpf.AvalonDock.Layout;
+using AvalonDock;
+using AvalonDock.Layout;
 
 using Newtonsoft.Json;
 
@@ -151,8 +151,7 @@ namespace Levrum.DataBridge
 
                 if (mapDocument != null)
                 {
-                    int index = DocumentPane.IndexOfChild(mapDocument.Document);
-                    DocumentPane.SelectedContentIndex = index;
+                    mapDocument.Document.IsActive = true;
                     addRecentFile(fileName);
                     return mapDocument;
                 }
@@ -171,7 +170,7 @@ namespace Levrum.DataBridge
                 DocumentPane.Children.Add(document);
                 mapDocument = new DataMapDocument(map, document);
                 openDocuments.Add(mapDocument);
-                DocumentPane.SelectedContentIndex = DocumentPane.Children.IndexOf(document);
+                document.IsActive = true;
                 addRecentFile(fileName);
                 return mapDocument;
             }
@@ -442,6 +441,7 @@ namespace Levrum.DataBridge
             CreateCsvButton.IsEnabled = controlsEnabled;
             InvertLatitudeButton.IsEnabled = controlsEnabled;
             InvertLongitudeButton.IsEnabled = controlsEnabled;
+            ToggleRestorePrecisionButton.IsEnabled = controlsEnabled;
             EditProjectionButton.IsEnabled = controlsEnabled;
             ConvertCoordinateButton.IsEnabled = controlsEnabled;
             EditPostProcessingButton.IsEnabled = controlsEnabled;
@@ -482,6 +482,7 @@ namespace Levrum.DataBridge
                 EditProjectionMenuItem.IsEnabled = documentOpen;
                 ToggleInvertLatitudeMenuItem.IsEnabled = documentOpen;
                 ToggleInvertLongitudeMenuItem.IsEnabled = documentOpen;
+                ToggleRestorePrecisionMenuItem.IsEnabled = documentOpen;
                 ToggleTransportAsClearSceneMenuItem.IsEnabled = documentOpen;
 
                 EditCauseTreeMenuItem.IsEnabled = documentOpen;
@@ -493,6 +494,7 @@ namespace Levrum.DataBridge
                 ConvertCoordinateButton.IsEnabled = documentOpen;
                 InvertLatitudeButton.IsEnabled = documentOpen;
                 InvertLongitudeButton.IsEnabled = documentOpen;
+                ToggleRestorePrecisionButton.IsEnabled = documentOpen;
                 EditProjectionButton.IsEnabled = documentOpen;
                 EditCauseTreeButton.IsEnabled = documentOpen;
                 EditPostProcessingButton.IsEnabled = documentOpen;
@@ -507,6 +509,7 @@ namespace Levrum.DataBridge
                     updateCoordinateConversionControls();
                     updateInvertLatitude();
                     updateInvertLongitude();
+                    updateRestorePrecision();
                     updateTransportAsClearScene();
                 }
                 else
@@ -641,7 +644,7 @@ namespace Levrum.DataBridge
                         LogHelper.LogMessage(LogLevel.Info, string.Format("Converting JSON {0} to CSVs {1} and {2}", ofd.FileName, incidentCsvFileName, responseCsvFileName));
                         DisableControls();
                         string incidentJson = File.ReadAllText(ofd.FileName);
-                        DataSet<IncidentData> incidents = JsonConvert.DeserializeObject<DataSet<IncidentData>>(incidentJson);
+                        DataSet<IncidentData> incidents = DataSet<IncidentData>.Deserialize(ofd.FileName);
 
                         IncidentDataTools.CreateCsvs(incidents, incidentCsvFileName, responseCsvFileName);
 
@@ -754,7 +757,7 @@ namespace Levrum.DataBridge
                 document.Content = editor;
                 DocumentPane.Children.Add(document);
                 openDocuments.Add(new DataMapDocument(newMap, document));
-                DocumentPane.SelectedContentIndex = DocumentPane.Children.Count - 1;
+                document.IsActive = true;
             }
             catch (Exception ex)
             {
@@ -878,8 +881,7 @@ namespace Levrum.DataBridge
                             LogHelper.LogMessage(LogLevel.Info, string.Format("Attempting to append incidents to existing DataSet"));
                             try
                             {
-                                string incidentJson = File.ReadAllText(sfd.FileName);
-                                lastData = JsonConvert.DeserializeObject<DataSet<IncidentData>>(incidentJson);
+                                lastData = DataSet<IncidentData>.Deserialize(sfd.FileName);
                                 loader.LoadMapAndAppend(DataSources.Map, lastData);
                             } 
                             catch (Exception ex)
@@ -1236,6 +1238,51 @@ namespace Levrum.DataBridge
             }
         }
 
+        private void ToggleRestorePrecision_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (DataSources.Map.RestorePrecision == -1)
+                {
+                    SingleValueForm svf = new SingleValueForm("Configure Restore Precision", "Number of digits of precision to restore");
+                    svf.Numeric = true;
+                    svf.ShowDialog();
+                    if (svf.DialogResult == false)
+                    {
+                        return;
+                    }
+                    DataSources.Map.RestorePrecision = int.Parse(svf.Text);
+                } else
+                {
+                    DataSources.Map.RestorePrecision = -1;
+                }
+                updateRestorePrecision();
+
+                SetChangesMade(DataSources.Map, true);
+            }
+            catch (Exception ex)
+            {
+                logException(sender, "Unable to toggle restore precision", ex);
+            }
+        }
+
+        private void updateRestorePrecision()
+        {
+            if (DataSources.Map.RestorePrecision == -1)
+            {
+                ToggleRestorePrecisionMenuItem.Header = "_Restore Precision Disabled";
+                ToggleRestorePrecisionMenuItem.IsChecked = false;
+                ToggleRestorePrecisionButton.IsChecked = false;
+                ToggleRestorePrecisionButton.ToolTip = "Toggle Restore Precision";
+            } else
+            {
+                ToggleRestorePrecisionMenuItem.Header = "_Restore Precision Enabled";
+                ToggleRestorePrecisionMenuItem.IsChecked = true;
+                ToggleRestorePrecisionButton.IsChecked = true;
+                ToggleRestorePrecisionButton.ToolTip = string.Format("Restoring {0} digits of precision", DataSources.Map.RestorePrecision);
+            }
+        }
+
         private void EditCauseTree_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -1434,6 +1481,50 @@ namespace Levrum.DataBridge
             p.StartInfo = new ProcessStartInfo(fileName);
             p.StartInfo.UseShellExecute = true;
             p.Start();
+        }
+
+        private void Window_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                bool isDataMap = true;
+                foreach (string fileName in files)
+                {
+                    FileInfo file = new FileInfo(fileName);
+                    if (file.Extension.ToLowerInvariant() == ".dmap")
+                    {
+                        try
+                        {
+                            OpenDataMap(fileName);
+                        } catch (Exception ex)
+                        {
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void Window_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+                bool isDataMap = true;
+                foreach (string fileName in files)
+                {
+                    FileInfo file = new FileInfo(fileName);
+                    isDataMap = isDataMap && file.Extension.ToLowerInvariant() == ".dmap";
+                }
+                if (isDataMap)
+                {
+                    e.Effects = DragDropEffects.Copy;
+                    return;
+                }
+            } 
+
+            e.Effects = DragDropEffects.None;
         }
     }
 

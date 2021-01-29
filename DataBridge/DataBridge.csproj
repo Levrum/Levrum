@@ -39,6 +39,7 @@
     <None Remove="Resources\databridge.png" />
     <None Remove="Resources\hamburger.png" />
     <None Remove="Resources\PostProcessing Script Manual.pdf" />
+    <None Remove="Resources\PrecisionIcon.png" />
     <None Remove="Resources\RightArrowIcon.png" />
     <None Remove="Resources\StopIcon.png" />
     <None Remove="SaveIcon.png" />
@@ -68,10 +69,11 @@
 
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.0.1" />
-    <PackageReference Include="Dirkster.AvalonDock" Version="3.6.2" />
-    <PackageReference Include="Dirkster.AvalonDock.Themes.VS2013" Version="3.6.2" />
+    <PackageReference Include="Dirkster.AvalonDock" Version="4.50.1" />
+    <PackageReference Include="Dirkster.AvalonDock.Themes.VS2013" Version="4.50.1" />
     <PackageReference Include="DotNetProjects.Extended.Wpf.Toolkit" Version="4.6.78" />
     <PackageReference Include="DotNetProjects.WpfToolkit.Input" Version="6.0.85" />
+    <PackageReference Include="gong-wpf-dragdrop" Version="2.3.2" />
     <PackageReference Include="Levrum.Licensing.Client.WPF" Version="0.1.3" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NLog" Version="4.6.8" />
@@ -117,6 +119,7 @@
     <Content Include="Resources\PostProcessing Script Manual.pdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\PrecisionIcon.png" />
     <Resource Include="Resources\RightArrowIcon.png" />
     <Resource Include="Resources\SaveIcon.png" />
     <Resource Include="Resources\StopIcon.png" />
