@@ -133,17 +133,21 @@ namespace Levrum.DataBridge
                 SqlServerAddress.Text = DataSource.Parameters["Server"];
                 SqlServerPort.Text = DataSource.Parameters["Port"];
                 SqlServerUser.Text = DataSource.Parameters["User"];
-                SqlServerPassword.Password = DataSource.Parameters["Password"];
+                SqlServerPassword.Password = ((SqlSource)DataSource).Password;
                 SqlServerDatabase.Text = DataSource.Parameters["Database"];
                 connectToSqlSource();
                 if (DataSource.Parameters.ContainsKey("Query") && DataSource.Parameters["Query"] != null)
                 {
                     SqlDataTypeComboBox.SelectedItem = SqlSourceTypes[1];
                     SqlQueryTextBox.Text = DataSource.Parameters["Query"];
+                    SqlDateColumnTextBox.Foreground = System.Windows.Media.Brushes.Gray;
+                    SqlDateColumnComboBox.IsEnabled = false;
                 }
                 else
                 {
                     SqlTableComboBox.SelectedItem = DataSource.Parameters["Table"];
+                    SqlDateColumnTextBox.Foreground = System.Windows.Media.Brushes.Black;
+                    SqlDateColumnComboBox.IsEnabled = true;
                 }
 
                 SqlIdColumnComboBox.SelectedItem = DataSource.IDColumn;
@@ -333,7 +337,7 @@ namespace Levrum.DataBridge
                 DataSource.Parameters["Server"] = SqlServerAddress.Text;
                 DataSource.Parameters["Port"] = SqlServerPort.Text;
                 DataSource.Parameters["User"] = SqlServerUser.Text;
-                DataSource.Parameters["Password"] = SqlServerPassword.Password;
+                ((SqlSource)DataSource).Password = SqlServerPassword.Password;
                 DataSource.Parameters["Database"] = SqlServerDatabase.Text;
                 if (SqlDataTypeComboBox.SelectedItem == SqlSourceTypes[0])
                 {
@@ -342,7 +346,8 @@ namespace Levrum.DataBridge
                         DataSource.Parameters.Remove("Query");
                     }
                     DataSource.Parameters["Table"] = SqlTableComboBox.SelectedItem as string;
-                    SqlDateColumnComboBox.Visibility = Visibility.Visible;
+                    SqlDateColumnTextBox.Foreground = System.Windows.Media.Brushes.Black;
+                    SqlDateColumnComboBox.IsEnabled = true;
                 }
                 else
                 {
@@ -351,7 +356,8 @@ namespace Levrum.DataBridge
                         DataSource.Parameters.Remove("Table");
                     }
                     DataSource.Parameters["Query"] = SqlQueryTextBox.Text;
-                    SqlDateColumnComboBox.Visibility = Visibility.Hidden;
+                    SqlDateColumnTextBox.Foreground = System.Windows.Media.Brushes.Gray;
+                    SqlDateColumnComboBox.IsEnabled = false;
                 }
             }
             else if (DataSource is GeoSource)
@@ -596,7 +602,7 @@ namespace Levrum.DataBridge
             dataSource.Parameters["Server"] = SqlServerAddress.Text;
             dataSource.Parameters["Port"] = SqlServerPort.Text;
             dataSource.Parameters["User"] = SqlServerUser.Text;
-            dataSource.Parameters["Password"] = SqlServerPassword.Password;
+            dataSource.Password = SqlServerPassword.Password;
             dataSource.Parameters["Database"] = SqlServerDatabase.Text;
 
             if (!string.IsNullOrWhiteSpace(SqlQueryTextBox.Text))
@@ -632,27 +638,23 @@ namespace Levrum.DataBridge
             if (SqlDataTypeComboBox.SelectedItem == SqlSourceTypes[0])
             {
                 // Table
-                SqlTableComboBox.Visibility = Visibility.Visible;
-                SqlTableTextBlock.Visibility = Visibility.Visible;
+                SqlTableComboBox.IsEnabled = true;
+                SqlTableTextBlock.Foreground = System.Windows.Media.Brushes.Black;
                 SqlTableDetailsTextBox.Visibility = Visibility.Visible;
                 SqlQueryTextBox.Visibility = Visibility.Hidden;
                 SqlQueryTextBox.Text = string.Empty;
-                if (DataSource != null)
-                {
-                    DataSource.Parameters.Remove("Query");
-                }
+                SqlDateColumnComboBox.IsEnabled = true;
+                SqlDateColumnTextBox.Foreground = System.Windows.Media.Brushes.Black;
             }
             else
             {
                 // Query
-                SqlTableComboBox.Visibility = Visibility.Hidden;
-                SqlTableTextBlock.Visibility = Visibility.Hidden;
+                SqlTableComboBox.IsEnabled = false;
+                SqlTableTextBlock.Foreground = System.Windows.Media.Brushes.Gray;
                 SqlTableDetailsTextBox.Visibility = Visibility.Hidden;
                 SqlQueryTextBox.Visibility = Visibility.Visible;
-                if (DataSource != null)
-                {
-                    DataSource.Parameters.Remove("Table");
-                }
+                SqlDateColumnComboBox.IsEnabled = false;
+                SqlDateColumnTextBox.Foreground = System.Windows.Media.Brushes.Gray;
             }
         }
 

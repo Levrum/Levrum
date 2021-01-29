@@ -7,6 +7,8 @@ using Microsoft.Data.SqlClient;
 
 using Newtonsoft.Json;
 
+using Levrum.Utils;
+
 namespace Levrum.Data.Sources
 {
     public class SqlSource : IDataSource
@@ -49,6 +51,37 @@ namespace Levrum.Data.Sources
         protected bool m_connected = false;
 
         private List<Record> m_cachedRecords = null;
+        private static AESCryptor s_cryptor = new AESCryptor() { StringPermutation = "DataSource.SqlSource" };
+
+        [JsonIgnore]
+        public string Password
+        {
+            get
+            {
+                if (Parameters.ContainsKey("PWEncrypted") && Parameters.ContainsKey("Password"))
+                {
+                    return s_cryptor.Decrypt(Parameters["Password"]);
+                } else if (Parameters.ContainsKey("Password"))
+                {
+                    return Parameters["Password"];
+                } else
+                {
+                    return string.Empty;
+                }
+            }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    Parameters["Password"] = string.Empty;
+                }
+                else
+                {
+                    Parameters["Password"] = s_cryptor.Encrypt(value);
+                    Parameters["PWEncrypted"] = "true";
+                }
+            }
+        }
 
         public SqlSource()
         {
@@ -88,7 +121,7 @@ namespace Levrum.Data.Sources
             {
                 SqlConnectionStringBuilder sqlcsb = new SqlConnectionStringBuilder();
                 sqlcsb.UserID = Parameters["User"];
-                sqlcsb.Password = Parameters["Password"];
+                sqlcsb.Password = Password;
 
                 string dataSource = "";
                 if (!Parameters.ContainsKey("Port") || string.IsNullOrWhiteSpace(Parameters["Port"]))

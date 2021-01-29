@@ -128,7 +128,7 @@
                     <ComboBox x:Name="SqlIdColumnComboBox" Grid.Column="1" Margin="8,0,8,0" SelectionChanged="IdColumnComboBox_SelectionChanged"></ComboBox>
                     <TextBlock Height="16" Grid.Column="2">Response ID:</TextBlock>
                     <ComboBox x:Name="SqlResponseIdColumnComboBox" Grid.Column="3" Margin="8,0,8,0" SelectionChanged="ResponseIdColumnComboBox_SelectionChanged"></ComboBox>
-                    <TextBlock Height="16" Grid.Column="4">Date:</TextBlock>
+                    <TextBlock x:Name="SqlDateColumnTextBox" Height="16" Grid.Column="4">Date:</TextBlock>
                     <ComboBox x:Name="SqlDateColumnComboBox" Grid.Column="5" Margin="0,0,8,0" SelectionChanged="SqlDateColumnComboBox_SelectionChanged"/>
                     </Grid>
                 </DockPanel>
