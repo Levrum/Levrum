@@ -42,6 +42,7 @@
     <None Remove="Resources\PrecisionIcon.png" />
     <None Remove="Resources\RightArrowIcon.png" />
     <None Remove="Resources\StopIcon.png" />
+    <None Remove="Resources\StopIconRed.png" />
     <None Remove="SaveIcon.png" />
     <None Remove="SuperionTemplate.png" />
     <None Remove="Templates\Code3Strategist.dmap" />
@@ -123,6 +124,7 @@
     <Resource Include="Resources\RightArrowIcon.png" />
     <Resource Include="Resources\SaveIcon.png" />
     <Resource Include="Resources\StopIcon.png" />
+    <Resource Include="Resources\StopIconRed.png" />
     <Resource Include="Resources\SuperionTemplate.png" />
     <Resource Include="Resources\TritechTemplate.png" />
     <Resource Include="Resources\XIcon.png" />
