@@ -46,7 +46,25 @@ namespace Levrum.Data.Classes
             {
                 if (Data.ContainsKey("Value"))
                 {
-                    return (double)Data["Value"];
+                    
+                    object value = Data["Value"];
+                    if (value is double || value is int)
+                    {
+                        return (double)value;
+                    } else if (value is string)
+                    {
+                        double output;
+                        if (double.TryParse(Data["Value"] as string, out output))
+                        {
+                            return output;
+                        } else
+                        {
+                            return double.NaN;
+                        }
+                    } else
+                    {
+                        return double.NaN;
+                    }
                 }
                 else
                 {
