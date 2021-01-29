@@ -536,18 +536,12 @@ namespace Levrum.Data.Map
             foreach (IDataSource dataSource in dataSources)
             {
                 List<DataMapping> mappingsForSource = (from mapping in Map.ResponseDataMappings
-                                                       where mapping.Column.DataSource == dataSource
+                                                       where mapping.Column.DataSource == dataSource &&
+                                                       !string.IsNullOrEmpty(dataSource.ResponseIDColumn)
                                                        select mapping).ToList();
 
                 if (mappingsForSource.Count == 0)
                 {
-                    continue;
-                }
-
-
-                if (string.IsNullOrEmpty(dataSource.ResponseIDColumn))
-                {
-                    AddErrorRecord(MapLoaderErrorType.NoResponseIdColumn, dataSource, null, null);
                     continue;
                 }
 
@@ -623,7 +617,11 @@ namespace Levrum.Data.Map
                         nmapping++;
                         string scolname = mapping?.Column?.ColumnName;
                         if (string.IsNullOrEmpty(scolname)) { throw (new Exception("Unable to identify column name in response mapping #" + nmapping)); }
-                        if (!record.HasColumn(scolname)) { throw (new Exception("Response record does not contain column '" + scolname + "' (#" + nmapping + ")")); }
+                        if (!record.HasColumn(scolname))
+                        {
+                            AddErrorRecord(MapLoaderErrorType.NullValue, dataSource, mapping, record);
+                            continue;
+                        }
 
                         string stringValue = record.GetValue(mapping.Column.ColumnName).ToString();
                         if (string.IsNullOrEmpty(stringValue))
@@ -635,6 +633,69 @@ namespace Levrum.Data.Map
                         object parsedValue = getParsedValue(stringValue);
 
                         response.Data[mapping.Field] = parsedValue;
+                    }
+                }
+            }
+
+            foreach (IDataSource dataSource in dataSources)
+            {
+                List<DataMapping> mappingsForSource = (from mapping in Map.ResponseDataMappings
+                                                       where mapping.Column.DataSource == dataSource &&
+                                                       string.IsNullOrEmpty(dataSource.ResponseIDColumn)
+                                                       select mapping).ToList();
+
+                if (mappingsForSource.Count == 0)
+                {
+                    continue;
+                }
+
+                double progressPerSource = 100 / numSources;
+                double progress = completedSources * progressPerSource;
+                updateProgress(2, string.Format("Adding data from non-response data source {0}", dataSource.Name), progress);
+                List<Record> recordsFromSource = dataSource.GetRecords(StartDate, EndDate);
+                int recordNumber = 0;
+                foreach (Record record in recordsFromSource)
+                {
+                    if (Cancelling())
+                        return;
+
+                    recordNumber++;
+
+                    double recordProgress = progressPerSource / recordsFromSource.Count;
+                    updateProgress(2, string.Format("Processing non-response data record {0} out of {1} from data source {2}", recordNumber, recordsFromSource.Count, dataSource.Name), progress + (recordProgress * recordNumber), recordNumber == recordsFromSource.Count);
+                    IncidentData incident;
+                    object value = record.GetValue(dataSource.IDColumn);
+                    string recordIncidentId = null;
+                    if (value != null)
+                    {
+                        recordIncidentId = value.ToString();
+                    }
+
+                    if (!IncidentsById.TryGetValue(recordIncidentId, out incident))
+                    {
+                        continue;
+                    }
+
+                    int nmapping = 0;
+                    foreach (ResponseData response in incident.Responses)
+                    {
+                        foreach (DataMapping mapping in mappingsForSource)
+                        {
+                            nmapping++;
+                            string scolname = mapping?.Column?.ColumnName;
+                            if (string.IsNullOrEmpty(scolname)) { throw (new Exception("Unable to identify column name in response mapping #" + nmapping)); }
+
+                            string stringValue = record.GetValue(mapping.Column.ColumnName).ToString();
+                            if (string.IsNullOrEmpty(stringValue))
+                            {
+                                AddErrorRecord(MapLoaderErrorType.NullValue, dataSource, mapping, record);
+                                continue;
+                            }
+
+                            object parsedValue = getParsedValue(stringValue);
+
+                            response.Data[mapping.Field] = parsedValue;
+                        }
                     }
                 }
             }
