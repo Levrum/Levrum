@@ -6,132 +6,134 @@
              xmlns:local="clr-namespace:Levrum.DataBridge"
              xmlns:dd="urn:gong-wpf-dragdrop"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
-        <!--
-        <Style TargetType="GroupBox">
-            <Setter Property="Margin" Value="5,1,5,5"/>
-            <Setter Property="HeaderTemplate">
-                <Setter.Value>
-                    <DataTemplate>
-                        <TextBlock Text="{Binding}" FontWeight="Bold" FontSize="16"/>
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        -->
-    </UserControl.Resources>
-    <Grid Background="WhiteSmoke">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="260*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="260*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="260*"/>
-        </Grid.ColumnDefinitions>
-        <GroupBox Grid.Column="0">
-            <GroupBox.Header>
-                <TextBlock Text="Incident Data" FontSize="16" FontWeight="DemiBold"/>
-            </GroupBox.Header>
-            <Grid Margin="0,0,0,0">
-                <Grid Grid.Row="1" Margin="0,4,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="200*"/>
-                        <RowDefinition Height="40"/>
-                    </Grid.RowDefinitions>
-                    <ListBox x:Name="IncidentDataListBox" Grid.Row="0" SelectionChanged="IncidentDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="IncidentDataListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="0,2">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column ="0" Text="{Binding Field}"/>
-                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}" HorizontalAlignment="Center" Margin="8,0,8,0"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding Column.ShortColumnName}" HorizontalAlignment="Right"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
-                        <Button Name="AddIncidentFieldButton" Margin="8,8,8,8" Width="60" Click="AddIncidentFieldButton_Click">Add</Button>
-                        <Button Name="EditIncidentFieldButton" Margin="8,8,8,8" Width="60" Click="EditIncidentFieldButton_Click" IsEnabled="False">Edit</Button>
-                        <Button Name="RemoveIncidentFieldButton" Margin="8,8,8,8" Width="60" Click="RemoveIncidentFieldButton_Click" IsEnabled="False">Remove</Button>
-                    </StackPanel>
+             d:DesignHeight="650" d:DesignWidth="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="450*"/>
+            <RowDefinition Height="2"/>
+            <RowDefinition Height="200"/>
+        </Grid.RowDefinitions>
+        <Grid Background="WhiteSmoke">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="260*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="260*"/>
+            </Grid.ColumnDefinitions>
+            <GroupBox Grid.Column="0">
+                <GroupBox.Header>
+                    <TextBlock Text="Incident Data" FontSize="16" FontWeight="DemiBold"/>
+                </GroupBox.Header>
+                <Grid Margin="0,0,0,0">
+                    <Grid Grid.Row="1" Margin="0,4,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="200*"/>
+                            <RowDefinition Height="40"/>
+                        </Grid.RowDefinitions>
+                        <ListBox x:Name="IncidentDataListBox" Grid.Row="0" SelectionChanged="IncidentDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="IncidentDataListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DragDropCopyKeyState="ControlKey">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column ="0" Text="{Binding Field}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}" HorizontalAlignment="Center" Margin="8,0,8,0"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Column.ShortColumnName}" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
+                            <Button Name="AddIncidentFieldButton" Margin="8,8,8,8" Width="60" Click="AddIncidentFieldButton_Click">Add</Button>
+                            <Button Name="EditIncidentFieldButton" Margin="8,8,8,8" Width="60" Click="EditIncidentFieldButton_Click" IsEnabled="False">Edit</Button>
+                            <Button Name="RemoveIncidentFieldButton" Margin="8,8,8,8" Width="60" Click="RemoveIncidentFieldButton_Click" IsEnabled="False">Remove</Button>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
-            </Grid>
-        </GroupBox>
-        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="2"/>
-        <GroupBox Grid.Column="2">
-            <GroupBox.Header>
-                <TextBlock Text="Response Data" FontSize="16" FontWeight="DemiBold"/>
-            </GroupBox.Header>
-            <Grid>
-                <Grid Grid.Row="0" Margin="0,4,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="200*"/>
-                        <RowDefinition Height="40"/>
-                    </Grid.RowDefinitions>
-                    <ListBox Grid.Row="0" x:Name="ResponseDataListBox" SelectionChanged="ResponseDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="ResponseDataListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="0,2">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column ="0" Text="{Binding Field}"/>
-                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}" HorizontalAlignment="Center" Margin="8,0,8,0"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding Column.ShortColumnName}" HorizontalAlignment="Right"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
-                        <Button x:Name="AddResponseFieldButton" Margin="8,8,8,8" Width="60" Click="AddResponseFieldButton_Click">Add</Button>
-                        <Button x:Name="EditResponseFieldButton" Margin="8,8,8,8" Width="60" Click="EditResponseFieldButton_Click" IsEnabled="False">Edit</Button>
-                        <Button x:Name="RemoveResponseFieldButton" Margin="8,8,8,8" Width="60" Click="RemoveResponseFieldButton_Click" IsEnabled="False">Remove</Button>
-                    </StackPanel>
+            </GroupBox>
+            <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="2"/>
+            <GroupBox Grid.Column="2">
+                <GroupBox.Header>
+                    <TextBlock Text="Response Data" FontSize="16" FontWeight="DemiBold"/>
+                </GroupBox.Header>
+                <Grid>
+                    <Grid Grid.Row="0" Margin="0,4,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="200*"/>
+                            <RowDefinition Height="40"/>
+                        </Grid.RowDefinitions>
+                        <ListBox Grid.Row="0" x:Name="ResponseDataListBox" SelectionChanged="ResponseDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="ResponseDataListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DragDropCopyKeyState="ControlKey">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column ="0" Text="{Binding Field}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}" HorizontalAlignment="Center" Margin="8,0,8,0"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Column.ShortColumnName}" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
+                            <Button x:Name="AddResponseFieldButton" Margin="8,8,8,8" Width="60" Click="AddResponseFieldButton_Click">Add</Button>
+                            <Button x:Name="EditResponseFieldButton" Margin="8,8,8,8" Width="60" Click="EditResponseFieldButton_Click" IsEnabled="False">Edit</Button>
+                            <Button x:Name="RemoveResponseFieldButton" Margin="8,8,8,8" Width="60" Click="RemoveResponseFieldButton_Click" IsEnabled="False">Remove</Button>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
-            </Grid>
-        </GroupBox>
-        <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="2"/>
-        <GroupBox Grid.Column="4">
-            <GroupBox.Header>
-                <TextBlock Text="Response Timings" FontSize="16" FontWeight="DemiBold"/>
-            </GroupBox.Header>
-            <Grid Margin="0,4,0,0">
-                <Grid Grid.Row="0" Margin="0,0,0,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="200*"/>
-                        <RowDefinition Height="40"/>
-                    </Grid.RowDefinitions>
-                    <ListBox Grid.Row="0" x:Name="BenchmarkListBox" SelectionChanged="BenchmarkListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="BenchmarkListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="0,2">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Grid.Column ="0" Text="{Binding Field}"/>
-                                    <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}" HorizontalAlignment="Center" Margin="8,0,8,0"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding Column.ShortColumnName}" HorizontalAlignment="Right"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
-                        <Button x:Name="AddBenchmarkButton" Margin="8,8,8,8" Width="60" Click="AddBenchmarkButton_Click">Add</Button>
-                        <Button x:Name="EditBenchmarkButton" Margin="8,8,8,8" Width="60" Click="EditBenchmarkButton_Click" IsEnabled="False">Edit</Button>
-                        <Button x:Name="RemoveBenchmarkButton" Margin="8,8,8,8" Width="60" Click="RemoveBenchmarkButton_Click" IsEnabled="False">Remove</Button>
-                    </StackPanel>
+            </GroupBox>
+            <GridSplitter Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="2"/>
+            <GroupBox Grid.Column="4">
+                <GroupBox.Header>
+                    <TextBlock Text="Response Timings" FontSize="16" FontWeight="DemiBold"/>
+                </GroupBox.Header>
+                <Grid Margin="0,4,0,0">
+                    <Grid Grid.Row="0" Margin="0,0,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="200*"/>
+                            <RowDefinition Height="40"/>
+                        </Grid.RowDefinitions>
+                        <ListBox Grid.Row="0" x:Name="BenchmarkListBox" SelectionChanged="BenchmarkListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="BenchmarkListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DragDropCopyKeyState="ControlKey">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,2">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column ="0" Text="{Binding Field}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Column.DataSource.Name}" HorizontalAlignment="Center" Margin="8,0,8,0"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Column.ShortColumnName}" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
+                            <Button x:Name="AddBenchmarkButton" Margin="8,8,8,8" Width="60" Click="AddBenchmarkButton_Click">Add</Button>
+                            <Button x:Name="EditBenchmarkButton" Margin="8,8,8,8" Width="60" Click="EditBenchmarkButton_Click" IsEnabled="False">Edit</Button>
+                            <Button x:Name="RemoveBenchmarkButton" Margin="8,8,8,8" Width="60" Click="RemoveBenchmarkButton_Click" IsEnabled="False">Remove</Button>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
-            </Grid>
-        </GroupBox>
+            </GroupBox>
+        </Grid>
+        <GridSplitter Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Stretch" Foreground="DarkGray" Height="2"/>
+        <Grid Grid.Row="2">
+            <GroupBox Grid.Column="0">
+                <GroupBox.Header>
+                    <TextBlock Text="Data Sources" FontSize="16" FontWeight="DemiBold"/>
+                </GroupBox.Header>
+                <local:DataSourcesList x:Name="DataSources" Margin="0,4,0,0"/>
+            </GroupBox>
+        </Grid>
     </Grid>
 </UserControl>

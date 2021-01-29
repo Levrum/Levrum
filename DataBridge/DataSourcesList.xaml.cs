@@ -201,10 +201,6 @@ namespace Levrum.DataBridge
                     else if (result == MessageBoxResult.Yes)
                     {
                         deleteDataSourceReferences(currentSource);
-                        if (Window != null && Window.ActiveEditor != null)
-                        {
-                            //Window.ActiveEditor.UpdateStaticMappingButtons();
-                        }
                     }
                 }
 

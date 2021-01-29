@@ -66,9 +66,11 @@
             <MenuItem Name="PropertiesMenu" Header="_Properties" IsTabStop="False">
                 <MenuItem x:Name="CoordinateConversionMenuItem" Header="Enable _Coordinate Conversion" Click="ToggleConvertCoordinate_Click" IsEnabled="False"/>
                 <MenuItem x:Name="EditProjectionMenuItem" Header="Edit Conversion _Projection..." Click="EditProjection_Click" IsEnabled="False"/>
+                <Separator/>
                 <MenuItem x:Name="ToggleInvertLongitudeMenuItem" Header="Enable Invert Lon_gitude" Click="ToggleInvertLongitude_Click" IsEnabled="False"/>
                 <MenuItem x:Name="ToggleInvertLatitudeMenuItem" Header="Enable Invert _Latitude" Click="ToggleInvertLatitude_Click" IsEnabled="False"/>
                 <MenuItem x:Name="ToggleRestorePrecisionMenuItem" Header="Enable _Restore Precision" Click="ToggleRestorePrecision_Click" IsEnabled="False"/>
+                <Separator/>
                 <MenuItem x:Name="ToggleTransportAsClearSceneMenuItem" Header="Enable Tra_nsport As ClearScene" Click="ToggleTransportAsClearScene_Click" IsEnabled="False"/>
                 <Separator/>
                 <MenuItem x:Name="EditCauseTreeMenuItem" Header="Edit Cause _Tree..." Click="EditCauseTree_Click" IsEnabled="False"/>
@@ -116,13 +118,20 @@
                     </StackPanel>
                 </Button>
                 <Button x:Name="StopButton" IsEnabled="False" Click="StopButton_Click" ToolTip="Stop Processing">
-                    <Image Source="/DataBridge;component/Resources/StopIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
+                    <Image x:Name="StopButtonImage" Source="/DataBridge;component/Resources/StopIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
                 </Button>
             </ToolBar>
             <ToolBar>
                 <ToggleButton x:Name="ConvertCoordinateButton" Margin="0,0,0,-1" Click="ToggleConvertCoordinate_Click" ToolTip="Toggle Coordinate Conversion">
                     <Image x:Name="ConvertCoordinateButtonIcon" Source="/DataBridge;component/Resources/CoordinateIcon.png" Width="24" Height="24" Margin="0,0,0,0" Style="{StaticResource DynamicImageOpacity}"/>
                 </ToggleButton>
+                <Button x:Name="EditProjectionButton" Margin="0,0,0,-1" Click="EditProjection_Click" ToolTip="Edit Projection">
+                    <StackPanel Orientation="Horizontal">
+                        <Image x:Name="EditProjectionButtonIcon" Source="/DataBridge;component/Resources/GlobeIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
+                        <Label Height="28">Edit Projection...</Label>
+                    </StackPanel>
+                </Button>
+                <Separator/>
                 <ToggleButton x:Name="InvertLongitudeButton" Margin="0,0,0,-1" Click="ToggleInvertLongitude_Click" ToolTip="Toggle Invert Longitude">
                     <Image x:Name="InvertLongitudeButtonIcon" Source="/DataBridge;component/Resources/XIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
                 </ToggleButton>
@@ -132,15 +141,10 @@
                 <ToggleButton x:Name="ToggleRestorePrecisionButton" Margin="0,0,0,-1" Click="ToggleRestorePrecision_Click" ToolTip="Toggle Restore Precision">
                     <Image x:Name="ToggleRestorePrecisionButtonIcon" Source="/DataBridge;component/Resources/PrecisionIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
                 </ToggleButton>
+                <Separator/>
                 <ToggleButton x:Name="ToggleTransportAsClearSceneButton" Margin="0,0,0,-1" Click="ToggleTransportAsClearScene_Click" ToolTip="Toggle Transport As ClearScene">
                     <Image x:Name="ToggleTransportAsClearSceneButtonIcon" Source="/DataBridge;component/Resources/Ambulance.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
                 </ToggleButton>
-                <Button x:Name="EditProjectionButton" Margin="0,0,0,-1" Click="EditProjection_Click" ToolTip="Edit Projection">
-                    <StackPanel Orientation="Horizontal">
-                        <Image x:Name="EditProjectionButtonIcon" Source="/DataBridge;component/Resources/GlobeIcon.png" Width="24" Height="24" Style="{StaticResource DynamicImageOpacity}"/>
-                        <Label Height="28">Edit Projection...</Label>
-                    </StackPanel>
-                </Button>
                 <Separator/>
                 <Button x:Name="EditCauseTreeButton" Margin="0,0,0,-1" Click="EditCauseTree_Click" ToolTip="Edit Cause Tree">
                     <StackPanel Orientation="Horizontal">
@@ -178,12 +182,6 @@
                         <avdock:LayoutDocumentPane x:Name="DocumentPane" PropertyChanged="DocumentPane_PropertyChanged">
                         </avdock:LayoutDocumentPane>
                     </avdock:LayoutDocumentPaneGroup >
-                    <avdock:LayoutAnchorablePane DockHeight="200">
-                        <avdock:LayoutAnchorable ContentId="sources" Title="Data Sources" CanHide="False" CanClose="False"
-                                            AutoHideWidth="240">
-                            <local:DataSourcesList x:Name="DataSources" Margin="0,0,0,0" IsEnabled="False"/>
-                        </avdock:LayoutAnchorable>
-                    </avdock:LayoutAnchorablePane>
                 </avdock:LayoutPanel>
             </avdock:LayoutRoot>
         </avdock:DockingManager>
@@ -192,7 +190,7 @@
                 <ProgressBar x:Name="StatusBarProgress" Width="200" Height="18" Maximum="100" Margin="2,0,0,0"/>
             </StatusBarItem>
             <StatusBarItem>
-                <TextBlock Name="StatusBarText" Margin="0,0,0,0"></TextBlock>
+                <TextBlock Name="StatusBarText" Margin="0,0,0,0">Ready</TextBlock>
             </StatusBarItem>
         </StatusBar>
     </Grid>

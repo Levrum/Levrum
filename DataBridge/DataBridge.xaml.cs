@@ -41,6 +41,7 @@ namespace Levrum.DataBridge
         public List<DataMapDocument> openDocuments = new List<DataMapDocument>();
 
         public DataMapEditor ActiveEditor { get; set; } = null;
+        public DataMap Map { get; set; } = null;
 
         public JavascriptDebugWindow JSDebugWindow { get; set; } = new JavascriptDebugWindow();
         public JsonViewerWindow JsonViewWindow { get; set; } = new JsonViewerWindow();
@@ -57,7 +58,7 @@ namespace Levrum.DataBridge
             client.OnException += LicenseClient_OnException;
             client.VerifyOrRequestLicense();
 
-            DataSources.Window = this;
+            //DataSources.Window = this;
             App app = Application.Current as App;
             if (app != null)
             {
@@ -163,9 +164,8 @@ namespace Levrum.DataBridge
 
                 LayoutDocument document = new LayoutDocument();
                 document.Title = map.Name;
-                DataMapEditor editor = new DataMapEditor(map);
+                DataMapEditor editor = new DataMapEditor(map, this);
                 ActiveEditor = editor;
-                editor.Window = this;
                 document.Content = editor;
                 DocumentPane.Children.Add(document);
                 mapDocument = new DataMapDocument(map, document);
@@ -399,7 +399,7 @@ namespace Levrum.DataBridge
             }
             else
 
-                Cursor = Cursors.Arrow;
+            Cursor = Cursors.Arrow;
             toggleControls(false);
         }
 
@@ -449,6 +449,15 @@ namespace Levrum.DataBridge
             ToggleTransportAsClearSceneButton.IsEnabled = controlsEnabled;
 
             StopButton.IsEnabled = runningOperation;
+            Uri uri;
+            if (runningOperation)
+            {
+                uri = new Uri(@"/DataBridge;component/Resources/StopIconRed.png", UriKind.Relative);                
+            } else
+            {
+                uri = new Uri(@"/DataBridge;component/Resources/StopIcon.png", UriKind.Relative);
+            }
+            StopButtonImage.Source = new System.Windows.Media.Imaging.BitmapImage(uri);
         }
 
         public void updateToolbarsAndMenus()
@@ -504,7 +513,7 @@ namespace Levrum.DataBridge
                 {
                     SaveAsMenuItem.Header = string.Format("Save {0} _As...", map.Name);
                     SaveMenuItem.Header = string.Format("_Save {0}", map.Name);
-                    DataSources.Map = map;
+                    Map = map;
 
                     updateCoordinateConversionControls();
                     updateInvertLatitude();
@@ -516,7 +525,7 @@ namespace Levrum.DataBridge
                 {
                     SaveAsMenuItem.Header = "Save _As...";
                     SaveMenuItem.Header = "_Save";
-                    DataSources.Map = null;
+                    Map = null;
 
                     InvertLatitudeButton.IsChecked = false;
                     InvertLongitudeButton.IsChecked = false;
@@ -525,7 +534,7 @@ namespace Levrum.DataBridge
                     ConvertCoordinateButton.IsChecked = false;
                 }
 
-                DataSources.IsEnabled = documentOpen;
+                // DataSources.IsEnabled = documentOpen;
             }
             catch (Exception ex)
             {
@@ -541,7 +550,7 @@ namespace Levrum.DataBridge
         public void SetChangesMade(DataMap map, bool status)
         {
             DataMapDocument document = (from DataMapDocument d in openDocuments
-                                        where d.Map == DataSources.Map
+                                        where d.Map == map
                                         select d).FirstOrDefault();
 
             if (document != null)
@@ -758,9 +767,8 @@ namespace Levrum.DataBridge
 
                 newMap.Name = title;
                 document.Title = title;
-                DataMapEditor editor = new DataMapEditor(newMap);
+                DataMapEditor editor = new DataMapEditor(newMap, this);
                 ActiveEditor = editor;
-                editor.Window = this;
                 document.Content = editor;
                 DocumentPane.Children.Add(document);
                 DataMapDocument newDocument = new DataMapDocument(newMap, document);
@@ -829,9 +837,9 @@ namespace Levrum.DataBridge
             {
                 SaveFileDialog sfd = new SaveFileDialog();
                 FileInfo file;
-                if (DataSources.Map.Data.ContainsKey("LastJsonExport"))
+                if (Map.Data.ContainsKey("LastJsonExport"))
                 {
-                    file = new FileInfo(DataSources.Map.Data["LastJsonExport"] as string);
+                    file = new FileInfo(Map.Data["LastJsonExport"] as string);
                     if (file.Exists)
                     {
                         sfd.InitialDirectory = file.DirectoryName;
@@ -863,13 +871,13 @@ namespace Levrum.DataBridge
                 }
 
                 Cursor = Cursors.Wait;
-                if (!DataSources.Map.Data.ContainsKey("LastJsonExport") || DataSources.Map.Data["LastJsonExport"] as string != sfd.FileName)
+                if (!Map.Data.ContainsKey("LastJsonExport") || Map.Data["LastJsonExport"] as string != sfd.FileName)
                 {
-                    DataSources.Map.Data["LastJsonExport"] = sfd.FileName;
+                    Map.Data["LastJsonExport"] = sfd.FileName;
 
-                    SetChangesMade(DataSources.Map, true);
+                    SetChangesMade(Map, true);
                 }
-                LogHelper.LogMessage(LogLevel.Info, string.Format("Creating JSON {0} from DataMap {1}", sfd.FileName, DataSources.Map.Name));
+                LogHelper.LogMessage(LogLevel.Info, string.Format("Creating JSON {0} from DataMap {1}", sfd.FileName, Map.Name));
 
                 MapLoader loader = new MapLoader();
                 loader.OnProgressUpdate += onLoaderProgress;
@@ -889,32 +897,22 @@ namespace Levrum.DataBridge
                             LogHelper.LogMessage(LogLevel.Info, string.Format("Attempting to append incidents to existing DataSet"));
                             try
                             {
+                                onLoaderProgress(this, "Loading previous DataSet", 0);
                                 lastData = DataSet<IncidentData>.Deserialize(sfd.FileName);
-                                loader.LoadMapAndAppend(DataSources.Map, lastData);
+                                loader.LoadMapAndAppend(Map, lastData);
                             } 
                             catch (Exception ex)
                             {
                                 appendData = false;
                                 logException(newSender, "Unable to load previous DataSet", ex);
-                                loader.LoadMap(DataSources.Map);
+                                loader.LoadMap(Map);
                             }
                         } else
                         {
-                            loader.LoadMap(DataSources.Map);
+                            loader.LoadMap(Map);
                         }
 
-                        foreach (IncidentData incident in loader.Incidents)
-                        {
-                            incident.Intern();
-                            foreach (ResponseData response in incident.Responses)
-                            {
-                                response.Intern();
-                                foreach (TimingData benchmark in response.TimingData)
-                                {
-                                    response.Intern();
-                                }
-                            }
-                        }
+                        onLoaderProgress(this, "Generating and saving JSON", 0);
 
                         GC.Collect();
                         if (Worker.CancellationPending)
@@ -922,18 +920,8 @@ namespace Levrum.DataBridge
                             LogHelper.LogMessage(LogLevel.Info, string.Format("Cancelled JSON creation at user request"));
                             return;
                         }
-                        onLoaderProgress(this, "Generating and saving JSON", 0);
-                        JsonSerializerSettings settings = new JsonSerializerSettings();
-                        settings.TypeNameHandling = TypeNameHandling.All;
-                        settings.Formatting = Formatting.Indented;
-                        using (TextWriter writer = File.CreateText(sfd.FileName))
-                        {
-                            var serializer = new JsonSerializer();
-                            serializer.Formatting = Formatting.Indented;
-                            serializer.TypeNameHandling = TypeNameHandling.Auto;
-                            serializer.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
-                            serializer.Serialize(writer, loader.Incidents);
-                        }
+
+                        loader.Incidents.Serialize(sfd.FileName);
 
                         MessageBox.Show(string.Format("Incidents saved as JSON file '{0}'", file.Name));
                     }
@@ -974,9 +962,9 @@ namespace Levrum.DataBridge
             try
             {
                 SaveFileDialog sfd = new SaveFileDialog();
-                if (DataSources.Map.Data.ContainsKey("LastCsvIncidentExport"))
+                if (Map.Data.ContainsKey("LastCsvIncidentExport"))
                 {
-                    FileInfo file = new FileInfo(DataSources.Map.Data["LastCsvIncidentExport"] as string);
+                    FileInfo file = new FileInfo(Map.Data["LastCsvIncidentExport"] as string);
                     if (file.Exists)
                     {
                         sfd.InitialDirectory = file.DirectoryName;
@@ -1000,13 +988,13 @@ namespace Levrum.DataBridge
                 string incidentCsvFileName = sfd.FileName;
 
                 sfd.Title = "Save Response CSV";
-                if (DataSources.Map.Data.ContainsKey("LastCsvReponseExport"))
+                if (Map.Data.ContainsKey("LastCsvReponseExport"))
                 {
-                    FileInfo file = new FileInfo(DataSources.Map.Data["LastCsvResponseExport"] as string);
+                    FileInfo file = new FileInfo(Map.Data["LastCsvResponseExport"] as string);
                     if (file.Exists)
                     {
                         sfd.InitialDirectory = file.DirectoryName;
-                        sfd.FileName = DataSources.Map.Data["LastCsvResponseExport"] as string;
+                        sfd.FileName = Map.Data["LastCsvResponseExport"] as string;
                     }
                 }
                 else
@@ -1026,16 +1014,16 @@ namespace Levrum.DataBridge
                 }
                 Cursor = Cursors.Wait;
                 string responseCsvFileName = sfd.FileName;
-                if (!DataSources.Map.Data.ContainsKey("LastCsvIncidentExport") || DataSources.Map.Data["LastCsvIncidentExport"] as string != incidentCsvFileName ||
-                    !DataSources.Map.Data.ContainsKey("LastCsvResponseExport") || DataSources.Map.Data["LastCsvResponseExport"] as string != responseCsvFileName)
+                if (!Map.Data.ContainsKey("LastCsvIncidentExport") || Map.Data["LastCsvIncidentExport"] as string != incidentCsvFileName ||
+                    !Map.Data.ContainsKey("LastCsvResponseExport") || Map.Data["LastCsvResponseExport"] as string != responseCsvFileName)
                 {
-                    DataSources.Map.Data["LastCsvIncidentExport"] = incidentCsvFileName;
-                    DataSources.Map.Data["LastCsvResponseExport"] = responseCsvFileName;
+                    Map.Data["LastCsvIncidentExport"] = incidentCsvFileName;
+                    Map.Data["LastCsvResponseExport"] = responseCsvFileName;
 
-                    SetChangesMade(DataSources.Map, true);
+                    SetChangesMade(Map, true);
                 }
 
-                LogHelper.LogMessage(LogLevel.Info, string.Format("Creating CSVs {0} and {1} from DataMap {2}", incidentCsvFileName, responseCsvFileName, DataSources.Map.Name));
+                LogHelper.LogMessage(LogLevel.Info, string.Format("Creating CSVs {0} and {1} from DataMap {2}", incidentCsvFileName, responseCsvFileName, Map.Name));
 
                 MapLoader loader = new MapLoader();
                 loader.OnProgressUpdate += onLoaderProgress;
@@ -1048,7 +1036,7 @@ namespace Levrum.DataBridge
                     try
                     {
                         DisableControls();
-                        loader.LoadMap(DataSources.Map);
+                        loader.LoadMap(Map);
                         foreach (IncidentData incident in loader.Incidents)
                         {
                             incident.Intern();
@@ -1108,10 +1096,10 @@ namespace Levrum.DataBridge
         {
             try
             {
-                DataSources.Map.EnableCoordinateConversion = !DataSources.Map.EnableCoordinateConversion;
+                Map.EnableCoordinateConversion = !Map.EnableCoordinateConversion;
                 updateCoordinateConversionControls();
 
-                SetChangesMade(DataSources.Map, true);
+                SetChangesMade(Map, true);
             }
             catch (Exception ex)
             {
@@ -1121,7 +1109,7 @@ namespace Levrum.DataBridge
 
         private void updateCoordinateConversionControls()
         {
-            if (DataSources.Map.EnableCoordinateConversion)
+            if (Map.EnableCoordinateConversion)
             {
                 CoordinateConversionMenuItem.Header = "_Coordinate Conversion Enabled";
                 CoordinateConversionMenuItem.IsChecked = true;
@@ -1140,9 +1128,9 @@ namespace Levrum.DataBridge
             try
             {
                 string projection = null;
-                if (!string.IsNullOrWhiteSpace(DataSources.Map.Projection))
+                if (!string.IsNullOrWhiteSpace(Map.Projection))
                 {
-                    projection = DataSources.Map.Projection;
+                    projection = Map.Projection;
                 }
                 TextInputDialog dialog = new TextInputDialog("Define Projection", "Projection:", projection);
                 dialog.Owner = this;
@@ -1150,8 +1138,8 @@ namespace Levrum.DataBridge
 
                 if (dialog.DialogResult == true)
                 {
-                    DataSources.Map.Projection = dialog.Result;
-                    SetChangesMade(DataSources.Map, true);
+                    Map.Projection = dialog.Result;
+                    SetChangesMade(Map, true);
                 }
             }
             catch (Exception ex)
@@ -1164,10 +1152,10 @@ namespace Levrum.DataBridge
         {
             try
             {
-                DataSources.Map.InvertLatitude = !DataSources.Map.InvertLatitude;
+                Map.InvertLatitude = !Map.InvertLatitude;
                 updateInvertLatitude();
 
-                SetChangesMade(DataSources.Map, true);
+                SetChangesMade(Map, true);
             }
             catch (Exception ex)
             {
@@ -1177,7 +1165,7 @@ namespace Levrum.DataBridge
 
         private void updateInvertLatitude()
         {
-            if (DataSources.Map.InvertLatitude)
+            if (Map.InvertLatitude)
             {
                 ToggleInvertLatitudeMenuItem.Header = "Invert _Latitude Enabled";
                 ToggleInvertLatitudeMenuItem.IsChecked = true;
@@ -1195,10 +1183,10 @@ namespace Levrum.DataBridge
         {
             try
             {
-                DataSources.Map.InvertLongitude = !DataSources.Map.InvertLongitude;
+                Map.InvertLongitude = !Map.InvertLongitude;
                 updateInvertLongitude();
 
-                SetChangesMade(DataSources.Map, true);
+                SetChangesMade(Map, true);
             }
             catch (Exception ex)
             {
@@ -1208,7 +1196,7 @@ namespace Levrum.DataBridge
 
         private void updateInvertLongitude()
         {
-            if (DataSources.Map.InvertLongitude)
+            if (Map.InvertLongitude)
             {
                 ToggleInvertLongitudeMenuItem.Header = "Invert Lon_gitude Enabled";
                 ToggleInvertLongitudeMenuItem.IsChecked = true;
@@ -1226,10 +1214,10 @@ namespace Levrum.DataBridge
         {
             try
             {
-                DataSources.Map.TransportAsClearScene = !DataSources.Map.TransportAsClearScene;
+                Map.TransportAsClearScene = !Map.TransportAsClearScene;
                 updateTransportAsClearScene();
 
-                SetChangesMade(DataSources.Map, true);
+                SetChangesMade(Map, true);
             }
             catch (Exception ex)
             {
@@ -1239,7 +1227,7 @@ namespace Levrum.DataBridge
 
         private void updateTransportAsClearScene()
         {
-            if (DataSources.Map.TransportAsClearScene)
+            if (Map.TransportAsClearScene)
             {
                 ToggleTransportAsClearSceneMenuItem.Header = "_Transport As ClearScene Enabled";
                 ToggleTransportAsClearSceneMenuItem.IsChecked = true;
@@ -1257,7 +1245,7 @@ namespace Levrum.DataBridge
         {
             try
             {
-                if (DataSources.Map.RestorePrecision == -1)
+                if (Map.RestorePrecision == -1)
                 {
                     SingleValueForm svf = new SingleValueForm("Configure Restore Precision", "Number of digits of precision to restore");
                     svf.Numeric = true;
@@ -1266,14 +1254,14 @@ namespace Levrum.DataBridge
                     {
                         return;
                     }
-                    DataSources.Map.RestorePrecision = int.Parse(svf.Text);
+                    Map.RestorePrecision = int.Parse(svf.Text);
                 } else
                 {
-                    DataSources.Map.RestorePrecision = -1;
+                    Map.RestorePrecision = -1;
                 }
                 updateRestorePrecision();
 
-                SetChangesMade(DataSources.Map, true);
+                SetChangesMade(Map, true);
             }
             catch (Exception ex)
             {
@@ -1283,7 +1271,7 @@ namespace Levrum.DataBridge
 
         private void updateRestorePrecision()
         {
-            if (DataSources.Map.RestorePrecision == -1)
+            if (Map.RestorePrecision == -1)
             {
                 ToggleRestorePrecisionMenuItem.Header = "_Restore Precision Disabled";
                 ToggleRestorePrecisionMenuItem.IsChecked = false;
@@ -1294,7 +1282,7 @@ namespace Levrum.DataBridge
                 ToggleRestorePrecisionMenuItem.Header = "_Restore Precision Enabled";
                 ToggleRestorePrecisionMenuItem.IsChecked = true;
                 ToggleRestorePrecisionButton.IsChecked = true;
-                ToggleRestorePrecisionButton.ToolTip = string.Format("Restoring {0} digits of precision", DataSources.Map.RestorePrecision);
+                ToggleRestorePrecisionButton.ToolTip = string.Format("Restoring {0} digits of precision", Map.RestorePrecision);
             }
         }
 
@@ -1303,7 +1291,7 @@ namespace Levrum.DataBridge
             try
             {
                 List<ICategoryData> tree = new List<ICategoryData>();
-                foreach (CauseData cause in DataSources.Map.CauseTree)
+                foreach (CauseData cause in Map.CauseTree)
                 {
                     tree.Add(cause);
                 }
@@ -1318,8 +1306,8 @@ namespace Levrum.DataBridge
                         causeTree.Add(CauseData.ConvertICategoryData(item));
                     }
 
-                    DataSources.Map.CauseTree = causeTree;
-                    SetChangesMade(DataSources.Map, true);
+                    Map.CauseTree = causeTree;
+                    SetChangesMade(Map, true);
                 }
             }
             catch (Exception ex)
@@ -1392,9 +1380,9 @@ namespace Levrum.DataBridge
             try
             {
                 string script = null;
-                if (!string.IsNullOrWhiteSpace(DataSources.Map.PostProcessingScript))
+                if (!string.IsNullOrWhiteSpace(Map.PostProcessingScript))
                 {
-                    script = DataSources.Map.PostProcessingScript;
+                    script = Map.PostProcessingScript;
                 }
                 EditScriptDialog dialog = new EditScriptDialog(ScriptType.PostLoad, "Edit Post-Loading Script", null, script);
                 dialog.Owner = this;
@@ -1402,8 +1390,8 @@ namespace Levrum.DataBridge
 
                 if (dialog.DialogResult == true)
                 {
-                    DataSources.Map.PostProcessingScript = dialog.Result;
-                    SetChangesMade(DataSources.Map, true);
+                    Map.PostProcessingScript = dialog.Result;
+                    SetChangesMade(Map, true);
                 }
             }
             catch (Exception ex)
@@ -1417,9 +1405,9 @@ namespace Levrum.DataBridge
             try
             {
                 string script = null;
-                if (!string.IsNullOrWhiteSpace(DataSources.Map.PerIncidentScript))
+                if (!string.IsNullOrWhiteSpace(Map.PerIncidentScript))
                 {
-                    script = DataSources.Map.PerIncidentScript;
+                    script = Map.PerIncidentScript;
                 }
                 EditScriptDialog dialog = new EditScriptDialog(ScriptType.PerIncident, "Edit Per Incident Script", null, script);
                 dialog.Owner = this;
@@ -1427,8 +1415,8 @@ namespace Levrum.DataBridge
 
                 if (dialog.DialogResult == true)
                 {
-                    DataSources.Map.PerIncidentScript = dialog.Result;
-                    SetChangesMade(DataSources.Map, true);
+                    Map.PerIncidentScript = dialog.Result;
+                    SetChangesMade(Map, true);
                 }
             }
             catch (Exception ex)
@@ -1442,9 +1430,9 @@ namespace Levrum.DataBridge
             try
             {
                 string script = null;
-                if (!string.IsNullOrWhiteSpace(DataSources.Map.FinalProcessingScript))
+                if (!string.IsNullOrWhiteSpace(Map.FinalProcessingScript))
                 {
-                    script = DataSources.Map.FinalProcessingScript;
+                    script = Map.FinalProcessingScript;
                 }
                 EditScriptDialog dialog = new EditScriptDialog(ScriptType.FinalProcessing, "Edit Final Processing Script", null, script);
                 dialog.Owner = this;
@@ -1452,8 +1440,8 @@ namespace Levrum.DataBridge
 
                 if (dialog.DialogResult == true)
                 {
-                    DataSources.Map.FinalProcessingScript = dialog.Result;
-                    SetChangesMade(DataSources.Map, true);
+                    Map.FinalProcessingScript = dialog.Result;
+                    SetChangesMade(Map, true);
                 }
             }
             catch (Exception ex)

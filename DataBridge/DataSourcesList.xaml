@@ -7,12 +7,12 @@
              xmlns:dd="urn:gong-wpf-dragdrop"
              mc:Ignorable="d" 
              d:DesignHeight="200" d:DesignWidth="800">
-    <Grid x:Name="DataSourcesListGrid" Background="White" AllowDrop="True" Drop="DataSourcesListGrid_Drop" DragOver="DataSourcesListGrid_DragOver">
+    <Grid x:Name="DataSourcesListGrid" AllowDrop="True" Drop="DataSourcesListGrid_Drop" DragOver="DataSourcesListGrid_DragOver">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="500*"/>
             <ColumnDefinition Width="100"/>
         </Grid.ColumnDefinitions>
-        <ListBox x:Name="DataSourcesListBox" Grid.Column="0" ItemsSource="{Binding DataSources}" DisplayMemberPath="Info" SelectionChanged="DataSourcesListBox_SelectionChanged" MouseDoubleClick="DataSourcesListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"/>
+        <ListBox x:Name="DataSourcesListBox" Grid.Column="0" ItemsSource="{Binding DataSources}" DisplayMemberPath="Info" SelectionChanged="DataSourcesListBox_SelectionChanged" MouseDoubleClick="DataSourcesListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DragDropCopyKeyState="ControlKey"/>
         <StackPanel Grid.Column="1" VerticalAlignment="Center">
             <Button x:Name="AddButton" Margin="8,8,8,4" Click="AddButton_Click">_Add</Button>
             <Button x:Name="EditButton" Margin="8,4,8,4" Click="EditButton_Click" IsEnabled="False">_Edit</Button>

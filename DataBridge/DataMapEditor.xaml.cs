@@ -22,17 +22,20 @@ namespace Levrum.DataBridge
     /// </summary>
     public partial class DataMapEditor : UserControl
     {
-        public MainDataBridgeWindow Window { get; set; } = null;
+        private MainDataBridgeWindow m_window = null;
+        public MainDataBridgeWindow Window { get { return m_window; } set { m_window = value; DataSources.Window = value; } }
+
         public DataMap DataMap { get; protected set; }
 
-        public DataMapEditor(DataMap _map = null)
+        public DataMapEditor(DataMap _map = null, MainDataBridgeWindow _window = null)
         {
             InitializeComponent();
             DataMap = _map;
+            DataSources.Map = _map;
             IncidentDataListBox.ItemsSource = _map.IncidentDataMappings;
             ResponseDataListBox.ItemsSource = _map.ResponseDataMappings;
             BenchmarkListBox.ItemsSource = _map.BenchmarkMappings;
-            //UpdateStaticMappingButtons();
+            Window = _window;
         }
 
         public enum DataMappingType { IncidentData, ResponseData, ResponseTiming };
