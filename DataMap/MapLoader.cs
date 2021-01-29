@@ -916,6 +916,12 @@ namespace Levrum.Data.Map
                     incident.Longitude = incident.Longitude * -1.0;
                 }
 
+                if (Map.RestorePrecision != -1)
+                {
+                    incident.Latitude = incident.Latitude / Math.Pow(10, Map.RestorePrecision);
+                    incident.Longitude = incident.Longitude / Math.Pow(10, Map.RestorePrecision);
+                }
+
                 if (incident.Location != null)
                 {
                     incident.Location = incident.Location.Trim();

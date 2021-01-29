@@ -1,0 +1,457 @@
+{
+  "$id": "1",
+  "$type": "Levrum.Data.Map.DataMap, Levrum.Data.Map",
+  "Name": "TriTech.dmap",
+  "EnableCoordinateConversion": false,
+  "IncidentMappings": {
+    "$id": "2",
+    "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Levrum.Data.Map.DataMapping, Levrum.Data.Map]], System.ObjectModel",
+    "$values": []
+  },
+  "IncidentDataMappings": {
+    "$id": "3",
+    "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Levrum.Data.Map.DataMapping, Levrum.Data.Map]], System.ObjectModel",
+    "$values": [
+      {
+        "$id": "4",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Time",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "5",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Time_PhonePickUp",
+          "DataSource": {
+            "$id": "6",
+            "$type": "Levrum.Data.Sources.SqlSource, Levrum.Data.Sources",
+            "Name": "Response Master Incident",
+            "Type": 1,
+            "IDColumn": "ID",
+            "ResponseIDColumn": "",
+            "DateColumn": "",
+            "Parameters": {
+              "$id": "7",
+              "$type": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib],[System.String, System.Private.CoreLib]], System.Private.CoreLib",
+              "Server": "",
+              "Port": "",
+              "User": "",
+              "Password": "",
+              "Database": "Reporting_System",
+              "Query": "SELECT * FROM RESPONSE_MASTER_INCIDENT WHERE Response_Date >= !!startdate!! AND Response_Date <= !!enddate!! AND (Agency_Type LIKE '%Fire%' OR Agency_Type LIKE '%EMS%');"
+            },
+            "ErrorMessage": ""
+          }
+        }
+      },
+      {
+        "$id": "8",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Latitude",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "9",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Latitude",
+          "DataSource": {
+            "$ref": "6"
+          }
+        }
+      },
+      {
+        "$id": "10",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Longitude",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "11",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Longitude",
+          "DataSource": {
+            "$ref": "6"
+          }
+        }
+      },
+      {
+        "$id": "12",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Location",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "13",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Address",
+          "DataSource": {
+            "$ref": "6"
+          }
+        }
+      },
+      {
+        "$id": "14",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "City",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "15",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "City",
+          "DataSource": {
+            "$ref": "6"
+          }
+        }
+      },
+      {
+        "$id": "16",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "State",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "17",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "State",
+          "DataSource": {
+            "$ref": "6"
+          }
+        }
+      },
+      {
+        "$id": "18",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Code",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "19",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Problem",
+          "DataSource": {
+            "$ref": "6"
+          }
+        }
+      },
+      {
+        "$id": "20",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Jurisdiction",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "21",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Jurisdiction",
+          "DataSource": {
+            "$ref": "6"
+          }
+        }
+      },
+      {
+        "$id": "22",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Station",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "23",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Station",
+          "DataSource": {
+            "$ref": "6"
+          }
+        }
+      },
+      {
+        "$id": "24",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "AgencyType",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "25",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Agency_Type",
+          "DataSource": {
+            "$ref": "6"
+          }
+        }
+      },
+      {
+        "$id": "26",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "UniqueId",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "27",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Master_Incident_Number",
+          "DataSource": {
+            "$ref": "6"
+          }
+        }
+      }
+    ]
+  },
+  "ResponseDataMappings": {
+    "$id": "28",
+    "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Levrum.Data.Map.DataMapping, Levrum.Data.Map]], System.ObjectModel",
+    "$values": [
+      {
+        "$id": "29",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Unit",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "30",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Radio_Name",
+          "DataSource": {
+            "$id": "31",
+            "$type": "Levrum.Data.Sources.SqlSource, Levrum.Data.Sources",
+            "Name": "Response Vehicles Assigned",
+            "Type": 1,
+            "IDColumn": "Master_Incident_ID",
+            "ResponseIDColumn": "Vehicle_ID",
+            "DateColumn": "",
+            "Parameters": {
+              "$id": "32",
+              "$type": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib],[System.String, System.Private.CoreLib]], System.Private.CoreLib",
+              "Server": "",
+              "Port": "",
+              "User": "",
+              "Password": "",
+              "Database": "Reporting_System",
+              "Query": "SELECT R.Master_Incident_Number, V.* FROM Response_Master_Incident R LEFT JOIN Response_Vehicles_Assigned V ON V.Master_Incident_ID = R.ID WHERE R.Response_Date >= !!startdate!! AND R.Response_Date <= !!enddate!! AND (R.Agency_Type LIKE '%Fire%' OR R.Agency_Type LIKE '%EMS%');"
+            },
+            "ErrorMessage": ""
+          }
+        }
+      },
+      {
+        "$id": "33",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "UnitType",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "34",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Description",
+          "DataSource": {
+            "$id": "35",
+            "$type": "Levrum.Data.Sources.SqlSource, Levrum.Data.Sources",
+            "Name": "Vehicle",
+            "Type": 1,
+            "IDColumn": "ID",
+            "ResponseIDColumn": "ID",
+            "DateColumn": "",
+            "Parameters": {
+              "$id": "36",
+              "$type": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib],[System.String, System.Private.CoreLib]], System.Private.CoreLib",
+              "Server": "",
+              "Port": "",
+              "User": "",
+              "Password": "",
+              "Database": "Reporting_System",
+              "Query": "SELECT * FROM Vehicle V INNER JOIN VehicleBodyType T ON V.VehicleBodyType_ID = T.ID"
+            },
+            "ErrorMessage": ""
+          }
+        }
+      },
+      {
+        "$id": "37",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "TransportDestination",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "38",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Location_Name",
+          "DataSource": {
+            "$id": "39",
+            "$type": "Levrum.Data.Sources.SqlSource, Levrum.Data.Sources",
+            "Name": "Response Transports",
+            "Type": 1,
+            "IDColumn": "Master_Incident_ID",
+            "ResponseIDColumn": "Vehicle_ID",
+            "DateColumn": "",
+            "Parameters": {
+              "$id": "40",
+              "$type": "System.Collections.Generic.Dictionary`2[[System.String, System.Private.CoreLib],[System.String, System.Private.CoreLib]], System.Private.CoreLib",
+              "Server": "",
+              "Port": "",
+              "User": "",
+              "Password": "",
+              "Database": "Reporting_System",
+              "Query": "SELECT T.*, V.Vehicle_ID FROM [Reporting_System].[dbo].[Response_Transports] T INNER JOIN Response_Vehicles_Assigned V ON T.Vehicle_Assigned_ID = V.ID INNER JOIN Response_Master_Incident R on V.Master_Incident_ID = R.ID WHERE R.Response_Date >= !!startdate!! AND R.Response_Date <= !!enddate!! AND (R.Agency_Type LIKE '%Fire%' OR R.Agency_Type LIKE '%EMS%')"
+            },
+            "ErrorMessage": ""
+          }
+        }
+      },
+      {
+        "$id": "41",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "TransportMode",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "42",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Transport_Mode",
+          "DataSource": {
+            "$ref": "39"
+          }
+        }
+      },
+      {
+        "$id": "43",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Urgency",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "44",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Priority_Number",
+          "DataSource": {
+            "$ref": "6"
+          }
+        }
+      }
+    ]
+  },
+  "BenchmarkMappings": {
+    "$id": "45",
+    "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Levrum.Data.Map.DataMapping, Levrum.Data.Map]], System.ObjectModel",
+    "$values": [
+      {
+        "$id": "46",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Assigned",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "47",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Time_Assigned",
+          "DataSource": {
+            "$ref": "31"
+          }
+        }
+      },
+      {
+        "$id": "48",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Responding",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "49",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Time_Enroute",
+          "DataSource": {
+            "$ref": "31"
+          }
+        }
+      },
+      {
+        "$id": "50",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "OnScene",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "51",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Time_ArrivedAtScene",
+          "DataSource": {
+            "$ref": "31"
+          }
+        }
+      },
+      {
+        "$id": "52",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "ClearScene",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "53",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Time_Call_Cleared",
+          "DataSource": {
+            "$ref": "31"
+          }
+        }
+      },
+      {
+        "$id": "54",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Transport",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "55",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Time_Depart_Scene",
+          "DataSource": {
+            "$ref": "39"
+          }
+        }
+      },
+      {
+        "$id": "56",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Hospital",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "57",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Time_Arrive_Destination",
+          "DataSource": {
+            "$ref": "39"
+          }
+        }
+      },
+      {
+        "$id": "58",
+        "$type": "Levrum.Data.Map.DataMapping, Levrum.Data.Map",
+        "Field": "Handoff",
+        "ColumnType": 1,
+        "Column": {
+          "$id": "59",
+          "$type": "Levrum.Data.Map.ColumnMapping, Levrum.Data.Map",
+          "ColumnName": "Time_ClearedThisDest",
+          "DataSource": {
+            "$ref": "39"
+          }
+        }
+      }
+    ]
+  },
+  "DataSources": {
+    "$id": "60",
+    "$type": "System.Collections.ObjectModel.ObservableCollection`1[[Levrum.Data.Sources.IDataSource, Levrum.Data.Sources]], System.ObjectModel",
+    "$values": [
+      {
+        "$ref": "6"
+      },
+      {
+        "$ref": "31"
+      },
+      {
+        "$ref": "35"
+      },
+      {
+        "$ref": "39"
+      }
+    ]
+  },
+  "ResponseIdColumn": "",
+  "Projection": "",
+  "InvertLongitude": true,
+  "InvertLatitude": false,
+  "RestorePrecision": 6,
+  "TransportAsClearScene": false,
+  "CauseTree": {
+    "$id": "61",
+    "$type": "System.Collections.Generic.List`1[[Levrum.Data.Classes.CauseData, Levrum.Data.Classes]], System.Private.CoreLib",
+    "$values": []
+  },
+  "PostProcessingScript": "",
+  "PerIncidentScript": "",
+  "FinalProcessingScript": "",
+  "Data": {
+    "$type": "Levrum.Data.Classes.InternedDictionary`2[[System.String, System.Private.CoreLib],[System.Object, System.Private.CoreLib]], Levrum.Data.Classes",
+    "LastJsonExport": "C:\\Users\\Kevin\\Documents\\Levrum\\debug.json",
+    "LastCsvIncidentExport": "C:\\Users\\Kevin\\Documents\\Levrum\\demo.csv",
+    "LastCsvResponseExport": "C:\\Users\\Kevin\\Documents\\Levrum\\demo Responses.csv"
+  }
+}

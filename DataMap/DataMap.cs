@@ -33,7 +33,7 @@ namespace Levrum.Data.Map
 
         public bool InvertLongitude { get; set; } = false;
         public bool InvertLatitude { get; set; } = false;
-        public bool TritechCoordinates { get; set; } = false;
+        public int RestorePrecision { get; set; } = -1;
         public bool TransportAsClearScene { get; set; } = false;
 
         public List<CauseData> CauseTree { get; set; } = new List<CauseData>();
