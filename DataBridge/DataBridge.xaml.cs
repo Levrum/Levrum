@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 using Microsoft.Win32;
@@ -29,16 +30,16 @@ using Levrum.UI.WPF;
 
 using Levrum.Utils;
 using Levrum.Utils.Data;
-using System.Windows.Controls;
+using Levrum.Utils.Messaging;
 
 namespace Levrum.DataBridge
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainDataBridgeWindow : Window
+    public partial class MainDataBridgeWindow : Window, IDisposable
     {
-        public List<DataMapDocument> openDocuments = new List<DataMapDocument>();
+        public List<DataMapDocument> m_openDocs = new List<DataMapDocument>();
 
         public DataMapEditor ActiveEditor { get; set; } = null;
         public DataMap Map { get; set; } = null;
@@ -58,44 +59,82 @@ namespace Levrum.DataBridge
             client.OnException += LicenseClient_OnException;
             client.VerifyOrRequestLicense();
 
-            //DataSources.Window = this;
             App app = Application.Current as App;
             if (app != null)
             {
                 if (app.StartupFileNames.Length > 0)
                 {
-                    DataMapDocument firstDocument = null;
-                    foreach (string fileName in app.StartupFileNames)
-                    {
-                        try
-                        {
-                            var document = OpenDataMap(fileName);
-                            if (firstDocument == null)
-                            {
-                                firstDocument = document;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            logException(this, string.Format("Unable to open DataMap file '{0}'", fileName), ex);
-                        }
-                    }
-
-                    if (firstDocument != null)
-                    {
-                        int index = DocumentPane.IndexOfChild(firstDocument.Document);
-                        DocumentPane.SelectedContentIndex = index;
-                    }
+                    openDocuments(app.StartupFileNames);
                 }
 
                 if (app.DebugMode)
                 {
                     ViewLogsMenuItem.Visibility = Visibility.Visible;
                 }
+
+                app.OnMessageReceived += OnIpcMessage;
             }
             checkForUpdates();
             updateRecentFilesMenu();
             updateToolbarsAndMenus();
+        }
+
+        public void Dispose()
+        {
+            App app = Application.Current as App;
+            if (app == null)
+            {
+                return;
+            }
+            app.OnMessageReceived -= OnIpcMessage;
+        }
+
+        private void OnIpcMessage(IPCMessage message)
+        {
+            if (message.Type == IPCMessageType.OpenDocument)
+            {
+                App app = Application.Current as App;
+                if (app.HasMutex)
+                {
+                    if (message.Data is string)
+                    {
+                        string[] fileName = new string[1];
+                        fileName[0] = message.Data as string;
+                        Dispatcher.Invoke(() => { openDocuments(fileName); Activate(); });
+                    }
+                    else if (message.Data is string[])
+                    {
+                        string[] fileNames = (string[])message.Data;
+                        Dispatcher.Invoke(() => { openDocuments(fileNames); Activate(); });
+                    }
+                }
+            }
+        }
+
+        private void openDocuments(string[] fileNames)
+        {
+            DataMapDocument firstDocument = null;
+            foreach (string fileName in fileNames)
+            {
+                try
+                {
+                    var document = OpenDataMap(fileName);
+                    if (firstDocument == null)
+                    {
+                        firstDocument = document;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logException(this, string.Format("Unable to open DataMap file '{0}'", fileName), ex);
+                }
+            }
+
+            if (firstDocument != null)
+            {
+                int index = DocumentPane.IndexOfChild(firstDocument.Document);
+                DocumentPane.SelectedContentIndex = index;
+            }
         }
 
         private void LicenseClient_OnException(Exception ex)
@@ -146,7 +185,7 @@ namespace Levrum.DataBridge
         {
             try
             {
-                DataMapDocument mapDocument = (from DataMapDocument d in openDocuments
+                DataMapDocument mapDocument = (from DataMapDocument d in m_openDocs
                                                where d.Map.Path == fileName
                                                select d).FirstOrDefault();
 
@@ -167,9 +206,15 @@ namespace Levrum.DataBridge
                 DataMapEditor editor = new DataMapEditor(map, this);
                 ActiveEditor = editor;
                 document.Content = editor;
-                DocumentPane.Children.Add(document);
+                var firstPane = DocumentPaneGroup.Children[0];
+                if (firstPane is LayoutDocumentPane)
+                {
+                    LayoutDocumentPane docPane = firstPane as LayoutDocumentPane;
+                    docPane.Children.Add(document);
+                }
+
                 mapDocument = new DataMapDocument(map, document);
-                openDocuments.Add(mapDocument);
+                m_openDocs.Add(mapDocument);
                 document.IsActive = true;
                 addRecentFile(fileName);
                 return mapDocument;
@@ -189,7 +234,7 @@ namespace Levrum.DataBridge
                 DataMapEditor editor = document.Content as DataMapEditor;
                 ActiveEditor = null;
                 DataMap map = editor.DataMap;
-                DataMapDocument openDocument = (from DataMapDocument d in openDocuments
+                DataMapDocument openDocument = (from DataMapDocument d in m_openDocs
                                                 where d.Map == map
                                                 select d).FirstOrDefault();
 
@@ -213,7 +258,7 @@ namespace Levrum.DataBridge
                 if (openDocument != null)
                 {
                     DocumentPane.Children.Remove(document);
-                    openDocuments.Remove(openDocument);
+                    m_openDocs.Remove(openDocument);
                 }
             }
             catch (Exception ex)
@@ -241,7 +286,7 @@ namespace Levrum.DataBridge
         {
             try
             {
-                DataMapDocument document = (from DataMapDocument d in openDocuments
+                DataMapDocument document = (from DataMapDocument d in m_openDocs
                                             where d.Map == map
                                             select d).FirstOrDefault();
 
@@ -549,7 +594,7 @@ namespace Levrum.DataBridge
 
         public void SetChangesMade(DataMap map, bool status)
         {
-            DataMapDocument document = (from DataMapDocument d in openDocuments
+            DataMapDocument document = (from DataMapDocument d in m_openDocs
                                         where d.Map == map
                                         select d).FirstOrDefault();
 
@@ -561,7 +606,7 @@ namespace Levrum.DataBridge
 
         public DataMapDocument GetDocumentForMap(DataMap map)
         {
-            return (from DataMapDocument d in openDocuments
+            return (from DataMapDocument d in m_openDocs
                     where d.Map == map
                     select d).FirstOrDefault();
         }
@@ -573,7 +618,7 @@ namespace Levrum.DataBridge
                 LayoutDocument document = e.Document;
                 DataMapEditor editor = document.Content as DataMapEditor;
                 DataMap map = editor.DataMap;
-                DataMapDocument openDocument = (from DataMapDocument d in openDocuments
+                DataMapDocument openDocument = (from DataMapDocument d in m_openDocs
                                                 where d.Map == map
                                                 select d).FirstOrDefault();
 
@@ -595,7 +640,7 @@ namespace Levrum.DataBridge
                     }
                 }
 
-                openDocuments.Remove(openDocument);
+                m_openDocs.Remove(openDocument);
             }
             catch (Exception ex)
             {
@@ -707,7 +752,7 @@ namespace Levrum.DataBridge
                     }
                     Worker.CancelAsync();
                 }
-                foreach (DataMapDocument doc in openDocuments)
+                foreach (DataMapDocument doc in m_openDocs)
                 {
                     if (doc.ChangesMade)
                     {
@@ -756,9 +801,18 @@ namespace Levrum.DataBridge
                 string baseTitle = newMap.Name.Substring(0, newMap.Name.Length - 5);
                 string title = newMap.Name;
                 int counter = 1;
-                foreach (DataMapDocument mapDocument in openDocuments)
+                bool titleInUse = true;
+                while (titleInUse)
                 {
-                    while (mapDocument.Map.Name == title)
+                    titleInUse = false;
+                    foreach (DataMapDocument mapDocument in m_openDocs)
+                    {
+                        if (mapDocument.Map.Name == title)
+                        {
+                            titleInUse = true;
+                        }
+                    }
+                    if (titleInUse)
                     {
                         title = string.Format("{0} {1}.dmap", baseTitle, counter);
                         counter++;
@@ -770,9 +824,16 @@ namespace Levrum.DataBridge
                 DataMapEditor editor = new DataMapEditor(newMap, this);
                 ActiveEditor = editor;
                 document.Content = editor;
-                DocumentPane.Children.Add(document);
+
+                var firstPane = DocumentPaneGroup.Children[0];
+                if (firstPane is LayoutDocumentPane)
+                {
+                    LayoutDocumentPane docPane = firstPane as LayoutDocumentPane;
+                    docPane.Children.Add(document);
+                }
+                
                 DataMapDocument newDocument = new DataMapDocument(newMap, document);
-                openDocuments.Add(newDocument);
+                m_openDocs.Add(newDocument);
                 document.IsActive = true;
             }
             catch (Exception ex)
@@ -1500,6 +1561,7 @@ namespace Levrum.DataBridge
                         try
                         {
                             OpenDataMap(fileName);
+                            Activate();                            
                         } catch (Exception ex)
                         {
                             continue;

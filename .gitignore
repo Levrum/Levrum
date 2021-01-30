@@ -5,3 +5,4 @@ obj/
 *.user
 packages/
 Build Tools/backup
+output/

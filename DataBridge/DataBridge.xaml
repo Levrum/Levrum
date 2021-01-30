@@ -178,7 +178,7 @@
             </avdock:DockingManager.DocumentHeaderTemplate>
             <avdock:LayoutRoot x:Name="_layoutRoot">
                 <avdock:LayoutPanel Orientation="Vertical">
-                    <avdock:LayoutDocumentPaneGroup >
+                    <avdock:LayoutDocumentPaneGroup x:Name="DocumentPaneGroup">
                         <avdock:LayoutDocumentPane x:Name="DocumentPane" PropertyChanged="DocumentPane_PropertyChanged">
                         </avdock:LayoutDocumentPane>
                     </avdock:LayoutDocumentPaneGroup >
