@@ -92,12 +92,12 @@ namespace Levrum.DataBridge
                 GainMutexTask = new Task(() => {
                     try
                     {
-                        bool newMutex = false;
-                        while (newMutex == false && !AbortMutex)
+                        bool isNewMutex = false;
+                        while (isNewMutex == false && !AbortMutex)
                         {
                             Thread.Sleep(100);
-                            mutex = new Mutex(true, AppIdentifier, out newMutex);
-                            if (newMutex)
+                            mutex = new Mutex(true, AppIdentifier, out isNewMutex);
+                            if (isNewMutex)
                             {
                                 s_mutex = mutex;
                             } else
