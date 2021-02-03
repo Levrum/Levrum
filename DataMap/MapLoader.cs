@@ -446,7 +446,7 @@ namespace Levrum.Data.Map
             HashSet<IDataSource> dataSources = (from mapping in Map.IncidentDataMappings
                                                 select mapping.Column.DataSource).ToHashSet();
 
-            updateProgress(1, string.Format("Loading incident data records from {0} data sources", dataSources.Count), 0, true);
+            updateProgress(1, string.Format("Loading incident data records from {0} data sources", dataSources.Count), double.NaN, true);
 
             int numSources = dataSources.Count;
             int completedSources = 0;
@@ -505,7 +505,7 @@ namespace Levrum.Data.Map
                         if (string.IsNullOrEmpty(scolname)) { throw (new Exception("Unable to identify column name in incident mapping #" + nmapping)); }
                         if (!record.HasColumn(scolname)) 
                         {
-                            AddErrorRecord(MapLoaderErrorType.NullValue, dataSource, mapping, record); // throw (new Exception("Incident record does not contain column '" + scolname + "' (#" + nmapping + ")"));  
+                            AddErrorRecord(MapLoaderErrorType.NullValue, dataSource, mapping, record);
                             continue;
                         }
 
@@ -529,7 +529,7 @@ namespace Levrum.Data.Map
             HashSet<IDataSource> dataSources = (from mapping in Map.ResponseDataMappings
                                                 select mapping.Column.DataSource).ToHashSet();
 
-            updateProgress(2, string.Format("Loading response data records from {0} data sources", dataSources.Count), 0, true);
+            updateProgress(2, string.Format("Loading response data records from {0} data sources", dataSources.Count), double.NaN, true);
 
             int numSources = dataSources.Count;
             int completedSources = 0;
@@ -706,7 +706,7 @@ namespace Levrum.Data.Map
             HashSet<IDataSource> dataSources = (from mapping in Map.BenchmarkMappings
                                                 select mapping.Column.DataSource).ToHashSet();
 
-            updateProgress(3, string.Format("Loading response timing records from {0} data sources", dataSources.Count), 0, true);
+            updateProgress(3, string.Format("Loading response timing records from {0} data sources", dataSources.Count), double.NaN, true);
 
             int numSources = dataSources.Count;
             int completedSources = 0;
