@@ -31,10 +31,10 @@
                             <RowDefinition Height="200*"/>
                             <RowDefinition Height="40"/>
                         </Grid.RowDefinitions>
-                        <ListBox x:Name="IncidentDataListBox" Grid.Row="0" SelectionChanged="IncidentDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="IncidentDataListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DragDropCopyKeyState="ControlKey">
+                        <ListBox x:Name="IncidentDataListBox" Grid.Row="0" SelectionChanged="IncidentDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="IncidentDataListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DragDropCopyKeyState="ControlKey" PreviewMouseRightButtonUp="IncidentDataListBox_PreviewMouseRightButtonUp" PreviewKeyUp="IncidentDataListBox_PreviewKeyUp" SelectionMode="Extended">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Margin="0,2">
+                                    <Grid Margin="0,2" PreviewMouseRightButtonUp="IncidentDataItem_PreviewMouseRightButtonUp">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
@@ -46,11 +46,18 @@
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem x:Name="AddIncidentDataMenuItem" Header="_Add..." Click="AddIncidentFieldButton_Click"/>
+                                    <MenuItem x:Name="EditIncidentDataMenuItem" Header="_Edit..." Click="EditIncidentFieldButton_Click"/>
+                                    <MenuItem x:Name="DeleteIncidentDataMenuItem" Header="_Delete" Click="DeleteIncidentFieldButton_Click"/>
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
                         </ListBox>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
                             <Button Name="AddIncidentFieldButton" Margin="8,8,8,8" Width="60" Click="AddIncidentFieldButton_Click">Add</Button>
                             <Button Name="EditIncidentFieldButton" Margin="8,8,8,8" Width="60" Click="EditIncidentFieldButton_Click" IsEnabled="False">Edit</Button>
-                            <Button Name="RemoveIncidentFieldButton" Margin="8,8,8,8" Width="60" Click="RemoveIncidentFieldButton_Click" IsEnabled="False">Remove</Button>
+                            <Button Name="DeleteIncidentFieldButton" Margin="8,8,8,8" Width="60" Click="DeleteIncidentFieldButton_Click" IsEnabled="False">Delete</Button>
                         </StackPanel>
                     </Grid>
                 </Grid>
@@ -66,10 +73,10 @@
                             <RowDefinition Height="200*"/>
                             <RowDefinition Height="40"/>
                         </Grid.RowDefinitions>
-                        <ListBox Grid.Row="0" x:Name="ResponseDataListBox" SelectionChanged="ResponseDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="ResponseDataListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DragDropCopyKeyState="ControlKey">
+                        <ListBox Grid.Row="0" x:Name="ResponseDataListBox" SelectionChanged="ResponseDataListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="ResponseDataListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DragDropCopyKeyState="ControlKey" PreviewMouseRightButtonUp="ResponseDataListBox_PreviewMouseRightButtonUp" PreviewKeyUp="ResponseDataListBox_PreviewKeyUp" SelectionMode="Extended">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Margin="0,2">
+                                    <Grid Margin="0,2" PreviewMouseRightButtonUp="ResponseDataItem_PreviewMouseRightButtonUp">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
@@ -81,11 +88,18 @@
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem x:Name="AddResponseDataMenuItem" Header="_Add..." Click="AddResponseFieldButton_Click"/>
+                                    <MenuItem x:Name="EditResponseDataMenuItem" Header="_Edit..." Click="EditResponseFieldButton_Click"/>
+                                    <MenuItem x:Name="DeleteResponseDataMenuItem" Header="_Delete" Click="DeleteResponseFieldButton_Click"/>
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
                         </ListBox>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
                             <Button x:Name="AddResponseFieldButton" Margin="8,8,8,8" Width="60" Click="AddResponseFieldButton_Click">Add</Button>
                             <Button x:Name="EditResponseFieldButton" Margin="8,8,8,8" Width="60" Click="EditResponseFieldButton_Click" IsEnabled="False">Edit</Button>
-                            <Button x:Name="RemoveResponseFieldButton" Margin="8,8,8,8" Width="60" Click="RemoveResponseFieldButton_Click" IsEnabled="False">Remove</Button>
+                            <Button x:Name="DeleteResponseFieldButton" Margin="8,8,8,8" Width="60" Click="DeleteResponseFieldButton_Click" IsEnabled="False">Delete</Button>
                         </StackPanel>
                     </Grid>
                 </Grid>
@@ -101,10 +115,10 @@
                             <RowDefinition Height="200*"/>
                             <RowDefinition Height="40"/>
                         </Grid.RowDefinitions>
-                        <ListBox Grid.Row="0" x:Name="BenchmarkListBox" SelectionChanged="BenchmarkListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="BenchmarkListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DragDropCopyKeyState="ControlKey">
+                        <ListBox Grid.Row="0" x:Name="BenchmarkListBox" SelectionChanged="BenchmarkListBox_SelectionChanged" HorizontalContentAlignment="Stretch" MouseDoubleClick="BenchmarkListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DragDropCopyKeyState="ControlKey" PreviewMouseRightButtonUp="BenchmarkListBox_PreviewMouseRightButtonUp" PreviewKeyUp="BenchmarkListBox_PreviewKeyUp" SelectionMode="Extended">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Margin="0,2">
+                                    <Grid Margin="0,2" PreviewMouseRightButtonUp="TimingDataItem_PreviewMouseRightButtonUp">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*" />
@@ -116,11 +130,18 @@
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem x:Name="AddTimingDataMenuItem" Header="_Add..." Click="AddBenchmarkButton_Click"/>
+                                    <MenuItem x:Name="EditTimingDataMenuItem" Header="_Edit..." Click="EditBenchmarkButton_Click"/>
+                                    <MenuItem x:Name="DeleteTimingDataMenuItem" Header="_Delete" Click="DeleteBenchmarkButton_Click"/>
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
                         </ListBox>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Grid.Row="1">
                             <Button x:Name="AddBenchmarkButton" Margin="8,8,8,8" Width="60" Click="AddBenchmarkButton_Click">Add</Button>
                             <Button x:Name="EditBenchmarkButton" Margin="8,8,8,8" Width="60" Click="EditBenchmarkButton_Click" IsEnabled="False">Edit</Button>
-                            <Button x:Name="RemoveBenchmarkButton" Margin="8,8,8,8" Width="60" Click="RemoveBenchmarkButton_Click" IsEnabled="False">Remove</Button>
+                            <Button x:Name="DeleteBenchmarkButton" Margin="8,8,8,8" Width="60" Click="DeleteBenchmarkButton_Click" IsEnabled="False">Delete</Button>
                         </StackPanel>
                     </Grid>
                 </Grid>

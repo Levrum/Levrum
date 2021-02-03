@@ -62,22 +62,25 @@ namespace Levrum.DataBridge
             }
         }
 
-        private void RemoveIncidentFieldButton_Click(object sender, RoutedEventArgs e)
+        private void DeleteIncidentFieldButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                DataMapping incidentMapping = IncidentDataListBox.SelectedItem as DataMapping;
-                if (incidentMapping != null)
+                foreach (object item in IncidentDataListBox.SelectedItems)
                 {
-                    DataMap.IncidentDataMappings.Remove(incidentMapping);
-                    if (Window != null)
+                    DataMapping incidentMapping = item as DataMapping;
+                    if (incidentMapping != null)
                     {
-                        Window.SetChangesMade(DataMap, true);
+                        DataMap.IncidentDataMappings.Remove(incidentMapping);
+                        if (Window != null)
+                        {
+                            Window.SetChangesMade(DataMap, true);
+                        }
                     }
                 }
             } catch (Exception ex)
             {
-                LogHelper.LogMessage(LogLevel.Error, "Unable to remove Incident Field", ex);
+                LogHelper.LogMessage(LogLevel.Error, "Unable to Delete Incident Field", ex);
             }
         }
 
@@ -103,114 +106,27 @@ namespace Levrum.DataBridge
             }
         }
 
-        private void RemoveResponseFieldButton_Click(object sender, RoutedEventArgs e)
+        private void DeleteResponseFieldButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                DataMapping responseMapping = ResponseDataListBox.SelectedItem as DataMapping;
-                if (responseMapping != null)
+                foreach (object item in ResponseDataListBox.SelectedItems)
                 {
-                    DataMap.ResponseDataMappings.Remove(responseMapping);
-                    if (Window != null)
+                    DataMapping responseMapping = item as DataMapping;
+                    if (responseMapping != null)
                     {
-                        Window.SetChangesMade(DataMap, true);
+                        DataMap.ResponseDataMappings.Remove(responseMapping);
+                        if (Window != null)
+                        {
+                            Window.SetChangesMade(DataMap, true);
+                        }
                     }
                 }
             } catch (Exception ex)
             {
-                LogHelper.LogMessage(LogLevel.Error, "Unable to remove Response Field", ex);
+                LogHelper.LogMessage(LogLevel.Error, "Unable to Delete Response Field", ex);
             }
         }
-
-/*        private void IncidentTimeButton_Click(object sender, RoutedEventArgs e)
-        {
-            editStaticMapping("Time");
-        }
-
-        private void IncidentLatitudeButton_Click(object sender, RoutedEventArgs e)
-        {
-            editStaticMapping("Latitude");
-        }
-
-        private void IncidentLongitudeButton_Click(object sender, RoutedEventArgs e)
-        {
-            editStaticMapping("Longitude");
-        }
-
-        private void IncidentLocationButton_Click(object sender, RoutedEventArgs e)
-        {
-            editStaticMapping("Location");
-        }
-*/
-/*        private void editStaticMapping(string fieldName)
-        {
-            try
-            {
-                DataMapping oldMapping = (from m in DataMap.IncidentMappings
-                                          where m.Field == fieldName
-                                          select m).FirstOrDefault();
-
-                ColumnSelectionDialog dialog = new ColumnSelectionDialog(DataMap.DataSources.ToList(), fieldName, true);
-                dialog.Owner = Window;
-                if (oldMapping != null)
-                {
-                    dialog.Result = oldMapping;
-                }
-
-                dialog.ShowDialog();
-                DataMapping newMapping = dialog.Result;
-                if (oldMapping != null)
-                {
-                    DataMap.IncidentMappings.Remove(oldMapping);
-                }
-                DataMap.IncidentMappings.Add(newMapping);
-                if (Window != null)
-                {
-                    Window.SetChangesMade(DataMap, true);
-                }
-                UpdateStaticMappingButtons();
-            }
-            catch (Exception ex)
-            {
-                LogHelper.LogMessage(LogLevel.Error, "Unable to edit mapping", ex);
-            }
-        }*/
-
-/*        public void UpdateStaticMappingButtons()
-        {
-            DataMapping timeMapping = (from m in DataMap.IncidentMappings
-                                       where m != null && m.Field == "Time"
-                                       select m).FirstOrDefault();
-
-            DataMapping latMapping = (from m in DataMap.IncidentMappings
-                                      where m != null && m.Field == "Latitude"
-                                      select m).FirstOrDefault();
-
-            DataMapping longMapping = (from m in DataMap.IncidentMappings
-                                       where m != null && m.Field == "Longitude"
-                                       select m).FirstOrDefault();
-
-            DataMapping locMapping = (from m in DataMap.IncidentMappings
-                                      where m != null && m.Field == "Location"
-                                      select m).FirstOrDefault();
-
-            IncidentTimeButtonText.Text = getStaticMappingButtonText(timeMapping);
-            IncidentLatitudeButtonText.Text = getStaticMappingButtonText(latMapping);
-            IncidentLongitudeButtonText.Text = getStaticMappingButtonText(longMapping);
-            IncidentLocationButtonText.Text = getStaticMappingButtonText(locMapping);
-        }
-
-        private string getStaticMappingButtonText(DataMapping mapping)
-        {
-            try
-            {
-                return string.Format("{0}: {1}", mapping.Column.DataSource.Name, mapping.Column.ColumnName);
-            }
-            catch (Exception ex)
-            {
-                return "Click here to select...";
-            }
-        }*/
 
         private void AddBenchmarkButton_Click(object sender, RoutedEventArgs e)
         {
@@ -234,40 +150,43 @@ namespace Levrum.DataBridge
             }
         }
 
-        private void RemoveBenchmarkButton_Click(object sender, RoutedEventArgs e)
+        private void DeleteBenchmarkButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                DataMapping benchmarkMapping = BenchmarkListBox.SelectedItem as DataMapping;
-                if (benchmarkMapping != null)
+                foreach (object item in BenchmarkListBox.SelectedItems)
                 {
-                    DataMap.BenchmarkMappings.Remove(benchmarkMapping);
-                    if (Window != null)
+                    DataMapping benchmarkMapping = item as DataMapping;
+                    if (benchmarkMapping != null)
                     {
-                        Window.SetChangesMade(DataMap, true);
+                        DataMap.BenchmarkMappings.Remove(benchmarkMapping);
+                        if (Window != null)
+                        {
+                            Window.SetChangesMade(DataMap, true);
+                        }
                     }
                 }
             } catch (Exception ex)
             {
-                LogHelper.LogMessage(LogLevel.Error, "Unable to remove Response Timing Field", ex);
+                LogHelper.LogMessage(LogLevel.Error, "Unable to Delete Response Timing Field", ex);
             }
         }
 
         private void IncidentDataListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            RemoveIncidentFieldButton.IsEnabled = IncidentDataListBox.SelectedIndex != -1;
+            DeleteIncidentFieldButton.IsEnabled = IncidentDataListBox.SelectedIndex != -1;
             EditIncidentFieldButton.IsEnabled = IncidentDataListBox.SelectedIndex != -1;
         }
 
         private void ResponseDataListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            RemoveResponseFieldButton.IsEnabled = ResponseDataListBox.SelectedIndex != -1;
+            DeleteResponseFieldButton.IsEnabled = ResponseDataListBox.SelectedIndex != -1;
             EditResponseFieldButton.IsEnabled = ResponseDataListBox.SelectedIndex != -1;
         }
 
         private void BenchmarkListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            RemoveBenchmarkButton.IsEnabled = BenchmarkListBox.SelectedIndex != -1;
+            DeleteBenchmarkButton.IsEnabled = BenchmarkListBox.SelectedIndex != -1;
             EditBenchmarkButton.IsEnabled = BenchmarkListBox.SelectedIndex != -1;
         }
 
@@ -371,6 +290,119 @@ namespace Levrum.DataBridge
             {
                 EditBenchmarkButton_Click(sender, e);
             }
+        }
+
+        private void IncidentDataListBox_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (IncidentDataListBox.SelectedItems.Count == 0)
+            {
+                EditIncidentDataMenuItem.IsEnabled = false;
+                DeleteIncidentDataMenuItem.IsEnabled = false;
+            }
+        }
+
+        private void IncidentDataListBox_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete && IncidentDataListBox.SelectedIndex != -1)
+            {
+                string prompt;
+                if (IncidentDataListBox.SelectedItems.Count > 1)
+                {
+                    prompt = "Delete selected Incident Data Mappings?";
+                } else
+                {
+                    DataMapping selectedField = IncidentDataListBox.SelectedItem as DataMapping;
+                    prompt = string.Format("Delete Incident Data Mapping for field '{0}'?", selectedField.Field);
+                }
+                
+                MessageBoxResult result = MessageBox.Show(prompt, "Confirm Delete", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.No)
+                    return;
+
+                DeleteIncidentFieldButton_Click(sender, e);
+            }
+        }
+
+        private void ResponseDataListBox_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (ResponseDataListBox.SelectedItems.Count == 0)
+            {
+                EditResponseDataMenuItem.IsEnabled = false;
+                DeleteResponseDataMenuItem.IsEnabled = false;
+            }
+        }
+
+        private void ResponseDataListBox_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete && ResponseDataListBox.SelectedIndex != -1)
+            {
+                string prompt;
+                if (IncidentDataListBox.SelectedItems.Count > 1)
+                {
+                    prompt = "Delete selected Response Data Mappings?";
+                }
+                else
+                {
+                    DataMapping selectedField = ResponseDataListBox.SelectedItem as DataMapping;
+                    prompt = string.Format("Delete Response Data Mapping for field '{0}'?", selectedField.Field);
+                }
+
+                MessageBoxResult result = MessageBox.Show(prompt, "Confirm Delete", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.No)
+                    return;
+
+                DeleteResponseFieldButton_Click(sender, e);
+            }
+        }
+
+        private void BenchmarkListBox_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (BenchmarkListBox.SelectedItems.Count == 0)
+            {
+                EditTimingDataMenuItem.IsEnabled = false;
+                DeleteTimingDataMenuItem.IsEnabled = false;
+            }
+        }
+
+        private void BenchmarkListBox_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete && BenchmarkListBox.SelectedIndex != -1)
+            {
+                string prompt;
+                if (BenchmarkListBox.SelectedItems.Count > 1)
+                {
+                    prompt = "Delete selected Timing Data Mappings?";
+                }
+                else
+                {
+                    DataMapping selectedField = BenchmarkListBox.SelectedItem as DataMapping;
+                    prompt = string.Format("Delete Timing Data Mapping for field '{0}'?", selectedField.Field);
+                }
+
+                MessageBoxResult result = MessageBox.Show(prompt, "Confirm Delete", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.No)
+                    return;
+
+                DeleteBenchmarkButton_Click(sender, e);
+            }
+        }
+
+        private void IncidentDataItem_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            EditIncidentDataMenuItem.IsEnabled = true;
+            DeleteIncidentDataMenuItem.IsEnabled = true;
+        }
+
+        private void ResponseDataItem_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            EditResponseDataMenuItem.IsEnabled = true;
+            DeleteResponseDataMenuItem.IsEnabled = true;
+        }
+
+        private void TimingDataItem_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            EditTimingDataMenuItem.IsEnabled = true;
+            DeleteTimingDataMenuItem.IsEnabled = true;
         }
     }
 }

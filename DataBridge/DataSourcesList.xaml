@@ -12,7 +12,20 @@
             <ColumnDefinition Width="500*"/>
             <ColumnDefinition Width="100"/>
         </Grid.ColumnDefinitions>
-        <ListBox x:Name="DataSourcesListBox" Grid.Column="0" ItemsSource="{Binding DataSources}" DisplayMemberPath="Info" SelectionChanged="DataSourcesListBox_SelectionChanged" MouseDoubleClick="DataSourcesListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DragDropCopyKeyState="ControlKey"/>
+        <ListBox x:Name="DataSourcesListBox" Grid.Column="0" ItemsSource="{Binding DataSources}" DisplayMemberPath="Info" SelectionChanged="DataSourcesListBox_SelectionChanged" MouseDoubleClick="DataSourcesListBox_MouseDoubleClick" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DragDropCopyKeyState="ControlKey" PreviewKeyUp="DataSourcesListBox_PreviewKeyUp" PreviewMouseRightButtonUp="DataSourcesListBox_PreviewMouseRightButtonUp">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                    <EventSetter Event="PreviewMouseRightButtonUp" Handler="ListBoxItem_PreviewMouseRightButtonUp"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem x:Name="AddMenuItem" Header="Add..." Click="AddButton_Click"/>
+                    <MenuItem x:Name="EditMenuItem" Header="Edit..." Click="EditButton_Click"/>
+                    <MenuItem x:Name="DeleteMenuItem" Header="Delete" Click="DeleteButton_Click"/>
+                </ContextMenu>
+            </ListBox.ContextMenu>
+        </ListBox>
         <StackPanel Grid.Column="1" VerticalAlignment="Center">
             <Button x:Name="AddButton" Margin="8,8,8,4" Click="AddButton_Click">_Add</Button>
             <Button x:Name="EditButton" Margin="8,4,8,4" Click="EditButton_Click" IsEnabled="False">_Edit</Button>

@@ -52,7 +52,6 @@ namespace Levrum.DataBridge
         public DataSourcesList()
         {
             InitializeComponent();
-            // DataSourcesListBox.ItemsSource = _map.DataSources;
             DataSourcesListBox.DisplayMemberPath = "Info";
         }
 
@@ -382,6 +381,34 @@ namespace Levrum.DataBridge
             {
                 EditButton_Click(sender, e);
             }
+        }
+
+        private void DataSourcesListBox_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete && DataSourcesListBox.SelectedIndex != -1)
+            {
+                IDataSource source = DataSourcesListBox.SelectedItem as IDataSource;
+                MessageBoxResult result = MessageBox.Show(string.Format("Are you sure you want to delete the Data Source '{0}'?", source.Name), "Confirm Delete", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.No)
+                    return;
+
+                DeleteButton_Click(sender, e);
+            }
+        }
+
+        private void DataSourcesListBox_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (DataSourcesListBox.SelectedIndex == -1)
+            {
+                EditMenuItem.IsEnabled = false;
+                DeleteMenuItem.IsEnabled = false;
+            }
+        }
+
+        private void ListBoxItem_PreviewMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            EditMenuItem.IsEnabled = true;
+            DeleteMenuItem.IsEnabled = true;
         }
     }
 }

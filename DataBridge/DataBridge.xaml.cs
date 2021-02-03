@@ -62,9 +62,9 @@ namespace Levrum.DataBridge
             App app = Application.Current as App;
             if (app != null)
             {
-                if (app.StartupFileNames.Length > 0)
+                if (app.StartupFileNames.Count > 0)
                 {
-                    openDocuments(app.StartupFileNames);
+                    openDocuments(app.StartupFileNames.ToArray());
                 }
 
                 if (app.DebugMode)
@@ -102,10 +102,10 @@ namespace Levrum.DataBridge
                         fileName[0] = message.Data as string;
                         Dispatcher.Invoke(() => { openDocuments(fileName); Activate(); });
                     }
-                    else if (message.Data is string[])
+                    else if (message.Data is List<string>)
                     {
-                        string[] fileNames = (string[])message.Data;
-                        Dispatcher.Invoke(() => { openDocuments(fileNames); Activate(); });
+                        List<string> fileNames = (List<string>)message.Data;
+                        Dispatcher.Invoke(() => { openDocuments(fileNames.ToArray()); Activate(); });
                     }
                 }
             }
@@ -155,8 +155,30 @@ namespace Levrum.DataBridge
                 return;
             }
 
-            StatusBarProgress.Value = progress;
-            StatusBarText.Text = message;
+            if (double.IsNaN(progress))
+            {
+                StatusBarProgress.IsIndeterminate = true;
+                StatusBarText.Text = message;
+            }
+            else
+            {
+                StatusBarProgress.IsIndeterminate = false;
+                StatusBarProgress.Value = progress;
+                StatusBarText.Text = message;
+            }
+        }
+
+        private void resetLoaderProgress()
+        {
+            if (!Dispatcher.CheckAccess())
+            {
+                Dispatcher.Invoke(new Action(() => { resetLoaderProgress(); }));
+                return;
+            }
+
+            StatusBarProgress.IsIndeterminate = false;
+            StatusBarProgress.Value = 0;
+            StatusBarText.Text = "Ready";
         }
 
         private void logException(object sender, string message, Exception ex)
@@ -704,11 +726,12 @@ namespace Levrum.DataBridge
                     {
                         LogHelper.LogMessage(LogLevel.Info, string.Format("Converting JSON {0} to CSVs {1} and {2}", ofd.FileName, incidentCsvFileName, responseCsvFileName));
                         DisableControls();
+                        onLoaderProgress(otherSender, "Loading JSON", double.NaN);
                         string incidentJson = File.ReadAllText(ofd.FileName);
                         DataSet<IncidentData> incidents = DataSet<IncidentData>.Deserialize(ofd.FileName);
-
+                        onLoaderProgress(otherSender, "Creating CSVs", double.NaN);
                         IncidentDataTools.CreateCsvs(incidents, incidentCsvFileName, responseCsvFileName);
-
+                        resetLoaderProgress();
                         MessageBox.Show(string.Format("Incidents saved as CSV files '{0}' and '{1}'", incidentCsvFileName, responseCsvFileName));
                     }
                     catch (Exception ex)
@@ -722,8 +745,6 @@ namespace Levrum.DataBridge
                     {
                         EnableControls();
                         LogHelper.LogMessage(LogLevel.Info, "Finished converting JSON to CSVs");
-                        StatusBarProgress.Value = 0;
-                        StatusBarText.Text = "Ready";
                     }
                     catch (Exception ex)
                     {
@@ -958,7 +979,7 @@ namespace Levrum.DataBridge
                             LogHelper.LogMessage(LogLevel.Info, string.Format("Attempting to append incidents to existing DataSet"));
                             try
                             {
-                                onLoaderProgress(this, "Loading previous DataSet", 0);
+                                onLoaderProgress(this, "Loading previous DataSet", double.NaN);
                                 lastData = DataSet<IncidentData>.Deserialize(sfd.FileName);
                                 loader.LoadMapAndAppend(Map, lastData);
                             } 
@@ -973,7 +994,7 @@ namespace Levrum.DataBridge
                             loader.LoadMap(Map);
                         }
 
-                        onLoaderProgress(this, "Generating and saving JSON", 0);
+                        onLoaderProgress(this, "Generating and saving JSON", double.NaN);
 
                         GC.Collect();
                         if (Worker.CancellationPending)
@@ -998,11 +1019,16 @@ namespace Levrum.DataBridge
                         loader.DebugHost.OnDebugMessage -= JSDebugWindow.OnMessageReceived;
                         loader.Incidents.Clear();
                         loader.IncidentsById.Clear();
-                        LogHelper.LogMessage(LogLevel.Info, "Finished creating JSON");
+                        if (!loader.Cancelling())
+                        {
+                            LogHelper.LogMessage(LogLevel.Info, "Finished creating JSON");
+                        } else
+                        {
+                            LogHelper.LogMessage(LogLevel.Info, "JSON creation cancelled");
+                        }
                         GC.Collect();
                         EnableControls();
-                        StatusBarProgress.Value = 0;
-                        StatusBarText.Text = "Ready";
+                        resetLoaderProgress();
                     }
                     catch (Exception ex)
                     {
@@ -1098,18 +1124,6 @@ namespace Levrum.DataBridge
                     {
                         DisableControls();
                         loader.LoadMap(Map);
-                        foreach (IncidentData incident in loader.Incidents)
-                        {
-                            incident.Intern();
-                            foreach (ResponseData response in incident.Responses)
-                            {
-                                response.Intern();
-                                foreach (TimingData benchmark in response.TimingData)
-                                {
-                                    response.Intern();
-                                }
-                            }
-                        }
 
                         if (Worker.CancellationPending)
                         {
@@ -1118,7 +1132,7 @@ namespace Levrum.DataBridge
                         }
 
                         GC.Collect();
-                        onLoaderProgress(this, "Generating and saving CSVs", 0);
+                        onLoaderProgress(this, "Generating and saving CSVs", double.NaN);
                         IncidentDataTools.CreateCsvs(loader.Incidents, incidentCsvFileName, responseCsvFileName);
                         MessageBox.Show(string.Format("Incidents saved as CSV files '{0}' and '{1}'", incidentCsvFileName, responseCsvFileName));
                     }
@@ -1134,11 +1148,16 @@ namespace Levrum.DataBridge
                         loader.DebugHost.OnDebugMessage -= JSDebugWindow.OnMessageReceived;
                         loader.Incidents.Clear();
                         loader.IncidentsById.Clear();
-                        LogHelper.LogMessage(LogLevel.Info, string.Format("Finished creating CSVs"));
+                        if (!loader.Cancelling())
+                        {
+                            LogHelper.LogMessage(LogLevel.Info, string.Format("Finished creating CSVs"));
+                        } else
+                        {
+                            LogHelper.LogMessage(LogLevel.Info, string.Format("CSV creation cancelled"));
+                        }
                         GC.Collect();
                         EnableControls();
-                        StatusBarProgress.Value = 0;
-                        StatusBarText.Text = "Ready";
+                        resetLoaderProgress();
                     }
                     catch (Exception ex)
                     {

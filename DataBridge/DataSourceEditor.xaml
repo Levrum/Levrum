@@ -16,7 +16,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    <Grid x:Name="DataSourceEditorGrid" Margin="0,0,0,0" Background="Transparent" AllowDrop="True" Drop="DataSourceEditorGrid_Drop" DragOver="DataSourceEditorGrid_DragOver">
+    <Grid x:Name="DataSourceEditorGrid" Margin="0,0,0,0" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" AllowDrop="True" Drop="DataSourceEditorGrid_Drop" DragOver="DataSourceEditorGrid_DragOver">
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
             <RowDefinition Height="270*"/>
@@ -55,11 +55,11 @@
                 <TextBox x:Name="CsvFileNameTextBox" Height="24" Grid.Column="1" IsEnabled="False" Background="LightGray" VerticalContentAlignment="Center"></TextBox>
                 <Button x:Name="CsvFileSelectButton" Height="24" Grid.Column="2" Margin="8,0,8,0" Click="CsvFileSelectButton_Click">Select...</Button>
                 <TextBlock Height="16" Grid.Column="3" Margin="0,0,0,0">Incident ID:</TextBlock>
-                <ComboBox x:Name="IdColumnComboBox" Grid.Column="4" Margin="0,8,8,8" SelectionChanged="IdColumnComboBox_SelectionChanged"></ComboBox>
+                <input:AutoCompleteBox Style="{DynamicResource AutoCompleteBox}" x:Name="IdColumnAutoCompleteBox" Grid.Column="4" Margin="0,8,8,8" SelectionChanged="IdColumnAutoCompleteBox_SelectionChanged" MinimumPrefixLength="0" BorderBrush="#FFACACAC" Padding="2,3,2,2" FilterMode="Contains"/>
                 <TextBlock Height="16" Grid.Column="5">Response ID:</TextBlock>
-                <ComboBox x:Name="ResponseIdColumnComboBox" Grid.Column="6" Margin="0,8,8,8" SelectionChanged="ResponseIdColumnComboBox_SelectionChanged"></ComboBox>
+                <input:AutoCompleteBox Style="{DynamicResource AutoCompleteBox}" x:Name="ResponseIdColumnAutoCompleteBox" Grid.Column="6" Margin="0,8,8,8" SelectionChanged="ResponseIdColumnAutoCompleteBox_SelectionChanged" MinimumPrefixLength="0" BorderBrush="#FFACACAC" Padding="2,3,2,2" FilterMode="Contains"/>
                 <TextBlock Height="16" Grid.Column="7">Date:</TextBlock>
-                <ComboBox x:Name="DateColumnComboBox" Grid.Column="8" Margin="0,8,8,8" SelectionChanged="DateColumnComboBox_SelectionChanged"/>
+                <input:AutoCompleteBox Style="{DynamicResource AutoCompleteBox}" x:Name="DateColumnAutoCompleteBox" Grid.Column="8" Margin="0,8,8,8" SelectionChanged="DateColumnAutoCompleteBox_SelectionChanged" MinimumPrefixLength="0" BorderBrush="#FFACACAC" Padding="2,3,2,2" FilterMode="Contains"/>
             </Grid>
             <Grid Grid.Row="1">
                 <Grid>
@@ -68,7 +68,7 @@
                         <RowDefinition Height="280*"/>
                     </Grid.RowDefinitions>
                     <TextBlock Margin="10,0,0,0" FontSize="14">Summary</TextBlock>
-                    <avalonEdit:TextEditor x:Name="CsvSummaryTextBox" Grid.Row="1" Margin="8,0,8,0" Foreground="DarkSlateGray" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="WhiteSmoke">
+                    <avalonEdit:TextEditor x:Name="CsvSummaryTextBox" Grid.Row="1" Margin="8,0,8,0" Foreground="DarkSlateGray" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="White">
                         No data available...
                     </avalonEdit:TextEditor>
                 </Grid>
@@ -114,7 +114,7 @@
                 <ComboBox x:Name="SqlDataTypeComboBox" Grid.Column="1" Margin="0,0,0,0" SelectionChanged="SqlDataTypeComboBox_SelectionChanged"/>
                 <DockPanel Grid.Column="2" HorizontalAlignment="Stretch">
                     <TextBlock x:Name="SqlTableTextBlock" Height="16" Margin="8,0,0,0">Table:</TextBlock>
-                    <ComboBox x:Name="SqlTableComboBox" Width="100" Margin="8,0,0,0" SelectionChanged="SqlTableComboBox_SelectionChanged"/>
+                    <input:AutoCompleteBox Style="{DynamicResource AutoCompleteBox}" x:Name="SqlTableAutoCompleteBox" Width="100" Margin="8,0,0,0" SelectionChanged="SqlTableAutoCompleteBox_SelectionChanged" MinimumPrefixLength="0" BorderBrush="#FFACACAC" Padding="2,3,2,2" FilterMode="Contains"/>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="70"/>
@@ -125,17 +125,17 @@
                             <ColumnDefinition Width="120*"/>
                         </Grid.ColumnDefinitions>
                     <TextBlock Height="16" Grid.Column="0" Margin="8,0,0,0">Incident ID:</TextBlock>
-                    <ComboBox x:Name="SqlIdColumnComboBox" Grid.Column="1" Margin="8,0,8,0" SelectionChanged="IdColumnComboBox_SelectionChanged"></ComboBox>
-                    <TextBlock Height="16" Grid.Column="2">Response ID:</TextBlock>
-                    <ComboBox x:Name="SqlResponseIdColumnComboBox" Grid.Column="3" Margin="8,0,8,0" SelectionChanged="ResponseIdColumnComboBox_SelectionChanged"></ComboBox>
-                    <TextBlock x:Name="SqlDateColumnTextBox" Height="16" Grid.Column="4">Date:</TextBlock>
-                    <ComboBox x:Name="SqlDateColumnComboBox" Grid.Column="5" Margin="0,0,8,0" SelectionChanged="SqlDateColumnComboBox_SelectionChanged"/>
+                        <input:AutoCompleteBox Style="{DynamicResource AutoCompleteBox}" x:Name="SqlIdColumnAutoCompleteBox" Grid.Column="1" Margin="8,0,8,0" SelectionChanged="IdColumnAutoCompleteBox_SelectionChanged" MinimumPrefixLength="0" BorderBrush="#FFACACAC" Padding="2,3,2,2" FilterMode="Contains"/>
+                        <TextBlock Height="16" Grid.Column="2">Response ID:</TextBlock>
+                        <input:AutoCompleteBox Style="{DynamicResource AutoCompleteBox}" x:Name="SqlResponseIdColumnAutoCompleteBox" Grid.Column="3" Margin="8,0,8,0" SelectionChanged="ResponseIdColumnAutoCompleteBox_SelectionChanged" MinimumPrefixLength="0" BorderBrush="#FFACACAC" Padding="2,3,2,2" FilterMode="Contains"/>
+                        <TextBlock x:Name="SqlDateColumnTextBox" Height="16" Grid.Column="4">Date:</TextBlock>
+                        <input:AutoCompleteBox Style="{DynamicResource AutoCompleteBox}" x:Name="SqlDateColumnAutoCompleteBox" Grid.Column="5" Margin="0,0,8,0" SelectionChanged="SqlDateColumnAutoCompleteBox_SelectionChanged" MinimumPrefixLength="0" BorderBrush="#FFACACAC" Padding="2,3,2,2" FilterMode="Contains"/>
                     </Grid>
                 </DockPanel>
             </Grid>
             <Grid Grid.Row="2">
-                <avalonEdit:TextEditor x:Name="SqlQueryTextBox" Margin="8,0,8,0" Visibility="Visible" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="WhiteSmoke"/>
-                <avalonEdit:TextEditor x:Name="SqlTableDetailsTextBox" Margin="8,0,8,0" Visibility="Hidden" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="WhiteSmoke"/>
+                <avalonEdit:TextEditor x:Name="SqlQueryTextBox" Margin="8,0,8,0" Visibility="Visible" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="White"/>
+                <avalonEdit:TextEditor x:Name="SqlTableDetailsTextBox" Margin="8,0,8,0" Visibility="Hidden" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="White"/>
             </Grid>
         </Grid>
         <Grid x:Name="GeoOptionsGrid" Grid.Row="1" Visibility="Hidden">
@@ -166,7 +166,7 @@
                         <RowDefinition Height="280*"/>
                     </Grid.RowDefinitions>
                     <TextBlock Margin="10,0,0,0" FontSize="14">Summary</TextBlock>
-                    <avalonEdit:TextEditor x:Name="GeoSummaryTextBox" Grid.Row="1" Margin="10,0,8,0" Foreground="DarkSlateGray" IsReadOnly="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="WhiteSmoke">
+                    <avalonEdit:TextEditor x:Name="GeoSummaryTextBox" Grid.Row="1" Margin="10,0,8,0" Foreground="DarkSlateGray" IsReadOnly="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="White">
                         No file selected...
                     </avalonEdit:TextEditor>
                 </Grid>
@@ -219,7 +219,7 @@
                         <RowDefinition Height="280*"/>
                     </Grid.RowDefinitions>
                     <TextBlock Margin="10,0,0,0" FontSize="14">Summary</TextBlock>
-                    <avalonEdit:TextEditor x:Name="XmlSummaryTextBox" Grid.Row="1" Margin="8,0,8,0" Foreground="DarkSlateGray" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="WhiteSmoke">
+                    <avalonEdit:TextEditor x:Name="XmlSummaryTextBox" Grid.Row="1" Margin="8,0,8,0" Foreground="DarkSlateGray" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="White">
                         No data available...
                     </avalonEdit:TextEditor>
                 </Grid>
@@ -272,7 +272,7 @@
                         <RowDefinition Height="280*"/>
                     </Grid.RowDefinitions>
                     <TextBlock Margin="10,0,0,0" FontSize="14">Summary</TextBlock>
-                    <avalonEdit:TextEditor x:Name="DailyDigestSummaryTextBox" Grid.Row="1" Margin="8,0,8,0" Foreground="DarkSlateGray" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="WhiteSmoke">
+                    <avalonEdit:TextEditor x:Name="DailyDigestSummaryTextBox" Grid.Row="1" Margin="8,0,8,0" Foreground="DarkSlateGray" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" BorderThickness="1" BorderBrush="Black" Background="White">
                         No data available...
                     </avalonEdit:TextEditor>
                 </Grid>

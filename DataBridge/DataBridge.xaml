@@ -10,7 +10,9 @@
         Closing="Window_Closing" 
         AllowDrop="True" 
         Drop="Window_Drop" 
-        DragDrop.DragEnter="Window_DragEnter">
+        DragDrop.DragEnter="Window_DragEnter"
+        LocationChanged="Window_LocationChanged"
+        >
     <Window.Resources>
         <Style TargetType="Image" x:Key="DynamicImageOpacity">
             <Style.Triggers>

@@ -8,7 +8,7 @@
         Title="Enter value" Height="138" Width="400"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize">
-    <Grid>
+    <Grid Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}">
         <Grid.RowDefinitions>
             <RowDefinition Height="38"/>
             <RowDefinition Height="22"/>

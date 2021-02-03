@@ -119,12 +119,12 @@ namespace Levrum.DataBridge
                 }
 
                 List<string> columns = csvSource.GetColumns();
-                IdColumnComboBox.ItemsSource = columns;
-                IdColumnComboBox.SelectedItem = DataSource.IDColumn;
-                ResponseIdColumnComboBox.ItemsSource = columns;
-                ResponseIdColumnComboBox.SelectedItem = DataSource.ResponseIDColumn;
-                DateColumnComboBox.ItemsSource = columns;
-                DateColumnComboBox.SelectedItem = DataSource.DateColumn;
+                IdColumnAutoCompleteBox.ItemsSource = columns;
+                IdColumnAutoCompleteBox.SelectedItem = DataSource.IDColumn;
+                ResponseIdColumnAutoCompleteBox.ItemsSource = columns;
+                ResponseIdColumnAutoCompleteBox.SelectedItem = DataSource.ResponseIDColumn;
+                DateColumnAutoCompleteBox.ItemsSource = columns;
+                DateColumnAutoCompleteBox.SelectedItem = DataSource.DateColumn;
             }
             else if (DataSource.Type == DataSourceType.SqlSource)
             {
@@ -141,18 +141,18 @@ namespace Levrum.DataBridge
                     SqlDataTypeComboBox.SelectedItem = SqlSourceTypes[1];
                     SqlQueryTextBox.Text = DataSource.Parameters["Query"];
                     SqlDateColumnTextBox.Foreground = System.Windows.Media.Brushes.Gray;
-                    SqlDateColumnComboBox.IsEnabled = false;
+                    SqlDateColumnAutoCompleteBox.IsEnabled = false;
                 }
                 else
                 {
-                    SqlTableComboBox.SelectedItem = DataSource.Parameters["Table"];
+                    SqlTableAutoCompleteBox.SelectedItem = DataSource.Parameters["Table"];
                     SqlDateColumnTextBox.Foreground = System.Windows.Media.Brushes.Black;
-                    SqlDateColumnComboBox.IsEnabled = true;
+                    SqlDateColumnAutoCompleteBox.IsEnabled = true;
                 }
 
-                SqlIdColumnComboBox.SelectedItem = DataSource.IDColumn;
-                SqlResponseIdColumnComboBox.SelectedItem = DataSource.ResponseIDColumn;
-                SqlDateColumnComboBox.SelectedItem = DataSource.DateColumn;
+                SqlIdColumnAutoCompleteBox.SelectedItem = DataSource.IDColumn;
+                SqlResponseIdColumnAutoCompleteBox.SelectedItem = DataSource.ResponseIDColumn;
+                SqlDateColumnAutoCompleteBox.SelectedItem = DataSource.DateColumn;
             }
             else if (DataSource.Type == DataSourceType.GeoSource)
             {
@@ -345,9 +345,9 @@ namespace Levrum.DataBridge
                     {
                         DataSource.Parameters.Remove("Query");
                     }
-                    DataSource.Parameters["Table"] = SqlTableComboBox.SelectedItem as string;
+                    DataSource.Parameters["Table"] = SqlTableAutoCompleteBox.SelectedItem as string;
                     SqlDateColumnTextBox.Foreground = System.Windows.Media.Brushes.Black;
-                    SqlDateColumnComboBox.IsEnabled = true;
+                    SqlDateColumnAutoCompleteBox.IsEnabled = true;
                 }
                 else
                 {
@@ -357,7 +357,7 @@ namespace Levrum.DataBridge
                     }
                     DataSource.Parameters["Query"] = SqlQueryTextBox.Text;
                     SqlDateColumnTextBox.Foreground = System.Windows.Media.Brushes.Gray;
-                    SqlDateColumnComboBox.IsEnabled = false;
+                    SqlDateColumnAutoCompleteBox.IsEnabled = false;
                 }
             }
             else if (DataSource is GeoSource)
@@ -548,9 +548,9 @@ namespace Levrum.DataBridge
                 CsvFileNameTextBox.Text = ofd.FileName;
 
                 List<string> columns = source.GetColumns();
-                IdColumnComboBox.ItemsSource = columns;
-                ResponseIdColumnComboBox.ItemsSource = columns;
-                DateColumnComboBox.ItemsSource = columns;
+                IdColumnAutoCompleteBox.ItemsSource = columns;
+                ResponseIdColumnAutoCompleteBox.ItemsSource = columns;
+                DateColumnAutoCompleteBox.ItemsSource = columns;
                 ChangesMade = true;
             }
             catch (Exception ex)
@@ -571,22 +571,22 @@ namespace Levrum.DataBridge
             }
         }
 
-        private void IdColumnComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void IdColumnAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ComboBox comboBox = sender as ComboBox;
-            if (comboBox != null)
+            AutoCompleteBox autoComplete = sender as AutoCompleteBox;
+            if (autoComplete != null)
             {
-                DataSource.IDColumn = comboBox.SelectedItem as string;
+                DataSource.IDColumn = autoComplete.SelectedItem as string;
                 SaveButton.IsEnabled = true;
             }
         }
 
-        private void ResponseIdColumnComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void ResponseIdColumnAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ComboBox comboBox = sender as ComboBox;
-            if (comboBox != null)
+            AutoCompleteBox autoComplete = sender as AutoCompleteBox;
+            if (autoComplete != null)
             {
-                DataSource.ResponseIDColumn = comboBox.SelectedItem as string;
+                DataSource.ResponseIDColumn = autoComplete.SelectedItem as string;
             }
         }
 
@@ -622,13 +622,13 @@ namespace Levrum.DataBridge
             }
             List<string> tables = dataSource.GetTables();
             tables.Sort();
-            SqlTableComboBox.ItemsSource = tables;
+            SqlTableAutoCompleteBox.ItemsSource = tables;
             if (dataSource.Parameters.ContainsKey("Query"))
             {
                 List<string> columns = dataSource.GetColumns();
-                SqlIdColumnComboBox.ItemsSource = columns;
-                SqlResponseIdColumnComboBox.ItemsSource = columns;
-                SqlDateColumnComboBox.ItemsSource = columns;
+                SqlIdColumnAutoCompleteBox.ItemsSource = columns;
+                SqlResponseIdColumnAutoCompleteBox.ItemsSource = columns;
+                SqlDateColumnAutoCompleteBox.ItemsSource = columns;
             }
             dataSource.Disconnect();
         }
@@ -638,33 +638,33 @@ namespace Levrum.DataBridge
             if (SqlDataTypeComboBox.SelectedItem == SqlSourceTypes[0])
             {
                 // Table
-                SqlTableComboBox.IsEnabled = true;
+                SqlTableAutoCompleteBox.IsEnabled = true;
                 SqlTableTextBlock.Foreground = System.Windows.Media.Brushes.Black;
                 SqlTableDetailsTextBox.Visibility = Visibility.Visible;
                 SqlQueryTextBox.Visibility = Visibility.Hidden;
                 SqlQueryTextBox.Text = string.Empty;
-                SqlDateColumnComboBox.IsEnabled = true;
+                SqlDateColumnAutoCompleteBox.IsEnabled = true;
                 SqlDateColumnTextBox.Foreground = System.Windows.Media.Brushes.Black;
             }
             else
             {
                 // Query
-                SqlTableComboBox.IsEnabled = false;
+                SqlTableAutoCompleteBox.IsEnabled = false;
                 SqlTableTextBlock.Foreground = System.Windows.Media.Brushes.Gray;
                 SqlTableDetailsTextBox.Visibility = Visibility.Hidden;
                 SqlQueryTextBox.Visibility = Visibility.Visible;
-                SqlDateColumnComboBox.IsEnabled = false;
+                SqlDateColumnAutoCompleteBox.IsEnabled = false;
                 SqlDateColumnTextBox.Foreground = System.Windows.Media.Brushes.Gray;
             }
         }
 
-        private void SqlTableComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void SqlTableAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (DataSource != null)
             {
-                DataSource.Parameters["Table"] = SqlTableComboBox.SelectedItem as string;
-                SqlIdColumnComboBox.ItemsSource = DataSource.GetColumns();
-                SqlResponseIdColumnComboBox.ItemsSource = DataSource.GetColumns();
+                DataSource.Parameters["Table"] = SqlTableAutoCompleteBox.SelectedItem as string;
+                SqlIdColumnAutoCompleteBox.ItemsSource = DataSource.GetColumns();
+                SqlResponseIdColumnAutoCompleteBox.ItemsSource = DataSource.GetColumns();
             }
         }
 
@@ -1062,16 +1062,16 @@ namespace Levrum.DataBridge
             source.ResponseIDColumn = DailyDigestResponseIdNodeAutoCompleteBox.SelectedItem as string;
         }
 
-        private void DateColumnComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void DateColumnAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             CsvSource source = DataSource as CsvSource;
-            source.DateColumn = DateColumnComboBox.SelectedItem as string;
+            source.DateColumn = DateColumnAutoCompleteBox.SelectedItem as string;
         }
 
-        private void SqlDateColumnComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void SqlDateColumnAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             SqlSource source = DataSource as SqlSource;
-            source.DateColumn = SqlDateColumnComboBox.SelectedItem as string;
+            source.DateColumn = SqlDateColumnAutoCompleteBox.SelectedItem as string;
         }
 
         private void DailyDigestDateNodeAutoCompleteBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
