@@ -20,7 +20,7 @@ namespace Levrum.Data.Sources
         public DataSourceType Type { get { return DataSourceType.XmlSource; } }
 
         [JsonIgnore]
-        public string Info { get { return string.Format("XML Source '{0}': {1}", Name, Parameters["File"]); } }
+        public string Info { get { return string.Format("XML Source '{0}': {1}", Name, Parameters.ContainsKey("File") ? Parameters["File"] : "No File Selected"); } }
 
         public string IncidentNode { get; set; } = "";
         public string IDColumn { get; set; } = "";

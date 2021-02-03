@@ -78,7 +78,8 @@ namespace Levrum.Data.Sources
 
         public object Clone()
         {
-            CsvSource clone = new CsvSource(CsvFile.FullName, Name);
+            string fileName = CsvFile != null ? CsvFile.FullName : "";
+            CsvSource clone = new CsvSource(fileName, Name);
             clone.IDColumn = IDColumn;
             clone.ResponseIDColumn = ResponseIDColumn;
 
@@ -113,6 +114,10 @@ namespace Levrum.Data.Sources
         public List<string> GetColumns()
         {
             const string fn = "CsvSource.GetColumns()";
+            if (CsvFile == null || !CsvFile.Exists)
+            {
+                return new List<string>();
+            }
             Stream stream = null;
             try
             {
