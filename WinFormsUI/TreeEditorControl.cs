@@ -1683,16 +1683,7 @@ namespace Levrum.UI.WinForms
             DataSet<IncidentData> incidents = null;
             try
             {
-                if (firstChar == '[')
-                {
-                    incidents = DataSet<IncidentData>.Deserialize(file);
-                }
-                else if (firstChar == '{')
-                {
-                    incidents = JsonConvert.DeserializeObject<DataSet<IncidentData>>(File.ReadAllText(file.FullName), new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.All });
-                }
-                else
-                    throw new Exception("Invalid JSON");
+                incidents = DataSet<IncidentData>.Deserialize(file);
             }
             catch (Exception ex)
             {
