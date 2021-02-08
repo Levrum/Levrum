@@ -1708,6 +1708,8 @@ namespace Levrum.UI.WinForms
 
         public void GetDataFieldFromUser(DataSet<IncidentData> incidents)
         {
+            const int maxValues = 1000;
+
             this.Cursor = Cursors.Default;
 
             // Get list of all incident data fields
@@ -1753,9 +1755,9 @@ namespace Levrum.UI.WinForms
                     if (fieldValue == null)
                         continue;
                     dataFieldValues.Add(fieldValue.ToString());
-                    if (dataFieldValues.Count > 300)
+                    if (dataFieldValues.Count > maxValues)
                     {
-                        MessageBox.Show("This field exceeds the maximum number of values. Only showing 300 values.", "Too Many Values");
+                        MessageBox.Show($"This field exceeds the maximum number of values. Only showing {maxValues} values. This may noticeably affect performance.", "Too Many Values");
                         break;
                     }
                 }
