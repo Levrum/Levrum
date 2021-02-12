@@ -1650,8 +1650,9 @@ namespace Levrum.UI.WinForms
             {
                 return;
             }
-
-            LoadTreeFromFile(ofd.FileName);          
+            Cursor.Current = Cursors.WaitCursor;
+            LoadTreeFromFile(ofd.FileName);
+            Cursor.Current = Cursors.Default;
         }
         private void LoadTreeFromFile(string fileName)
         {
