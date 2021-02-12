@@ -363,6 +363,7 @@ namespace Levrum.UI.WinForms
                 AllowDrop = true,
                 Tag = panelCatData,
             };
+            newPanel.SuspendLayout();
             newPanel.MouseDown += SubPanel_MouseDown;
             newPanel.DragEnter += SubPanel_DragEnter;
             newPanel.DragDrop += SubPanel_DragDrop;
@@ -403,6 +404,7 @@ namespace Levrum.UI.WinForms
                 ICategoryData data = parentPanel.Tag as ICategoryData;
                 data.Children.Add(panelCatData);
             }
+            newPanel.ResumeLayout();
 
             UnsavedWork = true;
 
