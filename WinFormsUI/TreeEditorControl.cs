@@ -79,6 +79,14 @@ namespace Levrum.UI.WinForms
             MoveCursor = new Cursor(Properties.Resources.move_button.Handle);
         }
 
+        private void TreeEditorControl_Load(object sender, EventArgs e)
+        {
+            Form parentForm = Parent as Form;
+            parentForm.ResizeBegin += ParentForm_ResizeBegin;
+            parentForm.ResizeEnd += ParentForm_ResizeEnd;
+
+        }        
+
         public void AddExistingTrees(Dictionary<string, string> existingTrees)
         {
             m_existingTrees = existingTrees;
@@ -1896,6 +1904,17 @@ namespace Levrum.UI.WinForms
                 descendants.AddRange(GetControlDescendants(child));
             }
             return descendants;
+        }
+        private void ParentForm_ResizeBegin(object sender, EventArgs e)
+        {
+            m_flpOrganizedData.SuspendLayout();
+            Console.WriteLine("Resize begin");
+        }
+
+        private void ParentForm_ResizeEnd(object sender, EventArgs e)
+        {
+            m_flpOrganizedData.ResumeLayout();
+            Console.WriteLine("Resize end");
         }
     }
 }
