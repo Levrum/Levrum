@@ -1654,7 +1654,7 @@ namespace Levrum.UI.WinForms
             LoadTreeFromFile(ofd.FileName);
             Cursor.Current = Cursors.Default;
         }
-        private void LoadTreeFromFile(string fileName)
+        public void LoadTreeFromFile(string fileName)
         {
             List<ICategoryData> tree = null;
             try
