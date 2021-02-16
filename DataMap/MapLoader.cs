@@ -6,8 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 
-using Microsoft.ClearScript;
-using Microsoft.ClearScript.V8;
+using Jint;
+using Jint.Runtime.Interop;
+
+//using Microsoft.ClearScript;
+//using Microsoft.ClearScript.V8;
 
 using Levrum.Data.Sources;
 using Levrum.Data.Classes;
@@ -1571,7 +1574,7 @@ namespace Levrum.Data.Map
                     IncidentQueue.Add(incident);
                 }
 
-                int threadCount = Environment.ProcessorCount - 1;
+                int threadCount = 1; // Environment.ProcessorCount - 1;
                 Thread[] threads = new Thread[threadCount];
 
                 for (int i = 0; i < threadCount; i++)
@@ -1767,6 +1770,34 @@ namespace Levrum.Data.Map
             }
         }
 
+        private void setupJintScriptEngine(Engine engine)
+        {
+            engine.SetValue("Engine", engine);
+            engine.SetValue("Tools", new AnnotatedDataTools());
+            engine.SetValue("Incidents", Incidents);
+            engine.SetValue("Debug", DebugHost);
+            engine.SetValue("Logger", Logger);
+            engine.SetValue("MapLoader", this);
+            engine.SetValue("log", new Action<object>(Console.WriteLine));
+            engine.SetValue("object", TypeReference.CreateTypeReference(engine, typeof(object)));
+            engine.SetValue("bool", TypeReference.CreateTypeReference(engine, typeof(bool)));
+            engine.SetValue("double", TypeReference.CreateTypeReference(engine, typeof(double)));
+            engine.SetValue("int", TypeReference.CreateTypeReference(engine, typeof(int)));
+            engine.SetValue("string", TypeReference.CreateTypeReference(engine, typeof(string)));
+            engine.SetValue("DateTime", TypeReference.CreateTypeReference(engine, typeof(DateTime)));
+            engine.SetValue("TimeSpan", TypeReference.CreateTypeReference(engine, typeof(TimeSpan)));
+            engine.SetValue("LogLevel", TypeReference.CreateTypeReference(engine, typeof(NLogLevel)));
+            engine.SetValue("IncidentData", TypeReference.CreateTypeReference(engine, typeof(IncidentData)));
+            engine.SetValue("IncidentDataSet", TypeReference.CreateTypeReference(engine, typeof(DataSet<IncidentData>)));
+            engine.SetValue("ResponseData", TypeReference.CreateTypeReference(engine, typeof(ResponseData)));
+            engine.SetValue("ResponseDataSet", TypeReference.CreateTypeReference(engine, typeof(DataSet<ResponseData>)));
+            engine.SetValue("TimingData", TypeReference.CreateTypeReference(engine, typeof(TimingData)));
+            engine.SetValue("TimingDataSet", TypeReference.CreateTypeReference(engine, typeof(DataSet<TimingData>)));
+            engine.SetValue("MapLoaderErrorType", TypeReference.CreateTypeReference(engine, typeof(MapLoaderErrorType)));
+            engine.SetValue("MapLoaderError", TypeReference.CreateTypeReference(engine, typeof(MapLoaderError)));
+        }
+
+        /*
         private void setupScriptEngine(V8ScriptEngine engine)
         {
             engine.AddHostObject("Engine", engine);
@@ -1793,6 +1824,7 @@ namespace Levrum.Data.Map
             engine.AddHostType("MapLoaderErrorType", typeof(MapLoaderErrorType));
             engine.AddHostType("MapLoaderError", typeof(MapLoaderError));
         }
+        */
 
         private void executePostLoading()
         {
@@ -1805,16 +1837,15 @@ namespace Levrum.Data.Map
                 updateProgress(JSProgressStep, string.Format("Executing post-loading script"), 0, true);
                 try
                 {
-                    using (V8ScriptEngine v8 = new V8ScriptEngine())
-                    {
-                        ProgressInfo pInfo = new ProgressInfo();
-                        pInfo.Count = Incidents.Count;
-                        pInfo.Number = 0;
+                    Engine engine = new Engine();
+                    
+                    ProgressInfo pInfo = new ProgressInfo();
+                    pInfo.Count = Incidents.Count;
+                    pInfo.Number = 0;
 
-                        setupScriptEngine(v8);
-                        v8.AddHostObject("ProgressInfo", pInfo);
-                        v8.Execute(Map.PostProcessingScript);
-                    }
+                    setupJintScriptEngine(engine);
+                    engine.SetValue("ProgressInfo", pInfo);
+                    engine.Execute(Map.PostProcessingScript);
                 }
                 catch (Exception ex)
                 {
@@ -1834,59 +1865,56 @@ namespace Levrum.Data.Map
             if (!string.IsNullOrWhiteSpace(Map.PerIncidentScript))
             {
                 updateProgress(JSProgressStep, string.Format("Executing per incident script"), 0, true);
-                List<List<IncidentData>> chunks = new List<List<IncidentData>>();
-                List<IncidentData> newChunk = new List<IncidentData>();
-                chunks.Add(newChunk);
-                foreach (IncidentData incident in Incidents)
-                {
-                    if (newChunk.Count >= 1000)
-                    {
-                        newChunk = new List<IncidentData>();
-                        chunks.Add(newChunk);
-                    }
-                    newChunk.Add(incident);
-                }
+                //List<List<IncidentData>> chunks = new List<List<IncidentData>>();
+                //List<IncidentData> newChunk = new List<IncidentData>();
+                //chunks.Add(newChunk);
+                //foreach (IncidentData incident in Incidents)
+                //{
+                //    if (newChunk.Count >= 10000)
+                //    {
+                //        newChunk = new List<IncidentData>();
+                //        chunks.Add(newChunk);
+                //    }
+                //    newChunk.Add(incident);
+                //}
                 ProgressInfo pInfo = new ProgressInfo();
                 pInfo.Count = Incidents.Count;
                 pInfo.Number = 0;
                 int n_pperrs = 0;
                 LogHelper.LogMessage(Utils.LogLevel.Trace, "Starting Per Incident script execution");
-                int numChunk = 0;
-                foreach (List<IncidentData> chunk in chunks)
+                //int numChunk = 0;
+                //foreach (List<IncidentData> chunk in chunks)
+                //{
+                    //DateTime chunkStart = DateTime.Now;
+                Engine engine = new Engine();
+                setupJintScriptEngine(engine);
+                engine.SetValue("ProgressInfo", pInfo);
+                foreach (IncidentData incident in Incidents)
                 {
-                    DateTime chunkStart = DateTime.Now;
-                    using (V8ScriptEngine v8 = new V8ScriptEngine())
+                    if (Cancelling())
                     {
-                        setupScriptEngine(v8);
-                        v8.AddHostObject("ProgressInfo", pInfo);
-                        V8Script script = v8.Compile(Map.PerIncidentScript);
-                        foreach (IncidentData incident in chunk)
-                        {
-                            if (Cancelling())
-                            {
-                                return;
-                            }
-                            pInfo.Number++;
-
-                            updateProgress(JSProgressStep, string.Format("Executing per incident script for incident {0} of {1}", pInfo.Number, pInfo.Count), pInfo.Progress, pInfo.Number >= pInfo.Count - 20);
-                            v8.AddHostObject("Incident", incident);
-                            try
-                            {
-                                v8.Execute(script);
-                                // v8.CollectGarbage(true);
-                            }
-                            catch (Exception ex)
-                            {
-                                LogHelper.LogMessage(Utils.LogLevel.Warn, string.Format("Exception running per incident script for incident {0}", incident.Id), ex);
-                                n_pperrs++;
-                            }
-                        }
+                        return;
                     }
-                    TimeSpan chunkTime = DateTime.Now - chunkStart;
-                    LogHelper.LogMessage(Utils.LogLevel.Trace, string.Format("Chunk {0} completed in {1} seconds", numChunk, chunkTime.TotalSeconds));
-                    numChunk++;
-                    GC.Collect();
+                    pInfo.Number++;
+
+                    updateProgress(JSProgressStep, string.Format("Executing per incident script for incident {0} of {1}", pInfo.Number, pInfo.Count), pInfo.Progress, pInfo.Number >= pInfo.Count - 20);
+                    engine.SetValue("Incident", incident);
+                    try
+                    {
+                        engine.Execute(Map.PerIncidentScript);
+                        // v8.CollectGarbage(true);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogHelper.LogMessage(Utils.LogLevel.Warn, string.Format("Exception running per incident script for incident {0}", incident.Id), ex);
+                        n_pperrs++;
+                    }
                 }
+                    //TimeSpan chunkTime = DateTime.Now - chunkStart;
+                    //LogHelper.LogMessage(Utils.LogLevel.Trace, string.Format("Chunk {0} completed in {1} seconds", numChunk, chunkTime.TotalSeconds));
+                    //numChunk++;
+                    //GC.Collect();
+                //}
 
                 LogHelper.LogMessage(Utils.LogLevel.Trace, "Finished Per Incident script execution");
 
@@ -1908,16 +1936,14 @@ namespace Levrum.Data.Map
 
                 try
                 {
-                    using (V8ScriptEngine v8 = new V8ScriptEngine())
-                    {
-                        ProgressInfo pInfo = new ProgressInfo();
-                        pInfo.Count = Incidents.Count;
-                        pInfo.Number = 0;
+                    Engine engine = new Engine();
+                    ProgressInfo pInfo = new ProgressInfo();
+                    pInfo.Count = Incidents.Count;
+                    pInfo.Number = 0;
 
-                        setupScriptEngine(v8);
-                        v8.AddHostObject("ProgressInfo", pInfo);
-                        v8.Execute(Map.FinalProcessingScript);
-                    }
+                    setupJintScriptEngine(engine);
+                    engine.SetValue("ProgressInfo", pInfo);
+                    engine.Execute(Map.FinalProcessingScript);
                 }
                 catch (Exception ex)
                 {
