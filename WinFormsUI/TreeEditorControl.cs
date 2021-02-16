@@ -79,6 +79,14 @@ namespace Levrum.UI.WinForms
             MoveCursor = new Cursor(Properties.Resources.move_button.Handle);
         }
 
+        private void TreeEditorControl_Load(object sender, EventArgs e)
+        {
+            Form parentForm = Parent as Form;
+            parentForm.ResizeBegin += ParentForm_ResizeBegin;
+            parentForm.ResizeEnd += ParentForm_ResizeEnd;
+
+        }        
+
         public void AddExistingTrees(Dictionary<string, string> existingTrees)
         {
             m_existingTrees = existingTrees;
@@ -363,6 +371,7 @@ namespace Levrum.UI.WinForms
                 AllowDrop = true,
                 Tag = panelCatData,
             };
+            newPanel.SuspendLayout();
             newPanel.MouseDown += SubPanel_MouseDown;
             newPanel.DragEnter += SubPanel_DragEnter;
             newPanel.DragDrop += SubPanel_DragDrop;
@@ -403,6 +412,7 @@ namespace Levrum.UI.WinForms
                 ICategoryData data = parentPanel.Tag as ICategoryData;
                 data.Children.Add(panelCatData);
             }
+            newPanel.ResumeLayout();
 
             UnsavedWork = true;
 
@@ -1640,10 +1650,11 @@ namespace Levrum.UI.WinForms
             {
                 return;
             }
-
-            LoadTreeFromFile(ofd.FileName);          
+            Cursor.Current = Cursors.WaitCursor;
+            LoadTreeFromFile(ofd.FileName);
+            Cursor.Current = Cursors.Default;
         }
-        private void LoadTreeFromFile(string fileName)
+        public void LoadTreeFromFile(string fileName)
         {
             List<ICategoryData> tree = null;
             try
@@ -1683,16 +1694,7 @@ namespace Levrum.UI.WinForms
             DataSet<IncidentData> incidents = null;
             try
             {
-                if (firstChar == '[')
-                {
-                    incidents = DataSet<IncidentData>.Deserialize(file);
-                }
-                else if (firstChar == '{')
-                {
-                    incidents = JsonConvert.DeserializeObject<DataSet<IncidentData>>(File.ReadAllText(file.FullName), new JsonSerializerSettings { PreserveReferencesHandling = PreserveReferencesHandling.All });
-                }
-                else
-                    throw new Exception("Invalid JSON");
+                incidents = DataSet<IncidentData>.Deserialize(file);
             }
             catch (Exception ex)
             {
@@ -1717,6 +1719,8 @@ namespace Levrum.UI.WinForms
 
         public void GetDataFieldFromUser(DataSet<IncidentData> incidents)
         {
+            const int maxValues = 1000;
+
             this.Cursor = Cursors.Default;
 
             // Get list of all incident data fields
@@ -1762,9 +1766,9 @@ namespace Levrum.UI.WinForms
                     if (fieldValue == null)
                         continue;
                     dataFieldValues.Add(fieldValue.ToString());
-                    if (dataFieldValues.Count > 300)
+                    if (dataFieldValues.Count > maxValues)
                     {
-                        MessageBox.Show("This field exceeds the maximum number of values. Only showing 300 values.", "Too Many Values");
+                        MessageBox.Show($"This field exceeds the maximum number of values. Only showing {maxValues} values. This may noticeably affect performance.", "Too Many Values");
                         break;
                     }
                 }
@@ -1901,6 +1905,17 @@ namespace Levrum.UI.WinForms
                 descendants.AddRange(GetControlDescendants(child));
             }
             return descendants;
+        }
+        private void ParentForm_ResizeBegin(object sender, EventArgs e)
+        {
+            m_flpOrganizedData.SuspendLayout();
+            Console.WriteLine("Resize begin");
+        }
+
+        private void ParentForm_ResizeEnd(object sender, EventArgs e)
+        {
+            m_flpOrganizedData.ResumeLayout();
+            Console.WriteLine("Resize end");
         }
     }
 }

@@ -302,6 +302,7 @@
             this.MinimumSize = new System.Drawing.Size(493, 361);
             this.Name = "TreeEditorControl";
             this.Size = new System.Drawing.Size(847, 521);
+            this.Load += new System.EventHandler(this.TreeEditorControl_Load);
             this.Click += new System.EventHandler(this.TreeEditorControl_Click);
             this.m_scMain.Panel1.ResumeLayout(false);
             this.m_scMain.Panel2.ResumeLayout(false);
