@@ -6,7 +6,7 @@
     <AssemblyName>Levrum.Data.Classes</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Levrum.Data.Classes</PackageId>
-    <Version>0.2.1</Version>
+    <Version>0.2.1.1</Version>
     <Authors>Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
