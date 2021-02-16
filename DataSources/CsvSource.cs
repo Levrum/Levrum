@@ -232,7 +232,7 @@ namespace Levrum.Data.Sources
                         bool validDate = true;
                         foreach (string column in csvReader.Context.HeaderRecord)
                         {
-                            if (column != DateColumn)
+                            if (column != DateColumn || string.IsNullOrWhiteSpace(DateColumn))
                             {
                                 record.AddValue(column, csvReader.GetField(column));
                             } else

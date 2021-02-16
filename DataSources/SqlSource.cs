@@ -122,6 +122,7 @@ namespace Levrum.Data.Sources
                 SqlConnectionStringBuilder sqlcsb = new SqlConnectionStringBuilder();
                 sqlcsb.UserID = Parameters["User"];
                 sqlcsb.Password = Password;
+                sqlcsb.IntegratedSecurity = Parameters.ContainsKey("IntegratedSecurity");
 
                 string dataSource = "";
                 if (!Parameters.ContainsKey("Port") || string.IsNullOrWhiteSpace(Parameters["Port"]))
