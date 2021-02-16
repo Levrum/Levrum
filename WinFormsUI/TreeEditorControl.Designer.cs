@@ -45,7 +45,7 @@
             this.m_lbDataFields = new System.Windows.Forms.ListBox();
             this.m_labelDataFieldsHeader = new System.Windows.Forms.Label();
             this.m_btnSaveAs = new System.Windows.Forms.Button();
-            this.m_labelTreeSaved = new System.Windows.Forms.Label();
+            this.m_treeSavedLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.m_scMain)).BeginInit();
             this.m_scMain.Panel1.SuspendLayout();
             this.m_scMain.Panel2.SuspendLayout();
@@ -277,21 +277,21 @@
             // 
             // m_labelTreeSaved
             // 
-            this.m_labelTreeSaved.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.m_labelTreeSaved.AutoSize = true;
-            this.m_labelTreeSaved.ForeColor = System.Drawing.Color.Green;
-            this.m_labelTreeSaved.Location = new System.Drawing.Point(18, 503);
-            this.m_labelTreeSaved.Name = "m_labelTreeSaved";
-            this.m_labelTreeSaved.Size = new System.Drawing.Size(125, 13);
-            this.m_labelTreeSaved.TabIndex = 8;
-            this.m_labelTreeSaved.Text = "Tree Saved Successfully";
-            this.m_labelTreeSaved.Visible = false;
+            this.m_treeSavedLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.m_treeSavedLabel.AutoSize = true;
+            this.m_treeSavedLabel.ForeColor = System.Drawing.Color.Green;
+            this.m_treeSavedLabel.Location = new System.Drawing.Point(18, 503);
+            this.m_treeSavedLabel.Name = "m_labelTreeSaved";
+            this.m_treeSavedLabel.Size = new System.Drawing.Size(125, 13);
+            this.m_treeSavedLabel.TabIndex = 8;
+            this.m_treeSavedLabel.Text = "Tree Saved Successfully";
+            this.m_treeSavedLabel.Visible = false;
             // 
             // TreeEditorControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.m_labelTreeSaved);
+            this.Controls.Add(this.m_treeSavedLabel);
             this.Controls.Add(this.m_btnSaveAs);
             this.Controls.Add(this.m_cbDefaultTree);
             this.Controls.Add(this.m_labelDataFieldsHeader);
@@ -339,6 +339,6 @@
         private System.Windows.Forms.CheckBox m_cbOnlyUnadded;
         private System.Windows.Forms.Button m_btnUndoDelete;
         private System.Windows.Forms.Button m_btnSaveAs;
-        private System.Windows.Forms.Label m_labelTreeSaved;
+        private System.Windows.Forms.Label m_treeSavedLabel;
     }
 }
