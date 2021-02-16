@@ -6,7 +6,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <AssemblyName>Levrum.UI.WinForms</AssemblyName>
     <RootNamespace>Levrum.UI.WinForms</RootNamespace>
-    <Version>0.0.5.0</Version>
+    <Version>0.0.5.1</Version>
     <Authors>Joshua Bell, Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
