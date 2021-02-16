@@ -32,7 +32,7 @@ namespace Levrum.UI.WinForms
         {
             if (keyData == (Keys.Control | Keys.S) && UnsavedWork)
             {
-                SaveTree(m_savePath);
+                SaveTree(FileSavePath);
             }
             return base.ProcessCmdKey(ref msg, keyData);
         }
@@ -59,7 +59,8 @@ namespace Levrum.UI.WinForms
                 m_labelTreeSaved.Visible = !value;
             }
         }
-        private string m_savePath;
+
+        public string FileSavePath { get; set; }
 
         public bool SaveTreeToFile { get; set; } = true;
         public event SaveTreeDelegate OnSaveTree;
@@ -1061,9 +1062,9 @@ namespace Levrum.UI.WinForms
         {
             DeleteRecycledItems();
 
-            if (m_savePath != null)
+            if (FileSavePath != null)
             {
-                SaveTree(m_savePath);
+                SaveTree(FileSavePath);
             }
             else
             {
@@ -1093,7 +1094,7 @@ namespace Levrum.UI.WinForms
                     ofd.Title = "Save Tree";
                     if (ofd.ShowDialog() == DialogResult.OK)
                     {
-                        m_savePath = ofd.FileName;
+                        FileSavePath = ofd.FileName;
                         filePath = ofd.FileName;
                     }
                     else
@@ -1670,7 +1671,7 @@ namespace Levrum.UI.WinForms
 
             LoadTree(tree, m_flpOrganizedData);
 
-            m_savePath = fileName;
+            FileSavePath = fileName;
         }
 
         private void SubPanel_Paint(object sender, PaintEventArgs e)
