@@ -53,6 +53,6 @@
 
         #endregion
 
-        private Levrum.UI.WinForms.TreeEditorControl treeEditorControl1;
+        public Levrum.UI.WinForms.TreeEditorControl treeEditorControl1;
     }
 }

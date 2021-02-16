@@ -1044,14 +1044,25 @@ namespace Levrum.UI.WinForms
                 FlowLayoutPanel branch = control as FlowLayoutPanel;
                 if (branch == null)
                     continue;
-
-                if (control.Visible != false && IsTopLevelBranch(branch))
+                if (!IsRecycled(control) && IsTopLevelBranch(branch))
                 {
                     tree.Add(branch.Tag as ICategoryData);
                 }
             }
 
             return tree;
+        }
+
+        private bool IsRecycled(Control control)
+        {
+            foreach (var data in m_recyclingBin)
+            {
+                if (control == data.Control)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private bool IsTopLevelBranch(FlowLayoutPanel branch)

@@ -24,8 +24,12 @@ namespace FrameworkUI.Test
 
         private void treeEditorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            TreeControlTest treeControlTest = new TreeControlTest();
-            treeControlTest.ShowDialog();
+            using (TreeControlTest treeControlTest = new TreeControlTest())
+            {
+                treeControlTest.ShowDialog();
+                Console.WriteLine($"Tree size: {treeControlTest.treeEditorControl1.Tree.Count}");
+            }               
+
         }
     }
 }
