@@ -38,8 +38,14 @@ namespace Levrum.DataBridge
                 Thread.Sleep(100);
             }
 
-            SetOutputText(this, DebugOutput.ToString());
-            LastUpdateTime = DateTime.Now;
+            try
+            {
+                SetOutputText(this, DebugOutput.ToString());
+                LastUpdateTime = DateTime.Now;
+            } catch (Exception ex)
+            {
+                LogHelper.LogException(ex);
+            }
         }
 
         public void SetOutputText(object sender, string outputText)

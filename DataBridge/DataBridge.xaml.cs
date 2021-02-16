@@ -732,7 +732,7 @@ namespace Levrum.DataBridge
                         onLoaderProgress(otherSender, "Creating CSVs", double.NaN);
                         IncidentDataTools.CreateCsvs(incidents, incidentCsvFileName, responseCsvFileName);
                         resetLoaderProgress();
-                        MessageBox.Show(string.Format("Incidents saved as CSV files '{0}' and '{1}'", incidentCsvFileName, responseCsvFileName));
+                        MessageBox.Show(string.Format("Incidents saved as CSV files '{0}' and '{1}'", incidentCsvFileName, responseCsvFileName), "Incidents Saved");
                     }
                     catch (Exception ex)
                     {
