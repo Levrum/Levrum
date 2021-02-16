@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -134,11 +135,11 @@ namespace Levrum.Data.Sources
                 }
                 if ((!CsvFile.Directory.Exists) || (!CsvFile.Exists)) { return (new List<string>()); }
                     using (StreamReader sr = new StreamReader(stream))
-                    using (CsvReader csvReader = new CsvReader(sr))
+                    using (CsvReader csvReader = new CsvReader(sr, CultureInfo.CurrentCulture))
                     {
                         csvReader.Read();
                         csvReader.ReadHeader();
-                        return new List<string>(csvReader.Context.HeaderRecord);
+                        return new List<string>(csvReader.Context.Reader.HeaderRecord);
                     }
             }
             catch (Exception ex)
@@ -173,7 +174,7 @@ namespace Levrum.Data.Sources
 
                 List<string> values = new List<string>();
                 using (StreamReader sr = new StreamReader(stream))
-                using (CsvReader csvReader = new CsvReader(sr))
+                using (CsvReader csvReader = new CsvReader(sr, CultureInfo.CurrentCulture))
                 {
                     csvReader.Read();
                     csvReader.ReadHeader();
@@ -222,7 +223,7 @@ namespace Levrum.Data.Sources
 
                 List<Record> records = new List<Record>();
                 using (StreamReader sr = new StreamReader(stream))
-                using (CsvReader csvReader = new CsvReader(sr))
+                using (CsvReader csvReader = new CsvReader(sr, CultureInfo.CurrentCulture))
                 {
                     csvReader.Read();
                     csvReader.ReadHeader();
@@ -230,12 +231,13 @@ namespace Levrum.Data.Sources
                     {
                         Record record = new Record();
                         bool validDate = true;
-                        foreach (string column in csvReader.Context.HeaderRecord)
+                        foreach (string column in csvReader.Context.Reader.HeaderRecord)
                         {
                             if (column != DateColumn || string.IsNullOrWhiteSpace(DateColumn))
                             {
                                 record.AddValue(column, csvReader.GetField(column));
-                            } else
+                            }
+                            else
                             {
                                 string dateColumnValue = csvReader.GetField(column);
                                 DateTime dateTime;
@@ -243,7 +245,8 @@ namespace Levrum.Data.Sources
                                 {
                                     validDate = false;
                                     break;
-                                } else if (dateTime < startDate || dateTime > endDate)
+                                }
+                                else if (dateTime < startDate || dateTime > endDate)
                                 {
                                     validDate = false;
                                     break;

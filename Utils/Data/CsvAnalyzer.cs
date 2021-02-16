@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -72,7 +73,7 @@ namespace Levrum.Utils.Data
             {
                 using (MemoryStream stream = new MemoryStream(Contents))
                 using (StreamReader sr = new StreamReader(stream))
-                using (CsvReader csv = new CsvReader(sr))
+                using (CsvReader csv = new CsvReader(sr, CultureInfo.CurrentCulture))
                 {
                     csv.Read();
                     csv.ReadHeader();
@@ -120,11 +121,11 @@ namespace Levrum.Utils.Data
             {
                 using (MemoryStream stream = new MemoryStream(Contents))
                 using (StreamReader sr = new StreamReader(stream))
-                using (CsvReader csv = new CsvReader(sr))
+                using (CsvReader csv = new CsvReader(sr, CultureInfo.CurrentCulture))
                 {
                     csv.Read();
                     csv.ReadHeader();
-                    string[] headerRow = csv.Context.HeaderRecord;
+                    string[] headerRow = csv.Context.Reader.HeaderRecord;
                     List<string> fieldNames = new List<string>(headerRow);
                     for (int i = 0; i < fieldNames.Count; i++)
                     {

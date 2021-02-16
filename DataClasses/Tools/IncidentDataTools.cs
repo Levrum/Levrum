@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -132,7 +133,7 @@ namespace Levrum.Data.Classes.Tools
 
                 using (StringWriter writer = new StringWriter())
                 {
-                    using (CsvHelper.CsvWriter csv = new CsvHelper.CsvWriter(writer))
+                    using (CsvHelper.CsvWriter csv = new CsvHelper.CsvWriter(writer, CultureInfo.CurrentCulture))
                     {
                         csv.WriteRecords(incidentRecords);
                     }
@@ -141,7 +142,7 @@ namespace Levrum.Data.Classes.Tools
 
                 using (StringWriter writer = new StringWriter())
                 {
-                    using (CsvHelper.CsvWriter csv = new CsvHelper.CsvWriter(writer))
+                    using (CsvHelper.CsvWriter csv = new CsvHelper.CsvWriter(writer, CultureInfo.CurrentCulture))
                     {
                         csv.WriteRecords(responseRecords);
                     }
