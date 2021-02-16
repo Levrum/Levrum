@@ -54,16 +54,30 @@ namespace Levrum.Utils.Geography
 
         public CoordinateConverter(string _projection)
         {
-            CoordinateSystemFactory csFactory = new CoordinateSystemFactory();
-            CoordinateSystem = csFactory.CreateFromWkt(_projection);
+            try
+            {
+                CoordinateSystemFactory csFactory = new CoordinateSystemFactory();
+                CoordinateSystem = csFactory.CreateFromWkt(_projection);
 
-            CoordinateTransformationFactory ctFactory = new CoordinateTransformationFactory();
-            
-            XYToLonLatTransform = ctFactory.CreateFromCoordinateSystems(CoordinateSystem, WGS84).MathTransform;
-            LonLatToXYTransform = ctFactory.CreateFromCoordinateSystems(WGS84, CoordinateSystem).MathTransform;
-            
-            XYToWebTransform = ctFactory.CreateFromCoordinateSystems(CoordinateSystem, WebMercator).MathTransform;
-            WebToXYTransform = ctFactory.CreateFromCoordinateSystems(WebMercator, CoordinateSystem).MathTransform;
+                CoordinateTransformationFactory ctFactory = new CoordinateTransformationFactory();
+
+                XYToLonLatTransform = ctFactory.CreateFromCoordinateSystems(CoordinateSystem, WGS84).MathTransform;
+                LonLatToXYTransform = ctFactory.CreateFromCoordinateSystems(WGS84, CoordinateSystem).MathTransform;
+
+                XYToWebTransform = ctFactory.CreateFromCoordinateSystems(CoordinateSystem, WebMercator).MathTransform;
+                WebToXYTransform = ctFactory.CreateFromCoordinateSystems(WebMercator, CoordinateSystem).MathTransform;
+            } catch (Exception ex)
+            {
+                if (_projection.ToLowerInvariant().Contains("web_mercator"))
+                {
+                    CoordinateTransformationFactory ctFactory = new CoordinateTransformationFactory();
+                    LonLatToXYTransform = ctFactory.CreateFromCoordinateSystems(WGS84, WebMercator).MathTransform;
+                    XYToLonLatTransform = LonLatToXYTransform.Inverse();
+                } else
+                {
+                    throw ex;
+                }
+            }
         }
 
         public double[] ConvertLatLonToXY(LatitudeLongitude latLon)
