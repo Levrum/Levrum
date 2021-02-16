@@ -1113,6 +1113,7 @@ namespace Levrum.UI.WinForms
                 catch (Exception ex)
                 {
                     MessageBox.Show("Could not save tree.");
+                    return;
                 }
             }
             m_treeSavedLabel.Visible = true;
