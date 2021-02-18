@@ -133,11 +133,11 @@ namespace Levrum.Utils.Messaging
         public IMessageService Service { get; set; }
 
         public Logger Logger { get; set; }
-        public Stats Stats { get; set; }
+        public ServiceWire.Stats Stats { get; set; }
 
         public event IPCMessageDelegate OnMessageReceived;
 
-        public IPCNamedPipeServer (string _pipeName, IMessageService _service = null, Logger _logger = null, Stats _stats = null)
+        public IPCNamedPipeServer (string _pipeName, IMessageService _service = null, Logger _logger = null, ServiceWire.Stats _stats = null)
         {
             if (string.IsNullOrEmpty(_pipeName))
             {
@@ -150,7 +150,7 @@ namespace Levrum.Utils.Messaging
             Service.OnMessageReceived += messageReceived_relay;
 
             Logger = _logger != null ? _logger : new Logger(logLevel: ServiceWire.LogLevel.Warn);
-            Stats = _stats != null ? _stats : new Stats();
+            Stats = _stats != null ? _stats : new ServiceWire.Stats();
 
             NpHost = new NpHost(PipeName, Logger, Stats);
             NpHost.AddService(Service);

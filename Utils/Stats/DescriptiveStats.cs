@@ -5,7 +5,7 @@ using System.Text;
 
 using Levrum.Utils;
 
-namespace Levrum.Utils.MathAndStats
+namespace Levrum.Utils.Stats
 {
 
     /// <summary>
