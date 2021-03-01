@@ -338,7 +338,7 @@ namespace Levrum.Utils.Osm
             parent.Add(relationElement);
         }
 
-        public bool Download(string fileName, BoundingBox region)
+        public static bool Download(string fileName, BoundingBox region)
         {
             try
             {
