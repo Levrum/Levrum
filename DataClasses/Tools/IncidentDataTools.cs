@@ -10,7 +10,7 @@ using System.Text;
 
 using Levrum.Utils;
 using Levrum.Utils.Data;
-using Levrum.Utils.MathAndStats;
+using Levrum.Utils.Stats;
 
 namespace Levrum.Data.Classes.Tools
 {

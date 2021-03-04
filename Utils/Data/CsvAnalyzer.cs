@@ -11,7 +11,7 @@ using System.Text;
 
 using CsvHelper;
 
-using Levrum.Utils.MathAndStats;
+using Levrum.Utils.Stats;
 
 namespace Levrum.Utils.Data
 {

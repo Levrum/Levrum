@@ -6,7 +6,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-using Levrum.Utils.MathAndStats;
+using Levrum.Utils.Stats;
 
 namespace Levrum.Utils.Data
 {

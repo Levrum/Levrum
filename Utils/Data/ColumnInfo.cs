@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-using Levrum.Utils.MathAndStats;
+using Levrum.Utils.Stats;
 
 namespace Levrum.Utils.Data
 {
@@ -92,7 +92,7 @@ namespace Levrum.Utils.Data
     public class DateSummary : ColumnSummary
     {
         public int NonzeroSeconds { get; set; } = 0;
-        public Stats StatsRel19700101 = new Stats();
+        public Stats.Stats StatsRel19700101 = new Stats.Stats();
 
         public override string Summarize()
         {

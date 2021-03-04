@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security;
 using System.Text;
 using System.Xml;
@@ -335,6 +336,31 @@ namespace Levrum.Utils.Osm
         {
             XElement relationElement = relation.ToXElement();
             parent.Add(relationElement);
+        }
+
+        public static bool Download(string fileName, BoundingBox region)
+        {
+            try
+            {
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(string.Format("https://overpass-api.de/api/map?bbox={0},{1},{2},{3}", region.MinLon, region.MinLat, region.MaxLon, region.MaxLat));
+                request.Method = "GET";
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    using (Stream stream = response.GetResponseStream())
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        string xml = reader.ReadToEnd();
+                        System.IO.File.WriteAllText(fileName, xml);
+                        return true;
+                    }
+                }
+            } 
+            catch (Exception ex)
+            {
+                LogHelper.LogException(ex, "Unable to downlolad requested OSM file", false);
+            }
+            return false;
         }
 
         #endregion
