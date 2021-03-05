@@ -12,7 +12,21 @@ namespace Levrum.Utils.MonteCarlo
     {
 
         private Dictionary<T, int> _counts;
-        private SortedList<double, T> Distribution;
+        private List<Tuple<double, T>> _distribution;
+
+        public Dictionary<T, int> Counts { get
+            {
+                return _counts;
+            } 
+        }
+
+        public List<Tuple<double, T>> Distribution
+        {
+            get
+            {
+                return _distribution;
+            }
+        }
 
         public override T GetValue(double rngVal)
         {
@@ -20,12 +34,12 @@ namespace Levrum.Utils.MonteCarlo
             if (IsReady())
             {
                 rngVal = Math.Min(1, Math.Max(rngVal, 0)); //constrains to 0 and 1
-                for (int i = 0; i < Distribution.Count; i++)
+                for (int i = 0; i < _distribution.Count; i++)
                 {
-                    double key = Distribution.Keys[i];
-                    if (rngVal <= key)
+                    double probability = _distribution[i].Item1;
+                    if (rngVal <= probability)
                     {
-                        retVal = Distribution.Values[i];
+                        retVal = _distribution[i].Item2;
                         break;
                     }
                 }
@@ -36,7 +50,7 @@ namespace Levrum.Utils.MonteCarlo
 
         public override bool IsReady()
         {
-            return (Distribution == null);
+            return (_distribution == null);
         }
 
         public void CreateDistribution(List<object> data, Func<object, T> GetData)
@@ -81,13 +95,13 @@ namespace Levrum.Utils.MonteCarlo
             _counts = DataCounts;
             int dataSum = _counts.Values.Sum();
             var orderedCounts = _counts.OrderBy(x => x.Value);
-            Distribution = new SortedList<double, T>(_counts.Count);
+            _distribution = new List<Tuple<double, T>>(_counts.Count);
             double sum = 0;
             foreach(var kvp in orderedCounts)
             {
-                double probability = kvp.Value / dataSum;
+                double probability = (double)kvp.Value / dataSum;
                 sum += probability;
-                Distribution.Add(sum, kvp.Key);
+                _distribution.Add(new Tuple<double,T>(sum, kvp.Key));
             }
         }
     }

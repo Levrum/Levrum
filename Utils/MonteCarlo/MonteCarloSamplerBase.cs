@@ -5,8 +5,12 @@ using System.Text;
 
 namespace Levrum.Utils.MonteCarlo
 {
-    class MonteCarloSamplerBase
+    public abstract class MonteCarloSamplerBase<T>
     {
-        //todo
+        public MonteCarloDistributionBase<T> Distribution { get; set; }
+        public abstract T SampleNext();
+
     }
+
+
 }
