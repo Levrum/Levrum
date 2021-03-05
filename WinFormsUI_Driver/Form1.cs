@@ -12,6 +12,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using CoeloUtils.UiForms;
+using RandD.PumpAndPipeSketch;
 
 namespace WinFormsUI_Driver
 {
@@ -80,6 +82,28 @@ namespace WinFormsUI_Driver
             }
 
 
+        }
+
+        private void m_btnPumpAndPipeDemo_Click(object sender, EventArgs e)
+        {
+            string fn = MethodBase.GetCurrentMethod().Name;
+            try
+            {
+                CoeloUtils.RepositoryCache cache = new CoeloUtils.RepositoryCache();
+                
+
+                GenericObjectTreeForm form = new CoeloUtils.UiForms.GenericObjectTreeForm();
+                form.Text = form.Text = "Pump and Pipe Demo";
+                form.SubjectType = typeof(Dashboard);
+                form.Cache = cache;
+                form.ShowDialog();
+
+            }
+            catch (Exception exc)
+            {
+                Util.HandleExc(this, fn, exc);
+                MessageBox.Show("Internal error; please see event log");
+            }
         }
     }
 }

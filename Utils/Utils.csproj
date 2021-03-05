@@ -17,6 +17,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="PumpAndPipeSketch\**" />
+    <EmbeddedResource Remove="PumpAndPipeSketch\**" />
+    <None Remove="PumpAndPipeSketch\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Geography\SRID.zip" />
   </ItemGroup>
 

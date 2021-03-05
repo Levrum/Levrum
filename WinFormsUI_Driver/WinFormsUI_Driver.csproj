@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CoeloUtils">
+      <HintPath>..\..\CoeloUtils\CoeloUtils\bin\Debug\CoeloUtils.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -54,6 +57,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PumpAndPipeSketch\PumpAndPipeSketch.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -80,10 +84,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Code3 Model Standard\C3ModelStandard.csproj">
-      <Project>{64f5f37e-604b-4e12-b522-d942754ad05e}</Project>
-      <Name>C3ModelStandard</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Utils\Utils.csproj">
       <Project>{39b8ec03-f090-4416-b753-c709e6963716}</Project>
       <Name>Utils</Name>

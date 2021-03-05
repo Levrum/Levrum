@@ -6,6 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="PumpAndPipeSketch\**" />
+    <EmbeddedResource Remove="PumpAndPipeSketch\**" />
+    <None Remove="PumpAndPipeSketch\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\DataClasses\DataClasses.csproj" />
     <ProjectReference Include="..\DataMap\DataMap.csproj" />
     <ProjectReference Include="..\DataSources\DataSources.csproj" />
