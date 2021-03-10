@@ -50,7 +50,7 @@ namespace Levrum.Utils.MonteCarlo
 
         public override bool IsReady()
         {
-            return (_distribution == null);
+            return (_distribution != null);
         }
 
         public void CreateDistribution(List<object> data, Func<object, T> GetData)
@@ -61,7 +61,7 @@ namespace Levrum.Utils.MonteCarlo
                 T datum;
                 try
                 {
-                    datum = GetData(data);
+                    datum = GetData(odatum);
                 }catch(Exception e)
                 {
                     continue;
