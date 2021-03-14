@@ -42,7 +42,16 @@ namespace WinFormsUI_Driver
                 XmlDataSelectorForm form = new XmlDataSelectorForm();
                 form.FillXmlFromString(sxml);
                 form.EnableMultiSelection = m_chbEnableMultiSelection.Checked;
-                
+
+                FileInfo fi = new FileInfo(sfile);
+                DateTime fdtm = fi.CreationTime;
+                string sfname = fi.Name;
+
+                string scaption = string.Format("{0:D4}-{1:D2}-{2:D2}", fdtm.Year, fdtm.Month, fdtm.Day) +
+                    "  " + sfname;
+
+
+                form.Text = scaption;
                 form.Show();
                 form.BringToFront();
 
