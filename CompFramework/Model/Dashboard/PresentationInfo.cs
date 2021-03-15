@@ -23,10 +23,25 @@ namespace AnalysisFramework.Model.Dashboard
         [Caption("Stacked Area Chart")] StackedAreaChart,
     };
 
+
+    /// <summary>
+    /// This class defines the presentation parameters for a single display.
+    /// </summary>
     public class PresentationInfo
     {
 
+        /// <summary>
+        /// The display style for the display.
+        /// </summary>
         [Editable] public  PresentationStyles Style { set; get; } = PresentationStyles.Table;
+
+        /// <summary>
+        /// How the display is to be laid out within the dashboard.
+        /// </summary>
+        [Editable] public LayoutInfo Layout { set; get; } = new LayoutInfo();  // defaults to 1 display at 100% horiz/vert
+
+        [Editable] public VisualInfo SeriesInfo { set; get; } = new VisualInfo();   
+
         
 
 
