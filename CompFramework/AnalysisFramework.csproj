@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Model\Computation\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Utils\Utils.csproj" />
   </ItemGroup>
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using AnalysisFramework.Model.Computation;
 
 namespace AnalysisFramework.Model.Dashboard
 {
@@ -9,6 +10,6 @@ namespace AnalysisFramework.Model.Dashboard
     /// </summary>
     public class Display
     {
-
+        public AnalysisFramework.Model.Computation.Computation Comp = null;
     }
 }
