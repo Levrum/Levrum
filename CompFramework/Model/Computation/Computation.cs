@@ -1,4 +1,5 @@
 ﻿using AnalysisFramework.Infrastructure;
+using Levrum.Utils.Infra;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -40,10 +41,21 @@ namespace AnalysisFramework.Model.Computation
 
 
 
+    /// <summary>
+    /// This class is for providing some calculation examples
+    /// </summary>
     public class ComputationExamples
     {
         
-        public static List<Tuple<double,double>> Bernoulli([NumericRange(1,20)] int nApprox)
+        [DynamicCalc]
+        [Caption("Bernoulli Distribution Approximator[-1,1]")]
+        [Doc(
+@"This function approximates the Bernoulli distribution on [-1,1].  Its parameter specifies the 'fine-ness' of the
+distribution ... i.e., the number of steps (N) in a stepwise approximation.    
+ "          )
+        ]
+        public static List<Tuple<double,double>> Bernoulli(
+                            [NumericRange(1,100)] int nApprox)
         {
             List<Tuple<double, double>> retlist = new List<Tuple<double, double>>();
 

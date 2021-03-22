@@ -747,7 +747,7 @@ namespace Levrum.Utils.Infra
             }
         }
 
-        private bool ValidateParams(MethodInfo m_oMethod, params object[] oParams)
+        private bool ValidateParams(MethodInfo oMethod, params object[] oParams)
         {
             const string fn = "DynamicCalcInfo.ValidateParams()";
             try
@@ -864,22 +864,6 @@ namespace Levrum.Utils.Infra
         private MethodInfo m_oMethod = null;
 
 
-
-        internal List<PdciRuntimeParam> MakePersistableRuntimeParams()
-        {
-            string fn = MethodBase.GetCurrentMethod().Name;
-            List<PdciRuntimeParam> retlist = new List<PdciRuntimeParam>();
-            try
-            {
-                Util.HandleAppErrOnce(this, fn, "Not implemented yet");
-                return (retlist);
-            }
-            catch (Exception exc)
-            {
-                Util.HandleExc(this, fn, exc);
-                return (retlist);
-            }
-        }
 
 
         /// <summary>

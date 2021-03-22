@@ -15,4 +15,6 @@ namespace AnalysisFramework.Infrastructure
         IEnumerable GetValues(params object[] oParams);
     }
 
+
+
 }

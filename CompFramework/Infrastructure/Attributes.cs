@@ -1,10 +1,19 @@
 ﻿using Levrum.Utils.Infra;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace AnalysisFramework.Infrastructure
 {
+
+
+
+    /// <summary>
+    /// This attribute marks fields/properties that are editable in the UI.   The attribute marker can be
+    /// parameterized with the SpecialEditType enum to provide information about specific editing/metatadata
+    /// patterns.
+    /// </summary>
     public class EditableAttribute : Attribute
     {
         public EditableAttribute()
@@ -29,8 +38,7 @@ namespace AnalysisFramework.Infrastructure
         public SpecialEditType EditType = SpecialEditType.None;
 
 
-    }
-
+    } // end class
 
 
 
