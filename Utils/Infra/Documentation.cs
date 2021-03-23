@@ -41,6 +41,18 @@ namespace Levrum.Utils.Infra
 
 
     /// <summary>
+    /// Attribute for providing descriptive text about items.  This is intended forshort commentary, 3-12 words-ish.
+    /// </summary>
+    public class DescAttribute : DocBaseAttribute
+    {
+        public DescAttribute(string sDoc)
+            : base(sDoc)
+        {
+        }
+    }
+
+
+    /// <summary>
     /// Attribute for providing a help link.    E.g., [HelpLink("https://help.levrum.com/myTopic")]
     /// </summary>
     public class HelpLinkAttribute : DocBaseAttribute
@@ -75,7 +87,7 @@ namespace Levrum.Utils.Infra
         public static string GetText<T>(ICustomAttributeProvider oTargetInfo)
             where T : DocBaseAttribute
         {
-            const string fn = "TextableBaseAttribute.GetText()";
+            const string fn = "DocUtil.GetText()";
             try
             {
                 if (null == oTargetInfo) { return (""); }

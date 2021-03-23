@@ -85,6 +85,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CompFramework\AnalysisFramework.csproj">
+      <Project>{24fe1cad-5007-4099-8994-318a088628b8}</Project>
+      <Name>AnalysisFramework</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Utils\Utils.csproj">
       <Project>{39b8ec03-f090-4416-b753-c709e6963716}</Project>
       <Name>Utils</Name>

@@ -1,4 +1,5 @@
 ﻿using AnalysisFramework.Infrastructure;
+using Levrum.Utils.Infra;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,10 +10,24 @@ namespace AnalysisFramework.Model.Computation
     /// <summary>
     /// Information about a single parameter of a computation
     /// </summary>
-    public class ParameterInfo : NamedObj
+    [Caption("Computation Parameter")]
+    public class ParamInfo : NamedObj
     {
+        public ParamInfo(Type oParamType, string sName, string sComments = "")
+        {
+            Name = sName;
+            Desc = sComments;
+            ParameterType = oParamType;
+        }
 
         public Type ParameterType = typeof(object);
+
+        /// <summary>
+        /// Current bound parameter value.
+        /// </summary>
+        public object Value = null;
+
+
     }
 
 
@@ -36,12 +51,12 @@ namespace AnalysisFramework.Model.Computation
 
     public class ParameterError
     {
-        public ParameterError(ParameterInfo oPInfo, string sMsg)
+        public ParameterError(ParamInfo oPInfo, string sMsg)
         {
             ErrorMessage = sMsg;
             ParamInfo = oPInfo;
         }
         public string ErrorMessage = "";
-        public ParameterInfo ParamInfo = null;
+        public ParamInfo ParamInfo = null;
     }
 }

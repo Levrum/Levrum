@@ -6,9 +6,30 @@ using System.Text;
 
 namespace AnalysisFramework.Model.Computation
 {
-    public class Computation : NamedObj
+    
+    /// <summary>
+    /// This class encapsulates a single computation, including result type, 
+    /// </summary>
+    public abstract class Computation : NamedObj
     {
+
+
+        public List<ParamInfo> FormalParameters = new List<ParamInfo>();
+
+        public List<ParamInfo> ActualParameters = new List<ParamInfo>();
+
+        public Type ResultType = null;
+
+        public abstract ComputationResult Eval();
+
+
         
+        public virtual List<StatusInfo> ValidateParams(bool bRequireRuntimeParams = true)
+        {
+            const string fn = "Computation.ValidateParams()";
+            return (StatusInfo.MakeError(fn, "Not implemented yet"));
+        }
+
     }
 
 
@@ -37,37 +58,26 @@ namespace AnalysisFramework.Model.Computation
         public object Data = null;
         public bool Succeeded = false;
         public List<string> Messages = new List<string>();
-    }
 
-
-
-    /// <summary>
-    /// This class is for providing some calculation examples
-    /// </summary>
-    public class ComputationExamples
-    {
-        
-        [DynamicCalc]
-        [Caption("Bernoulli Distribution Approximator[-1,1]")]
-        [Doc(
-@"This function approximates the Bernoulli distribution on [-1,1].  Its parameter specifies the 'fine-ness' of the
-distribution ... i.e., the number of steps (N) in a stepwise approximation.    
- "          )
-        ]
-        public static List<Tuple<double,double>> Bernoulli(
-                            [NumericRange(1,100)] int nApprox)
+        public static ComputationResult Exception(object oSubject, object oContext, Exception oExc)
         {
-            List<Tuple<double, double>> retlist = new List<Tuple<double, double>>();
+            Util.HandleExc(oSubject, oContext, oExc);
+            ComputationResult cr = new ComputationResult();
+            cr.Succeeded = false;
+            cr.Messages.Add("Exception in " + oContext.ToString() + ": " + oExc);
+            return (cr);
+        }
 
-            Random r = new Random();
-            for (double x=-1; x<=1; x += 0.02)
-            {
-                double y = 0.0;
-                for (int i=0; i<nApprox; i++) { y += (r.Next() - 0.5) / nApprox; }
-                retlist.Add(new Tuple<double, double>(x, y));
-
-            }
-            return (retlist);
+        public static ComputationResult NotImplementedYet(string sContext)
+        {
+            Util.HandleAppWarningOnce(sContext, sContext, "Is not yet fully implemented");
+            ComputationResult cr = new ComputationResult();
+            cr.Succeeded = false;
+            cr.Messages.Add(sContext + " is not yet fully implemented");
+            return (cr);
         }
     }
+
+
+
 }

@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using CoeloUtils.UiForms;
 using RandD.PumpAndPipeSketch;
+using AnalysisFramework.Model.Computation;
 
 namespace WinFormsUI_Driver
 {
@@ -98,14 +99,38 @@ namespace WinFormsUI_Driver
             string fn = MethodBase.GetCurrentMethod().Name;
             try
             {
-                CoeloUtils.RepositoryCache cache = new CoeloUtils.RepositoryCache();
-                
+                //CoeloUtils.RepositoryCache cache = new CoeloUtils.RepositoryCache();
 
-                GenericObjectTreeForm form = new CoeloUtils.UiForms.GenericObjectTreeForm();
-                form.Text = form.Text = "Pump and Pipe Demo";
-                form.SubjectType = typeof(Dashboard);
-                form.Cache = cache;
-                form.ShowDialog();
+
+                //GenericObjectTreeForm form = new CoeloUtils.UiForms.GenericObjectTreeForm();
+                //form.Text = form.Text = "Pump and Pipe Demo";
+                //form.SubjectType = typeof(Dashboard);
+                //form.Cache = cache;
+                //form.ShowDialog();
+
+                //OpenFileDialog ofd = new OpenFileDialog();
+                //ofd.Title = "Please select the .Net assembly for which to get dynamic calc info";
+                //ofd.Filter = ".Net assemblies|*.dll";
+                //ofd.ShowDialog();
+                //string sfile = ofd.FileName;
+                //if (string.IsNullOrEmpty(sfile)) { return; }
+                //Assembly assembly = Assembly.LoadFile(sfile);
+                Assembly assembly = typeof(DynamicCalcComputation).Assembly;
+
+                List<DynamicCalcComputation> dccs = DynamicCalcComputation.WrapDynamicCalcsFromAssembly(assembly);
+
+                StringBuilder sb = new StringBuilder();
+                foreach (DynamicCalcComputation dcc in dccs)
+                {
+                    sb.AppendLine(dcc.Prettyprint());
+                    sb.AppendLine();
+                }
+
+                TextDisplayForm tdf = new TextDisplayForm(sb.ToString());
+                tdf.Text = "Dynamic calculations present in assembly " + assembly.FullName;
+                tdf.ShowInFront();
+
+
 
             }
             catch (Exception exc)
