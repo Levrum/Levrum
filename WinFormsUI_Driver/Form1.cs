@@ -15,6 +15,7 @@ using System.Windows.Forms;
 using CoeloUtils.UiForms;
 using RandD.PumpAndPipeSketch;
 using AnalysisFramework.Model.Computation;
+using C3m.Model;
 
 namespace WinFormsUI_Driver
 {
@@ -115,19 +116,23 @@ namespace WinFormsUI_Driver
                 //string sfile = ofd.FileName;
                 //if (string.IsNullOrEmpty(sfile)) { return; }
                 //Assembly assembly = Assembly.LoadFile(sfile);
-                Assembly assembly = typeof(DynamicCalcComputation).Assembly;
 
-                List<DynamicCalcComputation> dccs = DynamicCalcComputation.WrapDynamicCalcsFromAssembly(assembly);
+                Assembly assembly1 = typeof(DynamicCalcComputation).Assembly;    // gets examples built into the Levrum project
+                List<DynamicCalcComputation> dccs1 = DynamicCalcComputation.WrapDynamicCalcsFromAssembly(assembly1);
+                Assembly assembly2 = typeof(C3mStation).Assembly;
+
+                List<DynamicCalcComputation> dccs = DynamicCalcComputation.WrapDynamicCalcsFromAssembly(assembly2);
+                dccs1.AddRange(dccs);
 
                 StringBuilder sb = new StringBuilder();
-                foreach (DynamicCalcComputation dcc in dccs)
+                foreach (DynamicCalcComputation dcc in dccs1)
                 {
                     sb.AppendLine(dcc.Prettyprint());
                     sb.AppendLine();
                 }
 
                 TextDisplayForm tdf = new TextDisplayForm(sb.ToString());
-                tdf.Text = "Dynamic calculations present in assembly " + assembly.FullName;
+                tdf.Text = "Dynamic calculations present in assembly " + assembly2.FullName;
                 tdf.ShowInFront();
 
 

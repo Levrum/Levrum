@@ -15,6 +15,27 @@ namespace Levrum.Utils.Infra
         public DynamicCalcAttribute()
         {
         }
+
+        public static bool IsPresent(ICustomAttributeProvider oTarget)
+        {
+            const string fn = "DynamicCalcAttribute.IsPresent()";
+            try
+            {
+                if (null==oTarget) { return (false); }
+                object[] atts = oTarget.GetCustomAttributes(true);
+                foreach (object att in atts)
+                {
+                    Type att_type = att.GetType();
+                    if (att_type.Name.Contains("DynamicCalc")) { return (true); }
+                }
+                return (false);
+            }
+            catch(Exception exc)
+            {
+                Util.HandleExc(typeof(DynamicCalcAttribute), fn, exc);
+                return (false);
+            }
+        }
     }
 
     public class DynamicCalcErrValueAttribute : Attribute

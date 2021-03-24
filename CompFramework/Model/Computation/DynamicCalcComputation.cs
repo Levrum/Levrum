@@ -44,7 +44,7 @@ namespace AnalysisFramework.Model.Computation
                 {
 
                     string sdesc = DocUtil.GetText<DescAttribute>(pi);
-                    ParamInfo fparam = new ParamInfo(pi.ParameterType, pi.Name, sdesc );
+                    ParamInfo fparam = new ParamInfo(pi.ParameterType, CaptionAttribute.Get(pi), sdesc );
                     fparam.Help = DocUtil.GetText<DocAttribute>(pi);
                     string slink = DocUtil.GetText<HelpLinkAttribute>(pi);
                     if (!string.IsNullOrEmpty(slink)) { fparam.Help += "\r\nMore information: " + slink;  }
@@ -74,13 +74,11 @@ namespace AnalysisFramework.Model.Computation
             {
                 foreach (Type type in oAssembly.GetTypes())
                 {
-                    object[] typeatts = type.GetCustomAttributes(typeof(DynamicCalcAttribute), false);
-                    if ((null == typeatts) || (0 == typeatts.Length)) { continue; }
+                    if (!DynamicCalcAttribute.IsPresent(type)) { continue; }
                     foreach (MethodInfo mi in type.GetMethods())    // This will eventually iterate assemblies/classes/methods
                     {
                         if (!mi.IsPublic) { continue; }
-                        object[] methodatts = mi.GetCustomAttributes(typeof(DynamicCalcAttribute), true);
-                        if ((null == methodatts) || (0 == methodatts.Length)) { continue; }
+                        if (!DynamicCalcAttribute.IsPresent(mi)) { continue; }
 
                         DynamicCalcComputation dcc = DynamicCalcComputation.FromMethodInfo(mi);
                         retlist.Add(dcc);
@@ -107,7 +105,7 @@ namespace AnalysisFramework.Model.Computation
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("Computation: " + Name);
-            sb.AppendLine("  Produces: " + ResultType?.Name);
+            sb.AppendLine("  Produces: " + PrettifyType(ResultType));
             sb.AppendLine("  Parameters: ");
             foreach (ParamInfo pi in FormalParameters)
             {
@@ -118,6 +116,35 @@ namespace AnalysisFramework.Model.Computation
                 if (!string.IsNullOrEmpty(shelp)) { sb.AppendLine("      Help: " + shelp); }
             }
             return (sb.ToString());
+        }
+
+        private string PrettifyType(Type oType)
+        {
+            if (null==oType) { return (""); }
+
+            if (oType.IsGenericType)
+            {
+                return (PrettifyGenericType(oType));
+            } // endif(generic type)
+
+            return (CaptionAttribute.Get(oType));
+        }
+
+        private string PrettifyGenericType(Type oType)
+        {
+            string scleanname = oType.Name;
+            if (scleanname.Contains("`")) { scleanname = scleanname.Split("`".ToCharArray())[0]; }
+            string sgen = scleanname + "<";
+            int ngen = 0;
+            foreach (Type gtype in oType.GetGenericArguments())
+            {
+                if (0 < ngen++) { sgen += ","; }
+                if (gtype.IsGenericType) { sgen += PrettifyGenericType(gtype); }
+                else { sgen += CaptionAttribute.Get(gtype); }
+            }
+            sgen += ">";
+            return (sgen);
+
         }
     } // end class {}
 

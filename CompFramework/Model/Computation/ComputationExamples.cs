@@ -4,8 +4,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace AnalysisFramework.Model
+namespace AnalysisFramework.Model.Computation
 {
+
+    [Caption("2D Real Vector")]
+    public class TwoDVector
+    {
+        public double X = 0.0;
+        public double Y = 0.0;
+    }
+
     /// <summary>
     /// This class is for providing some calculation examples
     /// </summary>
@@ -22,7 +30,11 @@ distribution ... i.e., the number of steps (N) in a stepwise approximation.
         ]
         [HelpLink("https://www.levrum.com")]
         public static List<Tuple<double, double>> Bernoulli(
-                            int nApprox)
+                            [HelpLink("https://www.levrum.com/CompApi/help/functions/Bernoulli/nApprox")][Caption("Approximation steps")]
+                            [Doc(@"Enter a number between 1 and 100 to signify the number of approximation steps.  
+                                The higher the number, smoother, and more closely the distribution will approximate a normal distribution.")]
+                                int nApprox
+                            )
         {
             List<Tuple<double, double>> retlist = new List<Tuple<double, double>>();
 
@@ -35,6 +47,20 @@ distribution ... i.e., the number of steps (N) in a stepwise approximation.
 
             }
             return (retlist);
+        }
+
+        [DynamicCalc] [Caption("Euler Distribution")]
+        [Doc("Generates an Euler distribution on the specified range with a given mean and SD")]
+        [HelpLink("https://www.levrum.com/CalcHelp/Euler")]
+        public static List<TwoDVector>
+            Euler(
+                      [Caption("Range Minimum")] double dMin = -100.0,
+                      [Caption("Range Maximum")] double dMax = 100.0,
+                      double Mean = 0.0,
+                      [Caption("Standard Deviation")] double dStDev = 25.0
+                  )
+        {
+            return (new List<TwoDVector>());
         }
 
 

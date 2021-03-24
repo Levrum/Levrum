@@ -93,12 +93,12 @@ namespace Levrum.Utils.Infra
                 if (null == oTargetInfo) { return (""); }
                 Type info_object_type = typeof(T);
                 object[] atts = oTargetInfo.GetCustomAttributes(info_object_type, true);
-                string sdefault = (oTargetInfo is MemberInfo) ? ((oTargetInfo as MemberInfo).Name) : oTargetInfo.ToString();
-                if (null == atts) { return (sdefault); }
-                if (0 == atts.Length) { return (sdefault); }
+                if (null == atts) { return (""); }
+                if (0 == atts.Length) { return (""); }
+                //string sdefault = (oTargetInfo is MemberInfo) ? ((oTargetInfo as MemberInfo).Name) : oTargetInfo.ToString();
                 object obj0 = atts[0];
                 T att0 = obj0 as T;
-                if (null == att0) { return (sdefault); }
+                if (null == att0) { return (""); }
                 return (att0.Text);
 
                 
