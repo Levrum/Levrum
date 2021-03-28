@@ -27,6 +27,14 @@ namespace AnalysisFramework.Model.Computation
         /// </summary>
         public object Value = null;
 
+        /// <summary>
+        /// Is this parameter optional?
+        /// </summary>
+        [Caption("Is Optional")]
+        public bool IsOptional = false;
+
+        
+
 
     }
 

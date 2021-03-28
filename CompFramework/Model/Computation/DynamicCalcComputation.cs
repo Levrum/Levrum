@@ -9,7 +9,7 @@ namespace AnalysisFramework.Model.Computation
     /// <summary>
     /// Wrapper for DynamicCalcs within the Computation context.
     /// </summary>
-    public class DynamicCalcComputation : Computation
+    public class DynamicCalcComputation : Computable
     {
         public override ComputationResult Eval()
         {
@@ -49,7 +49,7 @@ namespace AnalysisFramework.Model.Computation
                     string slink = DocUtil.GetText<HelpLinkAttribute>(pi);
                     if (!string.IsNullOrEmpty(slink)) { fparam.Help += "\r\nMore information: " + slink;  }
                     fparam.Value = null;
-                    ret.FormalParameters.Add(fparam);
+                    ret.Parameters.Add(fparam);
                 }
                 return (ret);
             }
@@ -107,7 +107,7 @@ namespace AnalysisFramework.Model.Computation
             sb.AppendLine("Computation: " + Name);
             sb.AppendLine("  Produces: " + PrettifyType(ResultType));
             sb.AppendLine("  Parameters: ");
-            foreach (ParamInfo pi in FormalParameters)
+            foreach (ParamInfo pi in Parameters)
             {
                 sb.AppendLine("    " + pi.Name + " (" + pi.ParameterType?.Name + ")");
                 string sdesc = pi.Desc;

@@ -10,13 +10,12 @@ namespace AnalysisFramework.Model.Computation
     /// <summary>
     /// This class encapsulates a single computation, including result type, 
     /// </summary>
-    public abstract class Computation : NamedObj
+    public abstract class Computable : NamedObj
     {
 
 
-        public List<ParamInfo> FormalParameters = new List<ParamInfo>();
+        public List<ParamInfo> Parameters = new List<ParamInfo>();
 
-        public List<ParamInfo> ActualParameters = new List<ParamInfo>();
 
         public Type ResultType = null;
 

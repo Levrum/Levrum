@@ -11,5 +11,12 @@ namespace AnalysisFramework.Model.Dashboard
     /// </summary>
     public class  Dashboard
     {
+
+        /// <summary>
+        /// Displays that make up this dashboard.
+        /// </summary>
+        public List<Display> Displays = new List<Display>();    /// 20210327 OPENQ: should the dashboard, or the display, know the layout info?
+
+
     }
 }

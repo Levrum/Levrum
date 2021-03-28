@@ -2,9 +2,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
-namespace AnalysisFramework.Model.Computation
+
+/// <summary>
+/// This file contains computation examples for the analysis framework.
+/// </summary>
+
+namespace AnalysisFramework.Examples
 {
 
     [Caption("2D Real Vector")]
@@ -20,6 +24,11 @@ namespace AnalysisFramework.Model.Computation
     [DynamicCalc]
     public class ComputationExamples
     {
+
+
+
+
+
 
         [DynamicCalc]
         [Caption("Bernoulli Distribution Approximator[-1,1]")]
