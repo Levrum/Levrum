@@ -854,7 +854,7 @@ namespace Levrum.Utils.Infra
 
         public static string ColorDir
         {
-            get { return (Util.SafeDir(Environment.SpecialFolder.ApplicationData + "\\Levrum\\CustomColors\\CustomColors\\")); }
+            get { return (Util.SafeDir(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\Levrum\\CustomColors\\")); }
         }
 
         public static string LocalCfgDir
