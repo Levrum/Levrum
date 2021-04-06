@@ -14,6 +14,8 @@ using Levrum.Utils.Geography;
 
 using Levrum.Utils.Osm;
 using Levrum.Utils.Geometry;
+using System.Drawing;
+using System.Diagnostics;
 
 namespace Sandbox
 {
@@ -83,6 +85,103 @@ namespace Sandbox.DefaultCommands
             catch
             {
                 return "What the quack? You didn't quack right. Enter 'quack latitude longitude unit(optional)'. QUACK!";
+            }
+        }
+
+        public static string gradtests(List<string> args)
+        {
+            try
+            {
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                int failures = 0;
+                string result = "";
+                Levrum.Utils.Colors.Gradients cg = new Levrum.Utils.Colors.Gradients();
+                Random r = new Random();
+                List<Image> gradientList = new List<Image>();
+                for (int i = 0; i < 5; i++)
+                {
+                    List<Color> gradient = cg.CreateTwoColorGradient(Color.FromArgb(r.Next(0, 255), r.Next(0, 255), r.Next(0, 255)),
+                        Color.FromArgb(r.Next(0, 255), r.Next(0, 255), r.Next(0, 255)), 256);
+                    gradientList.Add(cg.CreateGradientImage(gradient, 256, 200));
+
+                    List<Color> nColors = new List<Color>();
+                    int n = r.Next(3, 10);
+                    for (int j = 0; j < n; j++)
+                    {
+                        nColors.Add(Color.FromArgb(r.Next(0, 255), r.Next(0, 255), r.Next(0, 255)));
+                    }
+                    gradientList.Add(cg.CreateGradientImage(cg.CreateNColorGradient(nColors, (255 * (n-1)) + 2)));
+                }
+
+                if (!cg.SaveGradientList(gradientList))
+                {
+                    result = "GradientListSaveFailed";
+                    failures--;
+                }
+
+                List<Color> test2 = cg.CreateThreeColorGradient(Color.Red, Color.White, Color.Blue, (256 * 2));
+                if(!cg.SaveGradient(test2, "Murica"))
+                {
+                    result += ".   Three color gradient save failed";
+                }
+
+                List<Color> b = new List<Color>
+                {
+                    Color.FromArgb(255,255,255,255),
+                    Color.FromArgb(255,0,0,0),
+                    Color.FromArgb(255,255,255,255),
+                    Color.FromArgb(255,0,0,0),
+                    Color.FromArgb(255,255,255,255),
+                    Color.FromArgb(255,0,0,0),
+                };
+
+                List<Color> finalTest = cg.CreateNColorGradient(b, (255 * 5) + 2);
+                if(!cg.SaveGradient(cg.CreateGradientImage(finalTest), "Zebra.png"))
+                {
+                    result += ".   N color gradient save failed";
+                    failures++;
+                }
+
+                int index = 0;
+                List<Color> reloaded = cg.ExtractGradientFromImage(cg.LoadGradientImage("Zebra"));
+                foreach (Color c in reloaded)
+                {
+                    if(finalTest[index].Name != c.Name)
+                    {
+                        result += ".   N color reload failed";
+                        failures++;
+                        break;
+                    }
+                    index++;
+                }
+                index = 0;
+                reloaded = cg.ExtractGradientFromImage(cg.LoadGradientImage("Zebra.png"));
+                foreach (Color c in reloaded)
+                {
+                    if (finalTest[index].Name != c.Name)
+                    {
+                        result += ".   N color reload 2 failed";
+                        failures++;
+                        break;
+                    }
+                    index++;
+                }
+                List <Image> imageList = cg.LoadAllGradientImages();
+
+                if(imageList.Count == 0)
+                {
+                    result += ".   All image load failed.";
+                    failures++;
+                }
+
+                sw.Stop();
+                result += " " + failures + " tests failed. Ran in " + sw.ElapsedMilliseconds + " ms.   Successfully saved files are in AppData\\Levrum\\CustomColors\\Gradients";
+                return result;
+            }
+            catch
+            {
+                return "Tests failed";
             }
         }
 
