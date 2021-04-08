@@ -291,6 +291,104 @@ namespace Levrum.Utils.Colors
             return gradient;
         }
 
+        public List<Color> ExtractPrimaryColorsFromGradient(List<Color> gradient)
+        {
+            //This can fail if the number of intervals is too high or the differences between primary colors is too small
+            //I'll add a bit of logic to determine what the minimum distance is between primary colors and use that to find missing values...
+            if(gradient.Count <= 2)
+            {
+                return gradient;
+            }
+
+            List<Color> primaryColors = new List<Color>();
+
+            Color previousColor = Color.Empty;
+            int aSlope = 0;
+            int rSlope = 0;
+            int gSlope = 0;
+            int bSlope = 0;
+            //This works off the idea that if the slope of any given color changes, we are moving towards a different color
+            //If we are moving towards a different color, the previous color was a primary color...
+            foreach(Color c in gradient)
+            {
+                if(previousColor != Color.Empty)
+                {
+                    bool primaryFound = false;
+                    int colorDiff = 0;
+
+                    //Alpha
+                    int currentSlope = c.A - previousColor.A;
+                    if (Math.Abs(aSlope - currentSlope) > 1)
+                    {
+                        primaryFound = true;
+                    }
+                    colorDiff += Math.Abs(aSlope - currentSlope);
+                    aSlope = currentSlope;
+
+                    //Red
+                    currentSlope = c.R - previousColor.R;
+                    if (rSlope - currentSlope > 1)
+                    {
+                        primaryFound = true;
+                    }
+                    rSlope = currentSlope;
+                    colorDiff += Math.Abs(rSlope - currentSlope);
+
+                    //Green
+                    currentSlope = c.G - previousColor.G;
+                    if (gSlope - currentSlope > 1)
+                    {
+                        primaryFound = true;
+                    }
+                    colorDiff += Math.Abs(gSlope - currentSlope);
+                    gSlope = currentSlope;
+
+                    //Blue
+                    currentSlope = c.B - previousColor.B;
+                    if (Math.Abs(bSlope - currentSlope) > 1)
+                    {
+                        primaryFound = true;
+                    }
+                    colorDiff += Math.Abs(bSlope - currentSlope);
+                    bSlope = currentSlope;
+
+                    if (primaryFound || colorDiff > 4)
+                    {
+                        //Slope changed. Therefore the previous color was a primary color.
+                        primaryColors.Add(previousColor);
+                    }
+                    previousColor = c;
+                }
+                else
+                {
+                    //First element. Always will be a primary value
+                    previousColor = c;
+                    primaryColors.Add(previousColor);
+                }
+            }
+
+            //Last element. Will always be a primary value
+            primaryColors.Add(previousColor);
+            return primaryColors;
+        }
+
+        public List<Color> InvertColorGradient(List<Color> gradient)
+        {
+            try
+            {
+                List<Color> inversedGradient = new List<Color>();
+                for (int i = gradient.Count - 1; i >= 0; i--)
+                {
+                    inversedGradient.Add(gradient[i]);
+                }
+                return inversedGradient;
+            }
+            catch
+            {
+                return gradient;
+            }
+        }
+
         public bool SaveGradient(Image gradientImage, string fileName = "")
         {
             //If a file name is not provided, it will be named Gradient#.png where # is the first available int...
@@ -443,6 +541,40 @@ namespace Levrum.Utils.Colors
                 foreach (string file in Directory.EnumerateFiles(string.Concat(AppSettings.ColorDir, "\\Gradients\\"), "*.png"))
                 {
                     gradientImages.Add(Image.FromFile(file));
+                }
+                if(gradientImages.Count == 0)
+                {
+                    //Set the default colors...
+                    List<Color> viridis = new List<Color> { Color.FromArgb(255, 68, 1, 84), Color.FromArgb(255, 72, 20, 102), Color.FromArgb(255, 72, 37, 118), Color.FromArgb(255, 69, 53, 128), Color.FromArgb(255, 65, 67, 135), Color.FromArgb(255, 59, 82, 139), Color.FromArgb(255, 52, 95, 141), Color.FromArgb(255, 46, 108, 142), Color.FromArgb(255, 42, 120, 142), Color.FromArgb(255, 37, 132, 142), Color.FromArgb(255, 32, 144, 140), Color.FromArgb(255, 30, 156, 137), Color.FromArgb(255, 35, 168, 132), Color.FromArgb(255, 47, 180, 123), Color.FromArgb(255, 68, 191, 112), Color.FromArgb(255, 93, 201, 98), Color.FromArgb(255, 122, 209, 81), Color.FromArgb(255, 154, 217, 61), Color.FromArgb(255, 188, 223, 39), Color.FromArgb(255, 222, 227, 25) };
+                    viridis = CreateNColorGradient(viridis, 1000);
+                    //viridis = InvertColorGradient(viridis);
+                    gradientImages.Add(CreateGradientImage(viridis));
+                    SaveGradient(CreateGradientImage(viridis), "L1 viridis");
+                    List<Color> seabreeze = new List<Color> { Color.White, Color.FromArgb(255, 133, 203, 207), Color.FromArgb(255, 57, 132, 182), Color.FromArgb(255, 29, 46, 129), Color.Black };
+                    seabreeze = CreateNColorGradient(seabreeze, 1000);
+                    seabreeze = InvertColorGradient(seabreeze);
+                    gradientImages.Add(CreateGradientImage(seabreeze));
+                    SaveGradient(CreateGradientImage(seabreeze), "L2 seabreeze");
+                    List<Color> oldschool = new List<Color> { Color.FromArgb(0, 148, 0), Color.Yellow, Color.Red };
+                    oldschool = CreateNColorGradient(oldschool, 1000);
+                    oldschool = InvertColorGradient(oldschool);
+                    gradientImages.Add(CreateGradientImage(oldschool));
+                    SaveGradient(CreateGradientImage(oldschool), "L3 oldschool");
+                    List<Color> spectral = new List<Color> { Color.FromArgb(255, 215, 25, 28), Color.FromArgb(255, 223, 55, 42), Color.FromArgb(255, 230, 85, 56), Color.FromArgb(255, 238, 115, 69), Color.FromArgb(255, 245, 144, 83), Color.FromArgb(255, 253, 174, 97), Color.FromArgb(255, 253, 190, 116), Color.FromArgb(255, 254, 206, 135), Color.FromArgb(255, 254, 223, 153), Color.FromArgb(255, 255, 239, 172), Color.FromArgb(255, 255, 255, 191), Color.FromArgb(255, 238, 248, 186), Color.FromArgb(255, 221, 241, 180), Color.FromArgb(255, 204, 235, 175), Color.FromArgb(255, 188, 228, 169), Color.FromArgb(255, 171, 221, 164), Color.FromArgb(255, 145, 203, 168), Color.FromArgb(255, 120, 185, 173), Color.FromArgb(255, 94, 167, 177), Color.FromArgb(255, 68, 149, 182) };
+                    spectral = CreateNColorGradient(spectral, 1000);
+                    //spectral = InvertColorGradient(spectral);
+                    gradientImages.Add(CreateGradientImage(spectral));
+                    SaveGradient(CreateGradientImage(spectral), "L5 spectral");
+                    List<Color> magma = new List<Color> { Color.FromArgb(255, 0, 0, 4), Color.FromArgb(255, 7, 6, 28), Color.FromArgb(255, 21, 14, 55), Color.FromArgb(255, 38, 17, 86), Color.FromArgb(255, 59, 15, 111), Color.FromArgb(255, 80, 18, 123), Color.FromArgb(255, 100, 26, 128), Color.FromArgb(255, 120, 34, 130), Color.FromArgb(255, 140, 41, 129), Color.FromArgb(255, 161, 48, 126), Color.FromArgb(255, 182, 54, 122), Color.FromArgb(255, 203, 62, 114), Color.FromArgb(255, 221, 74, 105), Color.FromArgb(255, 237, 89, 95), Color.FromArgb(255, 246, 112, 92), Color.FromArgb(255, 251, 136, 97), Color.FromArgb(255, 254, 160, 109), Color.FromArgb(255, 254, 183, 126), Color.FromArgb(255, 254, 206, 145), Color.FromArgb(255, 253, 230, 167) };
+                    magma = CreateNColorGradient(magma, 1000);
+                    //magma = InvertColorGradient(magma);
+                    gradientImages.Add(CreateGradientImage(magma));
+                    SaveGradient(CreateGradientImage(magma), "L6 magma");
+                    List<Color> inferno = new List<Color> { Color.FromArgb(255, 0, 0, 4), Color.FromArgb(255, 8, 6, 29), Color.FromArgb(255, 23, 11, 58), Color.FromArgb(255, 44, 11, 88), Color.FromArgb(255, 66, 10, 104), Color.FromArgb(255, 87, 15, 109), Color.FromArgb(255, 107, 23, 110), Color.FromArgb(255, 127, 31, 108), Color.FromArgb(255, 147, 38, 103), Color.FromArgb(255, 168, 46, 95), Color.FromArgb(255, 187, 55, 85), Color.FromArgb(255, 204, 66, 72), Color.FromArgb(255, 221, 81, 57), Color.FromArgb(255, 234, 98, 42), Color.FromArgb(255, 243, 119, 26), Color.FromArgb(255, 249, 142, 10), Color.FromArgb(255, 252, 165, 11), Color.FromArgb(255, 251, 190, 35), Color.FromArgb(255, 246, 214, 69), Color.FromArgb(255, 242, 238, 114) };
+                    inferno = CreateNColorGradient(inferno, 1000);
+                    //inferno = InvertColorGradient(inferno);
+                    gradientImages.Add(CreateGradientImage(inferno));
+                    SaveGradient(CreateGradientImage(inferno), "L7 inferno");
                 }
                 return gradientImages;
             }
