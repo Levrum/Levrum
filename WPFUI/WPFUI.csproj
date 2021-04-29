@@ -16,7 +16,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="databridge.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="DotNetProjects.WpfToolkit.Input" Version="6.0.85" />
+    <PackageReference Include="Levrum.Licensing" Version="0.1.1" />
+    <PackageReference Include="Levrum.Licensing.Client.WPF" Version="0.1.3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,6 +39,10 @@
     <Page Update="TextInputDialog.xaml">
       <SubType>Designer</SubType>
     </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="databridge.png" />
   </ItemGroup>
 
 </Project>

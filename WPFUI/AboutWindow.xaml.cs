@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -16,7 +15,7 @@ using System.Windows.Shapes;
 using Levrum.Licensing;
 using Levrum.Licensing.Client.WPF;
 
-namespace Levrum.DataBridge
+namespace Levrum.UI.WPF
 {
     /// <summary>
     /// Interaction logic for AboutWindow.xaml
@@ -70,10 +69,12 @@ Warning: This computer program is protected by copyright law and international t
                 if (license.Type == LicenseType.Enterprise)
                 {
                     licenseType = typeString;
-                } else if (license.Type == LicenseType.Machine)
+                }
+                else if (license.Type == LicenseType.Machine)
                 {
                     licenseType = string.Format("{0} ({1})", typeString, license.LicenseeMachineId);
-                } else if (license.Type == LicenseType.User)
+                }
+                else if (license.Type == LicenseType.User)
                 {
                     licenseType = string.Format("{0} ({1})", typeString, license.LicenseeEmail);
                 }
@@ -82,24 +83,16 @@ Warning: This computer program is protected by copyright law and international t
             AboutDetailsText.Text = string.Format(c_aboutTextFormat, status, licenseType, licenseExpires, supportExpires, customerName, customerId, machineId);
         }
 
-        private void OkButton_Click(object sender, RoutedEventArgs e)
-        {
-            Close();
-        }
+        public string MyProperty { get; set; }
 
         bool IsBurger = false;
         DateTime FirstClick = DateTime.MinValue;
-
-        private void BurgerButton_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-
-        }
 
         private void BurgerImage_MouseUp(object sender, MouseButtonEventArgs e)
         {
             DateTime secondClick = FirstClick;
             FirstClick = DateTime.Now;
-            if (FirstClick - secondClick > new TimeSpan(0,0,0,0,200))
+            if (FirstClick - secondClick > new TimeSpan(0, 0, 0, 0, 200))
             {
                 return;
             }
@@ -120,6 +113,11 @@ Warning: This computer program is protected by copyright law and international t
             {
 
             }
+        }
+
+        private void OkButton_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

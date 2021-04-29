@@ -1532,8 +1532,10 @@ namespace Levrum.DataBridge
 
         private void AboutMenuItem_Click(object sender, RoutedEventArgs e)
         {
+            this.Cursor = Cursors.Wait;
             AboutWindow aboutWindow = new AboutWindow();
             aboutWindow.ShowDialog();
+            this.Cursor = Cursors.Arrow;
         }
 
         private void UserManualPDFMenuItem_Click(object sender, RoutedEventArgs e)
