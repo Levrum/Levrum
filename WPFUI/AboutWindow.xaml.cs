@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -16,7 +15,7 @@ using System.Windows.Shapes;
 using Levrum.Licensing;
 using Levrum.Licensing.Client.WPF;
 
-namespace Levrum.DataBridge
+namespace Levrum.UI.WPF
 {
     /// <summary>
     /// Interaction logic for AboutWindow.xaml
@@ -24,15 +23,15 @@ namespace Levrum.DataBridge
     public partial class AboutWindow : Window
     {
         const string c_aboutTextFormat =
-@"Copyright © 2020 Levrum Data Technologies
+@"Copyright © {0} Levrum Data Technologies
 All rights reserved.
 
-License Status:     {0}     
-License Type:       {1}
-License Expires:    {2}     
-Support Expires:    {3}
-Licensed To:        {4} ({5})
-Machine ID:         {6}
+License Status:     {1}     
+License Type:       {2}
+License Expires:    {3}     
+Support Expires:    {4}
+Licensed To:        {5} ({6})
+Machine ID:         {7}
 
 Please contact info@levrum.com for more information on our products and services.
 
@@ -40,17 +39,17 @@ Special thanks to Georgetown Fire Department (Georgetown, TX), San Antonio Fire 
 
 Warning: This computer program is protected by copyright law and international treaties. Unauthorized reproduction or distribution of this program, of any portion of it, may result in severe civil and criminal penalties, and will be prosecuted to the maximum extent possible under the law.";
 
-        public AboutWindow()
+        public AboutWindow(Assembly assembly)
         {
             InitializeComponent();
 
-            Assembly assembly = Assembly.GetExecutingAssembly();
             LicenseClient client = new LicenseClient();
             FileInfo licenseFile = client.LicenseFile;
             License license = License.DecodeSignedLicense(licenseFile);
 
             VersionText.Text = string.Format("Version {0}", assembly.GetName().Version);
 
+            string year = DateTime.Today.Year.ToString();
             string status = "Unknown";
             string licenseExpires = "Unknown";
             string supportExpires = "Unknown";
@@ -70,36 +69,39 @@ Warning: This computer program is protected by copyright law and international t
                 if (license.Type == LicenseType.Enterprise)
                 {
                     licenseType = typeString;
-                } else if (license.Type == LicenseType.Machine)
+                }
+                else if (license.Type == LicenseType.Machine)
                 {
                     licenseType = string.Format("{0} ({1})", typeString, license.LicenseeMachineId);
-                } else if (license.Type == LicenseType.User)
+                }
+                else if (license.Type == LicenseType.User)
                 {
                     licenseType = string.Format("{0} ({1})", typeString, license.LicenseeEmail);
                 }
             }
 
-            AboutDetailsText.Text = string.Format(c_aboutTextFormat, status, licenseType, licenseExpires, supportExpires, customerName, customerId, machineId);
+            AboutDetailsText.Text = string.Format(c_aboutTextFormat, year, status, licenseType, licenseExpires, supportExpires, customerName, customerId, machineId);
         }
 
-        private void OkButton_Click(object sender, RoutedEventArgs e)
+        private ImageSource _imageSource;
+        public ImageSource ImageSource
         {
-            Close();
+            get => _imageSource;
+            set
+            {
+                _imageSource = value;
+                BurgerImage.Source = _imageSource;
+            }
         }
 
         bool IsBurger = false;
         DateTime FirstClick = DateTime.MinValue;
 
-        private void BurgerButton_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
         private void BurgerImage_MouseUp(object sender, MouseButtonEventArgs e)
         {
             DateTime secondClick = FirstClick;
             FirstClick = DateTime.Now;
-            if (FirstClick - secondClick > new TimeSpan(0,0,0,0,200))
+            if (FirstClick - secondClick > new TimeSpan(0, 0, 0, 0, 200))
             {
                 return;
             }
@@ -120,6 +122,12 @@ Warning: This computer program is protected by copyright law and international t
             {
 
             }
+        }
+
+        private void OkButton_Click(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+            Close();
         }
     }
 }
