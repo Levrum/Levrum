@@ -14,7 +14,7 @@
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Stretch">
-            <Image Name="BurgerImage" Margin="82,8,0,0" Source="/databridge.png" Height="80" MouseUp="BurgerImage_MouseUp"/>
+            <Image Name="BurgerImage" Margin="82,8,0,0" Height="80" MouseUp="BurgerImage_MouseUp"/>
             <TextBlock VerticalAlignment="Center" FontSize="36" Margin="16,0,0,0" FontWeight="DemiBold">Levrum DataBridge</TextBlock>
         </StackPanel>
         <StackPanel Orientation="Vertical" Grid.Row="1">

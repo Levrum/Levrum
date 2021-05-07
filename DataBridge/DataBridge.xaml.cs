@@ -1534,6 +1534,8 @@ namespace Levrum.DataBridge
         {
             this.Cursor = Cursors.Wait;
             AboutWindow aboutWindow = new AboutWindow();
+            System.Windows.Media.Imaging.BitmapImage img = new System.Windows.Media.Imaging.BitmapImage(new Uri("/Levrum.UI.WPF;component/databridge.png", UriKind.Relative));
+            aboutWindow.ImageSource = img;
             aboutWindow.ShowDialog();
             this.Cursor = Cursors.Arrow;
         }

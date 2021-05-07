@@ -83,7 +83,16 @@ Warning: This computer program is protected by copyright law and international t
             AboutDetailsText.Text = string.Format(c_aboutTextFormat, status, licenseType, licenseExpires, supportExpires, customerName, customerId, machineId);
         }
 
-        public string MyProperty { get; set; }
+        private ImageSource _imageSource;
+        public ImageSource ImageSource
+        {
+            get => _imageSource;
+            set
+            {
+                _imageSource = value;
+                BurgerImage.Source = _imageSource;
+            }
+        }
 
         bool IsBurger = false;
         DateTime FirstClick = DateTime.MinValue;
@@ -117,7 +126,8 @@ Warning: This computer program is protected by copyright law and international t
 
         private void OkButton_Click(object sender, RoutedEventArgs e)
         {
-
+            DialogResult = true;
+            Close();
         }
     }
 }
