@@ -5,14 +5,14 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>Levrum.UI.WPF</AssemblyName>
     <RootNamespace>Levrum.UI.WPF</RootNamespace>
-    <Version>0.0.5.0</Version>
+    <Version>0.0.5.1</Version>
     <Authors>Kevin M. Kelly</Authors>
     <Company>Levrum Data Technologies</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Copyright>(c) 2019 Levrum Data Technologies</Copyright>
-    <AssemblyVersion>0.0.5.0</AssemblyVersion>
-    <FileVersion>0.0.5.0</FileVersion>
+    <AssemblyVersion>0.0.5.1</AssemblyVersion>
+    <FileVersion>0.0.5.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
