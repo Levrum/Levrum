@@ -23,15 +23,15 @@ namespace Levrum.UI.WPF
     public partial class AboutWindow : Window
     {
         const string c_aboutTextFormat =
-@"Copyright © 2020 Levrum Data Technologies
+@"Copyright © {0} Levrum Data Technologies
 All rights reserved.
 
-License Status:     {0}     
-License Type:       {1}
-License Expires:    {2}     
-Support Expires:    {3}
-Licensed To:        {4} ({5})
-Machine ID:         {6}
+License Status:     {1}     
+License Type:       {2}
+License Expires:    {3}     
+Support Expires:    {4}
+Licensed To:        {5} ({6})
+Machine ID:         {7}
 
 Please contact info@levrum.com for more information on our products and services.
 
@@ -39,17 +39,17 @@ Special thanks to Georgetown Fire Department (Georgetown, TX), San Antonio Fire 
 
 Warning: This computer program is protected by copyright law and international treaties. Unauthorized reproduction or distribution of this program, of any portion of it, may result in severe civil and criminal penalties, and will be prosecuted to the maximum extent possible under the law.";
 
-        public AboutWindow()
+        public AboutWindow(Assembly assembly)
         {
             InitializeComponent();
 
-            Assembly assembly = Assembly.GetExecutingAssembly();
             LicenseClient client = new LicenseClient();
             FileInfo licenseFile = client.LicenseFile;
             License license = License.DecodeSignedLicense(licenseFile);
 
             VersionText.Text = string.Format("Version {0}", assembly.GetName().Version);
 
+            string year = DateTime.Today.Year.ToString();
             string status = "Unknown";
             string licenseExpires = "Unknown";
             string supportExpires = "Unknown";
@@ -80,7 +80,7 @@ Warning: This computer program is protected by copyright law and international t
                 }
             }
 
-            AboutDetailsText.Text = string.Format(c_aboutTextFormat, status, licenseType, licenseExpires, supportExpires, customerName, customerId, machineId);
+            AboutDetailsText.Text = string.Format(c_aboutTextFormat, year, status, licenseType, licenseExpires, supportExpires, customerName, customerId, machineId);
         }
 
         private ImageSource _imageSource;
