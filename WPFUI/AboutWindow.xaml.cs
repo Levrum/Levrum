@@ -39,7 +39,7 @@ Special thanks to Georgetown Fire Department (Georgetown, TX), San Antonio Fire 
 
 Warning: This computer program is protected by copyright law and international treaties. Unauthorized reproduction or distribution of this program, of any portion of it, may result in severe civil and criminal penalties, and will be prosecuted to the maximum extent possible under the law.";
 
-        public AboutWindow(Assembly assembly)
+        public AboutWindow(string title, Assembly assembly)
         {
             InitializeComponent();
 
@@ -80,6 +80,8 @@ Warning: This computer program is protected by copyright law and international t
                 }
             }
 
+            Title = $"About {title}";
+            titleBlock.Text = title;
             AboutDetailsText.Text = string.Format(c_aboutTextFormat, year, status, licenseType, licenseExpires, supportExpires, customerName, customerId, machineId);
         }
 

@@ -5,24 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Levrum.UI.WPF"
         mc:Ignorable="d"
-        Title="About Levrum DataBridge" Height="500" Width="600" ResizeMode="NoResize">
+        Title="About" Height="500" Width="600" ResizeMode="NoResize">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="17*"/>
+            <ColumnDefinition Width="58*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="96"/>
             <RowDefinition Height="24"/>
             <RowDefinition Height="300*"/>
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" Grid.Row="0" HorizontalAlignment="Stretch">
-            <Image Name="BurgerImage" Margin="82,8,0,0" Height="80" MouseUp="BurgerImage_MouseUp"/>
-            <TextBlock VerticalAlignment="Center" FontSize="36" Margin="16,0,0,0" FontWeight="DemiBold">Levrum DataBridge</TextBlock>
-        </StackPanel>
-        <StackPanel Orientation="Vertical" Grid.Row="1">
+        <Grid Grid.Row="0" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Image Name="BurgerImage" Grid.Column="0" Margin="40,8,0,0" Height="80" MouseUp="BurgerImage_MouseUp"/>
+            <Viewbox Grid.Column="1" Margin="16,0,40,0">
+                <TextBlock x:Name="titleBlock" TextWrapping="Wrap" FontWeight="DemiBold">Code3 Strategist</TextBlock>
+            </Viewbox>
+        </Grid>
+        <StackPanel Orientation="Vertical" Grid.Row="1" Grid.ColumnSpan="2">
             <TextBlock Name="VersionText" HorizontalAlignment="Stretch" TextAlignment="Center" FontWeight="DemiBold" FontSize="18">Version 0.1.0.88</TextBlock>
         </StackPanel>
-        <TextBlock Grid.Row="2" Name="AboutDetailsText" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="16,8,8,0" TextWrapping="Wrap" FontFamily="Consolas"/>
-        <StackPanel Orientation="Horizontal" Grid.Row="3" HorizontalAlignment="Right">
-            <Button Name="OkButton" Grid.Row="2" Height="24" Margin="0,0,8,0" Width="80" Click="OkButton_Click">OK</Button>
+        <TextBlock Grid.Row="2" Name="AboutDetailsText" Margin="16,8,8,0" TextWrapping="Wrap" FontFamily="Consolas" Grid.ColumnSpan="2"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="3" HorizontalAlignment="Right" Grid.Column="1"  Grid.RowSpan="3">
+            <Button Name="OkButton" Height="24" Margin="0,0,8,0" Width="80" Click="OkButton_Click">OK</Button>
         </StackPanel>
     </Grid>
 </Window>
